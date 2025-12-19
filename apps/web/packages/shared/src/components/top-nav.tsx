@@ -165,46 +165,30 @@ export const TopNav = React.forwardRef<HTMLElement, TopNavProps>(
     return (
       <header
         ref={ref}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          height: "52px",
-          minHeight: "52px",
-          paddingLeft: "0px",
-          paddingRight: "16px",
-          paddingTop: "8px",
-          paddingBottom: "8px",
-          backgroundColor: "#ffffff",
-          borderBottom: "1px solid #e5e7eb",
-          position: "sticky",
-          top: 0,
-          left: 0,
-          zIndex: 50,
-          marginLeft: 0,
-        }}
-        className={cn(className)}
+        className={cn(
+          "flex items-center justify-between w-full h-[52px] min-h-[52px] pl-0 pr-4 py-2 bg-white border-b border-gray-200 sticky top-0 left-0 z-50 m-0",
+          className
+        )}
         {...props}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "16px", flex: 1 }}>
+        <div className="flex items-center gap-4 flex-1">
           {left || defaultLeft}
           {title && !center && (
-            <h1 style={{ fontSize: "16px", fontWeight: 600 }}>{title}</h1>
+            <h1 className="text-base font-semibold">{title}</h1>
           )}
         </div>
         {center && (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flex: 1, gap: "16px" }}>
+          <div className="flex items-center justify-center flex-1 gap-4">
             {center}
           </div>
         )}
         {title && center && (
-          <h1 style={{ fontSize: "16px", fontWeight: 600 }}>{title}</h1>
+          <h1 className="text-base font-semibold">{title}</h1>
         )}
         {search && (
-          <div style={{ maxWidth: "400px", width: "100%" }}>{search}</div>
+          <div className="max-w-[400px] w-full">{search}</div>
         )}
-        <div style={{ display: "flex", alignItems: "center", gap: "16px", flex: 1, justifyContent: "flex-end" }}>
+        <div className="flex items-center gap-4 flex-1 justify-end">
           {right || defaultRight}
         </div>
       </header>

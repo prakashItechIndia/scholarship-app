@@ -21,7 +21,7 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
       }
     }, [value]);
 
-    const handleLinkClick = (item?: PivotItem, ev?: React.MouseEvent<HTMLElement>) => {
+    const handleLinkClick = (item?: PivotItem, _ev?: React.KeyboardEvent<HTMLElement> | React.MouseEvent<HTMLElement>) => {
       if (item?.props.itemKey) {
         setSelectedKey(item.props.itemKey);
         onValueChange?.(item.props.itemKey);
@@ -29,11 +29,30 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
     };
 
     return (
-      <div ref={ref} className={cn("", className)}>
+      <div ref={ref} className={cn("w-full", className)}>
         <Pivot
           selectedKey={selectedKey}
           onLinkClick={handleLinkClick}
-          className={cn(className)}
+          styles={{
+            root: {
+              width: "100%",
+            },
+            link: {
+              fontSize: "14px",
+              fontWeight: 400,
+              color: "#323130",
+              padding: "8px 16px",
+            },
+            linkIsSelected: {
+              fontSize: "14px",
+              fontWeight: 600,
+              color: "#0078d4",
+              borderBottom: "2px solid #0078d4",
+            },
+            linkContent: {
+              fontSize: "14px",
+            },
+          }}
           {...props}
         >
           {children}
@@ -60,11 +79,12 @@ export interface TabsTriggerProps extends React.HTMLAttributes<HTMLButtonElement
 
 const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
   ({ className, children, value, icon, variant, ...props }, ref) => {
+    const headerText = typeof children === "string" ? children : String(children);
     return (
       <PivotItem
         componentRef={ref as any}
         itemKey={value}
-        headerText={children as string}
+        headerText={headerText}
         className={cn(className)}
         {...(props as any)}
       />

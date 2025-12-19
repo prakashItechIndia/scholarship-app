@@ -40,6 +40,8 @@
     "generate-api:all": "pnpm generate-api:scholarship"
   },
   "dependencies": {
+    "@fluentui/react": "^8.124.0",
+    "@fluentui/react-icons": "^2.0.258",
     "@tanstack/react-query": "^5.18.1",
     "axios": "^1.2.1",
     "clsx": "^2.1.0",
