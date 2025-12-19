@@ -1,0 +1,11 @@
+packages:
+  - apps/*
+  - apps/web/apps/*
+  - apps/web/packages/*
+  - services/*
+  - workers/*
+  - packages/*
+
+onlyBuiltDependencies:
+  - bcrypt
+  - esbuild

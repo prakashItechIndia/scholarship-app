@@ -1,0 +1,62 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# app specific files
+apps/web/apps/sso-app/node_modules
+apps/web/apps/sso-app/dist
+apps/web/apps/sso-app/build
+apps/web/apps/sso-app/coverage
+apps/web/apps/sso-app/logs
+apps/web/apps/sso-app/node_modules
+apps/web/apps/sso-app/package-lock.json
+apps/web/apps/sso-app/pnpm-lock.yaml
+
+
+apps/web/apps/billing-app/node_modules
+apps/web/apps/billing-app/dist
+apps/web/apps/billing-app/build
+apps/web/apps/billing-app/coverage
+apps/web/apps/billing-app/logs
+apps/web/apps/billing-app/node_modules
+apps/web/apps/billing-app/package-lock.json
+apps/web/apps/billing-app/pnpm-lock.yaml
+
+
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing
+coverage
+
+# Turbo
+.turbo
+
+# Vercel
+.vercel
+
+# Build Outputs
+.next/
+out/
+build
+dist
+tsconfig.tsbuildinfo
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Misc
+.DS_Store
+*.pem
+
+# shared package build
+packages/shared/lib

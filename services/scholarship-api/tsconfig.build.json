@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "node_modules",
+    "test",
+    "dist",
+    "**/*spec.ts",
+    "src/modules/auth",
+    "src/modules/audit",
+    "src/modules/mfa",
+    "src/modules/oauth",
+    "src/modules/permissions",
+    "src/modules/trial-notifications",
+    "src/modules/cognito",
+    "src/modules/crm",
+    "src/modules/email",
+    "src/modules/sms"
+  ]
+}

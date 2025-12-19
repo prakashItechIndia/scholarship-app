@@ -1,0 +1,15 @@
+{
+  "name": "@icaptur-portal/types",
+  "version": "1.0.0",
+  "private": true,
+  "description": "iCaptur.AI Customer Portal - Shared TypeScript Types",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "dev": "echo 'Setup required'",
+    "build": "echo 'Setup required'",
+    "lint": "echo 'Setup required'",
+    "type-check": "echo 'Setup required'",
+    "test": "echo 'Setup required'"
+  }
+}

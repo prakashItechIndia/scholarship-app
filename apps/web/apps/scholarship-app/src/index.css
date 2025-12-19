@@ -1,0 +1,748 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== INTER FONT FAMILY ===== */
+/* All weights and styles included for use in iCaptur and other applications */
+/* Note: Font files should be placed in public/fonts/ or referenced from itech-fluentui package */
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-ThinItalic.ttf') format('truetype');
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-ExtraLightItalic.ttf') format('truetype');
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-SemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-ExtraBoldItalic.ttf') format('truetype');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-BlackItalic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ===== INTER FONT UTILITY CLASSES ===== */
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Base Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Apply Inter font globally to all elements */
+html,
+body,
+#root,
+input,
+textarea,
+select,
+button {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ===== CSS VARIABLES FROM FIGMA TOKENS (Exact Token Names Only) ===== */
+:root {
+  /* Brand Color Scale (vivid_blue palette - default) */
+  --brand-10: #000016;
+  --brand-20: #01012d;
+  --brand-30: #010347;
+  --brand-40: #020763;
+  --brand-50: #040b80;
+  --brand-60: #07119e;
+  --brand-70: #0e1cdd;
+  --brand-80: #1222fe;
+  --brand-90: #3366ff;
+  --brand-100: #4a7dff;
+  --brand-110: #6392ff;
+  --brand-120: #7ba5ff;
+  --brand-130: #95b8ff;
+  --brand-140: #afcaff;
+  --brand-150: #c9dcff;
+  --brand-160: #e4eeff;
+
+  /* Neutral Background Base */
+  --neutral-background-1-rest: #ffffff;
+
+  /* Brand Tokens */
+  --brandBackground1Hover: var(--brand-70);
+  --brandBackground1Pressed: var(--brand-40);
+  --brandBackground1Rest: var(--brand-80);
+  --brandBackground1Selected: var(--brand-60);
+  --brandBackground2Hover: var(--brand-150);
+  --brandBackground2Pressed: var(--brand-130);
+  --brandBackground2Rest: var(--brand-160);
+  --brandBackgroundCompoundHover: var(--brand-70);
+  --brandBackgroundCompoundPressed: var(--brand-60);
+  --brandBackgroundCompoundRest: var(--brand-80);
+  --brandBackgroundInvertedHover: var(--brand-160);
+  --brandBackgroundInvertedPressed: var(--brand-140);
+  --brandBackgroundInvertedRest: #ffffff;
+  --brandBackgroundInvertedSelected: var(--brand-150);
+  --brandBackgroundStaticRest: var(--brand-80);
+  --brandForeground1Rest: var(--brand-80);
+  --brandForeground2Hover: var(--brand-60);
+  --brandForeground2Pressed: var(--brand-30);
+  --brandForeground2Rest: var(--brand-70);
+  --brandForegroundCompoundHover: var(--brand-70);
+  --brandForegroundCompoundPressed: var(--brand-60);
+  --brandForegroundCompoundRest: var(--brand-80);
+  --brandForegroundInvertedHover: var(--brand-110);
+  --brandForegroundInvertedPressed: var(--brand-100);
+  --brandForegroundInvertedRest: var(--brand-100);
+  --brandForegroundLinkHover: var(--brand-60);
+  --brandForegroundLinkPressed: var(--brand-40);
+  --brandForegroundLinkRest: var(--brand-70);
+  --brandForegroundLinkSelected: var(--brand-70);
+  --brandForegroundOnLightHover: var(--brand-70);
+  --brandForegroundOnLightPressed: var(--brand-50);
+  --brandForegroundOnLightRest: var(--brand-80);
+  --brandForegroundOnLightSelected: var(--brand-60);
+  --brandStroke1Rest: var(--brand-80);
+  --brandStroke2ContrastRest: var(--brand-140);
+  --brandStroke2Hover: var(--brand-120);
+  --brandStroke2Pressed: var(--brand-80);
+  --brandStroke2Rest: var(--brand-140);
+  --brandStrokeCompoundHover: var(--brand-70);
+  --brandStrokeCompoundPressed: var(--brand-60);
+  --brandStrokeCompoundRest: var(--brand-80);
+
+  /* Neutral Background */
+  --neutralBackground1Hover: var(--neutral-background-1-rest);
+  --neutralBackground1Pressed: var(--brand-10);
+  --neutralBackground1Rest: #ffffff;
+  --neutralBackground1Selected: #e0e0e0;
+  --neutralBackground2Hover: #f0f0f0;
+  --neutralBackground2Pressed: #dbdbdb;
+  --neutralBackground2Rest: #fafafa;
+  --neutralBackground2Selected: #e6e6e6;
+  --neutralBackground3Hover: #ebebeb;
+  --neutralBackground3Pressed: #d6d6d6;
+  --neutralBackground3Rest: #f5f5f5;
+  --neutralBackground3Selected: #e0e0e0;
+  --neutralBackground4Hover: #fafafa;
+  --neutralBackground4Pressed: #f5f5f5;
+  --neutralBackground4Rest: #f0f0f0;
+  --neutralBackground4Selected: #ffffff;
+  --neutralBackground5Hover: #f5f5f5;
+  --neutralBackground5Pressed: #f0f0f0;
+  --neutralBackground5Rest: #ebebeb;
+  --neutralBackground5Selected: #fafafa;
+  --neutralBackground6Rest: #e6e6e6;
+  --neutralBackgroundAlpha1Rest: #ffffff;
+  --neutralBackgroundAlpha2Rest: #ffffff;
+  --neutralBackgroundDisabledRest: #f0f0f0;
+  --neutralBackgroundInvertedDisabledRest: #ffffff;
+  --neutralBackgroundInvertedRest: #292929;
+  --neutralBackgroundOverlayRest: #000000;
+  --neutralBackgroundOverlayScrollbarRest: #000000;
+  --neutralBackgroundStaticRest: #333333;
+  --neutralBackgroundStencil1Rest: #e6e6e6;
+  --neutralBackgroundStencil2Rest: #fafafa;
+  --neutralBackgroundSubtleHover: #f5f5f5;
+  --neutralBackgroundSubtleInvertedHover: #000000;
+  --neutralBackgroundSubtleInvertedPressed: #000000;
+  --neutralBackgroundSubtleInvertedRest: #000000;
+  --neutralBackgroundSubtleInvertedSelected: #000000;
+  --neutralBackgroundSubtleLightAlphaHover: #ffffff;
+  --neutralBackgroundSubtleLightAlphaPressed: #ffffff;
+  --neutralBackgroundSubtleLightAlphaSelected: #ffffff;
+  --neutralBackgroundSubtlePressed: #e0e0e0;
+  --neutralBackgroundSubtleRest: #ffffff;
+  --neutralBackgroundSubtleSelected: #ebebeb;
+  --neutralBackgroundTransparentHover: #ffffff;
+  --neutralBackgroundTransparentPressed: #ffffff;
+  --neutralBackgroundTransparentRest: #ffffff;
+  --neutralBackgroundTransparentSelected: #ffffff;
+
+  /* Neutral Foreground */
+  --neutralForeground1Hover: #242424;
+  --neutralForeground1Pressed: #242424;
+  --neutralForeground1Rest: #242424;
+  --neutralForeground1Selected: #242424;
+  --neutralForeground2BrandHover: var(--brand-80);
+  --neutralForeground2BrandPressed: var(--brand-70);
+  --neutralForeground2BrandSelected: var(--brand-80);
+  --neutralForeground2Hover: #242424;
+  --neutralForeground2LinkHover: #242424;
+  --neutralForeground2LinkPressed: #242424;
+  --neutralForeground2LinkRest: #424242;
+  --neutralForeground2LinkSelected: #242424;
+  --neutralForeground2Pressed: #242424;
+  --neutralForeground2Rest: #424242;
+  --neutralForeground2Selected: #242424;
+  --neutralForeground3BrandHover: var(--brand-80);
+  --neutralForeground3BrandPressed: var(--brand-70);
+  --neutralForeground3BrandSelected: var(--brand-80);
+  --neutralForeground3Hover: #424242;
+  --neutralForeground3Pressed: #424242;
+  --neutralForeground3Rest: #616161;
+  --neutralForeground3Selected: #424242;
+  --neutralForeground4Rest: #707070;
+  --neutralForegroundDisabledRest: #bdbdbd;
+  --neutralForegroundInverted1Hover: #ffffff;
+  --neutralForegroundInverted1Pressed: #ffffff;
+  --neutralForegroundInverted1Rest: #ffffff;
+  --neutralForegroundInverted1Selected: #ffffff;
+  --neutralForegroundInverted2Rest: #ffffff;
+  --neutralForegroundInvertedDisabledRest: #ffffff;
+  --neutralForegroundInvertedLinkHover: #ffffff;
+  --neutralForegroundInvertedLinkPressed: #ffffff;
+  --neutralForegroundInvertedLinkRest: #ffffff;
+  --neutralForegroundInvertedLinkSelected: #ffffff;
+  --neutralForegroundOnBrandRest: #ffffff;
+  --neutralForegroundStaticInvertedRest: #ffffff;
+  --neutralForegroundStaticRest: #242424;
+
+  /* Neutral Stroke */
+  --neutralStroke1Hover: #c7c7c7;
+  --neutralStroke1Pressed: #b3b3b3;
+  --neutralStroke1Rest: #d1d1d1;
+  --neutralStroke1Selected: #bdbdbd;
+  --neutralStroke2Rest: #e0e0e0;
+  --neutralStroke3Rest: #f0f0f0;
+  --neutralStrokeAccessibleHover: #575757;
+  --neutralStrokeAccessiblePressed: #4d4d4d;
+  --neutralStrokeAccessibleRest: #616161;
+  --neutralStrokeAccessibleSelected: var(--brand-80);
+  --neutralStrokeAlpha1Rest: #000000;
+  --neutralStrokeAlpha2Rest: #ffffff;
+  --neutralStrokeDisabledInvertedRest: #ffffff;
+  --neutralStrokeDisabledRest: #e0e0e0;
+  --neutralStrokeFocus1Rest: #ffffff;
+  --neutralStrokeFocus2Rest: #000000;
+  --neutralStrokeOnBrand21Rest: #ffffff;
+  --neutralStrokeOnBrand2Hover: #ffffff;
+  --neutralStrokeOnBrand2Pressed: #ffffff;
+  --neutralStrokeOnBrand2Rest: #ffffff;
+  --neutralStrokeOnBrand2Selected: #ffffff;
+  --neutralStrokeSubtleRest: #e0e0e0;
+  --neutralStrokeTransparentDisabledRest: #ffffff;
+  --neutralStrokeTransparentInteractiveRest: #ffffff;
+  --neutralStrokeTransparentRest: #ffffff;
+
+  /* Status Colors */
+  --statusAvailableForeground3Rest: #13a10e;
+  --statusAwayBackground3Rest: #eaa300;
+  --statusDangerBackground1Rest: #fdf3f4;
+  --statusDangerBackground3Rest: #c50f1f;
+  --statusDangerForeground1Rest: #b10e1c;
+  --statusDangerForeground3Rest: #c50f1f;
+  --statusDangerStroke1Rest: #eeacb2;
+  --statusDangerStroke2Rest: #c50f1f;
+  --statusSuccessBackground1Rest: #f1faf1;
+  --statusSuccessBackground3Rest: #107c10;
+  --statusSuccessForeground1Rest: #0e700e;
+  --statusSuccessForeground3Rest: #107c10;
+  --statusSuccessForegroundInvertedRest: #359b35;
+  --statusSuccessStroke1Rest: #9fd89f;
+  --statusSuccessStroke2Rest: #107c10;
+  --statusWarningBackground1Rest: #fff9f5;
+  --statusWarningBackground3Rest: #f7630c;
+  --statusWarningForeground1Rest: #bc4b09;
+  --statusWarningForeground2Rest: #8a3707;
+  --statusWarningStroke1Rest: #fdcfb4;
+  --statusOofForeground3Rest: #c239b3;
+
+  /* ===== TYPOGRAPHY TOKENS ===== */
+  --font-family-base: 'Inter', sans-serif;
+  --font-family-monospace: 'Consolas', 'Monaco', 'Courier New', monospace;
+  --font-family-numeric: 'Aptos', system-ui, sans-serif;
+  --font-family-inter: 'Inter', sans-serif;
+
+  /* Line Heights */
+  --line-height-100: 14px;
+  --line-height-200: 16px;
+  --line-height-300: 20px;
+  --line-height-400: 22px;
+  --line-height-500: 28px;
+  --line-height-600: 32px;
+  --line-height-700: 36px;
+  --line-height-800: 40px;
+  --line-height-900: 52px;
+  --line-height-1000: 92px;
+
+  /* Font Sizes */
+  --font-size-100: 10px;
+  --font-size-200: 12px;
+  --font-size-300: 14px;
+  --font-size-400: 16px;
+  --font-size-500: 20px;
+  --font-size-600: 24px;
+  --font-size-700: 28px;
+  --font-size-800: 32px;
+  --font-size-900: 40px;
+  --font-size-1000: 68px;
+
+  /* Font Weights */
+  --font-weight-light: 300;
+  --font-weight-semilight: 350;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ===== SPACING TOKENS ===== */
+  --spacing-none: 0px;
+  --spacing-xxs: 2px;
+  --spacing-xs: 4px;
+  --spacing-snudge: 6px;
+  --spacing-s: 8px;
+  --spacing-mnudge: 10px;
+  --spacing-m: 12px;
+  --spacing-l: 16px;
+  --spacing-xl: 20px;
+  --spacing-xxl: 24px;
+  --spacing-xxxl: 32px;
+
+  /* Spacing for padding/margin utilities (horizontal/vertical) */
+  --spacing-horizontal-xs: 4px;
+  --spacing-horizontal-s: 8px;
+  --spacing-horizontal-m: 12px;
+  --spacing-horizontal-l: 16px;
+  --spacing-horizontal-xl: 20px;
+  --spacing-vertical-xs: 4px;
+  --spacing-vertical-s: 8px;
+  --spacing-vertical-m: 12px;
+  --spacing-vertical-l: 16px;
+  --spacing-vertical-xl: 20px;
+
+  /* ===== CORNER RADIUS TOKENS ===== */
+  --corner-radius-none: 0px;
+  --corner-radius-small: 2px;
+  --corner-radius-medium: 4px;
+  --corner-radius-large: 6px;
+  --corner-radius-xlarge: 8px;
+  --corner-radius-circular: 9999px;
+
+  /* ===== STROKE WIDTH TOKENS ===== */
+  --stroke-width-none: 0px;
+  --stroke-width-thin: 1px;
+  --stroke-width-thick: 2px;
+  --stroke-width-thicker: 3px;
+  --stroke-width-thickest: 4px;
+}
+
+/* ===== FIGMA TEXT COLORS (Exact Token Names) ===== */
+/* Neutral Foreground */
+.text-Neutral-Foreground-1-Rest { color: var(--neutralForeground1Rest); }
+.text-Neutral-Foreground-1-Hover { color: var(--neutralForeground1Hover); }
+.text-Neutral-Foreground-1-Pressed { color: var(--neutralForeground1Pressed); }
+.text-Neutral-Foreground-2-Rest { color: var(--neutralForeground2Rest); }
+.text-Neutral-Foreground-3-Rest { color: var(--neutralForeground3Rest); }
+.text-Neutral-Foreground-4-Rest { color: var(--neutralForeground4Rest); }
+.text-Neutral-Foreground-Disabled-Rest { color: var(--neutralForegroundDisabledRest); }
+.text-Neutral-Foreground-Inverted-Rest { color: var(--neutralForegroundInvertedRest); }
+.text-Neutral-Foreground-2-Link-Rest { color: var(--neutralForeground2Rest); }
+.text-Neutral-Foreground-On-Brand-Rest { color: var(--neutralForegroundInvertedRest); }
+
+/* Brand Foreground */
+.text-Brand-Foreground-1-Rest { color: var(--brandForeground1Rest); }
+.text-Brand-Foreground-2-Rest { color: var(--brandForeground2Rest); }
+.text-Brand-Foreground-Link-Rest { color: var(--brandForegroundLinkRest); }
+.text-Brand-Foreground-Link-Hover { color: var(--brandForegroundLinkHover); }
+.text-Brand-Foreground-Link-Pressed { color: var(--brandForegroundLinkPressed); }
+
+/* Status Foreground */
+.text-Status-Danger-Foreground-1-Rest { color: var(--statusDangerForeground1Rest); }
+.text-Status-Danger-Foreground-3-Rest { color: var(--statusDangerForeground3Rest); }
+.text-Status-Success-Foreground-1-Rest { color: var(--statusSuccessForeground1Rest); }
+.text-Status-Success-Foreground-3-Rest { color: var(--statusSuccessForeground3Rest); }
+.text-Status-Success-Foreground-Inverted-Rest { color: var(--statusSuccessForegroundInvertedRest); }
+.text-Status-Warning-Foreground-1-Rest { color: var(--statusWarningForeground1Rest); }
+.text-Status-Warning-Foreground-2-Rest { color: var(--statusWarningForeground2Rest); }
+.text-Status-Available-Foreground-3-Rest { color: var(--statusAvailableForeground3Rest); }
+.text-Status-Oof-Foreground-3-Rest { color: var(--statusOofForeground3Rest); }
+
+/* Neutral Foreground - Additional States */
+.text-Neutral-Foreground-1-Selected { color: var(--neutralForeground1Selected); }
+.text-Neutral-Foreground-2-Hover { color: var(--neutralForeground2Hover); }
+.text-Neutral-Foreground-2-Pressed { color: var(--neutralForeground2Pressed); }
+.text-Neutral-Foreground-2-Selected { color: var(--neutralForeground2Selected); }
+.text-Neutral-Foreground-2-Brand-Hover { color: var(--neutralForeground2BrandHover); }
+.text-Neutral-Foreground-2-Brand-Pressed { color: var(--neutralForeground2BrandPressed); }
+.text-Neutral-Foreground-2-Brand-Selected { color: var(--neutralForeground2BrandSelected); }
+.text-Neutral-Foreground-2-Link-Hover { color: var(--neutralForeground2LinkHover); }
+.text-Neutral-Foreground-2-Link-Pressed { color: var(--neutralForeground2LinkPressed); }
+.text-Neutral-Foreground-2-Link-Selected { color: var(--neutralForeground2LinkSelected); }
+.text-Neutral-Foreground-3-Hover { color: var(--neutralForeground3Hover); }
+.text-Neutral-Foreground-3-Pressed { color: var(--neutralForeground3Pressed); }
+.text-Neutral-Foreground-3-Selected { color: var(--neutralForeground3Selected); }
+.text-Neutral-Foreground-3-Brand-Hover { color: var(--neutralForeground3BrandHover); }
+.text-Neutral-Foreground-3-Brand-Pressed { color: var(--neutralForeground3BrandPressed); }
+.text-Neutral-Foreground-3-Brand-Selected { color: var(--neutralForeground3BrandSelected); }
+.text-Neutral-Foreground-Inverted-1-Hover { color: var(--neutralForegroundInverted1Hover); }
+.text-Neutral-Foreground-Inverted-1-Pressed { color: var(--neutralForegroundInverted1Pressed); }
+.text-Neutral-Foreground-Inverted-1-Selected { color: var(--neutralForegroundInverted1Selected); }
+.text-Neutral-Foreground-Inverted-Link-Hover { color: var(--neutralForegroundInvertedLinkHover); }
+.text-Neutral-Foreground-Inverted-Link-Pressed { color: var(--neutralForegroundInvertedLinkPressed); }
+.text-Neutral-Foreground-Inverted-Link-Selected { color: var(--neutralForegroundInvertedLinkSelected); }
+.text-Neutral-Foreground-Static-Rest { color: var(--neutralForegroundStaticRest); }
+.text-Neutral-Foreground-Static-Inverted-Rest { color: var(--neutralForegroundStaticInvertedRest); }
+
+/* Brand Foreground - Additional States */
+.text-Brand-Foreground-Compound-Hover { color: var(--brandForegroundCompoundHover); }
+.text-Brand-Foreground-Compound-Pressed { color: var(--brandForegroundCompoundPressed); }
+.text-Brand-Foreground-Compound-Rest { color: var(--brandForegroundCompoundRest); }
+.text-Brand-Foreground-Inverted-Hover { color: var(--brandForegroundInvertedHover); }
+.text-Brand-Foreground-Inverted-Pressed { color: var(--brandForegroundInvertedPressed); }
+.text-Brand-Foreground-Inverted-Rest { color: var(--brandForegroundInvertedRest); }
+.text-Brand-Foreground-Link-Selected { color: var(--brandForegroundLinkSelected); }
+.text-Brand-Foreground-On-Light-Hover { color: var(--brandForegroundOnLightHover); }
+.text-Brand-Foreground-On-Light-Pressed { color: var(--brandForegroundOnLightPressed); }
+.text-Brand-Foreground-On-Light-Rest { color: var(--brandForegroundOnLightRest); }
+.text-Brand-Foreground-On-Light-Selected { color: var(--brandForegroundOnLightSelected); }
+
+/* ===== FIGMA BACKGROUND COLORS (Exact Token Names) ===== */
+/* Neutral Background */
+.bg-Neutral-Background-1-Rest { background-color: var(--neutralBackground1Rest); }
+.bg-Neutral-Background-1-Hover { background-color: var(--neutralBackground1Hover); }
+.bg-Neutral-Background-1-Pressed { background-color: var(--neutralBackground1Pressed); }
+.bg-Neutral-Background-2-Rest { background-color: var(--neutralBackground2Rest); }
+.bg-Neutral-Background-3-Rest { background-color: var(--neutralBackground3Rest); }
+.bg-Neutral-Background-4-Rest { background-color: var(--neutralBackground4Rest); }
+.bg-Neutral-Background-5-Rest { background-color: var(--neutralBackground5Rest); }
+.bg-Neutral-Background-6-Rest { background-color: var(--neutralBackground6Rest); }
+.bg-Neutral-Background-Disabled-Rest { background-color: var(--neutralBackgroundDisabledRest); }
+.bg-Neutral-Background-Inverted-Rest { background-color: var(--neutralBackgroundInvertedRest); }
+
+/* Brand Background */
+.bg-Brand-Background-1-Rest { background-color: var(--brandBackground1Rest); }
+.bg-Brand-Background-1-Hover { background-color: var(--brandBackground1Hover); }
+.bg-Brand-Background-1-Pressed { background-color: var(--brandBackground1Pressed); }
+.bg-Brand-Background-2-Rest { background-color: var(--brandBackground2Rest); }
+.bg-Brand-Background-Inverted-Rest { background-color: var(--brandBackgroundInvertedRest); }
+
+/* Status Background */
+.bg-Status-Danger-Background-1-Rest { background-color: var(--statusDangerBackground1Rest); }
+.bg-Status-Danger-Background-3-Rest { background-color: var(--statusDangerBackground3Rest); }
+.bg-Status-Success-Background-1-Rest { background-color: var(--statusSuccessBackground1Rest); }
+.bg-Status-Success-Background-3-Rest { background-color: var(--statusSuccessBackground3Rest); }
+.bg-Status-Warning-Background-1-Rest { background-color: var(--statusWarningBackground1Rest); }
+.bg-Status-Warning-Background-3-Rest { background-color: var(--statusWarningBackground3Rest); }
+.bg-Status-Away-Background-3-Rest { background-color: var(--statusAwayBackground3Rest); }
+
+/* Neutral Background - Additional States */
+.bg-Neutral-Background-1-Selected { background-color: var(--neutralBackground1Selected); }
+.bg-Neutral-Background-2-Hover { background-color: var(--neutralBackground2Hover); }
+.bg-Neutral-Background-2-Pressed { background-color: var(--neutralBackground2Pressed); }
+.bg-Neutral-Background-2-Selected { background-color: var(--neutralBackground2Selected); }
+.bg-Neutral-Background-3-Hover { background-color: var(--neutralBackground3Hover); }
+.bg-Neutral-Background-3-Pressed { background-color: var(--neutralBackground3Pressed); }
+.bg-Neutral-Background-3-Selected { background-color: var(--neutralBackground3Selected); }
+.bg-Neutral-Background-4-Hover { background-color: var(--neutralBackground4Hover); }
+.bg-Neutral-Background-4-Pressed { background-color: var(--neutralBackground4Pressed); }
+.bg-Neutral-Background-4-Selected { background-color: var(--neutralBackground4Selected); }
+.bg-Neutral-Background-5-Hover { background-color: var(--neutralBackground5Hover); }
+.bg-Neutral-Background-5-Pressed { background-color: var(--neutralBackground5Pressed); }
+.bg-Neutral-Background-5-Selected { background-color: var(--neutralBackground5Selected); }
+.bg-Neutral-Background-Alpha-1-Rest { background-color: var(--neutralBackgroundAlpha1Rest); }
+.bg-Neutral-Background-Alpha-2-Rest { background-color: var(--neutralBackgroundAlpha2Rest); }
+.bg-Neutral-Background-Inverted-Disabled-Rest { background-color: var(--neutralBackgroundInvertedDisabledRest); }
+.bg-Neutral-Background-Overlay-Rest { background-color: var(--neutralBackgroundOverlayRest); }
+.bg-Neutral-Background-Overlay-Scrollbar-Rest { background-color: var(--neutralBackgroundOverlayScrollbarRest); }
+.bg-Neutral-Background-Static-Rest { background-color: var(--neutralBackgroundStaticRest); }
+.bg-Neutral-Background-Stencil-1-Rest { background-color: var(--neutralBackgroundStencil1Rest); }
+.bg-Neutral-Background-Stencil-2-Rest { background-color: var(--neutralBackgroundStencil2Rest); }
+.bg-Neutral-Background-Subtle-Hover { background-color: var(--neutralBackgroundSubtleHover); }
+.bg-Neutral-Background-Subtle-Pressed { background-color: var(--neutralBackgroundSubtlePressed); }
+.bg-Neutral-Background-Subtle-Rest { background-color: var(--neutralBackgroundSubtleRest); }
+.bg-Neutral-Background-Subtle-Selected { background-color: var(--neutralBackgroundSubtleSelected); }
+.bg-Neutral-Background-Transparent-Hover { background-color: var(--neutralBackgroundTransparentHover); }
+.bg-Neutral-Background-Transparent-Pressed { background-color: var(--neutralBackgroundTransparentPressed); }
+.bg-Neutral-Background-Transparent-Selected { background-color: var(--neutralBackgroundTransparentSelected); }
+
+/* Brand Background - Additional States */
+.bg-Brand-Background-1-Selected { background-color: var(--brandBackground1Selected); }
+.bg-Brand-Background-2-Hover { background-color: var(--brandBackground2Hover); }
+.bg-Brand-Background-2-Pressed { background-color: var(--brandBackground2Pressed); }
+.bg-Brand-Background-Compound-Hover { background-color: var(--brandBackgroundCompoundHover); }
+.bg-Brand-Background-Compound-Pressed { background-color: var(--brandBackgroundCompoundPressed); }
+.bg-Brand-Background-Compound-Rest { background-color: var(--brandBackgroundCompoundRest); }
+.bg-Brand-Background-Inverted-Hover { background-color: var(--brandBackgroundInvertedHover); }
+.bg-Brand-Background-Inverted-Pressed { background-color: var(--brandBackgroundInvertedPressed); }
+.bg-Brand-Background-Inverted-Selected { background-color: var(--brandBackgroundInvertedSelected); }
+.bg-Brand-Background-Static-Rest { background-color: var(--brandBackgroundStaticRest); }
+
+/* ===== BRAND PALETTE ===== */
+.bg-brand-10 { background-color: var(--brand-10); }
+.bg-brand-20 { background-color: var(--brand-20); }
+.bg-brand-30 { background-color: var(--brand-30); }
+.bg-brand-40 { background-color: var(--brand-40); }
+.bg-brand-50 { background-color: var(--brand-50); }
+.bg-brand-60 { background-color: var(--brand-60); }
+.bg-brand-70 { background-color: var(--brand-70); }
+.bg-brand-80 { background-color: var(--brand-80); }
+.bg-brand-90 { background-color: var(--brand-90); }
+.bg-brand-100 { background-color: var(--brand-100); }
+.text-brand-80 { color: var(--brand-80); }
+.text-brand-100 { color: var(--brand-100); }
+
+/* ===== FIGMA BORDER/STROKE COLORS (Exact Token Names) ===== */
+.border-Neutral-Stroke-1-Rest { border-color: var(--neutralStroke1Rest); }
+.border-Neutral-Stroke-1-Hover { border-color: var(--neutralStroke1Hover); }
+.border-Neutral-Stroke-1-Pressed { border-color: var(--neutralStroke1Pressed); }
+.border-Neutral-Stroke-2-Rest { border-color: var(--neutralStroke2Rest); }
+.border-Neutral-Stroke-Accessible-Rest { border-color: var(--neutralStrokeAccessibleRest); }
+.border-Neutral-Stroke-Accessible-Hover { border-color: var(--neutralStrokeAccessibleHover); }
+.border-Neutral-Stroke-Accessible-Pressed { border-color: var(--neutralStrokeAccessiblePressed); }
+.border-Neutral-Stroke-Accessible-Selected { border-color: var(--neutralStrokeAccessibleSelected); }
+.border-Neutral-Stroke-Disabled-Rest { border-color: var(--neutralStrokeDisabledRest); }
+.border-Neutral-Stroke-Alpha-1-Rest { border-color: var(--neutralStrokeAlpha1Rest); }
+.border-Neutral-Stroke-Alpha-2-Rest { border-color: var(--neutralStrokeAlpha2Rest); }
+.border-Neutral-Stroke-Focus-1-Rest { border-color: var(--neutralStrokeFocus1Rest); }
+.border-Neutral-Stroke-Focus-2-Rest { border-color: var(--neutralStrokeFocus2Rest); }
+.border-Neutral-Stroke-On-Brand-2-Rest { border-color: var(--neutralStrokeOnBrand2Rest); }
+.border-Neutral-Stroke-On-Brand-2-Hover { border-color: var(--neutralStrokeOnBrand2Hover); }
+.border-Neutral-Stroke-On-Brand-2-Pressed { border-color: var(--neutralStrokeOnBrand2Pressed); }
+.border-Neutral-Stroke-On-Brand-2-Selected { border-color: var(--neutralStrokeOnBrand2Selected); }
+.border-Neutral-Stroke-Subtle-Rest { border-color: var(--neutralStrokeSubtleRest); }
+.border-Brand-Stroke-1-Rest { border-color: var(--brandStroke1Rest); }
+.border-Brand-Stroke-2-Rest { border-color: var(--brandStroke2Rest); }
+.border-Brand-Stroke-2-Contrast-Rest { border-color: var(--brandStroke2ContrastRest); }
+.border-Brand-Stroke-2-Hover { border-color: var(--brandStroke2Hover); }
+.border-Brand-Stroke-2-Pressed { border-color: var(--brandStroke2Pressed); }
+.border-Brand-Stroke-Compound-Hover { border-color: var(--brandStrokeCompoundHover); }
+.border-Brand-Stroke-Compound-Pressed { border-color: var(--brandStrokeCompoundPressed); }
+.border-Brand-Stroke-Compound-Rest { border-color: var(--brandStrokeCompoundRest); }
+.border-Status-Danger-Stroke-1-Rest { border-color: var(--statusDangerStroke1Rest); }
+.border-Status-Danger-Stroke-2-Rest { border-color: var(--statusDangerStroke2Rest); }
+.border-Status-Success-Stroke-1-Rest { border-color: var(--statusSuccessStroke1Rest); }
+.border-Status-Success-Stroke-2-Rest { border-color: var(--statusSuccessStroke2Rest); }
+.border-Status-Warning-Stroke-1-Rest { border-color: var(--statusWarningStroke1Rest); }
+
+/* ===== BORDER RADIUS ===== */
+.rounded-sm { border-radius: var(--corner-radius-small); }
+.rounded-md { border-radius: var(--corner-radius-medium); }
+.rounded-lg { border-radius: var(--corner-radius-large); }
+.rounded-xl { border-radius: var(--corner-radius-xlarge); }
+.rounded-full { border-radius: 9999px; }
+
+/* ===== FONT SIZES ===== */
+.text-xs { font-size: var(--font-size-100); }
+.text-sm { font-size: var(--font-size-200); }
+.text-base { font-size: var(--font-size-300); }
+.text-lg { font-size: var(--font-size-400); }
+.text-xl { font-size: var(--font-size-500); }
+.text-2xl { font-size: var(--font-size-600); }
+.text-3xl { font-size: var(--font-size-700); }
+.text-4xl { font-size: var(--font-size-800); }
+
+/* ===== FONT WEIGHTS ===== */
+.font-regular { font-weight: var(--font-weight-regular); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+/* ===== SPACING (padding) ===== */
+.p-xs { padding: var(--spacing-vertical-xs) var(--spacing-horizontal-xs); }
+.p-s { padding: var(--spacing-vertical-s) var(--spacing-horizontal-s); }
+.p-m { padding: var(--spacing-vertical-m) var(--spacing-horizontal-m); }
+.p-l { padding: var(--spacing-vertical-l) var(--spacing-horizontal-l); }
+.p-xl { padding: var(--spacing-vertical-xl) var(--spacing-horizontal-xl); }
+.px-s { padding-left: var(--spacing-horizontal-s); padding-right: var(--spacing-horizontal-s); }
+.px-m { padding-left: var(--spacing-horizontal-m); padding-right: var(--spacing-horizontal-m); }
+.px-l { padding-left: var(--spacing-horizontal-l); padding-right: var(--spacing-horizontal-l); }
+.py-s { padding-top: var(--spacing-vertical-s); padding-bottom: var(--spacing-vertical-s); }
+.py-m { padding-top: var(--spacing-vertical-m); padding-bottom: var(--spacing-vertical-m); }
+.py-l { padding-top: var(--spacing-vertical-l); padding-bottom: var(--spacing-vertical-l); }
+
+/* ===== SPACING (margin) ===== */
+.m-xs { margin: var(--spacing-vertical-xs) var(--spacing-horizontal-xs); }
+.m-s { margin: var(--spacing-vertical-s) var(--spacing-horizontal-s); }
+.m-m { margin: var(--spacing-vertical-m) var(--spacing-horizontal-m); }
+.m-l { margin: var(--spacing-vertical-l) var(--spacing-horizontal-l); }
+.mx-s { margin-left: var(--spacing-horizontal-s); margin-right: var(--spacing-horizontal-s); }
+.mx-m { margin-left: var(--spacing-horizontal-m); margin-right: var(--spacing-horizontal-m); }
+.my-s { margin-top: var(--spacing-vertical-s); margin-bottom: var(--spacing-vertical-s); }
+.my-m { margin-top: var(--spacing-vertical-m); margin-bottom: var(--spacing-vertical-m); }
+
+/* ===== GAP ===== */
+.gap-xs { gap: var(--spacing-horizontal-xs); }
+.gap-s { gap: var(--spacing-horizontal-s); }
+.gap-m { gap: var(--spacing-horizontal-m); }
+.gap-l { gap: var(--spacing-horizontal-l); }
+.gap-xl { gap: var(--spacing-horizontal-xl); }
+
+/* ===== SHADOWS ===== */
+.shadow-sm { box-shadow: var(--shadow-2); }
+.shadow-md { box-shadow: var(--shadow-4); }
+.shadow-lg { box-shadow: var(--shadow-8); }
+.shadow-xl { box-shadow: var(--shadow-16); }
+
+/* ===== BADGE PRESETS ===== */
+.badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--corner-radius-medium); font-size: var(--font-size-200); font-weight: var(--font-weight-medium); }
+.badge-default { background: var(--color-neutral-background-3); color: var(--color-neutral-foreground-1); }
+.badge-brand { background: var(--brand-20); color: var(--brand-80); }
+.badge-success { background: var(--color-status-success-background-1); color: var(--color-status-success-foreground-1); }
+.badge-danger { background: var(--color-status-danger-background-1); color: var(--color-status-danger-foreground-1); }
+.badge-warning { background: var(--color-status-warning-background-1); color: var(--color-status-warning-foreground-1); }
+
+/* ===== BORDERS ===== */
+.border { border: 1px solid var(--color-neutral-stroke-1); }
+.border-2 { border: 2px solid var(--color-neutral-stroke-1); }
+
+/* ===== FLUENT UI FONT OVERRIDES ===== */
+/* Override FluentUI v8 default fonts to use Inter */
+.ms-Fabric,
+.ms-Fabric *,
+[class*="ms-"],
+[class*="ms-"] *,
+.ms-Button,
+.ms-Button *,
+.ms-TextField,
+.ms-TextField *,
+.ms-MessageBar,
+.ms-MessageBar *,
+.ms-Spinner,
+.ms-Spinner * {
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* Ensure all form elements use Inter */
+input,
+textarea,
+select,
+button,
+label {
+  font-family: 'Inter', sans-serif !important;
+}

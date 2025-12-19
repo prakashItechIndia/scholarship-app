@@ -1,0 +1,27 @@
+{
+  "name": "@icaptur/database-seeds",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "seed:roles": "tsx src/seed-roles.ts",
+    "seed:admin-users": "tsx src/seed-admin-users.ts",
+    "seed:product-roles": "tsx src/seed-product-roles.ts",
+    "seed:zoho": "tsx src/seed-zoho-config.ts",
+    "seed:country-state": "tsx src/seed-country-state.ts"
+  },
+  "dependencies": {
+    "@icaptur/database-schema": "workspace:*",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.44.7",
+    "pg": "^8.11.5",
+    "@aws-sdk/client-kms": "^3.556.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^20.12.7",
+    "@types/pg": "^8.11.6",
+    "tsx": "^4.7.2",
+    "typescript": "^5.4.5"
+  }
+}

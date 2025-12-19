@@ -1,0 +1,23 @@
+Task ID,Task Name,Module,Priority,UI Status,API Status,Assignee,Estimated Hours,Estimated Days,Start Date,Target Completion Date,Status,Notes/Comments
+TASK-001,Remember me,Login,Medium,,,,,,,,,
+TASK-002,Terms and Privacy links,,,,,,,,,,,
+TASK-003,iTech logo click to redirect,,,,,,,,,,,
+TASK-004,Contact support,,,,,,,,,,,
+TASK-005,"Auto complete OFF 
+For all input fields",,,,,,,,,,,
+TASK-006,Phone number fix by default it should be +1 & 0 should be masked format,ALL,High,,,,,,,,,
+TASK-007,"Admin – Add new user 
+Popup click outside – Fields are removed entered values",,,,,,,,,,,
+TASK-008,Dropdown arrow click – should open,,,,,,,,,,,
+TASK-009,Dont create CRM customers when new user add in -  admin users,,,,,,,,,,,
+TASK-010,"Data table - ... icon should be open proper popover (Edit, Delete, Resend Activation)",,,,,,,,,,,
+TASK-011,Email template – Click to copy and style fix,Email service,,Pending,Pending,Vivek,,,,,,
+TASK-012,"Help – Tutorial, Sales, Technical, FAQ, Search",Help,,,,,,,,,,
+TASK-013,Settings – MFA – SMS not implemented,MFA,,,,,,,,,,
+TASK-014,Super admin – Header Global Search,,,,,,,,,,,
+TASK-015,,,,,,,,,,,,
+TASK-016,,,,,,,,,,,,
+TASK-017,,,,,,,,,,,,
+TASK-018,,,,,,,,,,,,
+TASK-019,,,,,,,,,,,,
+TASK-020,,,,,,,,,,,,

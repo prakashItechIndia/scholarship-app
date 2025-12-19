@@ -1,0 +1,2 @@
+echo "Running pre-commit hooks!"
+npx pretty-quick --staged && npx lint-staged --concurrent false && npm run build

@@ -1,0 +1,25 @@
+{
+  "name": "@icaptur/database-schema",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Shared Drizzle schema for iCaptur APIs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -w -p tsconfig.json",
+    "lint": "eslint \"src/**/*.ts\"",
+    "type-check": "tsc --noEmit",
+    "test": "echo 'No tests'",
+    "prepare": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0",
+    "eslint": "^9.18.0"
+  }
+}

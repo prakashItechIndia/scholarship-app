@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "lib": ["ES2022"],
+    "resolveJsonModule": true,
+    "noEmit": true
+  },
+  "include": ["drizzle.config.ts"]
+}
+

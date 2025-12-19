@@ -1,0 +1,34 @@
+/**
+ * PM2 Ecosystem Configuration
+ * 
+ * Copy this file to ecosystem.config.js and update paths/values as needed
+ * 
+ * Usage:
+ *   pm2 start ecosystem.config.js
+ *   pm2 save
+ */
+
+module.exports = {
+  apps: [
+    {
+      name: 'scholarship-api',
+      cwd: '/home/ubuntu/icaptur-billing-sso-xp/services/scholarship-api',
+      script: 'node',
+      args: 'dist/main.js',
+      env: {
+        NODE_ENV: 'production',
+      },
+      error_file: '/home/ubuntu/.pm2/logs/scholarship-api-error.log',
+      out_file: '/home/ubuntu/.pm2/logs/scholarship-api-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
+      autorestart: true,
+      max_memory_restart: '500M',
+      instances: 1,
+      exec_mode: 'fork',
+      watch: false,
+      ignore_watch: ['node_modules', 'dist', 'logs'],
+    },
+  ],
+};
+
