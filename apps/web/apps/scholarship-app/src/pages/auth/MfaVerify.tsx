@@ -257,20 +257,14 @@ export default function MfaVerify() {
 
                 <p className="text-[10px] text-Neutral-Foreground-2-Rest leading-[16px]">
                   <span>By continuing, you agree to our </span>
-                  <a
-                    href="#"
-                    className="text-[10px] font-medium text-Neutral-Foreground-2-Rest underline decoration-solid underline-offset-0 leading-[16px]"
-                  >
+                  <span className="text-[10px] font-bold text-Neutral-Foreground-2-Rest leading-[16px]">
                     Terms of Service
-                  </a>
+                  </span>
                   <span className="text-Neutral-Foreground-2-Rest font-medium"> </span>
                   <span>and </span>
-                  <a
-                    href="#"
-                    className="text-[10px] font-medium text-Neutral-Foreground-2-Rest underline decoration-solid underline-offset-0 leading-[16px]"
-                  >
+                  <span className="text-[10px] font-bold text-Neutral-Foreground-2-Rest leading-[16px]">
                     Privacy Policy
-                  </a>
+                  </span>
                   <span className="text-Neutral-Foreground-2-Rest font-medium">.</span>
                 </p>
               </div>
