@@ -15,6 +15,7 @@ const RegistrationPage = lazy(() => import('../pages/registration/RegistrationFo
 const VerificationPage = lazy(() => import('../pages/auth/Verification'));
 const SetPasswordPage = lazy(() => import('../pages/auth/SetPassword'));
 const ProcessPage = lazy(() => import('../pages/process'));
+const LandingPage = lazy(() => import('../pages/Landing'));
 
 export const Router = () => {
   return (
@@ -128,6 +129,16 @@ export const Router = () => {
             <Suspense fallback={<LoadingScreen message="Loading..." />}>
               <ErrorBoundary>
                 <ProcessPage />
+              </ErrorBoundary>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/landing"
+          element={
+            <Suspense fallback={<LoadingScreen message="Loading..." />}>
+              <ErrorBoundary>
+                <LandingPage />
               </ErrorBoundary>
             </Suspense>
           }
