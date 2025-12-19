@@ -12,6 +12,8 @@ const ResetPasswordPage = lazy(() => import('../pages/auth/ResetPassword'));
 const ChangePasswordPage = lazy(() => import('../pages/auth/ChangePassword'));
 const MfaVerifyPage = lazy(() => import('../pages/auth/MfaVerify'));
 const RegistrationPage = lazy(() => import('../pages/registration/RegistrationForm'));
+const VerificationPage = lazy(() => import('../pages/auth/Verification'));
+const SetPasswordPage = lazy(() => import('../pages/auth/SetPassword'));
 
 export const Router = () => {
   return (
@@ -94,6 +96,27 @@ export const Router = () => {
             <Suspense fallback={<LoadingScreen message="Loading..." />}>
               <ErrorBoundary>
                 <MfaVerifyPage />
+              </ErrorBoundary>
+            </Suspense>
+          }
+        />
+
+<Route
+          path="/verification"
+          element={
+            <Suspense fallback={<LoadingScreen message="Loading..." />}>
+              <ErrorBoundary>
+                <VerificationPage />
+              </ErrorBoundary>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/set-password"
+          element={
+            <Suspense fallback={<LoadingScreen message="Loading..." />}>
+              <ErrorBoundary>
+                <SetPasswordPage />
               </ErrorBoundary>
             </Suspense>
           }
