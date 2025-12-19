@@ -1,21 +1,14 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Input } from '@/components/ui/input';
-import { PersonIcon } from '@/components/ui/icons';
-import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
-import { PrimaryButton, DefaultButton } from '@fluentui/react';
+import { Stack, Text, Image, mergeStyles, IStackStyles, ImageFit, PrimaryButton, DefaultButton } from '@fluentui/react';
 import { SEO } from '../../components/seo/SEO';
-
-// Step 1 Schema - Identity Verification Details
-const identitySchema = z.object({
-  applicantType: z.string().min(1, 'Please select an option'),
-  aadhaarId: z.string().min(1, 'AADHAAR ID is required'),
-  panId: z.string().min(1, 'PAN ID is required'),
-});
-
-type IdentityFormData = z.infer<typeof identitySchema>;
+import { RegistrationProvider, useRegistration } from '@/contexts/RegistrationContext';
+import IdentityDetails from './steps/IdentityDetails';
+import PersonalDetails from './steps/PersonalDetails';
+import FamilyDetails from './steps/FamilyDetails';
+import BankDetails from './steps/BankDetails';
+import DocumentsUpload from './steps/DocumentsUpload';
+import ReviewSubmit from './steps/ReviewSubmit';
+import logo from '../../assets/logo.png';
+import background from '../../assets/header-bg.png';
 
 const STEPS = [
   { id: 1, title: 'Identity Details', key: 'identity' },
@@ -23,43 +16,113 @@ const STEPS = [
   { id: 3, title: 'Family details', key: 'family' },
   { id: 4, title: 'Bank details of Applicant', key: 'bank' },
   { id: 5, title: 'Documents Upload', key: 'documents' },
+  { id: 6, title: 'Review & Submit', key: 'review' },
 ];
 
-const RegistrationForm = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+// --- Styles ---
 
-  const form = useForm<IdentityFormData>({
-    resolver: zodResolver(identitySchema),
-    defaultValues: {
-      applicantType: 'I am a Research Scholar seeking Scholarship',
-      aadhaarId: '9373 3038 0292',
-      panId: 'PSM229802',
-    },
-  });
+const headerStyles: IStackStyles = {
+  root: {
+    backgroundImage: `url(${background})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'repeat',
+    position: 'relative',
+    borderBottom: '1px solid #FAFAFA', // border-gray-200
+    width: '100%',
+    opacity: 0.8,
+  },
+};
 
-  const onSubmit = (data: IdentityFormData) => {
-    console.log('Form data:', data);
-    // Mark current step as completed
-    if (!completedSteps.includes(currentStep)) {
-      setCompletedSteps([...completedSteps, currentStep]);
-    }
-    // Move to next step
-    if (currentStep < STEPS.length) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
+const headerContentStyles: IStackStyles = {
+  root: {
+    width: '100%',
+    padding: '24px 40px', // py-6 px-10
+    position: 'relative',
+    zIndex: 10,
+  },
+};
 
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
+const overlayStyles = mergeStyles({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(255, 255, 255, 0.1)', // bg-white/10
+  backdropFilter: 'blur(2px)',
+});
+
+const logoContainerStyles = mergeStyles({
+  width: 140,
+  height: 140,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  overflow: 'hidden',
+  padding: 4,
+});
+
+const sidebarStyles: IStackStyles = {
+  root: {
+    width: 400, // w-64
+    fontSize: 15,
+    backgroundColor: '#FAFAFA', // Dark gray
+    padding: 32,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+    height: '100%', // Full height of the parent container
+    overflowY: 'auto', // Scroll if content overflows
+  },
+};
+
+// --- Sub-components ---
+
+const StepIndicator = ({ step, isActive, isCompleted }: { step: any, isActive: boolean, isCompleted: boolean }) => {
+  return (
+    <Stack horizontal tokens={{ childrenGap: 16 }} verticalAlign="start" className={isActive ? '' : 'opacity-70'}>
+      <div className={mergeStyles({
+        width: 32, height: 32, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 14, fontWeight: 'bold', border: '2px solid',
+        transition: 'all 0.2s',
+        backgroundColor: isActive ? '#111827' : (isCompleted ? '#22c55e' : 'transparent'), // gray-900 / green-500
+        color: isActive || isCompleted ? 'white' : '#9ca3af', // gray-400
+        borderColor: isActive ? '#111827' : (isCompleted ? '#22c55e' : '#d1d5db'), // gray-300
+      })}>
+        {isCompleted ? '✓' : step.id}
+      </div>
+      <Stack styles={{ root: { paddingTop: 10, paddingBottom: 2, justifyContent: 'center' } }}>
+        <Text variant="small" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280', fontWeight: 600, marginBottom: 2, }}>
+          STEP {step.id}
+        </Text>
+        <Text variant="large" style={{ fontWeight: 700, color: isActive ? '#111827' : '#4b5563' }}>
+          {step.title}
+        </Text>
+      </Stack>
+    </Stack>
+  );
+};
+
+const RegistrationContent = () => {
+  const { currentStep, completedSteps, prevStep } = useRegistration();
 
   const handleCancel = () => {
-    // Handle cancel logic
     window.location.href = '/signin';
   };
+
+  const renderStepObject = () => {
+    switch (currentStep) {
+      case 1: return <IdentityDetails />;
+      case 2: return <PersonalDetails />;
+      case 3: return <FamilyDetails />;
+      case 4: return <BankDetails />;
+      case 5: return <DocumentsUpload />;
+      case 6: return <ReviewSubmit />;
+      default: return <IdentityDetails />;
+    }
+  };
+
+  const progressPercentage = (completedSteps.length / STEPS.length) * 100;
 
   return (
     <>
@@ -68,285 +131,162 @@ const RegistrationForm = () => {
         description="Online Registration for Scholarship Assistance - Academic Year 2025-2026"
         url="/registration"
       />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <Stack style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f9fafb' }}> {/* bg-gray-50 */}
+
+        {/* Header - Fixed Height */}
+        <Stack horizontal verticalAlign="center" styles={headerStyles} disableShrink>
+          <div className={overlayStyles}></div>
+          <Stack horizontal horizontalAlign="space-between" verticalAlign="center" styles={headerContentStyles}>
             {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-md">
-                <PersonIcon className="w-8 h-8 text-white" />
+            <Stack.Item disableShrink>
+              <div className={logoContainerStyles}>
+                <Image src={logo} alt="Leo Muthu Scholarship Logo" width="100%" height="100%" imageFit={ImageFit.contain} />
               </div>
-              <div>
-                <h1 className="text-sm font-bold text-gray-800">
-                  Shri. Leo Muthu Scholarship
-                </h1>
-                <p className="text-xs text-gray-600">
-                  Founder Chairman - Sairam Institutions
-                </p>
-              </div>
-            </div>
+            </Stack.Item>
 
             {/* Title */}
-            <div className="flex-1 text-center">
-              <h1 className="text-2xl font-bold text-gray-900">
-                Leo Muthu Scholarship Application
-              </h1>
-            </div>
+            <Stack.Item grow>
+              <Stack horizontalAlign="center" tokens={{ childrenGap: 8 }}>
+                <Text variant="xxLarge" style={{ fontWeight: 600, color: '#111827' }}>
+                  Leo Muthu Scholarship Application
+                </Text>
+                <Text variant="large" style={{ fontWeight: 500, color: '#1f2937' }}>
+                  Online Registration for Scholarship Assistance - Academic Year 2025-2026
+                </Text>
+                <Text variant="medium" style={{ color: '#374151', marginTop: 4 }}>
+                  Complete the form below to apply for our scholarship program
+                </Text>
+              </Stack>
+            </Stack.Item>
 
-            {/* Spacer for alignment */}
-            <div className="w-48"></div>
-          </div>
-        </header>
+            {/* Spacer */}
+            <Stack.Item disableShrink>
+              <div style={{ width: 120, display: 'none' }} className="lg:block"></div>
+            </Stack.Item>
+          </Stack>
+        </Stack>
 
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          {/* Subtitle */}
-          <div className="text-center mb-6">
-            <p className="text-lg text-gray-700 font-medium">
-              Online Registration for Scholarship Assistance - Academic Year 2025-2026
-            </p>
-            <p className="text-sm text-gray-600 mt-2">
-              Complete the form below to apply for our scholarship program
-            </p>
-          </div>
+        {/* Main Body - Fills remaining height */}
+        <Stack horizontal grow styles={{ root: { overflow: 'hidden', width: '100%' } }}>
 
-          <div className="flex gap-8">
-            {/* Left Sidebar - Progress */}
-            <aside className="w-64 flex-shrink-0">
-              <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-                <div className="mb-6">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-1">
+          {/* Sidebar - Fixed Width, Scrollable inside if needed */}
+          <Stack styles={sidebarStyles} disableShrink>
+            <Stack tokens={{ childrenGap: 32 }} style={{ marginBottom: 32 }}>
+              <Stack horizontal horizontalAlign="space-between" verticalAlign="center">
+                <Stack style={{ marginBottom: 20 }}>
+                  <Text variant="xLarge" style={{ fontWeight: 'bold', fontSize: 30 }}>
                     Online registration
-                  </h3>
-                  <p className="text-xs text-gray-500">Getting started</p>
-                </div>
+                  </Text>
+                  <Text variant="small" style={{ color: '#9ca3af', fontSize: 14, marginTop: 2 }}>Getting started</Text>
+                </Stack>
 
-                {/* Progress Badge */}
-                <div className="flex items-center justify-center mb-6">
-                  <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
+                {/* Progress Circle - SVG Implementation */}
+                <div style={{ position: 'relative', width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="60" height="60" viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)' }}>
+                    {/* Track */}
+                    <circle
+                      cx="36" cy="36" r="32"
+                      fill="white"
+                      stroke="#dbeafe"
+                      strokeWidth="4"
+                    />
+                    {/* Progress Arc */}
+                    <circle
+                      cx="36" cy="36" r="32"
+                      fill="none"
+                      stroke="#2563eb"
+                      strokeWidth="4"
+                      strokeDasharray={2 * Math.PI * 32}
+                      strokeDashoffset={(2 * Math.PI * 32) * (1 - (progressPercentage / 100))}
+                      strokeLinecap="round"
+                      style={{ transition: 'stroke-dashoffset 0.5s ease-out' }}
+                    />
+                  </svg>
+                  <div style={{ position: 'absolute', color: '#1f2937', fontWeight: 'bold', fontSize: 16 }}>
                     {completedSteps.length}/{STEPS.length}
                   </div>
                 </div>
+              </Stack>
+            </Stack>
 
-                {/* Steps List */}
-                <div className="space-y-4">
-                  {STEPS.map((step) => {
-                    const isActive = currentStep === step.id;
-                    const isCompleted = completedSteps.includes(step.id);
-                    return (
-                      <div
-                        key={step.id}
-                        className={`flex items-center gap-3 ${
-                          isActive ? 'font-semibold' : 'font-normal'
-                        }`}
-                      >
-                        <div
-                          className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                            isActive
-                              ? 'bg-gray-900 text-white'
-                              : isCompleted
-                              ? 'bg-green-500 text-white'
-                              : 'bg-gray-200 text-gray-500'
-                          }`}
-                        >
-                          {isCompleted ? '✓' : step.id}
-                        </div>
-                        <span
-                          className={`text-sm ${
-                            isActive ? 'text-gray-900' : 'text-gray-600'
-                          }`}
-                        >
-                          STEP {step.id}: {step.title}
-                        </span>
-                      </div>
-                    );
-                  })}
-                  <div className="flex items-center gap-3 pt-2">
-                    <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-500">
-                      ✓
-                    </div>
-                    <span className="text-sm text-gray-600">FINAL: Review and Submit</span>
-                  </div>
-                </div>
-              </div>
-            </aside>
+            <Stack tokens={{ childrenGap: 24 }}>
+              {STEPS.map(step => (
+                <StepIndicator
+                  key={step.id}
+                  step={step}
+                  isActive={currentStep === step.id}
+                  isCompleted={completedSteps.includes(step.id)}
+                />
+              ))}
 
-            {/* Main Content */}
-            <main className="flex-1">
-              <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200">
-                {/* Step Indicator */}
-                <div className="mb-6">
-                  <span className="text-sm font-semibold text-gray-700">
-                    STEP {currentStep}/{STEPS.length}
-                  </span>
-                </div>
 
-                {/* Step 1: Identity Verification Details */}
-                {currentStep === 1 && (
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                      Identity Verification Details
-                    </h2>
-                    <p className="text-sm text-gray-600 mb-6">
-                      Fill in the Required ID Numbers for Authentication
-                    </p>
+            </Stack>
+          </Stack>
 
-                    <Form {...form}>
-                      <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className="space-y-6"
-                      >
-                        <FormField
-                          control={form.control}
-                          name="applicantType"
-                          render={({ field }) => (
-                            <FormItem>
-                              <div className="flex flex-col gap-2">
-                                <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                                  <span>What describes you better</span>
-                                  <span className="text-red-500">*</span>
-                                </label>
-                                <FormControl>
-                                  <select
-                                    {...field}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  >
-                                    <option value="I am a Research Scholar seeking Scholarship">
-                                      I am a Research Scholar seeking Scholarship
-                                    </option>
-                                    <option value="I am a Student seeking Scholarship">
-                                      I am a Student seeking Scholarship
-                                    </option>
-                                    <option value="Other">Other</option>
-                                  </select>
-                                </FormControl>
-                                <FormMessage className="text-red-500 text-xs" />
-                              </div>
-                            </FormItem>
-                          )}
-                        />
+          {/* Main Form Content Wrapper - Flex Container */}
+          <Stack grow styles={{ root: { display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: 'white', borderTopRightRadius: 12 } }}>
 
-                        <FormField
-                          control={form.control}
-                          name="aadhaarId"
-                          render={({ field }) => (
-                            <FormItem>
-                              <div className="flex flex-col gap-2">
-                                <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                                  <span>AADHAAR ID (Candidate)</span>
-                                  <span className="text-red-500">*</span>
-                                </label>
-                                <FormControl>
-                                  <Input
-                                    {...field}
-                                    placeholder="Enter AADHAAR ID"
-                                    className="bg-white"
-                                  />
-                                </FormControl>
-                                <FormMessage className="text-red-500 text-xs" />
-                              </div>
-                            </FormItem>
-                          )}
-                        />
+            {/* Scrollable Content Area */}
+            <Stack grow styles={{ root: { overflowY: 'auto', padding: '32px 40px' } }}>
+              <Stack style={{ marginBottom: 32 }}>
+                <Text style={{ color: '#2563eb', fontSize: '0.625rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
+                  STEP {currentStep}/{STEPS.length}
+                </Text>
+              </Stack>
 
-                        <FormField
-                          control={form.control}
-                          name="panId"
-                          render={({ field }) => (
-                            <FormItem>
-                              <div className="flex flex-col gap-2">
-                                <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                                  <span>PAN ID (Candidate)</span>
-                                  <span className="text-red-500">*</span>
-                                </label>
-                                <FormControl>
-                                  <Input
-                                    {...field}
-                                    placeholder="Enter PAN ID"
-                                    className="bg-white"
-                                  />
-                                </FormControl>
-                                <FormMessage className="text-red-500 text-xs" />
-                              </div>
-                            </FormItem>
-                          )}
-                        />
+              {renderStepObject()}
+            </Stack>
 
-                        {/* Navigation Buttons */}
-                        <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-gray-200">
-                          <DefaultButton
-                            onClick={handleCancel}
-                            className="px-6 py-2"
-                          >
-                            Cancel
-                          </DefaultButton>
-                          <DefaultButton
-                            onClick={handlePrevious}
-                            disabled={currentStep === 1}
-                            className="px-6 py-2"
-                          >
-                            Previous
-                          </DefaultButton>
-                          <PrimaryButton
-                            type="submit"
-                            className="px-6 py-2"
-                          >
-                            Next
-                          </PrimaryButton>
-                        </div>
-                      </form>
-                    </Form>
-                  </div>
-                )}
+            {/* Navigation Footer - Fixed at bottom of this column */}
+            <Stack
+              horizontal
+              horizontalAlign="space-between"
+              verticalAlign="center"
+              styles={{
+                root: {
+                  padding: '24px 40px',
+                  borderTop: '1px solid #e5e7eb',
+                  backgroundColor: 'white',
+                  zIndex: 10,
+                  flexShrink: 0
+                }
+              }}
+            >
+              <DefaultButton
+                text="Cancel"
+                onClick={handleCancel}
+                styles={{ root: { height: 40, borderRadius: 9, minWidth: 90, borderColor: '#d1d5db' } }}
+              />
 
-                {/* Placeholder for other steps */}
-                {currentStep > 1 && (
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                      {STEPS[currentStep - 1].title}
-                    </h2>
-                    <p className="text-sm text-gray-600 mb-6">
-                      Step {currentStep} content will be implemented here
-                    </p>
+              <Stack horizontal tokens={{ childrenGap: 16 }}>
+                <DefaultButton
+                  text="Previous"
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                  styles={{ root: { height: 40, borderRadius: 9, minWidth: 90, borderColor: '#f3f4f6' } }}
+                />
+                <PrimaryButton
+                  text={currentStep === 6 ? 'Submit' : 'Next'}
+                  type="submit"
+                  form="current-step-form"
+                  styles={{ root: { height: 40, borderRadius: 9, minWidth: 90, backgroundColor: '#1d4ed8' } }}
+                />
+              </Stack>
+            </Stack>
 
-                    <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-gray-200">
-                      <DefaultButton
-                        onClick={handleCancel}
-                        className="px-6 py-2"
-                      >
-                        Cancel
-                      </DefaultButton>
-                      <DefaultButton
-                        onClick={handlePrevious}
-                        className="px-6 py-2"
-                      >
-                        Previous
-                      </DefaultButton>
-                      <PrimaryButton
-                        onClick={() => {
-                          if (!completedSteps.includes(currentStep)) {
-                            setCompletedSteps([...completedSteps, currentStep]);
-                          }
-                          if (currentStep < STEPS.length) {
-                            setCurrentStep(currentStep + 1);
-                          }
-                        }}
-                        className="px-6 py-2"
-                        type="button"
-                      >
-                        Next
-                      </PrimaryButton>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </main>
-          </div>
-        </div>
-      </div>
+          </Stack>
+
+        </Stack>
+
+      </Stack>
     </>
   );
 };
 
-export default RegistrationForm;
-
+export default function RegistrationForm() {
+  return (
+    <RegistrationProvider>
+      <RegistrationContent />
+    </RegistrationProvider>
+  );
+};
