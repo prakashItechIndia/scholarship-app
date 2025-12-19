@@ -7,6 +7,8 @@ export * from './providers';
 
 // Hooks & utilities
 export * from './lib';
+// Components
+export * from './components';
 
 // Types
 export * from './type';

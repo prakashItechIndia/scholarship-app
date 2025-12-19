@@ -14,6 +14,7 @@ const MfaVerifyPage = lazy(() => import('../pages/auth/MfaVerify'));
 const RegistrationPage = lazy(() => import('../pages/registration/RegistrationForm'));
 const VerificationPage = lazy(() => import('../pages/auth/Verification'));
 const SetPasswordPage = lazy(() => import('../pages/auth/SetPassword'));
+const ProcessPage = lazy(() => import('../pages/process'));
 
 export const Router = () => {
   return (
@@ -117,6 +118,16 @@ export const Router = () => {
             <Suspense fallback={<LoadingScreen message="Loading..." />}>
               <ErrorBoundary>
                 <SetPasswordPage />
+              </ErrorBoundary>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/process"
+          element={
+            <Suspense fallback={<LoadingScreen message="Loading..." />}>
+              <ErrorBoundary>
+                <ProcessPage />
               </ErrorBoundary>
             </Suspense>
           }

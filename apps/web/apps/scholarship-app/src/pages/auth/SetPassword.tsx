@@ -8,11 +8,11 @@ import { generateOrganizationSchema } from '../../utils/schema';
 import { AuthLayoutWrapper } from '@/components/auth/AuthLayoutWrapper';
 import { LogoHeader } from '@/components/auth/LogoHeader';
 import { Form } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
+import { Button } from '@shared/components';
 import { FormField } from '@/components/ui/form';
 import { FormFieldWrapper } from '@/components/auth/FormFieldWrapper';
 import { EyeIcon, EyeOffIcon } from '@/components/ui/icons';
-import { getBaseUrl } from '../../utils/signInUtils';
+import { getBaseUrl } from '@/utils/signInUtils';
 import { useToast } from '@/components/ui/toast';
 import { useNavigate } from 'react-router-dom';
 

@@ -10,7 +10,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { SEO } from '../../components/seo/SEO';
 import { generateOrganizationSchema } from '../../utils/schema';
 import { Form } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
+import { Button } from '@shared/components';
 import { useToast } from '@/components/ui/toast';
 import { SocialLoginButton } from '@/components/auth/SocialLoginButton';
 import { AuthLayoutWrapper } from '@/components/auth/AuthLayoutWrapper';
@@ -18,7 +18,7 @@ import { ScholarshipFooter } from '@/components/auth/ScholarshipFooter';
 import { LogoHeader } from '@/components/auth/LogoHeader';
 import { EmailField } from '@/components/auth/EmailField';
 import { PasswordField } from '@/components/auth/PasswordField';
-import { getBaseUrl } from '../../utils/signInUtils';
+import { getBaseUrl } from '@/utils/signInUtils';
 import { PersonIcon } from '@/components/ui/icons';
 
 const emailSchema = z.object({

@@ -5,7 +5,7 @@ import { SEO } from '../../components/seo/SEO';
 import { generateOrganizationSchema } from '../../utils/schema';
 import { AuthLayoutWrapper } from '@/components/auth/AuthLayoutWrapper';
 import { LogoHeader } from '@/components/auth/LogoHeader';
-import { getBaseUrl, createResendTimer } from '../../utils/signInUtils';
+import { getBaseUrl, createResendTimer } from '@/utils/signInUtils';
 import { useToast } from '@/components/ui/toast';
 
 const VerificationPage = () => {

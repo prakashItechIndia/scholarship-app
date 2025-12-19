@@ -1,5 +1,5 @@
 import { Stack, Text } from '@fluentui/react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@shared/components';
 import microsoftIcon from '@shared/assets/icons/microsoft.svg';
 import googleIcon from '@shared/assets/icons/google.svg';
 import appleIcon from '@shared/assets/icons/apple.svg';
