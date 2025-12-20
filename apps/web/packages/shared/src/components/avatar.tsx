@@ -2,27 +2,20 @@ import * as React from "react";
 import { Persona, PersonaSize, IPersonaProps } from "@fluentui/react";
 import { cn } from "../lib/utils";
 
-export interface AvatarProps extends Omit<IPersonaProps, "size"> {
-  variant?: "default" | "square" | "rounded";
+export interface AvatarProps extends Omit<IPersonaProps, "size" | "styles"> {
   size?: "sm" | "md" | "lg" | "xl";
   name?: string;
   imageUrl?: string;
-  children?: React.ReactNode;
 }
 
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
-  ({ className, variant = "default", size = "md", name, imageUrl, children, ...props }, ref) => {
-    // Extract image and fallback from children
+  ({ className, size = "md", name, imageUrl, children, ...props }, ref) => {
+    // Extract imageUrl from children if provided (for compatibility with AvatarImage)
     let extractedImageUrl = imageUrl;
-    let extractedInitials: string | undefined;
 
     React.Children.forEach(children, (child) => {
-      if (React.isValidElement(child)) {
-        if ((child.type as any)?.displayName === "AvatarImage") {
-          extractedImageUrl = (child.props as any).src;
-        } else if ((child.type as any)?.displayName === "AvatarFallback") {
-          extractedInitials = String((child.props as any).children || "");
-        }
+      if (React.isValidElement(child) && (child.type as any)?.displayName === "AvatarImage") {
+        extractedImageUrl = (child.props as any).src || extractedImageUrl;
       }
     });
 
@@ -39,42 +32,12 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
       }
     };
 
-    const getInitials = (): string | undefined => {
-      if (extractedInitials) return extractedInitials;
-      if (name) {
-        return name
-          .split(" ")
-          .map((n) => n[0])
-          .join("")
-          .toUpperCase()
-          .slice(0, 2);
-      }
-      return undefined;
-    };
-
-    const getBorderRadius = () => {
-      switch (variant) {
-        case "square":
-          return "4px";
-        case "rounded":
-          return "8px";
-        default:
-          return "50%";
-      }
-    };
-
     return (
-      <div ref={ref} className={cn("flex-shrink-0", className)}>
+      <div ref={ref} className={cn(className)}>
         <Persona
           imageUrl={extractedImageUrl}
           text={name}
           size={getPersonaSize()}
-          initials={getInitials()}
-          styles={{
-            root: {
-              borderRadius: getBorderRadius(),
-            },
-          }}
           {...props}
         />
       </div>
@@ -84,6 +47,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
 
 Avatar.displayName = "Avatar";
 
+// Placeholder components for compatibility with compound component pattern
 const AvatarImage = React.forwardRef<
   HTMLImageElement,
   React.ImgHTMLAttributes<HTMLImageElement>
@@ -97,4 +61,3 @@ const AvatarFallback = React.forwardRef<
 AvatarFallback.displayName = "AvatarFallback";
 
 export { Avatar, AvatarImage, AvatarFallback };
-

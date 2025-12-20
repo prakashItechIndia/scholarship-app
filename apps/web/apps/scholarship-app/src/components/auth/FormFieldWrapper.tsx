@@ -1,5 +1,5 @@
 import { Stack, Text } from '@fluentui/react';
-import { FormItem, FormControl, FormMessage } from '@/components/ui/form';
+import { FormItem, FormControl, FormMessage } from '@shared/components';
 import { ReactNode } from 'react';
 
 interface FormFieldWrapperProps {

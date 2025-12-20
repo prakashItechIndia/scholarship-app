@@ -3,14 +3,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { Stack, Text, MessageBar, MessageBarType, mergeStyles } from '@fluentui/react';
+import { Stack, Text, MessageBar, MessageBarType } from '@fluentui/react';
 import { secureTokenStorage } from '@shared/utils/secureTokenStorage';
 import { preserveQueryParams, handleAuthRedirect } from '../../utils/redirect';
 import { useAuth } from '../../contexts/AuthContext';
 import { SEO } from '../../components/seo/SEO';
 import { generateOrganizationSchema } from '../../utils/schema';
-import { Form } from '@/components/ui/form';
-import { Button } from '@shared/components';
+import { Form } from '@shared/components';
 import { useToast } from '@/components/ui/toast';
 import { SocialLoginButton } from '@/components/auth/SocialLoginButton';
 import { AuthLayoutWrapper } from '@/components/auth/AuthLayoutWrapper';
@@ -18,6 +17,10 @@ import { ScholarshipFooter } from '@/components/auth/ScholarshipFooter';
 import { LogoHeader } from '@/components/auth/LogoHeader';
 import { EmailField } from '@/components/auth/EmailField';
 import { PasswordField } from '@/components/auth/PasswordField';
+import { WelcomeText } from '@/components/auth/WelcomeText';
+import { TermsOfServiceText } from '@/components/auth/TermsOfServiceText';
+import { DividerWithText } from '@/components/auth/DividerWithText';
+import { SubmitButton } from '@/components/auth/SubmitButton';
 import { getBaseUrl } from '@/utils/signInUtils';
 import { PersonIcon } from '@/components/ui/icons';
 
@@ -152,17 +155,19 @@ const SignInPage = () => {
     } else {
       // Store email in localStorage and redirect to verification page
       localStorage.setItem('verification_email', email);
-      navigate('/verification');
+      void navigate('/verification');
     }
   };
 
-  const onEmailSubmit = (values: EmailFormData) => {
+  const onEmailSubmit = async (values: EmailFormData) => {
     // For now, always redirect to verification for new users
     // TODO: Add API call to check if user exists, then decide between 'login' and 'check'
+    // Simulate loading for a few seconds before navigation
+    await new Promise(resolve => setTimeout(resolve, 2000));
     verifyEmail(values.email, 'check');
   };
 
-  const onPasswordSubmit = (values: SignInFormData) => {
+  const onPasswordSubmit = async (values: SignInFormData) => {
     localStorage.setItem('scholarship_auth', JSON.stringify({
       email: values.email,
       password: values.password,
@@ -171,6 +176,8 @@ const SignInPage = () => {
       timestamp: Date.now(),
     }));
 
+    // Show loading for a few seconds before showing success and navigating
+    await new Promise(resolve => setTimeout(resolve, 2000));
     success('Sign In Successful', 'Redirecting to registration form...');
     setTimeout(() => void navigate('/registration'), 300);
   };
@@ -190,17 +197,7 @@ const SignInPage = () => {
         <AuthLayoutWrapper footerVariant="email">
           <LogoHeader variant="email" />
           
-          <Stack tokens={{ childrenGap: 8 }}>
-            <Text variant="xxLarge" styles={{ root: { fontWeight: 700, color: '#111827', lineHeight: '1.25' } }}>
-              Welcome to
-            </Text>
-            <Text variant="xxLarge" styles={{ root: { fontWeight: 700, color: '#111827', lineHeight: '1.25' } }}>
-              Leo Muthu Scholarship
-            </Text>
-            <Text variant="small" styles={{ root: { color: '#4b5563', marginTop: '8px' } }}>
-              Apply Online and Secure Your Educational Support
-            </Text>
-          </Stack>
+          <WelcomeText variant="email" />
 
           {passwordCreated && (
             <MessageBar messageBarType={MessageBarType.success}>
@@ -213,46 +210,23 @@ const SignInPage = () => {
               <Stack tokens={{ childrenGap: 24 }}>
                 <EmailField control={emailForm.control} name="email" variant="email" />
 
-                <Button
+                <SubmitButton
                   type="submit"
                   disabled={emailForm.formState.isSubmitting}
-                  variant="primary"
-                  styles={{
-                    root: {
-                      width: '100%',
-                      height: '44px',
-                      fontSize: '16px',
-                      fontWeight: 600,
-                    },
-                  }}
+                  isLoading={emailForm.formState.isSubmitting}
+                  loadingText="Loading..."
                 >
                   Continue
-                </Button>
+                </SubmitButton>
 
-                <Text variant="small" styles={{ root: { color: '#4b5563', textAlign: 'center', lineHeight: '1.75' } }}>
-                  By continuing, you agree to our{' '}
-                  <span style={{ color: '#000000', textDecoration: 'none', fontWeight: 600 }}>
-                    Terms of Service
-                  </span>{' '}
-                  and{' '}
-                  <span style={{ color: '#000000', textDecoration: 'none', fontWeight: 600 }}>
-                    Privacy Policy
-                  </span>
-                  .
-                </Text>
+                <TermsOfServiceText />
               </Stack>
             </form>
           </Form>
 
           {/* Social Login Section */}
           <Stack tokens={{ childrenGap: 16 }}>
-            <Stack horizontal tokens={{ childrenGap: 16 }} verticalAlign="center">
-              <div style={{ flex: 1, height: '1px', backgroundColor: '#d1d5db' }}></div>
-              <Text variant="small" styles={{ root: { color: '#6b7280' } }}>
-                OR Continue with
-              </Text>
-              <div style={{ flex: 1, height: '1px', backgroundColor: '#d1d5db' }}></div>
-            </Stack>
+            <DividerWithText />
 
             <Stack horizontal tokens={{ childrenGap: 12 }}>
               <SocialLoginButton provider="microsoft" />
@@ -277,38 +251,19 @@ const SignInPage = () => {
       />
       <Stack
         horizontal
-        className={mergeStyles({
-          minHeight: '100vh',
-          backgroundColor: '#0078D4',
-        })}
+        className="min-h-screen bg-[#0078D4]"
       >
         {/* Left Panel - Login Image */}
         <Stack
-          className={mergeStyles({
-            display: 'none',
-            width: '472px',
-            position: 'relative',
-            overflow: 'hidden',
-            '@media (min-width: 1024px)': {
-              display: 'flex',
-            },
-          })}
+          className="hidden lg:flex w-[472px] relative overflow-hidden"
         >
           <Stack
-            className={mergeStyles({
-              width: '100%',
-              height: '100%',
-              position: 'relative',
-              background: 'linear-gradient(180deg, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.8) 100%), linear-gradient(193deg, rgba(0, 0, 0, 0) 33%, rgba(208, 231, 248, 1) 73%)',
-              borderRadius: '40px',
-              border: '4px solid #FFFFFF',
-              margin: '20px',
-            })}
+            className="w-full h-full relative bg-gradient-to-b from-transparent via-transparent to-black/80 bg-[linear-gradient(193deg,rgba(0,0,0,0)_33%,rgba(208,231,248,1)_73%)] rounded-[40px] border-4 border-white m-5"
           >
-            <Stack horizontalAlign="center" verticalAlign="center" styles={{ root: { width: '100%', height: '100%' } }}>
-              <Stack horizontalAlign="center" tokens={{ childrenGap: 16 }} styles={{ root: { color: '#ffffff', textAlign: 'center', padding: '32px' } }}>
-                <PersonIcon style={{ width: '128px', height: '128px', margin: '0 auto 16px', opacity: 0.5 }} />
-                <Text variant="large" styles={{ root: { fontWeight: 600 } }}>
+            <Stack horizontalAlign="center" verticalAlign="center" className="w-full h-full">
+              <Stack horizontalAlign="center" tokens={{ childrenGap: 16 }} className="text-white text-center p-8">
+                <PersonIcon className="w-32 h-32 mx-auto mb-4 opacity-50" />
+                <Text variant="large" className="font-semibold">
                   Login Image
                 </Text>
               </Stack>
@@ -319,35 +274,18 @@ const SignInPage = () => {
         {/* Right Panel - Login Card */}
         <Stack
           grow
-          className={mergeStyles({
-            backgroundColor: '#ffffff',
-            borderTopLeftRadius: '20px',
-            borderBottomLeftRadius: '20px',
-            boxShadow: '0px 0px 0px 0px rgba(0,0,0,0.01), 2px 2px 6px 0px rgba(0,0,0,0.01), 7px 9px 11px 0px rgba(0,0,0,0.01), 16px 20px 15px 0px rgba(0,0,0,0.01), 28px 36px 18px 0px rgba(0,0,0,0), 44px 56px 20px 0px rgba(0,0,0,0)',
-          })}
+          className="bg-white rounded-tl-[20px] rounded-bl-[20px] shadow-[0px_0px_0px_0px_rgba(0,0,0,0.01),2px_2px_6px_0px_rgba(0,0,0,0.01),7px_9px_11px_0px_rgba(0,0,0,0.01),16px_20px_15px_0px_rgba(0,0,0,0.01),28px_36px_18px_0px_rgba(0,0,0,0),44px_56px_20px_0px_rgba(0,0,0,0)]"
         >
           <Stack
             grow
             horizontalAlign="center"
-            className={mergeStyles({
-              padding: '32px 24px',
-              '@media (min-width: 640px)': { padding: '32px 48px' },
-              '@media (min-width: 1024px)': { padding: '32px 64px' },
-              '@media (min-width: 1280px)': { padding: '32px 96px' },
-            })}
+            className="p-8 sm:p-12 lg:p-16 xl:p-24"
           >
             <LogoHeader variant="password" />
 
-            <Stack tokens={{ childrenGap: 4 }} styles={{ root: { width: '100%', maxWidth: '340px', marginTop: '48px', marginBottom: 0 } }}>
-              <Text variant="xLarge" styles={{ root: { color: '#242424', fontWeight: 600, fontFamily: 'Inter, sans-serif', lineHeight: '32px' } }}>
-                Welcome to<br />Leo Muthu Scholarship
-              </Text>
-              <Text variant="small" styles={{ root: { color: '#707070', fontFamily: 'Inter, sans-serif', lineHeight: '16px' } }}>
-                Log In to Administer and Monitor Scholarship Applications
-              </Text>
-            </Stack>
+            <WelcomeText variant="password" />
 
-            <Stack styles={{ root: { width: '100%', maxWidth: '340px', marginTop: '48px', marginBottom: 0 } }}>
+            <Stack className="w-full max-w-[340px] mt-12 mb-0">
               <Form {...passwordForm}>
                 <form onSubmit={(e) => void handlePasswordSubmit(onPasswordSubmit)(e)} noValidate>
                   <Stack tokens={{ childrenGap: 68 }}>
@@ -360,67 +298,26 @@ const SignInPage = () => {
                       variant="password"
                     />
 
-                    <Stack styles={{ root: { marginTop: 0 } }}>
+                    <Stack className="mt-0">
                       <Link
                         to={preserveQueryParams('/forgot-password', ['returnUrl', 'product', 'state'])}
-                        style={{
-                          color: '#2453C3',
-                          fontSize: '12px',
-                          fontFamily: 'Inter, sans-serif',
-                          lineHeight: '16px',
-                          textDecoration: 'none',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.textDecoration = 'underline';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.textDecoration = 'none';
-                        }}
+                        className="text-[#2453C3] text-xs font-sans leading-4 no-underline hover:underline"
                       >
                         Forgot your password?
                       </Link>
                     </Stack>
 
                     <Stack tokens={{ childrenGap: 8 }}>
-                      <Button
+                      <SubmitButton
                         type="submit"
-                        variant="primary"
+                        variant="password"
                         disabled={passwordForm.formState.isSubmitting}
-                        styles={{
-                          root: {
-                            width: '100%',
-                            borderRadius: '4px',
-                            backgroundColor: '#2453C3',
-                            padding: '6px 12px',
-                            color: '#ffffff',
-                            fontSize: '12px',
-                            fontWeight: 600,
-                            fontFamily: 'Inter, sans-serif',
-                            lineHeight: '20px',
-                            border: 'none',
-                            ':hover': {
-                              backgroundColor: '#1e42a0',
-                            },
-                            ':disabled': {
-                              cursor: 'not-allowed',
-                              backgroundColor: '#60a5fa',
-                            },
-                          },
-                        }}
+                        isLoading={passwordForm.formState.isSubmitting}
+                        loadingText="Signing in…"
                       >
-                        {passwordForm.formState.isSubmitting ? 'Signing in…' : 'Log In'}
-                      </Button>
-                      <Text variant="small" styles={{ root: { color: '#707070', fontSize: '10px', fontFamily: 'Inter, sans-serif', lineHeight: '16px' } }}>
-                        By continuing, you agree to our{' '}
-                        <a href="#" style={{ color: '#2453C3', fontSize: '10px', fontWeight: 500, fontFamily: 'Inter, sans-serif', textDecoration: 'underline', lineHeight: '16px' }}>
-                          Terms of Service
-                        </a>{' '}
-                        and{' '}
-                        <a href="#" style={{ color: '#2453C3', fontSize: '10px', fontWeight: 500, fontFamily: 'Inter, sans-serif', textDecoration: 'underline', lineHeight: '16px' }}>
-                          Privacy Policy
-                        </a>
-                        .
-                      </Text>
+                        Log In
+                      </SubmitButton>
+                      <TermsOfServiceText variant="small" />
                     </Stack>
                   </Stack>
                 </form>

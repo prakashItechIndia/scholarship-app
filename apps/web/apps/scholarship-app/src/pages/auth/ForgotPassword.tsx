@@ -8,9 +8,9 @@ import { AuthWrapper } from '@/components/auth/AuthWrapper';
 import { requestPasswordReset } from '../../services/auth.service';
 import { preserveQueryParams } from '../../utils/redirect';
 import { SEO } from '../../components/seo/SEO';
-import { Input } from '@/components/ui/input';
+import { Input } from '@shared/components';
 import { PersonIcon } from '@/components/ui/icons';
-import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
+import { Form, FormField, FormItem, FormControl, FormMessage, Label } from '@shared/components';
 import { PrimaryButton } from '@fluentui/react';
 import { useToast } from '@/components/ui/toast';
 
@@ -144,10 +144,9 @@ const ForgotPasswordPage = () => {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex flex-col gap-[4px]">
-                    <label className="text-[12px] font-normal text-Neutral-Foreground-1-Rest leading-[16px] flex items-end gap-[4px]">
-                      <span>Username</span>
-                      <span className="text-[12px] text-Status-Danger-Foreground-1-Rest">*</span>
-                    </label>
+                    <Label required className="text-[12px] font-normal text-Neutral-Foreground-1-Rest leading-[16px]">
+                      Username
+                    </Label>
                     <FormControl>
                       <Input
                         autoComplete='off'
@@ -157,7 +156,6 @@ const ForgotPasswordPage = () => {
                         type="email"
                         placeholder="Email address"
                         aria-invalid={Boolean(errors.email)}
-                        className="bg-white"
                         required={false}
                       />
                     </FormControl>

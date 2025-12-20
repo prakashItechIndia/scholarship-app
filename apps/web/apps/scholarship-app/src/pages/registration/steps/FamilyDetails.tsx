@@ -4,14 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
     Stack,
-    TextField,
-    Dropdown,
-    IDropdownOption,
     IStackStyles,
     IStackTokens,
     mergeStyles,
     FontWeights,
 } from '@fluentui/react';
+import { Input, Select, Label } from '@shared/components';
 import { useRegistration } from '@/contexts/RegistrationContext';
 
 // --- Validation Schema ---
@@ -45,23 +43,23 @@ const familySchema = z.object({
 type FamilyFormData = z.infer<typeof familySchema>;
 
 // --- Constants ---
-const OCCUPATION_OPTIONS: IDropdownOption[] = [
-    { key: 'government', text: 'Government Service' },
-    { key: 'private', text: 'Private Sector' },
-    { key: 'business', text: 'Business / Self Employed' },
-    { key: 'agriculture', text: 'Agriculture' },
-    { key: 'professional', text: 'Professional (Doctor, Lawyer, etc.)' },
-    { key: 'retired', text: 'Retired' },
-    { key: 'homemaker', text: 'Homemaker' },
-    { key: 'others', text: 'Others' },
+const OCCUPATION_OPTIONS = [
+    { value: 'government', label: 'Government Service' },
+    { value: 'private', label: 'Private Sector' },
+    { value: 'business', label: 'Business / Self Employed' },
+    { value: 'agriculture', label: 'Agriculture' },
+    { value: 'professional', label: 'Professional (Doctor, Lawyer, etc.)' },
+    { value: 'retired', label: 'Retired' },
+    { value: 'homemaker', label: 'Homemaker' },
+    { value: 'others', label: 'Others' },
 ];
 
-const INCOME_OPTIONS: IDropdownOption[] = [
-    { key: 'upto_1L', text: 'Up to 1 Lakh' },
-    { key: '1L_2.5L', text: '1 Lakh - 2.5 Lakhs' },
-    { key: '2.5L_5L', text: '2.5 Lakhs - 5 Lakhs' },
-    { key: '5L_8L', text: '5 Lakhs - 8 Lakhs' },
-    { key: 'above_8L', text: 'Above 8 Lakhs' },
+const INCOME_OPTIONS = [
+    { value: 'upto_1L', label: 'Up to 1 Lakh' },
+    { value: '1L_2.5L', label: '1 Lakh - 2.5 Lakhs' },
+    { value: '2.5L_5L', label: '2.5 Lakhs - 5 Lakhs' },
+    { value: '5L_8L', label: '5 Lakhs - 8 Lakhs' },
+    { value: 'above_8L', label: 'Above 8 Lakhs' },
 ];
 
 // --- Styles (Matching IdentityDetails) ---
@@ -108,17 +106,9 @@ const labelStyles = mergeStyles({
 
 const asteriskStyle = { color: '#ef4444' };
 
-const dropdownStyles = {
-    dropdown: { width: '100%' },
-    title: { height: 42, lineHeight: 40, borderRadius: 4, borderColor: '#d1d5db' },
-};
-
-const textFieldStyles = {
-    fieldGroup: { height: 42, borderRadius: 4, borderColor: '#d1d5db' }
-};
 
 const FamilyDetails = () => {
-    const { formData, updateFormData, nextStep, markStepComplete } = useRegistration();
+    const { formData, updateFormData, nextStep, markStepComplete, setIsLoading } = useRegistration();
 
     const {
         control,
@@ -155,52 +145,59 @@ const FamilyDetails = () => {
         };
     }, [updateFormData, getValues]);
 
-    const onSubmit = (data: FamilyFormData) => {
+    const onSubmit = async (data: FamilyFormData) => {
         console.log('Family Step Data:', data);
-        updateFormData(data);
-        markStepComplete(3);
-        nextStep();
+        setIsLoading(true);
+        try {
+            // Show loading for a few seconds before moving to next step
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            updateFormData(data);
+            markStepComplete(3);
+            nextStep();
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
-        <Stack styles={containerStyles}>
-            <h2 className={titleStyles}>Family details</h2>
-            <p className={subtitleStyles}>Provide Information About Your Immediate Family Members</p>
+        <Stack className="w-4/5 h-full flex flex-col">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-1">Family details</h2>
+            <p className="text-sm text-gray-500 mb-8">Provide Information About Your Immediate Family Members</p>
 
-            <form style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }} onSubmit={handleSubmit(onSubmit)} id="current-step-form">
+            <form className="w-full h-full flex flex-col" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
                 <Stack tokens={stackTokens}>
 
                     {/* Applicant & ID Row */}
                     <Stack horizontal tokens={rowTokens} wrap>
-                        <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                        <Stack.Item grow={1} className="min-w-[250px]">
                             <Controller
                                 name="fullName"
                                 control={control}
                                 render={({ field }) => (
                                     <Stack>
-                                        <label className={labelStyles}>Name of Applicant <span style={asteriskStyle}>*</span></label>
-                                        <TextField
+                                        <Label required>Name of Applicant</Label>
+                                        <Input
                                             {...field}
+                                            value={field.value ?? ''}
                                             placeholder="Enter the name"
                                             errorMessage={errors.fullName?.message}
-                                            styles={textFieldStyles}
                                         />
                                     </Stack>
                                 )}
                             />
                         </Stack.Item>
-                        <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                        <Stack.Item grow={1} className="min-w-[250px]">
                             <Controller
                                 name="studentId"
                                 control={control}
                                 render={({ field }) => (
                                     <Stack>
-                                        <label className={labelStyles}>Student ID (if known)</label>
-                                        <TextField
+                                        <Label>Student ID (if known)</Label>
+                                        <Input
                                             {...field}
+                                            value={field.value ?? ''}
                                             placeholder="Enter student ID"
                                             errorMessage={errors.studentId?.message}
-                                            styles={textFieldStyles}
                                         />
                                     </Stack>
                                 )}
@@ -210,35 +207,34 @@ const FamilyDetails = () => {
 
                     {/* Father Details */}
                     <Stack>
-                        <div className={sectionHeaderStyles}>Father Details</div>
+                        <div className="text-base font-semibold text-gray-900 mt-2 mb-4">Father Details</div>
                         <Stack tokens={rowTokens}>
                             <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="min-w-[250px]">
                                     <Controller
                                         name="fatherName"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Name <span style={asteriskStyle}>*</span></label>
-                                                <TextField {...field} placeholder="Enter father name" errorMessage={errors.fatherName?.message} styles={textFieldStyles} />
+                                                <Label required>Name</Label>
+                                                <Input {...field} value={field.value ?? ''} placeholder="Enter father name" errorMessage={errors.fatherName?.message} />
                                             </Stack>
                                         )}
                                     />
                                 </Stack.Item>
-                                <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="min-w-[250px]">
                                     <Controller
                                         name="fatherOccupation"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Occupation <span style={asteriskStyle}>*</span></label>
-                                                <Dropdown
+                                                <Label required>Occupation</Label>
+                                                <Select
                                                     selectedKey={field.value}
-                                                    onChange={(_, opt) => field.onChange(opt?.key)}
+                                                    onValueChange={field.onChange}
                                                     placeholder="Select"
                                                     options={OCCUPATION_OPTIONS}
                                                     errorMessage={errors.fatherOccupation?.message}
-                                                    styles={dropdownStyles}
                                                 />
                                             </Stack>
                                         )}
@@ -246,46 +242,45 @@ const FamilyDetails = () => {
                                 </Stack.Item>
                             </Stack>
                             <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="min-w-[250px]">
                                     <Controller
                                         name="fatherDesignation"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Designation</label>
-                                                <TextField {...field} placeholder="Enter father designation" errorMessage={errors.fatherDesignation?.message} styles={textFieldStyles} />
+                                                <Label>Designation</Label>
+                                                <Input {...field} value={field.value ?? ''} placeholder="Enter father designation" errorMessage={errors.fatherDesignation?.message} />
                                             </Stack>
                                         )}
                                     />
                                 </Stack.Item>
-                                <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="min-w-[250px]">
                                     <Controller
                                         name="fatherOrganization"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Organization Name</label>
-                                                <TextField {...field} placeholder="Enter organisation name" errorMessage={errors.fatherOrganization?.message} styles={textFieldStyles} />
+                                                <Label>Organization Name</Label>
+                                                <Input {...field} value={field.value ?? ''} placeholder="Enter organisation name" errorMessage={errors.fatherOrganization?.message} />
                                             </Stack>
                                         )}
                                     />
                                 </Stack.Item>
                             </Stack>
                             <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} styles={{ root: { width: '50%', minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="w-1/2 min-w-[250px]">
                                     <Controller
                                         name="fatherIncome"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Annual Income <span style={asteriskStyle}>*</span></label>
-                                                <Dropdown
+                                                <Label required>Annual Income</Label>
+                                                <Select
                                                     selectedKey={field.value}
-                                                    onChange={(_, opt) => field.onChange(opt?.key)}
+                                                    onValueChange={field.onChange}
                                                     placeholder="Select"
                                                     options={INCOME_OPTIONS}
                                                     errorMessage={errors.fatherIncome?.message}
-                                                    styles={dropdownStyles}
                                                 />
                                             </Stack>
                                         )}
@@ -297,35 +292,34 @@ const FamilyDetails = () => {
 
                     {/* Mother Details */}
                     <Stack>
-                        <div className={sectionHeaderStyles}>Mother Details</div>
+                        <div className="text-base font-semibold text-gray-900 mt-2 mb-4">Mother Details</div>
                         <Stack tokens={rowTokens}>
                             <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="min-w-[250px]">
                                     <Controller
                                         name="motherName"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Name <span style={asteriskStyle}>*</span></label>
-                                                <TextField {...field} placeholder="Enter mother name" errorMessage={errors.motherName?.message} styles={textFieldStyles} />
+                                                <Label required>Name</Label>
+                                                <Input {...field} value={field.value ?? ''} placeholder="Enter mother name" errorMessage={errors.motherName?.message} />
                                             </Stack>
                                         )}
                                     />
                                 </Stack.Item>
-                                <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="min-w-[250px]">
                                     <Controller
                                         name="motherOccupation"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Occupation <span style={asteriskStyle}>*</span></label>
-                                                <Dropdown
+                                                <Label required>Occupation</Label>
+                                                <Select
                                                     selectedKey={field.value}
-                                                    onChange={(_, opt) => field.onChange(opt?.key)}
+                                                    onValueChange={field.onChange}
                                                     placeholder="Select"
                                                     options={OCCUPATION_OPTIONS}
                                                     errorMessage={errors.motherOccupation?.message}
-                                                    styles={dropdownStyles}
                                                 />
                                             </Stack>
                                         )}
@@ -333,46 +327,45 @@ const FamilyDetails = () => {
                                 </Stack.Item>
                             </Stack>
                             <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="min-w-[250px]">
                                     <Controller
                                         name="motherDesignation"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Designation</label>
-                                                <TextField {...field} placeholder="Enter mother designation" errorMessage={errors.motherDesignation?.message} styles={textFieldStyles} />
+                                                <Label>Designation</Label>
+                                                <Input {...field} value={field.value ?? ''} placeholder="Enter mother designation" errorMessage={errors.motherDesignation?.message} />
                                             </Stack>
                                         )}
                                     />
                                 </Stack.Item>
-                                <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="min-w-[250px]">
                                     <Controller
                                         name="motherOrganization"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Organization Name</label>
-                                                <TextField {...field} placeholder="Enter organisation name" errorMessage={errors.motherOrganization?.message} styles={textFieldStyles} />
+                                                <Label>Organization Name</Label>
+                                                <Input {...field} value={field.value ?? ''} placeholder="Enter organisation name" errorMessage={errors.motherOrganization?.message} />
                                             </Stack>
                                         )}
                                     />
                                 </Stack.Item>
                             </Stack>
                             <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} styles={{ root: { width: '50%', minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="w-1/2 min-w-[250px]">
                                     <Controller
                                         name="motherIncome"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Annual Income <span style={asteriskStyle}>*</span></label>
-                                                <Dropdown
+                                                <Label required>Annual Income</Label>
+                                                <Select
                                                     selectedKey={field.value}
-                                                    onChange={(_, opt) => field.onChange(opt?.key)}
+                                                    onValueChange={field.onChange}
                                                     placeholder="Select"
                                                     options={INCOME_OPTIONS}
                                                     errorMessage={errors.motherIncome?.message}
-                                                    styles={dropdownStyles}
                                                 />
                                             </Stack>
                                         )}
@@ -384,35 +377,34 @@ const FamilyDetails = () => {
 
                     {/* Guardian Details */}
                     <Stack>
-                        <div className={sectionHeaderStyles}>Guardian Details</div>
+                        <div className="text-base font-semibold text-gray-900 mt-2 mb-4">Guardian Details</div>
                         <Stack tokens={rowTokens}>
                             <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="min-w-[250px]">
                                     <Controller
                                         name="guardianName"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Name</label>
-                                                <TextField {...field} placeholder="Enter guardian name" errorMessage={errors.guardianName?.message} styles={textFieldStyles} />
+                                                <Label>Name</Label>
+                                                <Input {...field} value={field.value ?? ''} placeholder="Enter guardian name" errorMessage={errors.guardianName?.message} />
                                             </Stack>
                                         )}
                                     />
                                 </Stack.Item>
-                                <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="min-w-[250px]">
                                     <Controller
                                         name="guardianOccupation"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Occupation</label>
-                                                <Dropdown
+                                                <Label>Occupation</Label>
+                                                <Select
                                                     selectedKey={field.value}
-                                                    onChange={(_, opt) => field.onChange(opt?.key)}
+                                                    onValueChange={field.onChange}
                                                     placeholder="Select"
                                                     options={OCCUPATION_OPTIONS}
                                                     errorMessage={errors.guardianOccupation?.message}
-                                                    styles={dropdownStyles}
                                                 />
                                             </Stack>
                                         )}
@@ -420,46 +412,45 @@ const FamilyDetails = () => {
                                 </Stack.Item>
                             </Stack>
                             <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="min-w-[250px]">
                                     <Controller
                                         name="guardianDesignation"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Designation</label>
-                                                <TextField {...field} placeholder="Enter guardian designation" errorMessage={errors.guardianDesignation?.message} styles={textFieldStyles} />
+                                                <Label>Designation</Label>
+                                                <Input {...field} value={field.value ?? ''} placeholder="Enter guardian designation" errorMessage={errors.guardianDesignation?.message} />
                                             </Stack>
                                         )}
                                     />
                                 </Stack.Item>
-                                <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="min-w-[250px]">
                                     <Controller
                                         name="guardianOrganization"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Organization Name</label>
-                                                <TextField {...field} placeholder="Enter organisation name" errorMessage={errors.guardianOrganization?.message} styles={textFieldStyles} />
+                                                <Label>Organization Name</Label>
+                                                <Input {...field} value={field.value ?? ''} placeholder="Enter organisation name" errorMessage={errors.guardianOrganization?.message} />
                                             </Stack>
                                         )}
                                     />
                                 </Stack.Item>
                             </Stack>
                             <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} styles={{ root: { width: '50%', minWidth: 250 } }}>
+                                <Stack.Item grow={1} className="w-1/2 min-w-[250px]">
                                     <Controller
                                         name="guardianIncome"
                                         control={control}
                                         render={({ field }) => (
                                             <Stack>
-                                                <label className={labelStyles}>Annual Income</label>
-                                                <Dropdown
+                                                <Label>Annual Income</Label>
+                                                <Select
                                                     selectedKey={field.value}
-                                                    onChange={(_, opt) => field.onChange(opt?.key)}
+                                                    onValueChange={field.onChange}
                                                     placeholder="Select"
                                                     options={INCOME_OPTIONS}
                                                     errorMessage={errors.guardianIncome?.message}
-                                                    styles={dropdownStyles}
                                                 />
                                             </Stack>
                                         )}

@@ -3,6 +3,7 @@ export * from "./button";
 export * from "./input";
 export * from "./select";
 export * from "./dropdown";
+export * from "./datepicker";
 export * from "./table";
 export * from "./tabs";
 export * from "./side-nav";

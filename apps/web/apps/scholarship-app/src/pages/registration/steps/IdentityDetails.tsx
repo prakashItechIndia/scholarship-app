@@ -12,6 +12,7 @@ import {
     mergeStyles,
     FontWeights,
 } from '@fluentui/react';
+import { Label } from '@shared/components';
 import { useRegistration } from '@/contexts/RegistrationContext';
 
 // --- Validation Schema ---
@@ -73,7 +74,7 @@ const labelStyles = mergeStyles({
 });
 
 const IdentityDetails = () => {
-    const { formData, updateFormData, nextStep, markStepComplete } = useRegistration();
+    const { formData, updateFormData, nextStep, markStepComplete, setIsLoading } = useRegistration();
 
     const {
         control,
@@ -96,26 +97,33 @@ const IdentityDetails = () => {
         };
     }, [updateFormData, getValues]);
 
-    const onSubmit = (data: IdentityFormData) => {
+    const onSubmit = async (data: IdentityFormData) => {
         console.log('Identity Step Data:', data);
-        updateFormData(data);
-        markStepComplete(1);
-        nextStep();
+        setIsLoading(true);
+        try {
+            // Show loading for a few seconds before moving to next step
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            updateFormData(data);
+            markStepComplete(1);
+            nextStep();
+        } finally {
+            setIsLoading(false);
+        }
     };
 
 
 
     return (
-        <Stack styles={containerStyles}>
+        <Stack className="w-4/5 h-full flex flex-col text-white [&_.ms-TextField-wrapper]:w-full">
 
             {/* Content Section (Grows to fill space) */}
             <Stack grow verticalAlign="start">
                 {/* Header Section */}
-                <h2 className={titleStyles}>Identity Verification Details</h2>
-                <p className={subtitleStyles}>Fill in the Required ID Numbers for Authentication</p>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-1">Identity Verification Details</h2>
+                <p className="text-sm text-gray-500 mb-8">Fill in the Required ID Numbers for Authentication</p>
 
                 {/* Form Fields */}
-                <form style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }} onSubmit={handleSubmit(onSubmit)} id="current-step-form">
+                <form className="w-full h-full flex flex-col" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
                     <Stack tokens={stackTokens}>
 
                         {/* Applicant Type Dropdown */}
@@ -124,15 +132,15 @@ const IdentityDetails = () => {
                             control={control}
                             render={({ field }) => (
                                 <Stack>
-                                    <label className={labelStyles}>What describes you better <span style={{ color: '#ef4444' }}>*</span></label>
+                                    <Label required>What describes you better</Label>
                                     <Dropdown
                                         selectedKey={field.value}
                                         onChange={(_, option) => field.onChange(option?.key)}
                                         placeholder="Select an option"
                                         options={APPLICANT_OPTIONS}
                                         errorMessage={errors.applicantType?.message}
+                                        className="w-full"
                                         styles={{
-                                            dropdown: { width: '100%' },
                                             title: { height: 42, lineHeight: 40, borderRadius: 4, borderColor: '#d1d5db' },
                                         }}
                                     />
@@ -142,13 +150,13 @@ const IdentityDetails = () => {
 
                         {/* IDs Row (Side by Side) */}
                         <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                            <Stack.Item grow={1} className="min-w-[250px]">
                                 <Controller
                                     name="aadhaarId"
                                     control={control}
                                     render={({ field }) => (
                                         <Stack>
-                                            <label className={labelStyles}>AADHAAR ID (Candidate)</label>
+                                            <Label>AADHAAR ID (Candidate)</Label>
                                             <TextField
                                                 {...field}
                                                 // Placeholder from image
@@ -161,13 +169,13 @@ const IdentityDetails = () => {
                                 />
                             </Stack.Item>
 
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                            <Stack.Item grow={1} className="min-w-[250px]">
                                 <Controller
                                     name="panId"
                                     control={control}
                                     render={({ field }) => (
                                         <Stack>
-                                            <label className={labelStyles}>PAN ID (Candidate)</label>
+                                            <Label>PAN ID (Candidate)</Label>
                                             <TextField
                                                 {...field}
                                                 placeholder="Enter Pan Card Number" // Placeholder from image

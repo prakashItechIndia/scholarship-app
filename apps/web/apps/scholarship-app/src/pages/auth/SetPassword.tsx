@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Stack, Text, mergeStyles } from '@fluentui/react';
+import { Stack, IconButton } from '@fluentui/react';
 import { SEO } from '../../components/seo/SEO';
 import { generateOrganizationSchema } from '../../utils/schema';
 import { AuthLayoutWrapper } from '@/components/auth/AuthLayoutWrapper';
-import { LogoHeader } from '@/components/auth/LogoHeader';
-import { Form } from '@/components/ui/form';
-import { Button } from '@shared/components';
-import { FormField } from '@/components/ui/form';
-import { FormFieldWrapper } from '@/components/auth/FormFieldWrapper';
+import { LogoHeaderWithOffset } from '@/components/auth/LogoHeaderWithOffset';
+import { AuthPageHeader } from '@/components/auth/AuthPageHeader';
+import { SubmitButton } from '@/components/auth/SubmitButton';
+import { TermsOfServiceText } from '@/components/auth/TermsOfServiceText';
+import { Form, FormField, FormItem, FormControl, FormMessage, Input, Label } from '@shared/components';
 import { EyeIcon, EyeOffIcon } from '@/components/ui/icons';
 import { getBaseUrl } from '@/utils/signInUtils';
 import { useToast } from '@/components/ui/toast';
@@ -58,8 +58,10 @@ const SetPasswordPage = () => {
     },
   });
 
-  const onSubmit = (_values: SetPasswordFormData) => {
+  const onSubmit = async (_values: SetPasswordFormData) => {
     // TODO: Implement password setting logic
+    // Show loading for a few seconds before showing success
+    await new Promise(resolve => setTimeout(resolve, 2000));
     success('Success', 'Password set successfully!');
     setTimeout(() => void navigate('/signin'), 1000);
   };
@@ -74,18 +76,14 @@ const SetPasswordPage = () => {
         schema={organizationSchema}
       />
       <AuthLayoutWrapper footerVariant="email">
-        <div style={{ position: 'relative', top: '-180px', marginBottom: '-100px' }}>
-          <LogoHeader variant="email" />
-        </div>
+        <LogoHeaderWithOffset variant="email" />
         
-        <Stack tokens={{ childrenGap: 24 }}>
-          <Text variant="xxLarge" styles={{ root: { fontWeight: 700, color: '#111827', lineHeight: '1.25', fontSize: '1.5rem' } }}>
-            Set Password
-          </Text>
-          
-          <Text variant="medium" styles={{ root: { color: '#707070', lineHeight: '1.5', fontSize: '1rem' } }}>
-            Set your password to enhance account security.
-          </Text>
+        <AuthPageHeader
+          title="Set Password"
+          subtitle="Set your password to enhance account security."
+          titleSize="xxLarge"
+          subtitleSize="medium"
+        />
 
           <Form {...form}>
             <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)} noValidate>
@@ -94,73 +92,40 @@ const SetPasswordPage = () => {
                 <FormField
                   control={form.control}
                   name="password"
-                  render={({ field }) => (
-                    <FormFieldWrapper label="New Password" required variant="email">
-                      <div style={{ position: 'relative' }}>
-                        <div
-                          className={mergeStyles({
-                            width: '100%',
-                            borderRadius: '6px',
-                            border: '1px solid #d1d5db',
-                            backgroundColor: '#ffffff',
-                          })}
-                        >
-                          <Stack horizontal tokens={{ childrenGap: 10 }} verticalAlign="center" styles={{ root: { padding: '0 12px' } }}>
-                            {/* <KeyIcon style={{ width: '16px', height: '16px', color: '#616161', flexShrink: 0 }} /> */}
-                            <input
-                              {...field}
-                              value={field.value ?? ''}
-                              type={showPassword ? 'text' : 'password'}
-                              placeholder="Enter your password"
-                              className={mergeStyles({
-                                width: '100%',
-                                height: '45px',
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                                outline: 'none',
-                                fontSize: '14px',
-                                lineHeight: '45px',
-                                color: '#111827',
-                                padding: '0 32px 0 0',
-                                '::placeholder': {
-                                  color: '#9ca3af',
-                                },
-                              })}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowPassword(!showPassword)}
-                              className={mergeStyles({
-                                position: 'absolute',
-                                right: '12px',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                color: '#616161',
-                                width: '20px',
-                                height: '20px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                                cursor: 'pointer',
-                                ':hover': {
-                                  color: '#424242',
-                                },
-                              })}
-                              tabIndex={-1}
-                              aria-label={showPassword ? 'Hide password' : 'Show password'}
-                            >
-                              {showPassword ? (
-                                <EyeIcon style={{ width: '20px', height: '20px' }} />
-                              ) : (
-                                <EyeOffIcon style={{ width: '20px', height: '20px' }} />
-                              )}
-                            </button>
-                          </Stack>
-                        </div>
+                  render={({ field }: { field: any }) => (
+                    <FormItem>
+                      <div className="flex flex-col gap-[4px]">
+                        <Label required className="text-[12px] font-normal text-Neutral-Foreground-1-Rest leading-[16px]">
+                          New Password
+                        </Label>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value ?? ''}
+                            suffixIcon={
+                              <IconButton
+                                onClick={() => setShowPassword(!showPassword)}
+                                ariaLabel={showPassword ? 'Hide password' : 'Show password'}
+                                onRenderIcon={() => 
+                                  showPassword ? (
+                                    <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                                  ) : (
+                                    <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                                  )
+                                }
+                                className="w-auto h-auto min-w-0 p-1 bg-transparent border-none hover:bg-transparent active:bg-transparent"
+                              />
+                            }
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Enter your password"
+                            autoComplete="new-password"
+                            aria-invalid={Boolean(form.formState.errors.password)}
+                            required={false}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-Status-Danger-Foreground-1-Rest text-xs" />
                       </div>
-                    </FormFieldWrapper>
+                    </FormItem>
                   )}
                 />
 
@@ -168,107 +133,56 @@ const SetPasswordPage = () => {
                 <FormField
                   control={form.control}
                   name="confirmPassword"
-                  render={({ field }) => (
-                    <FormFieldWrapper label="Confirm Password" required variant="email">
-                      <div style={{ position: 'relative' }}>
-                        <div
-                          className={mergeStyles({
-                            width: '100%',
-                            borderRadius: '6px',
-                            border: '1px solid #d1d5db',
-                            backgroundColor: '#ffffff',
-                          })}
-                        >
-                          <Stack horizontal tokens={{ childrenGap: 10 }} verticalAlign="center" styles={{ root: { padding: '0 12px' } }}>
-                            {/* <KeyIcon style={{ width: '16px', height: '16px', color: '#616161', flexShrink: 0 }} /> */}
-                            <input
-                              {...field}
-                              value={field.value ?? ''}
-                              type={showConfirmPassword ? 'text' : 'password'}
-                              placeholder="Enter your password"
-                              className={mergeStyles({
-                                width: '100%',
-                                height: '45px',
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                                outline: 'none',
-                                fontSize: '14px',
-                                lineHeight: '45px',
-                                color: '#111827',
-                                padding: '0 32px 0 0',
-                                '::placeholder': {
-                                  color: '#9ca3af',
-                                },
-                              })}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                              className={mergeStyles({
-                                position: 'absolute',
-                                right: '12px',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                color: '#616161',
-                                width: '20px',
-                                height: '20px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                                cursor: 'pointer',
-                                ':hover': {
-                                  color: '#424242',
-                                },
-                              })}
-                              tabIndex={-1}
-                              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                            >
-                              {showConfirmPassword ? (
-                                <EyeIcon style={{ width: '20px', height: '20px' }} />
-                              ) : (
-                                <EyeOffIcon style={{ width: '20px', height: '20px' }} />
-                              )}
-                            </button>
-                          </Stack>
-                        </div>
+                  render={({ field }: { field: any }) => (
+                    <FormItem>
+                      <div className="flex flex-col gap-[4px]">
+                        <Label required className="text-[12px] font-normal text-Neutral-Foreground-1-Rest leading-[16px]">
+                          Confirm Password
+                        </Label>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value ?? ''}
+                            suffixIcon={
+                              <IconButton
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                ariaLabel={showConfirmPassword ? 'Hide password' : 'Show password'}
+                                onRenderIcon={() => 
+                                  showConfirmPassword ? (
+                                    <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                                  ) : (
+                                    <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                                  )
+                                }
+                                className="w-auto h-auto min-w-0 p-1 bg-transparent border-none hover:bg-transparent active:bg-transparent"
+                              />
+                            }
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            placeholder="Confirm your password"
+                            autoComplete="new-password"
+                            aria-invalid={Boolean(form.formState.errors.confirmPassword)}
+                            required={false}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-Status-Danger-Foreground-1-Rest text-xs" />
                       </div>
-                    </FormFieldWrapper>
+                    </FormItem>
                   )}
                 />
 
-                <Button
+                <SubmitButton
                   type="submit"
                   disabled={form.formState.isSubmitting}
-                  variant="primary"
-                  styles={{
-                    root: {
-                      width: '100%',
-                      height: '44px',
-                      fontSize: '16px',
-                      fontWeight: 600,
-                    },
-                  }}
+                  isLoading={form.formState.isSubmitting}
+                  loadingText="Loading..."
                 >
                   Continue
-                </Button>
+                </SubmitButton>
 
-                <Text variant="small" styles={{ root: { color: '#4b5563', textAlign: 'center', lineHeight: '1.75' } }}>
-                  By continuing, you agree to our{' '}
-                  <span style={{ color: '#000000', textDecoration: 'none', fontWeight: 600 }}>
-                    Terms of Service
-                  </span>{' '}
-                  and{' '}
-                  <span style={{ color: '#000000', textDecoration: 'none', fontWeight: 600 }}>
-                    Privacy Policy
-                  </span>
-                  .
-                </Text>
+                <TermsOfServiceText />
               </Stack>
             </form>
           </Form>
-        </Stack>
       </AuthLayoutWrapper>
     </>
   );

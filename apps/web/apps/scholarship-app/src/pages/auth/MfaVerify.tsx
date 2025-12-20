@@ -10,7 +10,7 @@ import { handleAuthRedirect } from '../../utils/redirect';
 import { AuthWrapper } from '@/components/auth/AuthWrapper';
 import { SEO } from '../../components/seo/SEO';
 import { PrimaryButton } from '@fluentui/react';
-import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
+import { Form, FormField, FormItem, FormControl, FormMessage } from '@shared/components';
 import { useToast } from '@/components/ui/toast';
 
 const mfaSchema = z.object({

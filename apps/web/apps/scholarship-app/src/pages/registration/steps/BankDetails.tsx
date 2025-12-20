@@ -12,6 +12,7 @@ import {
     mergeStyles,
     FontWeights,
 } from '@fluentui/react';
+import { Label } from '@shared/components';
 import { useRegistration } from '@/contexts/RegistrationContext';
 
 // --- Validation Schema ---
@@ -96,7 +97,7 @@ const textFieldStyles = {
 };
 
 const BankDetails = () => {
-    const { formData, updateFormData, nextStep, markStepComplete } = useRegistration();
+    const { formData, updateFormData, nextStep, markStepComplete, setIsLoading } = useRegistration();
 
     const {
         control,
@@ -123,31 +124,38 @@ const BankDetails = () => {
         };
     }, [updateFormData, getValues]);
 
-    const onSubmit = (data: BankFormData) => {
+    const onSubmit = async (data: BankFormData) => {
         console.log('Bank Step Data:', data);
-        updateFormData(data);
-        markStepComplete(4);
-        nextStep();
+        setIsLoading(true);
+        try {
+            // Show loading for a few seconds before moving to next step
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            updateFormData(data);
+            markStepComplete(4);
+            nextStep();
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
-        <Stack styles={containerStyles}>
+        <Stack className="w-4/5 h-full flex flex-col">
             <Stack grow verticalAlign="start">
-                <h2 className={titleStyles}>Bank details of Applicant (Student)</h2>
-                <p className={subtitleStyles}>Provide accurate bank information for scholarship disbursement.</p>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-1">Bank details of Applicant (Student)</h2>
+                <p className="text-sm text-gray-500 mb-8">Provide accurate bank information for scholarship disbursement.</p>
 
-                <form style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }} onSubmit={handleSubmit(onSubmit)} id="current-step-form">
+                <form className="w-full h-full flex flex-col" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
                     <Stack tokens={stackTokens}>
 
                         {/* Row 1: Name and Account Number */}
                         <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                            <Stack.Item grow={1} className="min-w-[250px]">
                                 <Controller
                                     name="bankAccountName"
                                     control={control}
                                     render={({ field }) => (
                                         <Stack>
-                                            <label className={labelStyles}>Name (As per passbook) <span style={asteriskStyle}>*</span></label>
+                                            <Label required>Name (As per passbook)</Label>
                                             <TextField
                                                 {...field}
                                                 placeholder="Enter name"
@@ -158,13 +166,13 @@ const BankDetails = () => {
                                     )}
                                 />
                             </Stack.Item>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                            <Stack.Item grow={1} className="min-w-[250px]">
                                 <Controller
                                     name="bankAccountNumber"
                                     control={control}
                                     render={({ field }) => (
                                         <Stack>
-                                            <label className={labelStyles}>Account Number <span style={asteriskStyle}>*</span></label>
+                                            <Label required>Account Number</Label>
                                             <TextField
                                                 {...field}
                                                 placeholder="Enter account number"
@@ -179,13 +187,13 @@ const BankDetails = () => {
 
                         {/* Row 2: Bank and Branch */}
                         <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                            <Stack.Item grow={1} className="min-w-[250px]">
                                 <Controller
                                     name="bankName"
                                     control={control}
                                     render={({ field }) => (
                                         <Stack>
-                                            <label className={labelStyles}>Bank Name <span style={asteriskStyle}>*</span></label>
+                                            <Label required>Bank Name</Label>
                                             <Dropdown
                                                 selectedKey={field.value}
                                                 onChange={(_, opt) => field.onChange(opt?.key)}
@@ -198,13 +206,13 @@ const BankDetails = () => {
                                     )}
                                 />
                             </Stack.Item>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                            <Stack.Item grow={1} className="min-w-[250px]">
                                 <Controller
                                     name="bankBranch"
                                     control={control}
                                     render={({ field }) => (
                                         <Stack>
-                                            <label className={labelStyles}>Branch <span style={asteriskStyle}>*</span></label>
+                                            <Label required>Branch</Label>
                                             <Dropdown
                                                 selectedKey={field.value}
                                                 onChange={(_, opt) => field.onChange(opt?.key)}
@@ -221,13 +229,13 @@ const BankDetails = () => {
 
                         {/* Row 3: Request Amount & Scholarship Seeking For */}
                         <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                            <Stack.Item grow={1} className="min-w-[250px]">
                                 <Controller
                                     name="bankRequestAmount"
                                     control={control}
                                     render={({ field }) => (
                                         <Stack>
-                                            <label className={labelStyles}>Request Amount <span style={asteriskStyle}>*</span></label>
+                                            <Label required>Request Amount</Label>
                                             <TextField
                                                 {...field}
                                                 placeholder="Enter Request amount"
@@ -238,13 +246,13 @@ const BankDetails = () => {
                                     )}
                                 />
                             </Stack.Item>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
+                            <Stack.Item grow={1} className="min-w-[250px]">
                                 <Controller
                                     name="bankScholarshipSeekingFor"
                                     control={control}
                                     render={({ field }) => (
                                         <Stack>
-                                            <label className={labelStyles}>Scholarship Seeking For <span style={asteriskStyle}>*</span></label>
+                                            <Label required>Scholarship Seeking For</Label>
                                             <TextField
                                                 {...field}
                                                 placeholder="Enter Scholarship Seeking For"
@@ -259,15 +267,15 @@ const BankDetails = () => {
 
                         {/* Row 4: IFSC Code (Half width) */}
                         <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} styles={{ root: { width: '50%', minWidth: 250 } }}>
+                            <Stack.Item grow={1} className="w-1/2 min-w-[250px]">
                                 <Controller
                                     name="bankIfscCode"
                                     control={control}
                                     render={({ field }) => (
                                         <Stack>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <label className={labelStyles} style={{ marginBottom: 0 }}>IFSC Code <span style={asteriskStyle}>*</span></label>
-                                                <span className={lookupLinkStyle}>(Lookup IFSC Code)</span>
+                                            <div className="flex justify-between items-center">
+                                                <Label required className="mb-0">IFSC Code</Label>
+                                                <span className="float-right text-[#ef4444] text-xs cursor-pointer font-medium no-underline">(Lookup IFSC Code)</span>
                                             </div>
                                             <TextField
                                                 {...field}
@@ -277,6 +285,7 @@ const BankDetails = () => {
                                                     ...textFieldStyles,
                                                     root: { marginTop: 6 } // manual spacing since label wrapper is custom
                                                 }}
+                                                className="mt-1.5"
                                             />
                                         </Stack>
                                     )}

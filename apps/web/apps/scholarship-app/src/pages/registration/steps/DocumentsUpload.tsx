@@ -124,7 +124,7 @@ const fileItemStyles = mergeStyles({
 
 // --- Icons ---
 const UploadIcon = () => (
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: 16 }}>
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-4">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
         <polyline points="17 8 12 3 7 8" />
         <line x1="12" y1="3" x2="12" y2="15" />
@@ -149,7 +149,7 @@ const ImageIcon = () => (
 );
 
 const DocumentsUpload = () => {
-    const { formData, updateFormData, nextStep, markStepComplete } = useRegistration();
+    const { formData, updateFormData, nextStep, markStepComplete, setIsLoading } = useRegistration();
     const [uploadedFiles, setUploadedFiles] = useState<File[]>(formData.documents || []);
     const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -182,15 +182,22 @@ const DocumentsUpload = () => {
         fileInputRef.current?.click();
     };
 
-    const onFormSubmit = () => {
+    const onFormSubmit = async () => {
         if (uploadedFiles.length < 3) {
             setError(`You must upload at least 3 documents. Currently uploaded: ${uploadedFiles.length}`);
             return;
         }
 
-        updateFormData({ documents: uploadedFiles });
-        markStepComplete(5);
-        nextStep(); // This now navigates to the Review & Submit step
+        setIsLoading(true);
+        try {
+            // Show loading for a few seconds before moving to next step
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            updateFormData({ documents: uploadedFiles });
+            markStepComplete(5);
+            nextStep(); // This now navigates to the Review & Submit step
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     // Helper to check file type
@@ -200,37 +207,37 @@ const DocumentsUpload = () => {
     };
 
     return (
-        <Stack styles={containerStyles}>
+        <Stack className="w-4/5 h-full flex flex-col">
             <Stack grow verticalAlign="start">
-                <h2 className={titleStyles}>Documents to be uploaded</h2>
-                <p className={subtitleStyles}>Provide the requested documents to complete your application.</p>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-1">Documents to be uploaded</h2>
+                <p className="text-sm text-gray-500 mb-8">Provide the requested documents to complete your application.</p>
 
                 {error && (
-                    <MessageBar messageBarType={MessageBarType.error} styles={{ root: { marginBottom: 16 } }}>
+                    <MessageBar messageBarType={MessageBarType.error} className="mb-4">
                         {error}
                     </MessageBar>
                 )}
 
-                <form id="current-step-form" style={{ width: '100%', height: '100%' }} onSubmit={handleSubmit(onFormSubmit)}>
+                <form id="current-step-form" className="w-full h-full" onSubmit={handleSubmit(onFormSubmit)}>
                     {/* Main Layout: 3 Columns */}
-                    <Stack horizontal tokens={{ childrenGap: 24 }} wrap={false} styles={{ root: { width: '100%' } }}>
+                    <Stack horizontal tokens={{ childrenGap: 24 }} wrap={false} className="w-full">
 
                         {/* Column 1: Upload Area (Flexible width, maybe 40-50%) */}
-                        <Stack.Item grow={2} styles={{ root: { minWidth: 300 } }}>
+                        <Stack.Item grow={2} className="min-w-[300px]">
                             <div className={uploadAreaStyles} onClick={onDropClick}>
                                 <input
                                     type="file"
                                     multiple
                                     ref={fileInputRef}
-                                    style={{ display: 'none' }}
+                                    className="hidden"
                                     onChange={handleFileSelect}
                                     accept=".jpg,.jpeg,.png,.pdf"
                                 />
                                 <UploadIcon />
-                                <Text style={{ fontSize: 16, fontWeight: 600, color: '#111827', marginBottom: 2 }}>
+                                <Text className="text-base font-semibold text-gray-900 mb-0.5">
                                     Click to select files
                                 </Text>
-                                <Text style={{ fontSize: 13, color: '#6b7280' }}>
+                                <Text className="text-sm text-gray-500">
                                     Supported formats: JPG, PNG and PDF (up to 20MB)
                                 </Text>
                             </div>
@@ -238,29 +245,22 @@ const DocumentsUpload = () => {
 
                         {/* Column 2: Uploaded Files List (Fixed width or percentage, maybe 25%) */}
                         {uploadedFiles.length > 0 && (
-                            <Stack.Item styles={{ root: { width: 300, minWidth: 250 } }}>
+                            <Stack.Item className="w-[300px] min-w-[250px]">
                                 <Stack>
                                     {uploadedFiles.map((file, idx) => (
                                         <div key={idx} className={fileItemStyles}>
-                                            <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 12 }} style={{ overflow: 'hidden' }}>
-                                                <div style={{ flexShrink: 0 }}>
+                                            <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 12 }} className="overflow-hidden">
+                                                <div className="shrink-0">
                                                     {isImage(file) ? <ImageIcon /> : <PdfIcon />}
                                                 </div>
-                                                <Stack style={{ overflow: 'hidden' }}>
+                                                <Stack className="overflow-hidden">
                                                     <Text
-                                                        style={{
-                                                            fontWeight: 600,
-                                                            color: '#111827',
-                                                            fontSize: 14,
-                                                            whiteSpace: 'nowrap',
-                                                            overflow: 'hidden',
-                                                            textOverflow: 'ellipsis'
-                                                        }}
+                                                        className="font-semibold text-gray-900 text-sm whitespace-nowrap overflow-hidden text-ellipsis"
                                                         title={file.name}
                                                     >
                                                         {file.name}
                                                     </Text>
-                                                    <Text style={{ fontSize: 12, color: '#6b7280' }}>
+                                                    <Text className="text-xs text-gray-500">
                                                         {formatBytes(file.size)}
                                                     </Text>
                                                 </Stack>
@@ -270,9 +270,8 @@ const DocumentsUpload = () => {
                                                 title="Remove file"
                                                 ariaLabel="Remove file"
                                                 onClick={() => handleRemoveFile(idx)}
+                                                className="text-gray-400 h-6 w-6 hover:text-[#ef4444] hover:bg-transparent active:bg-transparent"
                                                 styles={{
-                                                    root: { color: '#9ca3af', height: 24, width: 24 },
-                                                    rootHovered: { color: '#ef4444', backgroundColor: 'transparent' },
                                                     icon: { fontSize: 14 }
                                                 }}
                                             />
@@ -283,13 +282,13 @@ const DocumentsUpload = () => {
                         )}
 
                         {/* Column 3: Requirements List (Fixed width, maybe 25%) */}
-                        <Stack.Item styles={{ root: { width: 300, minWidth: 250 } }}>
+                        <Stack.Item className="w-[300px] min-w-[250px]">
                             <div className={sideCardStyles}>
                                 <div className={sideCardHeaderStyles}>
-                                    <Text style={{ fontWeight: 600, color: '#111827', fontSize: 16, display: 'block' }}>
+                                    <Text className="font-semibold text-gray-900 text-base block">
                                         Documents required
                                     </Text>
-                                    <Text style={{ fontSize: 13, color: '#6b7280', display: 'block', marginTop: 2 }}>
+                                    <Text className="text-sm text-gray-500 block mt-0.5">
                                         (Any 3 documents are mandatory)
                                     </Text>
                                 </div>

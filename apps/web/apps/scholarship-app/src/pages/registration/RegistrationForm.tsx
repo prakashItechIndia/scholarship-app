@@ -1,4 +1,5 @@
-import { Stack, Text, Image, mergeStyles, IStackStyles, ImageFit, PrimaryButton, DefaultButton } from '@fluentui/react';
+import { Stack, Text, Image, mergeStyles, IStackStyles, ImageFit, Spinner, SpinnerSize } from '@fluentui/react';
+import { Button } from '@shared/components';
 import { SEO } from '../../components/seo/SEO';
 import { RegistrationProvider, useRegistration } from '@/contexts/RegistrationContext';
 import IdentityDetails from './steps/IdentityDetails';
@@ -6,11 +7,17 @@ import PersonalDetails from './steps/PersonalDetails';
 import FamilyDetails from './steps/FamilyDetails';
 import BankDetails from './steps/BankDetails';
 import DocumentsUpload from './steps/DocumentsUpload';
-import ReviewSubmit from './steps/ReviewSubmit';
-import logo from '../../assets/logo.png';
-import background from '../../assets/header-bg.png';
+// import ReviewSubmit from './steps/ReviewSubmit';
+import logo from '@shared/assets/icons/Logo.png';
+import background from '@shared/assets/icons/header-bg.png';
 
-const STEPS = [
+interface Step {
+  id: number;
+  title: string;
+  key: string;
+}
+
+const STEPS: Step[] = [
   { id: 1, title: 'Identity Details', key: 'identity' },
   { id: 2, title: 'Personal Details', key: 'personal' },
   { id: 3, title: 'Family details', key: 'family' },
@@ -78,24 +85,23 @@ const sidebarStyles: IStackStyles = {
 
 // --- Sub-components ---
 
-const StepIndicator = ({ step, isActive, isCompleted }: { step: any, isActive: boolean, isCompleted: boolean }) => {
+const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: boolean, isCompleted: boolean }) => {
   return (
     <Stack horizontal tokens={{ childrenGap: 16 }} verticalAlign="start" className={isActive ? '' : 'opacity-70'}>
-      <div className={mergeStyles({
-        width: 32, height: 32, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 14, fontWeight: 'bold', border: '2px solid',
-        transition: 'all 0.2s',
-        backgroundColor: isActive ? '#111827' : (isCompleted ? '#22c55e' : 'transparent'), // gray-900 / green-500
-        color: isActive || isCompleted ? 'white' : '#9ca3af', // gray-400
-        borderColor: isActive ? '#111827' : (isCompleted ? '#22c55e' : '#d1d5db'), // gray-300
-      })}>
+      <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold border-2 transition-all ${
+        isActive 
+          ? 'bg-gray-900 text-white border-gray-900' 
+          : isCompleted 
+            ? 'bg-green-500 text-white border-green-500' 
+            : 'bg-transparent text-gray-400 border-gray-300'
+      }`}>
         {isCompleted ? '✓' : step.id}
       </div>
-      <Stack styles={{ root: { paddingTop: 10, paddingBottom: 2, justifyContent: 'center' } }}>
-        <Text variant="small" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: '#6b7280', fontWeight: 600, marginBottom: 2, }}>
+      <Stack className="pt-[10px] pb-0.5 justify-center">
+        <Text variant="small" className="uppercase tracking-wider text-gray-500 font-semibold mb-0.5">
           STEP {step.id}
         </Text>
-        <Text variant="large" style={{ fontWeight: 700, color: isActive ? '#111827' : '#4b5563' }}>
+        <Text variant="large" className={`font-bold ${isActive ? 'text-gray-900' : 'text-gray-600'}`}>
           {step.title}
         </Text>
       </Stack>
@@ -104,7 +110,8 @@ const StepIndicator = ({ step, isActive, isCompleted }: { step: any, isActive: b
 };
 
 const RegistrationContent = () => {
-  const { currentStep, completedSteps, prevStep } = useRegistration();
+  // Direct destructuring - TypeScript should infer types from the hook's return type
+  const { currentStep, completedSteps, prevStep, isLoading } = useRegistration();
 
   const handleCancel = () => {
     window.location.href = '/signin';
@@ -117,7 +124,7 @@ const RegistrationContent = () => {
       case 3: return <FamilyDetails />;
       case 4: return <BankDetails />;
       case 5: return <DocumentsUpload />;
-      case 6: return <ReviewSubmit />;
+      // case 6: return <ReviewSubmit />;
       default: return <IdentityDetails />;
     }
   };
@@ -131,7 +138,7 @@ const RegistrationContent = () => {
         description="Online Registration for Scholarship Assistance - Academic Year 2025-2026"
         url="/registration"
       />
-      <Stack style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f9fafb' }}> {/* bg-gray-50 */}
+      <Stack className="h-screen overflow-hidden bg-gray-50">
 
         {/* Header - Fixed Height */}
         <Stack horizontal verticalAlign="center" styles={headerStyles} disableShrink>
@@ -147,13 +154,13 @@ const RegistrationContent = () => {
             {/* Title */}
             <Stack.Item grow>
               <Stack horizontalAlign="center" tokens={{ childrenGap: 8 }}>
-                <Text variant="xxLarge" style={{ fontWeight: 600, color: '#111827' }}>
+                <Text variant="xxLarge" className="font-semibold text-gray-900">
                   Leo Muthu Scholarship Application
                 </Text>
-                <Text variant="large" style={{ fontWeight: 500, color: '#1f2937' }}>
+                <Text variant="large" className="font-medium text-gray-800">
                   Online Registration for Scholarship Assistance - Academic Year 2025-2026
                 </Text>
-                <Text variant="medium" style={{ color: '#374151', marginTop: 4 }}>
+                <Text variant="medium" className="text-gray-700 mt-1">
                   Complete the form below to apply for our scholarship program
                 </Text>
               </Stack>
@@ -161,28 +168,28 @@ const RegistrationContent = () => {
 
             {/* Spacer */}
             <Stack.Item disableShrink>
-              <div style={{ width: 120, display: 'none' }} className="lg:block"></div>
+              <div className="hidden lg:block w-[120px]"></div>
             </Stack.Item>
           </Stack>
         </Stack>
 
         {/* Main Body - Fills remaining height */}
-        <Stack horizontal grow styles={{ root: { overflow: 'hidden', width: '100%' } }}>
+        <Stack horizontal grow className="overflow-hidden w-full">
 
           {/* Sidebar - Fixed Width, Scrollable inside if needed */}
           <Stack styles={sidebarStyles} disableShrink>
-            <Stack tokens={{ childrenGap: 32 }} style={{ marginBottom: 32 }}>
+            <Stack tokens={{ childrenGap: 32 }} className="mb-8">
               <Stack horizontal horizontalAlign="space-between" verticalAlign="center">
-                <Stack style={{ marginBottom: 20 }}>
-                  <Text variant="xLarge" style={{ fontWeight: 'bold', fontSize: 30 }}>
+                <Stack className="mb-5">
+                  <Text variant="xLarge" className="font-bold text-[30px]">
                     Online registration
                   </Text>
-                  <Text variant="small" style={{ color: '#9ca3af', fontSize: 14, marginTop: 2 }}>Getting started</Text>
+                  <Text variant="small" className="text-gray-400 text-sm mt-0.5">Getting started</Text>
                 </Stack>
 
                 {/* Progress Circle - SVG Implementation */}
-                <div style={{ position: 'relative', width: 60, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="60" height="60" viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)' }}>
+                <div className="relative w-[60px] h-[60px] flex items-center justify-center">
+                  <svg width="60" height="60" viewBox="0 0 72 72" className="rotate-[-90deg]">
                     {/* Track */}
                     <circle
                       cx="36" cy="36" r="32"
@@ -199,10 +206,10 @@ const RegistrationContent = () => {
                       strokeDasharray={2 * Math.PI * 32}
                       strokeDashoffset={(2 * Math.PI * 32) * (1 - (progressPercentage / 100))}
                       strokeLinecap="round"
-                      style={{ transition: 'stroke-dashoffset 0.5s ease-out' }}
+                      className="transition-[stroke-dashoffset] duration-500 ease-out"
                     />
                   </svg>
-                  <div style={{ position: 'absolute', color: '#1f2937', fontWeight: 'bold', fontSize: 16 }}>
+                  <div className="absolute text-gray-800 font-bold text-base">
                     {completedSteps.length}/{STEPS.length}
                   </div>
                 </div>
@@ -224,12 +231,12 @@ const RegistrationContent = () => {
           </Stack>
 
           {/* Main Form Content Wrapper - Flex Container */}
-          <Stack grow styles={{ root: { display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: 'white', borderTopRightRadius: 12 } }}>
+          <Stack grow className="flex flex-col h-full bg-white rounded-tr-xl">
 
             {/* Scrollable Content Area */}
-            <Stack grow styles={{ root: { overflowY: 'auto', padding: '32px 40px' } }}>
-              <Stack style={{ marginBottom: 32 }}>
-                <Text style={{ color: '#2563eb', fontSize: '0.625rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
+            <Stack grow className="overflow-y-auto py-8 px-10">
+              <Stack className="mb-8">
+                <Text className="text-blue-600 text-[0.625rem] font-bold uppercase tracking-wider mb-2">
                   STEP {currentStep}/{STEPS.length}
                 </Text>
               </Stack>
@@ -242,35 +249,38 @@ const RegistrationContent = () => {
               horizontal
               horizontalAlign="space-between"
               verticalAlign="center"
-              styles={{
-                root: {
-                  padding: '24px 40px',
-                  borderTop: '1px solid #e5e7eb',
-                  backgroundColor: 'white',
-                  zIndex: 10,
-                  flexShrink: 0
-                }
-              }}
+              className="py-6 px-10 border-t border-gray-200 bg-white z-10 shrink-0"
             >
-              <DefaultButton
-                text="Cancel"
+              <Button
+                variant="outline"
                 onClick={handleCancel}
-                styles={{ root: { height: 40, borderRadius: 9, minWidth: 90, borderColor: '#d1d5db' } }}
-              />
+              >
+                Cancel
+              </Button>
 
               <Stack horizontal tokens={{ childrenGap: 16 }}>
-                <DefaultButton
-                  text="Previous"
+                <Button
+                  variant="outline"
                   onClick={prevStep}
                   disabled={currentStep === 1}
-                  styles={{ root: { height: 40, borderRadius: 9, minWidth: 90, borderColor: '#f3f4f6' } }}
-                />
-                <PrimaryButton
-                  text={currentStep === 6 ? 'Submit' : 'Next'}
+                >
+                  Previous
+                </Button>
+                <Button
                   type="submit"
                   form="current-step-form"
-                  styles={{ root: { height: 40, borderRadius: 9, minWidth: 90, backgroundColor: '#1d4ed8' } }}
-                />
+                  variant="default"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Stack horizontal tokens={{ childrenGap: 8 }} verticalAlign="center" horizontalAlign="center">
+                      <Spinner size={SpinnerSize.small} />
+                      <span>Loading...</span>
+                    </Stack>
+                  ) : (
+                    currentStep === 6 ? 'Submit' : 'Next'
+                  )}
+                </Button>
               </Stack>
             </Stack>
 

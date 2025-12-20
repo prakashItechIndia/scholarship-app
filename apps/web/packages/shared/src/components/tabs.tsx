@@ -2,7 +2,7 @@ import * as React from "react";
 import { Pivot, PivotItem, IPivotProps } from "@fluentui/react";
 import { cn } from "../lib/utils";
 
-export interface TabsProps extends Omit<IPivotProps, "onLinkClick"> {
+export interface TabsProps extends Omit<IPivotProps, "onLinkClick" | "styles"> {
   variant?: "default" | "pills" | "underline";
   defaultValue?: string;
   value?: string;
@@ -28,31 +28,34 @@ const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
       }
     };
 
+    // Internal styles - maintained within component
+    const internalStyles = React.useMemo(() => ({
+      root: {
+        width: "100%",
+      },
+      link: {
+        fontSize: "14px",
+        fontWeight: "400" as const,
+        color: "#323130",
+        padding: "8px 16px",
+      },
+      linkIsSelected: {
+        fontSize: "14px",
+        fontWeight: "600" as const,
+        color: "#0078d4",
+        borderBottom: "2px solid #0078d4",
+      },
+      linkContent: {
+        fontSize: "14px",
+      },
+    } as any), []);
+
     return (
       <div ref={ref} className={cn("w-full", className)}>
         <Pivot
           selectedKey={selectedKey}
           onLinkClick={handleLinkClick}
-          styles={{
-            root: {
-              width: "100%",
-            },
-            link: {
-              fontSize: "14px",
-              fontWeight: 400,
-              color: "#323130",
-              padding: "8px 16px",
-            },
-            linkIsSelected: {
-              fontSize: "14px",
-              fontWeight: 600,
-              color: "#0078d4",
-              borderBottom: "2px solid #0078d4",
-            },
-            linkContent: {
-              fontSize: "14px",
-            },
-          }}
+          styles={internalStyles}
           {...props}
         >
           {children}
@@ -114,4 +117,3 @@ const Tab = TabsTrigger;
 const TabPanel = TabsContent;
 
 export { Tabs, TabsList, TabsTrigger, TabsContent, TabList, Tab, TabPanel };
-

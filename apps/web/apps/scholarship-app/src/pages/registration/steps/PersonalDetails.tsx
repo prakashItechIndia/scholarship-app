@@ -1,26 +1,23 @@
 import { useEffect, useState } from 'react';
-import ProfileImage from '../../../assets/ProfileImage.svg';
-import Avatar from '../../../assets/Avatar.svg';
+// import ProfileImage from '../../../assets/ProfileImage.svg';
+// import Avatar from '../../../assets/Avatar.svg';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
     Stack,
-    TextField,
-    Dropdown,
-    IDropdownOption,
     IStackStyles,
     IStackTokens,
     mergeStyles,
     FontWeights,
     ChoiceGroup,
     IChoiceGroupOption,
-    DatePicker,
     Text,
     Image,
     ImageFit,
 } from '@fluentui/react';
-import { useRegistration } from '@/contexts/RegistrationContext';
+import { Input, Select, DatePicker, Label } from '@shared/components';
+import { useRegistration, type RegistrationFormData } from '@/contexts/RegistrationContext';
 
 // --- Validation Schema ---
 const personalSchema = z.object({
@@ -53,19 +50,19 @@ const GENDER_OPTIONS: IChoiceGroupOption[] = [
     { key: 'female', text: 'Female' },
 ];
 
-const COMMUNITY_OPTIONS: IDropdownOption[] = [
-    { key: 'oc', text: 'OC' },
-    { key: 'bc', text: 'BC' },
-    { key: 'mbc', text: 'MBC' },
-    { key: 'sc', text: 'SC' },
-    { key: 'st', text: 'ST' },
+const COMMUNITY_OPTIONS = [
+    { value: 'oc', label: 'OC' },
+    { value: 'bc', label: 'BC' },
+    { value: 'mbc', label: 'MBC' },
+    { value: 'sc', label: 'SC' },
+    { value: 'st', label: 'ST' },
 ];
 
 // Mock options (usually fetched from API)
-const CASTE_OPTIONS: IDropdownOption[] = [{ key: 'caste1', text: 'Caste 1' }, { key: 'caste2', text: 'Caste 2' }];
-const DISTRICT_OPTIONS: IDropdownOption[] = [{ key: 'chennai', text: 'Chennai' }, { key: 'kancheepuram', text: 'Kancheepuram' }];
-const STATE_OPTIONS: IDropdownOption[] = [{ key: 'tn', text: 'Tamil Nadu' }, { key: 'ka', text: 'Karnataka' }];
-const COUNTRY_OPTIONS: IDropdownOption[] = [{ key: 'in', text: 'India' }];
+const CASTE_OPTIONS = [{ value: 'caste1', label: 'Caste 1' }, { value: 'caste2', label: 'Caste 2' }];
+const DISTRICT_OPTIONS = [{ value: 'chennai', label: 'Chennai' }, { value: 'kancheepuram', label: 'Kancheepuram' }];
+const STATE_OPTIONS = [{ value: 'tn', label: 'Tamil Nadu' }, { value: 'ka', label: 'Karnataka' }];
+const COUNTRY_OPTIONS = [{ value: 'in', label: 'India' }];
 
 
 // --- Styles (Matching IdentityDetails) ---
@@ -113,22 +110,48 @@ const labelStyles = mergeStyles({
     display: 'block'
 });
 
-const commonFieldStyles = { fieldGroup: { height: 42, borderRadius: 4, borderColor: '#d1d5db' } };
-const dropdownStyles = { dropdown: { width: '100%' }, title: { height: 42, lineHeight: 40, borderRadius: 4, borderColor: '#d1d5db' } };
 
 
 const PersonalDetails = () => {
-    const { formData, updateFormData, nextStep, markStepComplete } = useRegistration();
+    // Direct destructuring with explicit type annotations to help TypeScript
+    const { formData, updateFormData, nextStep, markStepComplete, setIsLoading } = useRegistration();
+
+    // Helper to safely get string value from formData
+    const getStringValue = (key: string): string => {
+        const value: string | number | Date | undefined | null = formData[key];
+        return typeof value === 'string' ? value : '';
+    };
+
+    // Helper to safely convert formData dob to Date
+    const getDobFromFormData = (): Date | undefined => {
+        const dobValue: string | number | Date | undefined | null = formData.dob;
+        if (!dobValue) return undefined;
+        if (dobValue instanceof Date) return dobValue;
+        if (typeof dobValue === 'string') {
+            const date = new Date(dobValue);
+            return isNaN(date.getTime()) ? undefined : date;
+        }
+        return undefined;
+    };
 
     const { control, handleSubmit, getValues, formState: { errors } } = useForm<PersonalFormData>({
         resolver: zodResolver(personalSchema),
         defaultValues: {
-            scholarshipApplied: '',
-            gender: '',
-            ...formData,
-            // Ensure dob is a proper Date object if it exists in formData (where it might be stored as string)
-            dob: formData.dob ? new Date(formData.dob) : undefined,
-        } as any, // Type cast to handle partial/loose matching with form data
+            scholarshipApplied: getStringValue('scholarshipApplied'),
+            gender: getStringValue('gender'),
+            community: getStringValue('community'),
+            caste: getStringValue('caste'),
+            dob: getDobFromFormData(),
+            email: getStringValue('email'),
+            mobile: getStringValue('mobile'),
+            addressLine1: getStringValue('addressLine1'),
+            addressLine2: getStringValue('addressLine2'),
+            city: getStringValue('city'),
+            district: getStringValue('district'),
+            state: getStringValue('state'),
+            pincode: getStringValue('pincode'),
+            country: getStringValue('country'),
+        },
     });
 
     const [isHovered, setIsHovered] = useState(false);
@@ -137,30 +160,62 @@ const PersonalDetails = () => {
     useEffect(() => {
         return () => {
             const data = getValues();
+            const dobValue = data.dob instanceof Date ? data.dob.toISOString() : undefined;
             updateFormData({
-                ...data,
-                dob: typeof data.dob === 'string' ? data.dob : data.dob?.toISOString() // Ensure dob is string if needed or keep date
-            } as any);
+                scholarshipApplied: data.scholarshipApplied,
+                gender: data.gender,
+                community: data.community,
+                caste: data.caste,
+                dob: dobValue,
+                email: data.email,
+                mobile: data.mobile,
+                addressLine1: data.addressLine1,
+                addressLine2: data.addressLine2,
+                city: data.city,
+                district: data.district,
+                state: data.state,
+                pincode: data.pincode,
+                country: data.country,
+            });
         };
     }, [updateFormData, getValues]);
 
-    const onSubmit = (data: PersonalFormData) => {
+    const onSubmit = async (data: PersonalFormData) => {
         console.log('Personal Step Data:', data);
-        updateFormData({
-            ...data,
-            dob: data.dob.toISOString(),
-        } as any);
-        markStepComplete(2);
-        nextStep();
+        setIsLoading(true);
+        try {
+            // Show loading for a few seconds before moving to next step
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            updateFormData({
+                scholarshipApplied: data.scholarshipApplied,
+                gender: data.gender,
+                community: data.community,
+                caste: data.caste,
+                dob: data.dob instanceof Date ? data.dob.toISOString() : undefined,
+                email: data.email,
+                mobile: data.mobile,
+                addressLine1: data.addressLine1,
+                addressLine2: data.addressLine2,
+                city: data.city,
+                district: data.district,
+                state: data.state,
+                pincode: data.pincode,
+                country: data.country,
+            });
+            markStepComplete(2);
+            nextStep();
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
-        <Stack styles={containerStyles}>
+        <Stack className="w-4/5 h-full flex flex-col [&_.ms-TextField-wrapper]:w-full">
             <Stack grow verticalAlign="start">
-                <h2 className={titleStyles}>Personal Details</h2>
-                <p className={subtitleStyles}>Fill In Your Essential Personal Information</p>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-1">Personal Details</h2>
+                <p className="text-sm text-gray-500 mb-8">Fill In Your Essential Personal Information</p>
 
-                <form style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }} onSubmit={handleSubmit(onSubmit)} id="current-step-form">
+                <form className="w-full h-full flex flex-col" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
                     <Stack tokens={stackTokens}>
 
                         {/* Profile Photo */}
@@ -168,15 +223,11 @@ const PersonalDetails = () => {
                             <div
                                 onMouseEnter={() => setIsHovered(true)}
                                 onMouseLeave={() => setIsHovered(false)}
-                                className={mergeStyles({
-                                    width: 80, height: 80, borderRadius: '50%', cursor: 'pointer', overflow: 'hidden',
-                                    position: 'relative',
-                                    transition: 'all 0.3s ease-in-out',
-                                    transform: isHovered ? 'scale(1.05)' : 'scale(1)'
-                                })}
+                                className={`w-20 h-20 rounded-full cursor-pointer overflow-hidden relative transition-all duration-300 ease-in-out ${isHovered ? 'scale-105' : 'scale-100'}`}
                             >
                                 <Image
-                                    src={isHovered ? Avatar : ProfileImage}
+                                    // src={isHovered ? Avatar : ProfileImage}
+                                    // src={Avatar}
                                     alt="Profile Photo"
                                     width={80}
                                     height={80}
@@ -189,15 +240,15 @@ const PersonalDetails = () => {
                                 />
                             </div>
                             <Stack>
-                                <Text variant="medium" style={{ fontWeight: 600, color: '#374151' }}>Profile Photo</Text>
-                                <Text variant="small" style={{ color: '#6b7280' }}>Supported formats: PNG, JPG and JPEG (up to 5MB)</Text>
+                                <Text variant="medium" className="font-semibold text-gray-700">Profile Photo</Text>
+                                <Text variant="small" className="text-gray-500">Supported formats: PNG, JPG and JPEG (up to 5MB)</Text>
                             </Stack>
                         </Stack>
 
                         {/* Row 1: Scholarship & Gender */}
                         <Stack horizontal tokens={rowTokens} wrap verticalAlign="start">
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
-                                <label className={labelStyles}>Applied for any other scholarship <span style={{ color: '#ef4444' }}>*</span></label>
+                            <Stack.Item grow={1} className="min-w-[250px]">
+                                <Label required>Applied for any other scholarship</Label>
                                 <Controller
                                     name="scholarshipApplied"
                                     control={control}
@@ -206,15 +257,15 @@ const PersonalDetails = () => {
                                             selectedKey={field.value}
                                             options={YES_NO_OPTIONS}
                                             onChange={(_, option) => field.onChange(option?.key)}
-                                            styles={{ flexContainer: { display: 'flex', flexDirection: 'row', gap: 24 } }}
+                                            className="flex flex-row gap-6"
                                         />
                                     )}
                                 />
-                                {errors.scholarshipApplied && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 4 }}>{errors.scholarshipApplied.message}</p>}
+                                {errors.scholarshipApplied && <p className="text-red-500 text-xs mt-1">{errors.scholarshipApplied.message}</p>}
                             </Stack.Item>
 
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
-                                <label className={labelStyles}>Gender <span style={{ color: '#ef4444' }}>*</span></label>
+                            <Stack.Item grow={1} className="min-w-[250px]">
+                                <Label required>Gender</Label>
                                 <Controller
                                     name="gender"
                                     control={control}
@@ -223,27 +274,26 @@ const PersonalDetails = () => {
                                             selectedKey={field.value}
                                             options={GENDER_OPTIONS}
                                             onChange={(_, option) => field.onChange(option?.key)}
-                                            styles={{ flexContainer: { display: 'flex', flexDirection: 'row', gap: 24 } }}
+                                            className="flex flex-row gap-6"
                                         />
                                     )}
                                 />
-                                {errors.gender && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 4 }}>{errors.gender.message}</p>}
+                                {errors.gender && <p className="text-red-500 text-xs mt-1">{errors.gender.message}</p>}
                             </Stack.Item>
                         </Stack>
 
                         {/* Community */}
                         <Stack>
-                            <label className={labelStyles}>Community <span style={{ color: '#ef4444' }}>*</span></label>
+                            <Label required>Community</Label>
                             <Controller
                                 name="community"
                                 control={control}
                                 render={({ field }) => (
-                                    <Dropdown
+                                    <Select
                                         placeholder="Select your community"
                                         selectedKey={field.value}
-                                        onChange={(_, option) => field.onChange(option?.key)}
+                                        onValueChange={field.onChange}
                                         options={COMMUNITY_OPTIONS}
-                                        styles={dropdownStyles}
                                         errorMessage={errors.community?.message}
                                     />
                                 )}
@@ -252,25 +302,24 @@ const PersonalDetails = () => {
 
                         {/* Row 2: Caste & DOB */}
                         <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
-                                <label className={labelStyles}>Caste <span style={{ color: '#ef4444' }}>*</span></label>
+                            <Stack.Item grow={1} className="min-w-[250px]">
+                                <Label required>Caste</Label>
                                 <Controller
                                     name="caste"
                                     control={control}
                                     render={({ field }) => (
-                                        <Dropdown
+                                        <Select
                                             placeholder="Select your caste"
                                             selectedKey={field.value}
-                                            onChange={(_, option) => field.onChange(option?.key)}
+                                            onValueChange={field.onChange}
                                             options={CASTE_OPTIONS}
-                                            styles={dropdownStyles}
                                             errorMessage={errors.caste?.message}
                                         />
                                     )}
                                 />
                             </Stack.Item>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
-                                <label className={labelStyles}>Date of Birth <span style={{ color: '#ef4444' }}>*</span></label>
+                            <Stack.Item grow={1} className="min-w-[250px]">
+                                <Label required>Date of Birth</Label>
                                 <Controller
                                     name="dob"
                                     control={control}
@@ -279,60 +328,59 @@ const PersonalDetails = () => {
                                             placeholder="Select Date of birth"
                                             value={field.value}
                                             onSelectDate={(date) => field.onChange(date)}
-                                            styles={{ textField: commonFieldStyles as any }} // Type casting for ease here
+                                            errorMessage={errors.dob?.message}
                                         />
                                     )}
                                 />
-                                {errors.dob && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 4 }}>{errors.dob.message}</p>}
                             </Stack.Item>
                         </Stack>
 
 
                         {/* Row 3: Email & Mobile */}
                         <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
-                                <label className={labelStyles}>Email <span style={{ color: '#ef4444' }}>*</span></label>
+                            <Stack.Item grow={1} className="min-w-[250px]">
+                                <Label required>Email</Label>
                                 <Controller
                                     name="email"
                                     control={control}
                                     render={({ field }) => (
-                                        <TextField {...field} placeholder="Enter email ID" styles={commonFieldStyles} errorMessage={errors.email?.message} />
+                                        <Input {...field} value={field.value ?? ''} placeholder="Enter email ID" type="email" errorMessage={errors.email?.message} />
                                     )}
                                 />
                             </Stack.Item>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
-                                <label className={labelStyles}>Mobile Number <span style={{ color: '#ef4444' }}>*</span></label>
+                            <Stack.Item grow={1} className="min-w-[250px]">
+                                <Label required>Mobile Number</Label>
                                 <Controller
                                     name="mobile"
                                     control={control}
                                     render={({ field }) => (
-                                        <TextField {...field} placeholder="Enter mobile number" styles={commonFieldStyles} errorMessage={errors.mobile?.message} />
+                                        <Input {...field} value={field.value ?? ''} placeholder="Enter mobile number" type="tel" errorMessage={errors.mobile?.message} />
                                     )}
                                 />
                             </Stack.Item>
                         </Stack>
 
-                        <div className={sectionHeaderStyles}>Address Details</div>
+                        <div className="text-base font-semibold text-gray-900 mt-2 mb-4">Address Details</div>
 
                         {/* Row 4: Address Lines */}
                         <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
-                                <label className={labelStyles}>Address Line 1 <span style={{ color: '#ef4444' }}>*</span></label>
+                            <Stack.Item grow={1} className="min-w-[250px]">
+                                <Label required>Address Line 1</Label>
                                 <Controller
                                     name="addressLine1"
                                     control={control}
                                     render={({ field }) => (
-                                        <TextField {...field} placeholder="Address line 1" styles={commonFieldStyles} errorMessage={errors.addressLine1?.message} />
+                                        <Input {...field} value={field.value ?? ''} placeholder="Address line 1" errorMessage={errors.addressLine1?.message} />
                                     )}
                                 />
                             </Stack.Item>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
-                                <label className={labelStyles}>Address Line 2</label>
+                            <Stack.Item grow={1} className="min-w-[250px]">
+                                <Label>Address Line 2</Label>
                                 <Controller
                                     name="addressLine2"
                                     control={control}
                                     render={({ field }) => (
-                                        <TextField {...field} placeholder="Address line 2" styles={commonFieldStyles} />
+                                        <Input {...field} value={field.value ?? ''} placeholder="Address line 2" />
                                     )}
                                 />
                             </Stack.Item>
@@ -340,28 +388,27 @@ const PersonalDetails = () => {
 
                         {/* Row 5: City & District */}
                         <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
-                                <label className={labelStyles}>City <span style={{ color: '#ef4444' }}>*</span></label>
+                            <Stack.Item grow={1} className="min-w-[250px]">
+                                <Label required>City</Label>
                                 <Controller
                                     name="city"
                                     control={control}
                                     render={({ field }) => (
-                                        <TextField {...field} placeholder="Enter city" styles={commonFieldStyles} errorMessage={errors.city?.message} />
+                                        <Input {...field} value={field.value ?? ''} placeholder="Enter city" errorMessage={errors.city?.message} />
                                     )}
                                 />
                             </Stack.Item>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
-                                <label className={labelStyles}>District <span style={{ color: '#ef4444' }}>*</span></label>
+                            <Stack.Item grow={1} className="min-w-[250px]">
+                                <Label required>District</Label>
                                 <Controller
                                     name="district"
                                     control={control}
                                     render={({ field }) => (
-                                        <Dropdown
+                                        <Select
                                             placeholder="Select"
                                             selectedKey={field.value}
-                                            onChange={(_, option) => field.onChange(option?.key)}
+                                            onValueChange={field.onChange}
                                             options={DISTRICT_OPTIONS}
-                                            styles={dropdownStyles}
                                             errorMessage={errors.district?.message}
                                         />
                                     )}
@@ -372,54 +419,52 @@ const PersonalDetails = () => {
 
                         {/* Row 6: State & Pincode */}
                         <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
-                                <label className={labelStyles}>State <span style={{ color: '#ef4444' }}>*</span></label>
+                            <Stack.Item grow={1} className="min-w-[250px]">
+                                <Label required>State</Label>
                                 <Controller
                                     name="state"
                                     control={control}
                                     render={({ field }) => (
-                                        <Dropdown
+                                        <Select
                                             placeholder="Select"
                                             selectedKey={field.value}
-                                            onChange={(_, option) => field.onChange(option?.key)}
+                                            onValueChange={field.onChange}
                                             options={STATE_OPTIONS}
-                                            styles={dropdownStyles}
                                             errorMessage={errors.state?.message}
                                         />
                                     )}
                                 />
                             </Stack.Item>
-                            <Stack.Item grow={1} styles={{ root: { minWidth: 250 } }}>
-                                <label className={labelStyles}>Pincode <span style={{ color: '#ef4444' }}>*</span></label>
+                            <Stack.Item grow={1} className="min-w-[250px]">
+                                <Label required>Pincode</Label>
                                 <Controller
                                     name="pincode"
                                     control={control}
                                     render={({ field }) => (
-                                        <TextField {...field} placeholder="Enter pincode" styles={commonFieldStyles} errorMessage={errors.pincode?.message} />
+                                        <Input {...field} value={field.value ?? ''} placeholder="Enter pincode" errorMessage={errors.pincode?.message} />
                                     )}
                                 />
                             </Stack.Item>
                         </Stack>
 
                         {/* Country */}
-                        <Stack style={{ maxWidth: '50%' }}>
-                            <label className={labelStyles}>Country <span style={{ color: '#ef4444' }}>*</span></label>
+                        <Stack className="max-w-[50%]">
+                            <Label required>Country</Label>
                             <Controller
                                 name="country"
                                 control={control}
                                 render={({ field }) => (
-                                    <Dropdown
+                                    <Select
                                         placeholder="Select"
                                         selectedKey={field.value}
-                                        onChange={(_, option) => field.onChange(option?.key)}
+                                        onValueChange={field.onChange}
                                         options={COUNTRY_OPTIONS}
-                                        styles={dropdownStyles}
                                         errorMessage={errors.country?.message}
                                     />
                                 )}
                             />
                         </Stack>
-                        <div style={{ height: 20 }}></div>
+                        <div className="h-5"></div>
 
                     </Stack>
                 </form>
