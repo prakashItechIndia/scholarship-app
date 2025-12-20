@@ -22,12 +22,12 @@ export const PasswordField = ({ control, name, showPassword, onTogglePassword, v
       name={name}
       render={({ field }: { field: { value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; onBlur: () => void; name: string; ref: React.Ref<any> } }) => {
         return (
-          <FormFieldWrapper label="Password" required variant={variant}>
+        <FormFieldWrapper label="Password" required variant={variant}>
             <Input
-              {...field}
-              value={field.value ?? ''}
-              type={showPassword ? 'text' : 'password'}
-              placeholder=""
+                  {...field}
+                  value={field.value ?? ''}
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder=""
               prefixIcon={<KeyIcon style={{ width: '16px', height: '16px', color: '#616161' }} />}
               suffixIcon={
                 <IconButton
@@ -36,7 +36,7 @@ export const PasswordField = ({ control, name, showPassword, onTogglePassword, v
                   onRenderIcon={() => 
                     showPassword ? (
                       <EyeIcon className="w-5 h-5 text-[#616161] hover:text-[#424242]" />
-                    ) : (
+                  ) : (
                       <EyeOffIcon className="w-5 h-5 text-[#616161] hover:text-[#424242]" />
                     )
                   }
@@ -45,7 +45,7 @@ export const PasswordField = ({ control, name, showPassword, onTogglePassword, v
               }
               required={false}
             />
-          </FormFieldWrapper>
+        </FormFieldWrapper>
         );
       }}
     />

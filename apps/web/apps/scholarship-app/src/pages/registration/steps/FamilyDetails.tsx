@@ -1,16 +1,10 @@
-import { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import {
-    Stack,
-    IStackStyles,
-    IStackTokens,
-    mergeStyles,
-    FontWeights,
-} from '@fluentui/react';
-import { Input, Select, Label } from '@shared/components';
-import { useRegistration } from '@/contexts/RegistrationContext';
+import { Stack } from '@fluentui/react';
+import { useRegistrationForm } from '../hooks/useRegistrationForm';
+import { StepLayout } from '../components/StepLayout';
+import { getStringValue } from '../utils/registrationHelpers';
+import { STACK_TOKENS } from '../utils/registrationConstants';
+import { InputField, FormRowContainer, FormRow, FamilyMemberSection } from '../components';
 
 // --- Validation Schema ---
 const familySchema = z.object({
@@ -40,7 +34,6 @@ const familySchema = z.object({
     guardianIncome: z.string().optional(),
 });
 
-type FamilyFormData = z.infer<typeof familySchema>;
 
 // --- Constants ---
 const OCCUPATION_OPTIONS = [
@@ -62,409 +55,100 @@ const INCOME_OPTIONS = [
     { value: 'above_8L', label: 'Above 8 Lakhs' },
 ];
 
-// --- Styles (Matching IdentityDetails) ---
-const containerStyles: IStackStyles = {
-    root: {
-        width: '80%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-    },
-};
-
-const stackTokens: IStackTokens = { childrenGap: 24 };
-const rowTokens: IStackTokens = { childrenGap: 24 };
-
-const titleStyles = mergeStyles({
-    fontSize: 24,
-    fontWeight: FontWeights.semibold,
-    color: '#111827',
-    marginBottom: 4,
-});
-
-const subtitleStyles = mergeStyles({
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 32,
-});
-
-const sectionHeaderStyles = mergeStyles({
-    fontSize: 16,
-    fontWeight: 600,
-    color: '#111827',
-    marginTop: 8,
-    marginBottom: 16,
-});
-
-const labelStyles = mergeStyles({
-    fontWeight: 600,
-    fontSize: 14,
-    color: '#374151',
-    marginBottom: 6,
-    display: 'block'
-});
-
-const asteriskStyle = { color: '#ef4444' };
 
 
 const FamilyDetails = () => {
-    const { formData, updateFormData, nextStep, markStepComplete, setIsLoading } = useRegistration();
-
-    const {
-        control,
-        handleSubmit,
-        getValues,
-        formState: { errors },
-    } = useForm<FamilyFormData>({
-        resolver: zodResolver(familySchema),
-        defaultValues: {
-            fullName: formData.fullName || '',
-            studentId: formData.studentId || '',
-            fatherName: formData.fatherName || '',
-            fatherOccupation: formData.fatherOccupation || '',
-            fatherDesignation: formData.fatherDesignation || '',
-            fatherOrganization: formData.fatherOrganization || '',
-            fatherIncome: formData.fatherIncome || '',
-            motherName: formData.motherName || '',
-            motherOccupation: formData.motherOccupation || '',
-            motherDesignation: formData.motherDesignation || '',
-            motherOrganization: formData.motherOrganization || '',
-            motherIncome: formData.motherIncome || '',
-            guardianName: formData.guardianName || '',
-            guardianOccupation: formData.guardianOccupation || '',
-            guardianDesignation: formData.guardianDesignation || '',
-            guardianOrganization: formData.guardianOrganization || '',
-            guardianIncome: formData.guardianIncome || '',
-        },
+    const { form, onSubmit } = useRegistrationForm({
+        schema: familySchema,
+        stepNumber: 3,
+        defaultValues: (formData) => ({
+            fullName: getStringValue(formData, 'fullName'),
+            studentId: getStringValue(formData, 'studentId'),
+            fatherName: getStringValue(formData, 'fatherName'),
+            fatherOccupation: getStringValue(formData, 'fatherOccupation'),
+            fatherDesignation: getStringValue(formData, 'fatherDesignation'),
+            fatherOrganization: getStringValue(formData, 'fatherOrganization'),
+            fatherIncome: getStringValue(formData, 'fatherIncome'),
+            motherName: getStringValue(formData, 'motherName'),
+            motherOccupation: getStringValue(formData, 'motherOccupation'),
+            motherDesignation: getStringValue(formData, 'motherDesignation'),
+            motherOrganization: getStringValue(formData, 'motherOrganization'),
+            motherIncome: getStringValue(formData, 'motherIncome'),
+            guardianName: getStringValue(formData, 'guardianName'),
+            guardianOccupation: getStringValue(formData, 'guardianOccupation'),
+            guardianDesignation: getStringValue(formData, 'guardianDesignation'),
+            guardianOrganization: getStringValue(formData, 'guardianOrganization'),
+            guardianIncome: getStringValue(formData, 'guardianIncome'),
+        }),
     });
 
-    // Save data to context on unmount
-    useEffect(() => {
-        return () => {
-            updateFormData(getValues());
-        };
-    }, [updateFormData, getValues]);
-
-    const onSubmit = async (data: FamilyFormData) => {
-        console.log('Family Step Data:', data);
-        setIsLoading(true);
-        try {
-            // Show loading for a few seconds before moving to next step
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            updateFormData(data);
-            markStepComplete(3);
-            nextStep();
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const { control, handleSubmit, formState: { errors } } = form;
 
     return (
-        <Stack className="w-4/5 h-full flex flex-col">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-1">Family details</h2>
-            <p className="text-sm text-gray-500 mb-8">Provide Information About Your Immediate Family Members</p>
-
+        <StepLayout
+            title="Family details"
+            subtitle="Provide Information About Your Immediate Family Members"
+        >
             <form className="w-full h-full flex flex-col" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
-                <Stack tokens={stackTokens}>
+                <Stack tokens={STACK_TOKENS}>
 
                     {/* Applicant & ID Row */}
-                    <Stack horizontal tokens={rowTokens} wrap>
-                        <Stack.Item grow={1} className="min-w-[250px]">
-                            <Controller
+                    <FormRowContainer>
+                        <FormRow>
+                            <InputField
                                 name="fullName"
                                 control={control}
-                                render={({ field }) => (
-                                    <Stack>
-                                        <Label required>Name of Applicant</Label>
-                                        <Input
-                                            {...field}
-                                            value={field.value ?? ''}
+                                errors={errors}
+                                label="Name of Applicant"
+                                required
                                             placeholder="Enter the name"
-                                            errorMessage={errors.fullName?.message}
                                         />
-                                    </Stack>
-                                )}
-                            />
-                        </Stack.Item>
-                        <Stack.Item grow={1} className="min-w-[250px]">
-                            <Controller
+                        </FormRow>
+                        <FormRow>
+                            <InputField
                                 name="studentId"
                                 control={control}
-                                render={({ field }) => (
-                                    <Stack>
-                                        <Label>Student ID (if known)</Label>
-                                        <Input
-                                            {...field}
-                                            value={field.value ?? ''}
+                                errors={errors}
+                                label="Student ID (if known)"
                                             placeholder="Enter student ID"
-                                            errorMessage={errors.studentId?.message}
-                                        />
-                                    </Stack>
-                                )}
                             />
-                        </Stack.Item>
-                    </Stack>
+                        </FormRow>
+                    </FormRowContainer>
 
                     {/* Father Details */}
-                    <Stack>
-                        <div className="text-base font-semibold text-gray-900 mt-2 mb-4">Father Details</div>
-                        <Stack tokens={rowTokens}>
-                            <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} className="min-w-[250px]">
-                                    <Controller
-                                        name="fatherName"
+                    <FamilyMemberSection
+                        title="Father Details"
+                        prefix="father"
                                         control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label required>Name</Label>
-                                                <Input {...field} value={field.value ?? ''} placeholder="Enter father name" errorMessage={errors.fatherName?.message} />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                                <Stack.Item grow={1} className="min-w-[250px]">
-                                    <Controller
-                                        name="fatherOccupation"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label required>Occupation</Label>
-                                                <Select
-                                                    selectedKey={field.value}
-                                                    onValueChange={field.onChange}
-                                                    placeholder="Select"
-                                                    options={OCCUPATION_OPTIONS}
-                                                    errorMessage={errors.fatherOccupation?.message}
-                                                />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                            </Stack>
-                            <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} className="min-w-[250px]">
-                                    <Controller
-                                        name="fatherDesignation"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label>Designation</Label>
-                                                <Input {...field} value={field.value ?? ''} placeholder="Enter father designation" errorMessage={errors.fatherDesignation?.message} />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                                <Stack.Item grow={1} className="min-w-[250px]">
-                                    <Controller
-                                        name="fatherOrganization"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label>Organization Name</Label>
-                                                <Input {...field} value={field.value ?? ''} placeholder="Enter organisation name" errorMessage={errors.fatherOrganization?.message} />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                            </Stack>
-                            <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} className="w-1/2 min-w-[250px]">
-                                    <Controller
-                                        name="fatherIncome"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label required>Annual Income</Label>
-                                                <Select
-                                                    selectedKey={field.value}
-                                                    onValueChange={field.onChange}
-                                                    placeholder="Select"
-                                                    options={INCOME_OPTIONS}
-                                                    errorMessage={errors.fatherIncome?.message}
-                                                />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                            </Stack>
-                        </Stack>
-                    </Stack>
+                        errors={errors}
+                        occupationOptions={OCCUPATION_OPTIONS}
+                        incomeOptions={INCOME_OPTIONS}
+                    />
 
                     {/* Mother Details */}
-                    <Stack>
-                        <div className="text-base font-semibold text-gray-900 mt-2 mb-4">Mother Details</div>
-                        <Stack tokens={rowTokens}>
-                            <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} className="min-w-[250px]">
-                                    <Controller
-                                        name="motherName"
+                    <FamilyMemberSection
+                        title="Mother Details"
+                        prefix="mother"
                                         control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label required>Name</Label>
-                                                <Input {...field} value={field.value ?? ''} placeholder="Enter mother name" errorMessage={errors.motherName?.message} />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                                <Stack.Item grow={1} className="min-w-[250px]">
-                                    <Controller
-                                        name="motherOccupation"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label required>Occupation</Label>
-                                                <Select
-                                                    selectedKey={field.value}
-                                                    onValueChange={field.onChange}
-                                                    placeholder="Select"
-                                                    options={OCCUPATION_OPTIONS}
-                                                    errorMessage={errors.motherOccupation?.message}
-                                                />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                            </Stack>
-                            <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} className="min-w-[250px]">
-                                    <Controller
-                                        name="motherDesignation"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label>Designation</Label>
-                                                <Input {...field} value={field.value ?? ''} placeholder="Enter mother designation" errorMessage={errors.motherDesignation?.message} />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                                <Stack.Item grow={1} className="min-w-[250px]">
-                                    <Controller
-                                        name="motherOrganization"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label>Organization Name</Label>
-                                                <Input {...field} value={field.value ?? ''} placeholder="Enter organisation name" errorMessage={errors.motherOrganization?.message} />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                            </Stack>
-                            <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} className="w-1/2 min-w-[250px]">
-                                    <Controller
-                                        name="motherIncome"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label required>Annual Income</Label>
-                                                <Select
-                                                    selectedKey={field.value}
-                                                    onValueChange={field.onChange}
-                                                    placeholder="Select"
-                                                    options={INCOME_OPTIONS}
-                                                    errorMessage={errors.motherIncome?.message}
-                                                />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                            </Stack>
-                        </Stack>
-                    </Stack>
+                        errors={errors}
+                        occupationOptions={OCCUPATION_OPTIONS}
+                        incomeOptions={INCOME_OPTIONS}
+                    />
 
                     {/* Guardian Details */}
-                    <Stack>
-                        <div className="text-base font-semibold text-gray-900 mt-2 mb-4">Guardian Details</div>
-                        <Stack tokens={rowTokens}>
-                            <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} className="min-w-[250px]">
-                                    <Controller
-                                        name="guardianName"
+                    <FamilyMemberSection
+                        title="Guardian Details"
+                        prefix="guardian"
                                         control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label>Name</Label>
-                                                <Input {...field} value={field.value ?? ''} placeholder="Enter guardian name" errorMessage={errors.guardianName?.message} />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                                <Stack.Item grow={1} className="min-w-[250px]">
-                                    <Controller
-                                        name="guardianOccupation"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label>Occupation</Label>
-                                                <Select
-                                                    selectedKey={field.value}
-                                                    onValueChange={field.onChange}
-                                                    placeholder="Select"
-                                                    options={OCCUPATION_OPTIONS}
-                                                    errorMessage={errors.guardianOccupation?.message}
+                        errors={errors}
+                        occupationOptions={OCCUPATION_OPTIONS}
+                        incomeOptions={INCOME_OPTIONS}
+                        isOptional
                                                 />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                            </Stack>
-                            <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} className="min-w-[250px]">
-                                    <Controller
-                                        name="guardianDesignation"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label>Designation</Label>
-                                                <Input {...field} value={field.value ?? ''} placeholder="Enter guardian designation" errorMessage={errors.guardianDesignation?.message} />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                                <Stack.Item grow={1} className="min-w-[250px]">
-                                    <Controller
-                                        name="guardianOrganization"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label>Organization Name</Label>
-                                                <Input {...field} value={field.value ?? ''} placeholder="Enter organisation name" errorMessage={errors.guardianOrganization?.message} />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                            </Stack>
-                            <Stack horizontal tokens={rowTokens} wrap>
-                                <Stack.Item grow={1} className="w-1/2 min-w-[250px]">
-                                    <Controller
-                                        name="guardianIncome"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Stack>
-                                                <Label>Annual Income</Label>
-                                                <Select
-                                                    selectedKey={field.value}
-                                                    onValueChange={field.onChange}
-                                                    placeholder="Select"
-                                                    options={INCOME_OPTIONS}
-                                                    errorMessage={errors.guardianIncome?.message}
-                                                />
-                                            </Stack>
-                                        )}
-                                    />
-                                </Stack.Item>
-                            </Stack>
-                        </Stack>
-                    </Stack>
-
-
 
                 </Stack>
             </form>
-        </Stack>
+        </StepLayout>
     );
 };
 

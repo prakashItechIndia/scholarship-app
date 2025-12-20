@@ -1,109 +1,120 @@
 import * as React from "react";
-import { DetailsList, IColumn, IDetailsListProps, DetailsListLayoutMode } from "@fluentui/react";
+import {
+  Table as FluentTable,
+  TableHeader,
+  TableHeaderCell,
+  TableBody,
+  TableRow,
+  TableCell,
+} from "@fluentui/react-components";
 import { cn } from "../lib/utils";
 
-export interface TableProps extends Omit<IDetailsListProps, "items" | "columns"> {
-  columns: Array<{
+/**
+ * Table Component - Wrapper around Fluent UI v9 Table components
+ * 
+ * Uses Fluent UI v9's Table components which provide:
+ * - Semantic HTML table structure
+ * - Accessibility support
+ * - Customizable styling
+ * 
+ * @see https://react.fluentui.dev/?path=/docs/components-table--default
+ */
+export interface TableProps {
+  /** Table column definitions */
+  columns: {
     key: string;
     name: string;
     fieldName?: string;
     minWidth?: number;
     maxWidth?: number;
     isResizable?: boolean;
+    isSortable?: boolean;
     onRender?: (item?: any, index?: number) => React.ReactNode;
-  }>;
+    onRenderHeader?: () => React.ReactNode;
+  }[];
+  /** Table data rows */
   data: any[];
+  /** Additional CSS class name */
+  className?: string;
 }
 
-const Table = React.forwardRef<HTMLDivElement, TableProps>(
-  ({ className, columns, data, ...props }, ref) => {
-    const fluentColumns: IColumn[] = columns.map((col) => ({
-      key: col.key,
-      name: col.name,
-      fieldName: col.fieldName || col.key,
-      minWidth: col.minWidth || 100,
-      maxWidth: col.maxWidth,
-      isResizable: col.isResizable !== false,
-      onRender: col.onRender,
-    }));
-
+export const Table = React.forwardRef<HTMLDivElement, TableProps>(
+  ({ className, columns, data }, ref) => {
     return (
       <div ref={ref} className={cn("relative w-full overflow-auto", className)}>
-        <DetailsList
-          items={data}
-          columns={fluentColumns}
-          layoutMode={DetailsListLayoutMode.fixedColumns}
-          {...props}
-        />
+        <FluentTable style={{ width: "100%" }}>
+          <TableHeader>
+            <TableRow style={{ backgroundColor: "#fafafa" }}>
+              {columns.map((col) => (
+                <TableHeaderCell 
+                  key={col.key} 
+                  style={{ 
+                    minWidth: col.minWidth, 
+                    maxWidth: col.maxWidth,
+                    padding: "12px 16px",
+                    fontSize: "14px",
+                    lineHeight: "20px",
+                    fontWeight: 600,
+                    color: "#242424",
+                    fontFamily: "'Inter', sans-serif",
+                    borderBottom: "1px solid #e0e0e0",
+                  }}
+                >
+                  {col.onRenderHeader ? col.onRenderHeader() : col.name}
+                </TableHeaderCell>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((item, rowIndex) => (
+              <TableRow 
+                key={rowIndex}
+                style={{
+                  backgroundColor: rowIndex % 2 === 0 ? "#ffffff" : "#fafafa",
+                  borderBottom: "1px solid #e0e0e0",
+                }}
+                className="hover:bg-[#f5f5f5]"
+                onClick={(e) => {
+                  // Prevent row click from triggering any actions
+                  // Only specific elements within cells should handle clicks
+                  e.stopPropagation();
+                }}
+              >
+                {columns.map((col) => {
+                  const fieldName = col.fieldName || col.key;
+                  const cellContent = col.onRender
+                    ? col.onRender(item, rowIndex)
+                    : item[fieldName];
+
+                  return (
+                    <TableCell 
+                      key={col.key} 
+                      style={{ 
+                        minWidth: col.minWidth, 
+                        maxWidth: col.maxWidth,
+                        padding: "12px 16px",
+                        fontSize: "14px",
+                        lineHeight: "20px",
+                        color: "#242424",
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                      onClick={(e) => {
+                        // Prevent cell click from triggering actions
+                        // Only specific interactive elements should handle clicks
+                        e.stopPropagation();
+                      }}
+                    >
+                      {cellContent}
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableBody>
+        </FluentTable>
       </div>
     );
-  },
+  }
 );
 
 Table.displayName = "Table";
-
-// Additional table components for compatibility
-const TableHeader = React.forwardRef<
-  HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
-));
-TableHeader.displayName = "TableHeader";
-
-const TableBody = React.forwardRef<
-  HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <tbody ref={ref} className={cn("[&_tr:last-child]:border-0", className)} {...props} />
-));
-TableBody.displayName = "TableBody";
-
-const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
-  ({ className, ...props }, ref) => (
-    <tr
-      ref={ref}
-      className={cn("border-b transition-colors hover:bg-gray-50", className)}
-      {...props}
-    />
-  )
-);
-TableRow.displayName = "TableRow";
-
-const TableHead = React.forwardRef<
-  HTMLTableCellElement,
-  React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
-  <th ref={ref} className={cn("h-12 px-4 text-left align-middle font-medium", className)} {...props} />
-));
-TableHead.displayName = "TableHead";
-
-const TableHeaderCell = TableHead;
-
-const TableCell = React.forwardRef<
-  HTMLTableCellElement,
-  React.TdHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
-  <td ref={ref} className={cn("p-4 align-middle", className)} {...props} />
-));
-TableCell.displayName = "TableCell";
-
-const TableCaption = React.forwardRef<
-  HTMLTableCaptionElement,
-  React.HTMLAttributes<HTMLTableCaptionElement>
->(({ className, ...props }, ref) => (
-  <caption ref={ref} className={cn("mt-4 text-sm text-gray-500", className)} {...props} />
-));
-TableCaption.displayName = "TableCaption";
-
-export {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-  TableCell,
-  TableCaption,
-};
-

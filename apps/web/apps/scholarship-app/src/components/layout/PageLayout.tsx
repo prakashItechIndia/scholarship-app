@@ -43,20 +43,20 @@ import { cn } from "@shared/lib/utils";
 export interface SideNavConfig {
   logo?: React.ReactNode;
   expanded?: boolean;
-  items?: Array<{
+  items?: {
     icon?: React.ReactNode;
     label: string;
     active?: boolean;
     onClick?: () => void;
     badge?: React.ReactNode;
-  }>;
-  footerItems?: Array<{
+  }[];
+  footerItems?: {
     icon?: React.ReactNode;
     label: string;
     active?: boolean;
     onClick?: () => void;
     badge?: React.ReactNode;
-  }>;
+  }[];
 }
 
 export interface PageLayoutProps {
@@ -76,14 +76,17 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
 }) => {
   const hasSideNav = sideNav !== null && sideNav !== undefined;
   const hasTopNav = topNav !== null && topNav !== undefined;
-  const sidebarWidth = hasSideNav && sideNav?.expanded ? 256 : 56;
 
   return (
     <div
       className={cn(
-        "flex flex-col min-h-screen bg-gray-50 w-full",
+        "flex flex-col min-h-screen bg-gray-50 overflow-x-hidden",
         containerClassName
       )}
+      style={{
+        width: "100vw",
+        maxWidth: "100vw",
+      }}
     >
       {/* Top Navigation - Renders if topNav is provided */}
       {hasTopNav && <TopNav {...topNav} />}
@@ -92,7 +95,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
       {hasSideNav && sideNav && (
         <SideNav
           logo={sideNav.logo}
-          expanded={sideNav.expanded || false}
+          expanded={sideNav.expanded ?? false}
           footer={
             sideNav.footerItems && sideNav.footerItems.length > 0 ? (
               <>
@@ -125,13 +128,27 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
 
       {/* Main Content Area */}
       <div
-        className={cn(
-          "flex-1 flex flex-col min-w-0 w-full",
-          hasSideNav && (sideNav?.expanded ? "ml-64" : "ml-14")
-        )}
+        className="flex-1 flex flex-col min-w-0"
+        style={{
+          marginLeft: hasSideNav 
+            ? (sideNav?.expanded ? '256px' : '56px')
+            : '0',
+          width: hasSideNav 
+            ? `calc(100vw - ${sideNav?.expanded ? '256px' : '56px'})`
+            : '100vw',
+          maxWidth: hasSideNav
+            ? `calc(100vw - ${sideNav?.expanded ? '256px' : '56px'})`
+            : '100vw',
+        }}
       >
         {/* Page Content */}
-        <main className={cn("flex-1 overflow-auto p-6", contentClassName)}>
+        <main 
+          className={cn("flex-1 overflow-y-auto overflow-x-hidden p-6", contentClassName)}
+          style={{
+            width: "100%",
+            maxWidth: "100%",
+          }}
+        >
           {children}
         </main>
       </div>

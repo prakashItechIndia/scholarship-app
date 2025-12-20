@@ -1,6 +1,4 @@
 import { Button } from '@shared/components';
-import { Spinner, SpinnerSize, IButtonStyles } from '@fluentui/react';
-import { Stack } from '@fluentui/react';
 
 interface SubmitButtonProps {
   type?: 'button' | 'submit' | 'reset';
@@ -24,34 +22,8 @@ export const SubmitButton = ({
   onClick,
 }: SubmitButtonProps) => {
   const baseClasses = variant === 'password'
-    ? 'w-full rounded bg-[#2453C3] px-3 py-1.5 text-white text-xs font-semibold font-sans leading-5 border-none hover:bg-[#1e42a0] disabled:cursor-not-allowed'
-    : 'w-full h-11 text-base font-semibold';
-
-  // Styles to override disabled state - keep same background color
-  const buttonStyles: IButtonStyles = variant === 'password'
-    ? {
-        root: {
-          backgroundColor: '#2453C3',
-        },
-        rootHovered: {
-          backgroundColor: '#1e42a0',
-        },
-        rootPressed: {
-          backgroundColor: '#1e42a0',
-        },
-        rootDisabled: {
-          backgroundColor: '#2453C3 !important',
-          opacity: 0.7,
-        },
-        rootFocused: {
-          backgroundColor: '#2453C3',
-        },
-      }
-    : {
-        rootDisabled: {
-          opacity: 0.7,
-        },
-      };
+    ? 'w-full rounded bg-[#2453C3] px-3 py-1.5 text-white text-xs font-semibold font-sans leading-5 border-none hover:bg-[#1e42a0] disabled:cursor-not-allowed disabled:opacity-70'
+    : 'w-full h-11 text-base font-semibold disabled:opacity-70';
 
   return (
     <Button
@@ -59,18 +31,16 @@ export const SubmitButton = ({
       disabled={disabled || isLoading}
       variant="default"
       className={`${baseClasses} ${className}`}
-      styles={buttonStyles}
       onClick={onClick}
     >
       {isLoading ? (
-        <Stack horizontal tokens={{ childrenGap: 8 }} verticalAlign="center" horizontalAlign="center">
-          <Spinner size={SpinnerSize.small} />
+        <div className="flex items-center justify-center gap-2">
+          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
           <span>{loadingText}</span>
-        </Stack>
+        </div>
       ) : (
         children
       )}
     </Button>
   );
 };
-

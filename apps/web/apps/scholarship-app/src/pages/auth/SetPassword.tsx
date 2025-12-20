@@ -23,6 +23,15 @@ const passwordSchema = z
       .default('')
       .refine((val) => val.length >= 8, {
         message: 'Password must be at least 8 characters long',
+      })
+      .refine((val) => val.length <= 16, {
+        message: 'Password cannot exceed 16 characters',
+      })
+      .refine((val) => /[a-zA-Z]/.test(val), {
+        message: 'Password must contain at least one letter (a-z, A-Z)',
+      })
+      .refine((val) => /[0-9]/.test(val), {
+        message: 'Password must contain at least one number (0-9)',
       }),
     confirmPassword: z.string().default(''),
   })

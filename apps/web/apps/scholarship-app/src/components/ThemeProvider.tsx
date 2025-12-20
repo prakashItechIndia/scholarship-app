@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useMemo } from "react";
+import { lightTheme, darkTheme, type ThemeTokens } from "@shared/config/theme";
 
 type Theme = "dark" | "light" | "system";
 
@@ -10,12 +11,16 @@ type ThemeProviderProps = {
 
 type ThemeProviderState = {
   theme: Theme;
+  resolvedTheme: "dark" | "light";
   setTheme: (theme: Theme) => void;
+  tokens: ThemeTokens;
 };
 
 const initialState: ThemeProviderState = {
   theme: "light",
+  resolvedTheme: "light",
   setTheme: () => null,
+  tokens: lightTheme,
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
@@ -37,9 +42,43 @@ export function ThemeProvider({
   storageKey = "icaptur-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() =>
+  const [theme, setThemeState] = useState<Theme>(() =>
     getStoredTheme(storageKey, defaultTheme),
   );
+  const [systemPrefersDark, setSystemPrefersDark] = useState(() => {
+    if (!isBrowser()) return false;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+
+  // Resolve the actual theme (dark or light)
+  const resolvedTheme: "dark" | "light" = useMemo(() => {
+    if (theme === "system") {
+      return systemPrefersDark ? "dark" : "light";
+    }
+    return theme;
+  }, [theme, systemPrefersDark]);
+
+  // Get theme tokens based on resolved theme
+  const tokens = useMemo<ThemeTokens>(() => {
+    return resolvedTheme === "dark" ? darkTheme : lightTheme;
+  }, [resolvedTheme]);
+
+  useEffect(() => {
+    if (!isBrowser()) {
+      return;
+    }
+
+    // Listen to system theme changes
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      setSystemPrefersDark(e.matches);
+    };
+
+    handleChange(mediaQuery);
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
   useEffect(() => {
     if (!isBrowser()) {
@@ -49,28 +88,21 @@ export function ThemeProvider({
     const root = window.document.documentElement;
 
     root.classList.remove("light", "dark");
+    root.classList.add(resolvedTheme);
+  }, [resolvedTheme]);
 
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-
-      root.classList.add(systemTheme);
-      return;
+  const setTheme = (newTheme: Theme) => {
+    if (isBrowser()) {
+      window.localStorage.setItem(storageKey, newTheme);
     }
-
-    root.classList.add(theme);
-  }, [theme]);
+    setThemeState(newTheme);
+  };
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      if (isBrowser()) {
-        window.localStorage.setItem(storageKey, theme);
-      }
-      setTheme(theme);
-    },
+    resolvedTheme,
+    setTheme,
+    tokens,
   };
 
   return (

@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 
 // Define a more specific type for form data
-export type RegistrationFormData = Record<string, string | number | Date | undefined | null>;
+export type RegistrationFormData = Record<string, string | number | Date | File[] | undefined | null>;
 
 export interface RegistrationContextType {
   currentStep: number;

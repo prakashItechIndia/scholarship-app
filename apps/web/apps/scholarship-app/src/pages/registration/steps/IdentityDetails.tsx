@@ -1,28 +1,34 @@
-import { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import {
-    Stack,
-    TextField,
-    Dropdown,
-    IDropdownOption,
-    IStackStyles,
-    IStackTokens,
-    mergeStyles,
-    FontWeights,
-} from '@fluentui/react';
-import { Label } from '@shared/components';
-import { useRegistration } from '@/contexts/RegistrationContext';
+import { Stack, IDropdownOption } from '@fluentui/react';
+import { useRegistrationForm } from '../hooks/useRegistrationForm';
+import { StepLayout } from '../components/StepLayout';
+import { getStringValue } from '../utils/registrationHelpers';
+import { STACK_TOKENS } from '../utils/registrationConstants';
+import { DropdownField, TextInputField, FormRowContainer, FormRow } from '../components';
 
 // --- Validation Schema ---
-const identitySchema = z.object({
+const identitySchema = z
+    .object({
     applicantType: z.string().min(1, 'Please select an option'),
-    aadhaarId: z.string().min(1, 'AADHAAR ID is required'),
-    panId: z.string().min(1, 'PAN ID is required'),
-});
-
-type IdentityFormData = z.infer<typeof identitySchema>;
+    aadhaarId: z.string().min(12, 'AADHAAR ID must be 12 digits').max(12, 'AADHAAR ID must be 12 digits').regex(/^\d+$/, 'AADHAAR ID must contain only digits'),
+        // PAN is optional per BRD Section 6.2.1 - only validate format if provided
+        panId: z.string().optional(),
+    })
+    .refine(
+        (data) => {
+            if (!data.panId || data.panId.trim() === '') return true; // Optional, empty is valid
+            const trimmed = data.panId.trim();
+            return trimmed.length === 10 && /^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$/.test(trimmed);
+        },
+        {
+            message: 'PAN ID format is invalid (e.g., ABCDE1234F). Format: 5 letters + 4 numbers + 1 letter',
+            path: ['panId'],
+        }
+    )
+    .transform((data) => ({
+        ...data,
+        panId: data.panId?.trim() ? data.panId.trim().toUpperCase() : data.panId,
+    }));
 
 // --- Constants ---
 const APPLICANT_OPTIONS: IDropdownOption[] = [
@@ -33,165 +39,63 @@ const APPLICANT_OPTIONS: IDropdownOption[] = [
 
 ];
 
-// --- Styles ---
-const containerStyles: IStackStyles = {
-    root: {
-        width: '80%',
-        height: '100%', // Full height to push footer down
-        display: 'flex',
-        flexDirection: 'column',
-        color: 'white',
-        selectors: {
-            '& .ms-TextField-wrapper': { width: '100%' },
-        },
-    },
-};
-
-const stackTokens: IStackTokens = { childrenGap: 24 };
-const rowTokens: IStackTokens = { childrenGap: 24 };
-
-const titleStyles = mergeStyles({
-    fontSize: 24, // text-2xl
-    fontWeight: FontWeights.semibold, // Changed to semi-bold to match image crispness
-    color: '#111827', // text-gray-900
-    marginBottom: 4, // Reduced bottom margin
-});
-
-const subtitleStyles = mergeStyles({
-    fontSize: 14, // text-sm
-    color: '#6b7280', // lighter gray check
-    marginBottom: 32, // Increased gap before form
-});
-
-
-
-const labelStyles = mergeStyles({
-    fontWeight: 600, // Medium-bold font
-    fontSize: 14,
-    color: '#374151',
-    marginBottom: 6,
-    display: 'block'
-});
-
 const IdentityDetails = () => {
-    const { formData, updateFormData, nextStep, markStepComplete, setIsLoading } = useRegistration();
-
-    const {
-        control,
-        handleSubmit,
-        getValues,
-        formState: { errors },
-    } = useForm<IdentityFormData>({
-        resolver: zodResolver(identitySchema),
-        defaultValues: {
-            applicantType: formData.applicantType || 'research_scholar', // Default or from context
-            aadhaarId: formData.aadhaarId || '',
-            panId: formData.panId || '',
-        },
+    const { form, onSubmit } = useRegistrationForm({
+        schema: identitySchema,
+        stepNumber: 1,
+        defaultValues: (formData) => ({
+            applicantType: getStringValue(formData, 'applicantType', 'research_scholar'),
+            aadhaarId: getStringValue(formData, 'aadhaarId'),
+            panId: getStringValue(formData, 'panId'),
+        }),
     });
 
-    // Save data to context on unmount (navigation)
-    useEffect(() => {
-        return () => {
-            updateFormData(getValues());
-        };
-    }, [updateFormData, getValues]);
-
-    const onSubmit = async (data: IdentityFormData) => {
-        console.log('Identity Step Data:', data);
-        setIsLoading(true);
-        try {
-            // Show loading for a few seconds before moving to next step
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            updateFormData(data);
-            markStepComplete(1);
-            nextStep();
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-
+    const { control, handleSubmit, formState: { errors } } = form;
 
     return (
-        <Stack className="w-4/5 h-full flex flex-col text-white [&_.ms-TextField-wrapper]:w-full">
-
-            {/* Content Section (Grows to fill space) */}
-            <Stack grow verticalAlign="start">
-                {/* Header Section */}
-                <h2 className="text-2xl font-semibold text-gray-900 mb-1">Identity Verification Details</h2>
-                <p className="text-sm text-gray-500 mb-8">Fill in the Required ID Numbers for Authentication</p>
-
-                {/* Form Fields */}
-                <form className="w-full h-full flex flex-col" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
-                    <Stack tokens={stackTokens}>
-
+        <StepLayout
+            title="Identity Verification Details"
+            subtitle="Fill in the Required ID Numbers for Authentication"
+        >
+            <form className="w-full h-full flex flex-col" onSubmit={(e) => void handleSubmit(onSubmit)(e)} id="current-step-form">
+                <Stack tokens={STACK_TOKENS}>
                         {/* Applicant Type Dropdown */}
-                        <Controller
+                    <DropdownField
                             name="applicantType"
                             control={control}
-                            render={({ field }) => (
-                                <Stack>
-                                    <Label required>What describes you better</Label>
-                                    <Dropdown
-                                        selectedKey={field.value}
-                                        onChange={(_, option) => field.onChange(option?.key)}
+                        errors={errors}
+                        label="What describes you better"
+                        required
+                        options={APPLICANT_OPTIONS}
                                         placeholder="Select an option"
-                                        options={APPLICANT_OPTIONS}
-                                        errorMessage={errors.applicantType?.message}
-                                        className="w-full"
-                                        styles={{
-                                            title: { height: 42, lineHeight: 40, borderRadius: 4, borderColor: '#d1d5db' },
-                                        }}
-                                    />
-                                </Stack>
-                            )}
                         />
 
                         {/* IDs Row (Side by Side) */}
-                        <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Controller
+                    <FormRowContainer>
+                        <FormRow>
+                            <TextInputField
                                     name="aadhaarId"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Stack>
-                                            <Label>AADHAAR ID (Candidate)</Label>
-                                            <TextField
-                                                {...field}
-                                                // Placeholder from image
+                                errors={errors}
+                                label="AADHAAR ID (Candidate)"
+                                required
                                                 placeholder="Enter 12 Digit Aadhar Number"
-                                                errorMessage={errors.aadhaarId?.message}
-                                                styles={{ fieldGroup: { height: 42, borderRadius: 4, borderColor: '#d1d5db' } }}
                                             />
-                                        </Stack>
-                                    )}
-                                />
-                            </Stack.Item>
-
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Controller
+                        </FormRow>
+                        <FormRow>
+                            <TextInputField
                                     name="panId"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Stack>
-                                            <Label>PAN ID (Candidate)</Label>
-                                            <TextField
-                                                {...field}
-                                                placeholder="Enter Pan Card Number" // Placeholder from image
-                                                errorMessage={errors.panId?.message}
-                                                styles={{ fieldGroup: { height: 42, borderRadius: 4, borderColor: '#d1d5db' } }}
+                                errors={errors}
+                                label="PAN ID (Candidate)"
+                                required={false}
+                                placeholder="Enter Pan Card Number (Optional)"
                                             />
-                                        </Stack>
-                                    )}
-                                />
-                            </Stack.Item>
-                        </Stack>
+                        </FormRow>
+                    </FormRowContainer>
                     </Stack>
                 </form>
-            </Stack>
-
-        </Stack>
+        </StepLayout>
     );
 };
 

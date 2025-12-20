@@ -1,7 +1,9 @@
 import { Stack, Text, Image, mergeStyles, IStackStyles, ImageFit, Spinner, SpinnerSize } from '@fluentui/react';
+import { RocketRegular } from '@fluentui/react-icons';
 import { Button } from '@shared/components';
 import { SEO } from '../../components/seo/SEO';
 import { RegistrationProvider, useRegistration } from '@/contexts/RegistrationContext';
+import { useThemeTokens } from '@/hooks/useThemeTokens';
 import IdentityDetails from './steps/IdentityDetails';
 import PersonalDetails from './steps/PersonalDetails';
 import FamilyDetails from './steps/FamilyDetails';
@@ -35,7 +37,7 @@ const headerStyles: IStackStyles = {
     backgroundPosition: 'center',
     backgroundRepeat: 'repeat',
     position: 'relative',
-    borderBottom: '1px solid #FAFAFA', // border-gray-200
+    borderBottom: '1px solid var(--gray-200, #fafafa)', // gray-200
     width: '100%',
     opacity: 0.8,
   },
@@ -74,7 +76,7 @@ const sidebarStyles: IStackStyles = {
   root: {
     width: 400, // w-64
     fontSize: 15,
-    backgroundColor: '#FAFAFA', // Dark gray
+    backgroundColor: 'var(--gray-50, #fafafa)', // gray-50
     padding: 32,
     borderTopLeftRadius: 12,
     borderBottomLeftRadius: 12,
@@ -86,22 +88,33 @@ const sidebarStyles: IStackStyles = {
 // --- Sub-components ---
 
 const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: boolean, isCompleted: boolean }) => {
+  const tokens = useThemeTokens();
+  const isFinalStep = step.id === STEPS.length;
+  
   return (
-    <Stack horizontal tokens={{ childrenGap: 16 }} verticalAlign="start" className={isActive ? '' : 'opacity-70'}>
+    <Stack horizontal tokens={{ childrenGap: 16 }} verticalAlign="start" className={isActive ? '' : !isCompleted ? 'opacity-70' : ''}>
       <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold border-2 transition-all ${
         isActive 
           ? 'bg-gray-900 text-white border-gray-900' 
           : isCompleted 
             ? 'bg-green-500 text-white border-green-500' 
-            : 'bg-transparent text-gray-400 border-gray-300'
-      }`}>
-        {isCompleted ? '✓' : step.id}
+            : isFinalStep
+              ? 'bg-gray-100 border-gray-300'
+              : 'bg-transparent border-gray-300'
+      }`} style={{ lineHeight: '32px' }}>
+        {isCompleted ? (
+          <span style={{ color: 'white', fontSize: '14px', lineHeight: '1' }}>✓</span>
+        ) : isFinalStep && !isActive ? (
+          <RocketRegular style={{ width: '16px', height: '16px', color: tokens.colorNeutralForeground3 }} />
+        ) : (
+          <span className={`text-sm font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>{step.id}</span>
+        )}
       </div>
-      <Stack className="pt-[10px] pb-0.5 justify-center">
-        <Text variant="small" className="uppercase tracking-wider text-gray-500 font-semibold mb-0.5">
-          STEP {step.id}
+      <Stack style={{ paddingTop: '2px', justifyContent: 'center' }}>
+        <Text variant="small" className={`uppercase tracking-wider font-semibold mb-1 ${isFinalStep ? 'text-gray-500' : 'text-gray-500'}`} style={{ fontSize: '11px', lineHeight: '16px' }}>
+          {isFinalStep ? 'FINAL' : `STEP ${step.id}`}
         </Text>
-        <Text variant="large" className={`font-bold ${isActive ? 'text-gray-900' : 'text-gray-600'}`}>
+        <Text variant="large" className={`font-bold ${isActive ? 'text-gray-900' : 'text-gray-600'}`} style={{ lineHeight: '24px', fontSize: '16px' }}>
           {step.title}
         </Text>
       </Stack>
@@ -111,7 +124,12 @@ const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: 
 
 const RegistrationContent = () => {
   // Direct destructuring - TypeScript should infer types from the hook's return type
-  const { currentStep, completedSteps, prevStep, isLoading } = useRegistration();
+  const { currentStep, completedSteps, prevStep, isLoading, formData } = useRegistration();
+  
+  // Check if documents step has minimum 3 files (step 5 is DocumentsUpload)
+  const isDocumentsStepValid = currentStep === 5 
+    ? (formData?.documents && Array.isArray(formData.documents) && formData.documents.length >= 3)
+    : true;
 
   const handleCancel = () => {
     window.location.href = '/signin';
@@ -138,7 +156,7 @@ const RegistrationContent = () => {
         description="Online Registration for Scholarship Assistance - Academic Year 2025-2026"
         url="/registration"
       />
-      <Stack className="h-screen overflow-hidden bg-gray-50">
+      <Stack className="h-screen overflow-hidden bg-gray-50 dark:bg-gray-900">
 
         {/* Header - Fixed Height */}
         <Stack horizontal verticalAlign="center" styles={headerStyles} disableShrink>
@@ -177,31 +195,31 @@ const RegistrationContent = () => {
         <Stack horizontal grow className="overflow-hidden w-full">
 
           {/* Sidebar - Fixed Width, Scrollable inside if needed */}
-          <Stack styles={sidebarStyles} disableShrink>
-            <Stack tokens={{ childrenGap: 32 }} className="mb-8">
-              <Stack horizontal horizontalAlign="space-between" verticalAlign="center">
-                <Stack className="mb-5">
-                  <Text variant="xLarge" className="font-bold text-[30px]">
+          <Stack styles={sidebarStyles} className="bg-gray-50 dark:bg-gray-800" disableShrink>
+            <Stack tokens={{ childrenGap: 24 }} style={{ marginBottom: 32 }}>
+              <Stack horizontal horizontalAlign="space-between" verticalAlign="center" style={{ marginBottom: 32 }}>
+                <Stack style={{ marginBottom: 0 }}>
+                  <Text variant="xLarge" className="font-bold text-[30px] mb-0" style={{ lineHeight: '36px' }}>
                     Online registration
                   </Text>
-                  <Text variant="small" className="text-gray-400 text-sm mt-0.5">Getting started</Text>
+                  <Text variant="small" className="text-gray-400 text-sm mt-1" style={{ lineHeight: '16px' }}>Getting started</Text>
                 </Stack>
 
                 {/* Progress Circle - SVG Implementation */}
-                <div className="relative w-[60px] h-[60px] flex items-center justify-center">
+                <div className="relative w-[60px] h-[60px] flex items-center justify-center" style={{ flexShrink: 0 }}>
                   <svg width="60" height="60" viewBox="0 0 72 72" className="rotate-[-90deg]">
                     {/* Track */}
                     <circle
                       cx="36" cy="36" r="32"
                       fill="white"
-                      stroke="#dbeafe"
+                      stroke="var(--blue-100, #dbeafe)"
                       strokeWidth="4"
                     />
                     {/* Progress Arc */}
                     <circle
                       cx="36" cy="36" r="32"
                       fill="none"
-                      stroke="#2563eb"
+                      stroke="var(--blue-600, #2563eb)"
                       strokeWidth="4"
                       strokeDasharray={2 * Math.PI * 32}
                       strokeDashoffset={(2 * Math.PI * 32) * (1 - (progressPercentage / 100))}
@@ -209,24 +227,22 @@ const RegistrationContent = () => {
                       className="transition-[stroke-dashoffset] duration-500 ease-out"
                     />
                   </svg>
-                  <div className="absolute text-gray-800 font-bold text-base">
+                  <div className="absolute text-gray-800 font-bold text-base" style={{ lineHeight: '20px' }}>
                     {completedSteps.length}/{STEPS.length}
                   </div>
                 </div>
               </Stack>
-            </Stack>
 
-            <Stack tokens={{ childrenGap: 24 }}>
-              {STEPS.map(step => (
-                <StepIndicator
-                  key={step.id}
-                  step={step}
-                  isActive={currentStep === step.id}
-                  isCompleted={completedSteps.includes(step.id)}
-                />
-              ))}
-
-
+              <Stack tokens={{ childrenGap: 24 }}>
+                {STEPS.map(step => (
+                  <StepIndicator
+                    key={step.id}
+                    step={step}
+                    isActive={currentStep === step.id}
+                    isCompleted={completedSteps.includes(step.id)}
+                  />
+                ))}
+              </Stack>
             </Stack>
           </Stack>
 
@@ -235,8 +251,8 @@ const RegistrationContent = () => {
 
             {/* Scrollable Content Area */}
             <Stack grow className="overflow-y-auto py-8 px-10">
-              <Stack className="mb-8">
-                <Text className="text-blue-600 text-[0.625rem] font-bold uppercase tracking-wider mb-2">
+              <Stack style={{ marginBottom: 24 }}>
+                <Text className="text-blue-600 text-[0.625rem] font-bold uppercase tracking-wider mb-0" style={{ lineHeight: '12px', letterSpacing: '0.05em' }}>
                   STEP {currentStep}/{STEPS.length}
                 </Text>
               </Stack>
@@ -270,7 +286,7 @@ const RegistrationContent = () => {
                   type="submit"
                   form="current-step-form"
                   variant="default"
-                  disabled={isLoading}
+                  disabled={isLoading || !isDocumentsStepValid}
                 >
                   {isLoading ? (
                     <Stack horizontal tokens={{ childrenGap: 8 }} verticalAlign="center" horizontalAlign="center">

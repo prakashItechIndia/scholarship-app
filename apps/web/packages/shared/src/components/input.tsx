@@ -1,15 +1,18 @@
 import * as React from "react";
-import { TextField, ITextFieldProps } from "@fluentui/react";
+import { Input as FluentInput, InputProps as FluentInputProps } from "@fluentui/react-components";
 import { cn } from "../lib/utils";
+import { useDarkMode } from "../hooks/useDarkMode";
+import { getThemeTokens } from "../config/theme";
 
-export interface InputProps extends Omit<ITextFieldProps, "type" | "onChange" | "value" | "styles" | "className"> {
+export interface InputProps extends Omit<FluentInputProps, "type" | "onChange" | "value"> {
   variant?: "default" | "outline" | "filled" | "underline";
   prefixIcon?: React.ReactNode;
   suffixIcon?: React.ReactNode;
   iconClassName?: string;
-  type?: React.HTMLInputTypeAttribute;
+  type?: "text" | "number" | "email" | "password" | "search" | "tel" | "url" | "date" | "time";
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  errorMessage?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -23,121 +26,80 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       value,
       onChange,
       errorMessage,
+      className,
       ...props
     },
     ref
   ) => {
     const hasPrefix = !!prefixIcon;
     const hasSuffix = !!suffixIcon;
+    const isDark = useDarkMode();
 
-    const handleChange = React.useCallback(
-      (_ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
-        if (onChange && newValue !== undefined) {
-          // Create a synthetic event for compatibility
-          const syntheticEvent = {
-            target: { value: newValue },
-            currentTarget: { value: newValue },
-          } as React.ChangeEvent<HTMLInputElement>;
-          onChange(syntheticEvent);
-        }
-      },
-      [onChange]
-    );
+    // Get theme tokens for styling
+    const tokens = React.useMemo(() => getThemeTokens(isDark ? 'dark' : 'light'), [isDark]);
 
-    // Internal styles - maintained within component for consistency
-    const internalStyles = React.useMemo(() => {
-      const borderColor = errorMessage ? "#B10E1C" : "#d1d5db"; // Red border when error, gray otherwise
-      
-      const baseStyles: any = {
-        fieldGroup: {
-          height: "45px",
-          minHeight: "45px",
-          borderRadius: "6px",
-          backgroundColor: "#ffffff",
-          border: `1px solid ${borderColor}`,
-        },
-        fieldGroupFocused: {
-          border: `1px solid ${borderColor}`, // Keep same border on focus (no color change)
-          outline: 'none', // Remove default focus outline
-          boxShadow: 'none', // Remove any box shadow on focus
-        },
-        fieldGroupHover: {
-          border: `1px solid ${borderColor}`, // Keep error border on hover
-        },
-        field: {
-          height: "45px",
-          minHeight: "45px",
-          lineHeight: "45px",
-          fontSize: "14px",
-        },
-        errorMessage: {
-          fontSize: "12px",
-          color: "#B10E1C",
-        },
-      };
-      
-      if (hasPrefix || hasSuffix) {
-        baseStyles.fieldGroup = {
-          ...baseStyles.fieldGroup,
-          paddingLeft: hasPrefix ? "32px" : undefined,
-          paddingRight: hasSuffix ? "32px" : undefined,
-        };
-        baseStyles.fieldGroupFocused = {
-          ...baseStyles.fieldGroupFocused,
-          paddingLeft: hasPrefix ? "32px" : undefined,
-          paddingRight: hasSuffix ? "32px" : undefined,
-        };
-        baseStyles.fieldGroupHover = {
-          ...baseStyles.fieldGroupHover,
-          paddingLeft: hasPrefix ? "32px" : undefined,
-          paddingRight: hasSuffix ? "32px" : undefined,
-        };
-      }
-      
-      return baseStyles;
-    }, [hasPrefix, hasSuffix, errorMessage]);
+    const borderColor = React.useMemo(() => {
+      return errorMessage 
+        ? (tokens as any).colorStatusDangerBorder2 || "#d13438"
+        : tokens.colorNeutralStroke1 || "#d1d5db";
+    }, [tokens, errorMessage]);
 
-    if (hasPrefix || hasSuffix) {
-      return (
-        <div className="relative w-full">
-          {prefixIcon && (
-            <div
-              className={cn(
-                "absolute left-2 top-1/2 -translate-y-1/2 z-10 pointer-events-none",
-                iconClassName
-              )}
-            >
-              {prefixIcon}
-            </div>
-          )}
-          <TextField
-            componentRef={ref as any}
-            type={type}
-            value={value ?? ""}
-            onChange={handleChange}
-            errorMessage={errorMessage}
-            styles={internalStyles}
-            {...props}
-          />
-          {suffixIcon && (
-            <div className={cn("absolute right-2 top-1/2 -translate-y-1/2 z-10", iconClassName)}>
-              {suffixIcon}
-            </div>
-          )}
-        </div>
-      );
-    }
+    const contentAfter = suffixIcon ? (
+      <span className={cn("flex items-center", iconClassName)}>{suffixIcon}</span>
+    ) : undefined;
+
+    const contentBefore = prefixIcon ? (
+      <span className={cn("flex items-center", iconClassName)}>{prefixIcon}</span>
+    ) : undefined;
+
+    // Calculate padding - if no prefix/suffix, use 12px, otherwise use 32px for icon space
+    const paddingLeft = hasPrefix ? "32px" : "12px";
+    const paddingRight = hasSuffix ? "32px" : "12px";
 
     return (
-      <TextField
-        componentRef={ref as any}
-        type={type}
-        value={value ?? ""}
-        onChange={handleChange}
-        errorMessage={errorMessage}
-        styles={internalStyles}
-        {...props}
-      />
+      <div className="relative w-full">
+        {errorMessage && (
+          <div 
+            className="text-xs mb-1" 
+            style={{ 
+              fontSize: tokens.fontSizeBase200, 
+              color: (tokens as any).colorStatusDangerForeground3 || "#d13438" 
+            }}
+          >
+            {errorMessage}
+          </div>
+        )}
+        <div
+          style={{
+            position: "relative",
+          }}
+        >
+          <FluentInput
+            ref={ref}
+            type={type}
+            value={value ?? ""}
+            onChange={onChange as any}
+            contentBefore={contentBefore}
+            contentAfter={contentAfter}
+            className={cn(className)}
+            style={{
+              width: "100%",
+              border: `1px solid ${borderColor}`,
+              borderRadius: tokens.borderRadiusLarge,
+              backgroundColor: tokens.colorNeutralBackground1,
+              color: tokens.colorNeutralForeground1,
+              fontSize: tokens.fontSizeBase300,
+              height: "45px",
+              minHeight: "45px",
+              paddingLeft: paddingLeft,
+              paddingRight: paddingRight,
+              paddingTop: "8px",
+              paddingBottom: "8px",
+            }}
+            {...props}
+          />
+        </div>
+      </div>
     );
   }
 );

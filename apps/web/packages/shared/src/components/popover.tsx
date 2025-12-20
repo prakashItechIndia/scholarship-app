@@ -1,99 +1,43 @@
 import * as React from "react";
-import { Callout, ICalloutProps } from "@fluentui/react";
+import { Popover as FluentPopover, PopoverSurface, PopoverTrigger, PopoverProps as FluentPopoverProps } from "@fluentui/react-components";
 import { cn } from "../lib/utils";
 
-export interface PopoverProps {
+export interface PopoverProps extends Omit<FluentPopoverProps, "open" | "onOpenChange"> {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   children: React.ReactNode;
 }
 
-const PopoverContext = React.createContext<{
-  open: boolean;
-  setOpen: (open: boolean) => void;
-}>({
-  open: false,
-  setOpen: () => {},
-});
-
-const Popover = ({ open: controlledOpen, onOpenChange, children }: PopoverProps) => {
-  const [internalOpen, setInternalOpen] = React.useState(false);
-  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
-  const setOpen = React.useCallback(
-    (newOpen: boolean) => {
-      if (controlledOpen === undefined) {
-        setInternalOpen(newOpen);
-      }
-      onOpenChange?.(newOpen);
-    },
-    [controlledOpen, onOpenChange]
-  );
-
+const Popover = ({ open, onOpenChange, children, ...props }: PopoverProps) => {
   return (
-    <PopoverContext.Provider value={{ open, setOpen }}>
+    <FluentPopover
+      open={open}
+      onOpenChange={(_, data) => onOpenChange?.(data.open || false)}
+      {...props}
+    >
       {children}
-    </PopoverContext.Provider>
+    </FluentPopover>
   );
 };
 
 Popover.displayName = "Popover";
 
-const PopoverTrigger = React.forwardRef<
-  HTMLElement,
-  React.HTMLAttributes<HTMLElement> & { asChild?: boolean }
->(({ children, asChild, ...props }, ref) => {
-  const { open, setOpen } = React.useContext(PopoverContext);
-  const triggerRef = React.useRef<HTMLElement>(null);
+const PopoverTriggerComponent = PopoverTrigger;
+PopoverTriggerComponent.displayName = "PopoverTrigger";
 
-  React.useImperativeHandle(ref, () => triggerRef.current!);
-
-  const handleClick = () => {
-    setOpen(!open);
-  };
-
-  if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
-      ref: triggerRef,
-      onClick: handleClick,
-      ...props,
-    } as any);
+const PopoverContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    align?: "start" | "end" | "center";
   }
-
+>(({ className, children, align, ...props }, ref) => {
   return (
-    <div ref={triggerRef as any} onClick={handleClick} {...props}>
+    <PopoverSurface ref={ref} className={cn("z-50 w-72 rounded-md border bg-white p-4 shadow-md", className)} {...props}>
       {children}
-    </div>
+    </PopoverSurface>
   );
 });
 
-PopoverTrigger.displayName = "PopoverTrigger";
-
-type PopoverContentProps = Omit<ICalloutProps, "target"> & {
-  align?: "start" | "end" | "center";
-};
-
-const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
-  ({ className, children, align, ...props }, ref) => {
-    const { open, setOpen } = React.useContext(PopoverContext);
-    const triggerRef = React.useRef<HTMLElement>(null);
-
-    if (!open) return null;
-
-    return (
-      <Callout
-        componentRef={ref as any}
-        target={triggerRef.current}
-        onDismiss={() => setOpen(false)}
-        className={cn("z-50 w-72 rounded-md border bg-white p-4 shadow-md", className)}
-        {...props}
-      >
-        {children}
-      </Callout>
-    );
-  }
-);
-
 PopoverContent.displayName = "PopoverContent";
 
-export { Popover, PopoverTrigger, PopoverContent };
-
+export { Popover, PopoverTriggerComponent as PopoverTrigger, PopoverContent };

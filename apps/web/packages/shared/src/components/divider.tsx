@@ -1,8 +1,8 @@
 import * as React from "react";
-import { Separator } from "@fluentui/react";
+import { Divider as FluentDivider, DividerProps as FluentDividerProps } from "@fluentui/react-components";
 import { cn } from "../lib/utils";
 
-export interface DividerProps {
+export interface DividerProps extends FluentDividerProps {
   className?: string;
   vertical?: boolean;
 }
@@ -10,8 +10,8 @@ export interface DividerProps {
 const Divider = React.forwardRef<HTMLDivElement, DividerProps>(
   ({ className, vertical, ...props }, ref) => {
     return (
-      <Separator
-        componentRef={ref as any}
+      <FluentDivider
+        ref={ref}
         vertical={vertical}
         className={cn(className)}
         {...props}
@@ -23,4 +23,3 @@ const Divider = React.forwardRef<HTMLDivElement, DividerProps>(
 Divider.displayName = "Divider";
 
 export { Divider };
-

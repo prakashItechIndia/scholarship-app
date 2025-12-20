@@ -17,4 +17,6 @@ export * from "./search";
 export * from "./form";
 export * from "./label";
 export * from "./divider";
+export * from "./modal";
+export * from "./drawer";
 

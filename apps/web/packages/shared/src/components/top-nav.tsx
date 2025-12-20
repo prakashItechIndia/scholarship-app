@@ -53,7 +53,7 @@ export const TopNav = React.forwardRef<HTMLElement, TopNavProps>(
     ref
   ) => {
     const defaultLeft = company ? (
-      <div className="flex items-center gap-4">
+      <div className="flex items-center">
         <div className="relative w-8 h-8 rounded overflow-hidden">
           {company.logoUrl ? (
             <img

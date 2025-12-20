@@ -1,5 +1,7 @@
 import * as React from "react";
 import { DatePicker as FluentDatePicker, IDatePickerProps } from "@fluentui/react";
+import { useDarkMode } from "../hooks/useDarkMode";
+import { getThemeTokens } from "../config/theme";
 
 export interface DatePickerProps extends Omit<IDatePickerProps, "styles"> {
   value?: Date;
@@ -9,17 +11,28 @@ export interface DatePickerProps extends Omit<IDatePickerProps, "styles"> {
 
 const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
   ({ errorMessage, textField, ...props }, ref) => {
+    const isDark = useDarkMode();
+    
     // Internal styles - maintained within component for consistency (matching Input component exactly)
     const internalStyles = React.useMemo(() => {
-      const borderColor = errorMessage ? "#B10E1C" : "#d1d5db"; // Red border when error, gray otherwise
+      // Get theme tokens based on dark mode
+      const tokens = getThemeTokens(isDark ? 'dark' : 'light');
+      
+      // Use theme tokens for colors
+      const borderColor = errorMessage 
+        ? (tokens as any).colorStatusDangerBorder2
+        : tokens.colorNeutralStroke1;
+      
+      const backgroundColor = tokens.colorNeutralBackground1;
+      const textColor = tokens.colorNeutralForeground1;
       
       return {
         textField: {
           fieldGroup: {
             height: "45px",
             minHeight: "45px",
-            borderRadius: "6px",
-            backgroundColor: "#ffffff",
+            borderRadius: tokens.borderRadiusLarge,
+            backgroundColor,
             border: `1px solid ${borderColor}`,
           },
           fieldGroupFocused: {
@@ -34,15 +47,16 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
             height: "45px",
             minHeight: "45px",
             lineHeight: "45px",
-            fontSize: "14px",
+            fontSize: tokens.fontSizeBase300,
+            color: textColor,
           },
           errorMessage: {
-            fontSize: "12px",
-            color: "#B10E1C",
+            fontSize: tokens.fontSizeBase200,
+            color: (tokens as any).colorStatusDangerForeground3,
           },
         },
       } as any;
-    }, [errorMessage]);
+    }, [errorMessage, isDark]);
 
     return (
       <FluentDatePicker
