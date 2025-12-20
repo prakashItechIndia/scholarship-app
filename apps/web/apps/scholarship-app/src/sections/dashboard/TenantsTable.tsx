@@ -1,3 +1,4 @@
+import { Button } from '@shared/components';
 import { useTenantList } from '../../services/tenants.service';
 
 const columnClasses = 'px-3 py-2 text-left text-sm text-slate-500';
@@ -19,13 +20,14 @@ export const TenantsTable = () => {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
         Unable to load tenant list.{' '}
-        <button
+        <Button
           type="button"
+          variant="link"
           onClick={handleRetry}
-          className="font-medium underline underline-offset-4"
+          className="font-medium underline underline-offset-4 p-0 h-auto min-w-0 text-red-700"
         >
           Retry
-        </button>
+        </Button>
       </div>
     );
   }

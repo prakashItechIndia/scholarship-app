@@ -2,7 +2,7 @@ import * as React from "react";
 import { Label as FluentLabel, ILabelProps } from "@fluentui/react";
 import { cn } from "../lib/utils";
 
-export interface LabelProps extends ILabelProps {
+export interface LabelProps extends Omit<ILabelProps, "styles"> {
   required?: boolean;
   children?: React.ReactNode;
 }
@@ -12,17 +12,16 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
     return (
       <FluentLabel
         componentRef={ref as any}
-        className={cn("text-sm font-medium", className)}
+        className={cn("font-semibold text-sm text-gray-700 mb-1.5 block", className)}
         {...props}
       >
         {children}
-        {required && <span className="text-red-700 ml-1">*</span>}
+        {required && <span className="text-[#B10E1C] ml-1">*</span>}
       </FluentLabel>
     );
-  },
+  }
 );
 
 Label.displayName = "Label";
 
 export { Label };
-

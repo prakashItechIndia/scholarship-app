@@ -7,10 +7,10 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { AuthWrapper } from '@/components/auth/AuthWrapper';
 import { useAuth } from '../../contexts/AuthContext';
 import { SEO } from '../../components/seo/SEO';
-import { Input } from '@/components/ui/input';
+import { IconButton, PrimaryButton } from '@fluentui/react';
+import { Input } from '@shared/components';
 import { KeyIcon, EyeIcon, EyeOffIcon } from '@/components/ui/icons';
-import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
-import { PrimaryButton } from '@fluentui/react';
+import { Form, FormField, FormItem, FormControl, FormMessage } from '@shared/components';
 import { useToast } from '@/components/ui/toast';
 import { apiClient } from '../../shared/api-client';
 import { secureTokenStorage } from '@shared/utils/secureTokenStorage';
@@ -200,19 +200,35 @@ const ChangePasswordPage = () => {
                         type={showCurrentPassword ? 'text' : 'password'}
                         prefixIcon={<KeyIcon />}
                         suffixIcon={
-                          <button
-                            type="button"
+                          <IconButton
                             onClick={() =>
                               setShowCurrentPassword(!showCurrentPassword)
                             }
-                            className="focus:outline-none"
-                          >
-                            {showCurrentPassword ? (
-                              <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest" />
-                            ) : (
-                              <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest" />
-                            )}
-                          </button>
+                            ariaLabel={showCurrentPassword ? 'Hide password' : 'Show password'}
+                            onRenderIcon={() => 
+                              showCurrentPassword ? (
+                                <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest" />
+                              ) : (
+                                <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest" />
+                              )
+                            }
+                            styles={{
+                              root: {
+                                width: 'auto',
+                                height: 'auto',
+                                minWidth: 'auto',
+                                padding: '4px',
+                                background: 'transparent',
+                                border: 'none',
+                              },
+                              rootHovered: {
+                                background: 'transparent',
+                              },
+                              rootPressed: {
+                                background: 'transparent',
+                              },
+                            }}
+                          />
                         }
                         placeholder="Enter your current password"
                         aria-invalid={!!fieldState.error}
@@ -235,17 +251,18 @@ const ChangePasswordPage = () => {
                         type={showNewPassword ? 'text' : 'password'}
                         prefixIcon={<KeyIcon />}
                         suffixIcon={
-                          <button
-                            type="button"
+                          <IconButton
                             onClick={() => setShowNewPassword(!showNewPassword)}
-                            className="focus:outline-none"
-                          >
-                            {showNewPassword ? (
-                              <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest" />
-                            ) : (
-                              <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest" />
-                            )}
-                          </button>
+                            ariaLabel={showNewPassword ? 'Hide password' : 'Show password'}
+                            onRenderIcon={() => 
+                              showNewPassword ? (
+                                <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                              ) : (
+                                <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                              )
+                            }
+                            className="w-auto h-auto min-w-0 p-1 bg-transparent border-none hover:bg-transparent active:bg-transparent focus:outline-none"
+                          />
                         }
                         placeholder="Enter your new password"
                         aria-invalid={!!fieldState.error}
@@ -268,19 +285,20 @@ const ChangePasswordPage = () => {
                         type={showConfirmPassword ? 'text' : 'password'}
                         prefixIcon={<KeyIcon />}
                         suffixIcon={
-                          <button
-                            type="button"
+                          <IconButton
                             onClick={() =>
                               setShowConfirmPassword(!showConfirmPassword)
                             }
-                            className="focus:outline-none"
-                          >
-                            {showConfirmPassword ? (
-                              <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest" />
-                            ) : (
-                              <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest" />
-                            )}
-                          </button>
+                            ariaLabel={showConfirmPassword ? 'Hide password' : 'Show password'}
+                            onRenderIcon={() => 
+                              showConfirmPassword ? (
+                                <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                              ) : (
+                                <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                              )
+                            }
+                            className="w-auto h-auto min-w-0 p-1 bg-transparent border-none hover:bg-transparent active:bg-transparent focus:outline-none"
+                          />
                         }
                         placeholder="Confirm your new password"
                         aria-invalid={!!fieldState.error}

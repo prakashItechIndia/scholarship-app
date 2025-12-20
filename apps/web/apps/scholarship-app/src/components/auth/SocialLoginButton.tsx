@@ -30,33 +30,17 @@ export const SocialLoginButton = ({ provider, onClick }: SocialLoginButtonProps)
   return (
     <Button
       type="button"
-      variant="default"
+      variant="outline"
       onClick={onClick}
-      styles={{
-        root: {
-          flex: 1,
-          height: 'auto',
-          padding: '16px',
-          backgroundColor: '#ffffff',
-          border: '1px solid #e5e7eb',
-          borderRadius: '8px',
-        },
-        rootHovered: {
-          backgroundColor: '#f9fafb',
-          border: '1px solid #d1d5db',
-        },
-      }}
+      className="flex-1 h-auto p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300"
     >
       <Stack horizontal tokens={{ childrenGap: 8 }} verticalAlign="center" horizontalAlign="start"  >
         <img
           src={config.icon}
           alt={config.name}
-          style={{
-            width: '15px',
-            height: '15px',
-          }}
+          className="w-[15px] h-[15px]"
         />
-        <Text variant="small" styles={{ root: { fontWeight: 500, color: '#374151' } }}>
+        <Text variant="small" className="font-medium text-gray-700">
           {config.name}
         </Text>
       </Stack>

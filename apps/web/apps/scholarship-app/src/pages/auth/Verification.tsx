@@ -4,7 +4,9 @@ import { Stack, Text } from '@fluentui/react';
 import { SEO } from '../../components/seo/SEO';
 import { generateOrganizationSchema } from '../../utils/schema';
 import { AuthLayoutWrapper } from '@/components/auth/AuthLayoutWrapper';
-import { LogoHeader } from '@/components/auth/LogoHeader';
+import { LogoHeaderWithOffset } from '@/components/auth/LogoHeaderWithOffset';
+import { AuthPageHeader } from '@/components/auth/AuthPageHeader';
+import { ResendButton } from '@/components/auth/ResendButton';
 import { getBaseUrl, createResendTimer } from '@/utils/signInUtils';
 import { useToast } from '@/components/ui/toast';
 
@@ -17,7 +19,7 @@ const VerificationPage = () => {
   // Get email from URL params or localStorage
   const emailFromParams = searchParams.get('email');
   const emailFromStorage = localStorage.getItem('verification_email');
-  const enteredEmail = emailFromParams || emailFromStorage || '';
+  const enteredEmail = emailFromParams ?? emailFromStorage ?? '';
 
   const baseUrl = getBaseUrl();
   const organizationSchema = generateOrganizationSchema({
@@ -68,44 +70,33 @@ const VerificationPage = () => {
         schema={organizationSchema}
       />
       <AuthLayoutWrapper footerVariant="email">
-        <div style={{ position: 'relative', top: '-180px', marginBottom: '-100px' }}>
-          <LogoHeader variant="email" />
-        </div>
+        <LogoHeaderWithOffset variant="email" />
         
         <Stack tokens={{ childrenGap: 24 }}>
-          <Text variant="xxLarge" styles={{ root: { fontWeight: 700, color: '#111827', lineHeight: '1.25',fontSize:'1.25rem' } }}>
-            Check your email
-          </Text>
-          
-          <Text variant="medium" styles={{ root: { color: '#707070', lineHeight: '1.5',fontSize:'1rem' } }}>
-            We've sent you a Verification link to
-            <br />
-            {enteredEmail && (
-              <span style={{ color: '#707070', fontWeight: 600 }}>{enteredEmail}</span>
-            )}
-            <br />
-            Please check your inbox and click the link to <br />activate your account.
-          </Text>
+          <AuthPageHeader
+            title="Check your email"
+            subtitle={
+              <>
+                We've sent you a Verification link to
+                <br />
+                {enteredEmail && (
+                  <span className="text-[#707070] font-semibold">{enteredEmail}</span>
+                )}
+                <br />
+                Please check your inbox and click the link to <br />activate your account.
+              </>
+            }
+            titleSize="xxLarge"
+            subtitleSize="medium"
+          />
 
           <Stack tokens={{ childrenGap: 12 }}>
-            <Text variant="small" styles={{ root: { color: '#707070',fontSize:'1rem' } }}>
+            <Text variant="small" className="text-[#707070] text-base">
               Didn't receive an email?{' '}
-              <button
+              <ResendButton
                 onClick={handleResendActivation}
-                disabled={resendCooldown > 0}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#1d4ed8',
-                  cursor: resendCooldown > 0 ? 'not-allowed' : 'pointer',
-                  textDecoration: 'none',
-                  padding: 0,
-                  fontSize: '14px',
-                  fontWeight: 600,
-                }}
-              >
-                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend'}
-              </button>
+                cooldown={resendCooldown}
+              />
             </Text>
           </Stack>
         </Stack>

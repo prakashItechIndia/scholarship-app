@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
+import { Label } from '@shared/components';
 
 import { signIn } from '../../services/auth.service';
 
@@ -80,9 +81,9 @@ const experienceAppUrl: string =
         noValidate
       >
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700" htmlFor="email">
+          <Label htmlFor="email" className="text-sm font-medium text-gray-700">
             Email
-          </label>
+          </Label>
           <input
             id="email"
             type="email"
@@ -96,12 +97,9 @@ const experienceAppUrl: string =
         </div>
 
         <div className="space-y-2">
-          <label
-            className="text-sm font-medium text-gray-700"
-            htmlFor="password"
-          >
+          <Label htmlFor="password" className="text-sm font-medium text-gray-700">
             Password
-          </label>
+          </Label>
           <input
             id="password"
             type="password"
@@ -115,14 +113,17 @@ const experienceAppUrl: string =
         </div>
 
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2">
             <input
+              id="rememberMe"
               type="checkbox"
               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               {...register('rememberMe')}
             />
-            Remember me on this device
-          </label>
+            <Label htmlFor="rememberMe" className="text-sm text-gray-600 mb-0 cursor-pointer">
+              Remember me on this device
+            </Label>
+          </div>
           <a
             href="#"
             className="text-sm text-blue-600 hover:text-blue-700 underline"

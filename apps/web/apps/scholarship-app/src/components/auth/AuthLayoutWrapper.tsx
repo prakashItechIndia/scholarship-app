@@ -24,37 +24,34 @@ export const AuthLayoutWrapper = ({ children, footerVariant = 'email' }: AuthLay
       {/* Left Panel - Memorial Section */}
       <Stack
         className={mergeStyles({
-          marginTop: '20px',
+          // marginTop: '20px',
           display: 'none',
           width: '60%',
           position: 'absolute',
-          left: 20,
-          top: 2,
+          // left: 20,
+          // top: 2,
           bottom: 0,
           zIndex: 10,
           overflow: 'hidden',
           '@media (min-width: 1024px)': {
             display: 'flex',
           },
-          
+          height: '100vh',
+          padding: '20px',
+          paddingRight: '0px',
         })}
       >
-        <Stack
-          className={mergeStyles({
-            width: '100%',
-            height: '100%',
-            minHeight: '85vh',
-            maxHeight: '95vh',
-            position: 'relative',
-            padding: '48px',
-            borderRadius: '40px',
-            backgroundImage: `url(${loginBanner})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          })}
-        >
-          <Stack horizontalAlign="center">
+        <div className="relative w-full h-full p-12 rounded-[40px] border-8 border-white overflow-hidden">
+          {/* Background Image */}
+          <img
+            src={loginBanner}
+            alt="Login Banner Background"
+            className="absolute inset-0 w-full h-full object-fill object-center"
+            aria-hidden="true"
+          />
+          
+          {/* Content Overlay */}
+          <Stack horizontalAlign="center" className="relative z-10">
             <Text variant="small" styles={{ root: { color: '#374151', marginBottom: '16px', fontSize: '1rem' } }}>
               In Fond Remembrance of
             </Text>
@@ -73,7 +70,7 @@ export const AuthLayoutWrapper = ({ children, footerVariant = 'email' }: AuthLay
               02-04-1952 - 10-07-2015
             </Text>
           </Stack>
-        </Stack>
+        </div>
       </Stack>
 
       {/* Right Panel - Content with Footer */}

@@ -2,7 +2,7 @@ import * as React from "react";
 import { TextField, ITextFieldProps } from "@fluentui/react";
 import { cn } from "../lib/utils";
 
-export interface InputProps extends Omit<ITextFieldProps, "type" | "onChange" | "value"> {
+export interface InputProps extends Omit<ITextFieldProps, "type" | "onChange" | "value" | "styles" | "className"> {
   variant?: "default" | "outline" | "filled" | "underline";
   prefixIcon?: React.ReactNode;
   suffixIcon?: React.ReactNode;
@@ -15,7 +15,6 @@ export interface InputProps extends Omit<ITextFieldProps, "type" | "onChange" | 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     {
-      className,
       variant = "default",
       prefixIcon,
       suffixIcon,
@@ -23,6 +22,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       type,
       value,
       onChange,
+      errorMessage,
       ...props
     },
     ref
@@ -44,6 +44,59 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       [onChange]
     );
 
+    // Internal styles - maintained within component for consistency
+    const internalStyles = React.useMemo(() => {
+      const borderColor = errorMessage ? "#B10E1C" : "#d1d5db"; // Red border when error, gray otherwise
+      
+      const baseStyles: any = {
+        fieldGroup: {
+          height: "45px",
+          minHeight: "45px",
+          borderRadius: "6px",
+          backgroundColor: "#ffffff",
+          border: `1px solid ${borderColor}`,
+        },
+        fieldGroupFocused: {
+          border: `1px solid ${borderColor}`, // Keep same border on focus (no color change)
+          outline: 'none', // Remove default focus outline
+          boxShadow: 'none', // Remove any box shadow on focus
+        },
+        fieldGroupHover: {
+          border: `1px solid ${borderColor}`, // Keep error border on hover
+        },
+        field: {
+          height: "45px",
+          minHeight: "45px",
+          lineHeight: "45px",
+          fontSize: "14px",
+        },
+        errorMessage: {
+          fontSize: "12px",
+          color: "#B10E1C",
+        },
+      };
+      
+      if (hasPrefix || hasSuffix) {
+        baseStyles.fieldGroup = {
+          ...baseStyles.fieldGroup,
+          paddingLeft: hasPrefix ? "32px" : undefined,
+          paddingRight: hasSuffix ? "32px" : undefined,
+        };
+        baseStyles.fieldGroupFocused = {
+          ...baseStyles.fieldGroupFocused,
+          paddingLeft: hasPrefix ? "32px" : undefined,
+          paddingRight: hasSuffix ? "32px" : undefined,
+        };
+        baseStyles.fieldGroupHover = {
+          ...baseStyles.fieldGroupHover,
+          paddingLeft: hasPrefix ? "32px" : undefined,
+          paddingRight: hasSuffix ? "32px" : undefined,
+        };
+      }
+      
+      return baseStyles;
+    }, [hasPrefix, hasSuffix, errorMessage]);
+
     if (hasPrefix || hasSuffix) {
       return (
         <div className="relative w-full">
@@ -62,13 +115,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             type={type}
             value={value ?? ""}
             onChange={handleChange}
-            className={cn(className)}
-            styles={{
-              fieldGroup: {
-                paddingLeft: hasPrefix ? "32px" : undefined,
-                paddingRight: hasSuffix ? "32px" : undefined,
-              },
-            }}
+            errorMessage={errorMessage}
+            styles={internalStyles}
             {...props}
           />
           {suffixIcon && (
@@ -86,7 +134,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         type={type}
         value={value ?? ""}
         onChange={handleChange}
-        className={cn(className)}
+        errorMessage={errorMessage}
+        styles={internalStyles}
         {...props}
       />
     );
@@ -96,4 +145,3 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = "Input";
 
 export { Input };
-

@@ -11,9 +11,10 @@ import {
 } from '../../services/auth.service';
 import { preserveQueryParams } from '../../utils/redirect';
 import { SEO } from '../../components/seo/SEO';
-import { Input } from '@/components/ui/input';
+import { IconButton } from '@fluentui/react';
+import { Input, Label } from '@shared/components';
 import { KeyIcon, EyeIcon, EyeOffIcon } from '@/components/ui/icons';
-import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
+import { Form, FormField, FormItem, FormControl, FormMessage, Label } from '@shared/components';
 import { useToast } from '@/components/ui/toast';
 
 const schema = z
@@ -190,33 +191,32 @@ const CreatePasswordPage = () => {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex flex-col gap-[4px]">
-                    <label className="text-[12px] font-normal text-Neutral-Foreground-1-Rest leading-[16px] flex items-end gap-[4px]">
-                      <span>New Password</span>
-                      <span className="text-[12px] text-[#b10e1c]">*</span>
-                    </label>
+                    <Label required className="text-[12px] font-normal text-Neutral-Foreground-1-Rest leading-[16px]">
+                      New Password
+                    </Label>
                     <FormControl>
                       <Input
                         {...field}
                         value={field.value ?? ''}
                         prefixIcon={<KeyIcon />}
                         suffixIcon={
-                          <button
-                            type="button"
+                          <IconButton
                             onClick={() => setShowPassword(!showPassword)}
-                            className="text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest flex items-center justify-center"
-                          >
-                            {showPassword ? (
-                              <EyeOffIcon className="w-4 h-4" />
-                            ) : (
-                              <EyeIcon className="w-4 h-4" />
-                            )}
-                          </button>
+                            ariaLabel={showPassword ? 'Hide password' : 'Show password'}
+                            onRenderIcon={() => 
+                              showPassword ? (
+                                <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                              ) : (
+                                <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                              )
+                            }
+                            className="w-auto h-auto min-w-0 p-1 bg-transparent border-none hover:bg-transparent active:bg-transparent"
+                          />
                         }
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Enter your password"
                         autoComplete="new-password"
                         aria-invalid={Boolean(form.formState.errors.password)}
-                        className="bg-white"
                         required={false}
                       />
                     </FormControl>
@@ -233,31 +233,29 @@ const CreatePasswordPage = () => {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex flex-col gap-[4px]">
-                    <label className="text-[12px] font-normal text-Neutral-Foreground-1-Rest leading-[16px] flex items-end gap-[4px]">
-                      <span>Confirm Password</span>
-                      <span className="text-[12px] text-[#b10e1c]">*</span>
-                    </label>
+                    <Label required className="text-[12px] font-normal text-Neutral-Foreground-1-Rest leading-[16px]">
+                      Confirm Password
+                    </Label>
                     <FormControl>
                       <Input
                         {...field}
                         value={field.value ?? ''}
                         prefixIcon={<KeyIcon />}
                         suffixIcon={
-                          <button
-                            type="button"
+                          <IconButton
                             onClick={() =>
                               setShowConfirmPassword(!showConfirmPassword)
                             }
-                            className="text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest flex items-center justify-center"
-                          >
-                            {showConfirmPassword ? (
-                              <EyeIcon className="w-4 h-4" />
-
-                            ) : (
-                              <EyeOffIcon className="w-4 h-4" />
-
-                            )}
-                          </button>
+                            ariaLabel={showConfirmPassword ? 'Hide password' : 'Show password'}
+                            onRenderIcon={() => 
+                              showConfirmPassword ? (
+                                <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                              ) : (
+                                <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                              )
+                            }
+                            className="w-auto h-auto min-w-0 p-1 bg-transparent border-none hover:bg-transparent active:bg-transparent"
+                          />
                         }
                         type={showConfirmPassword ? 'text' : 'password'}
                         placeholder="Confirm your password"
@@ -265,7 +263,6 @@ const CreatePasswordPage = () => {
                         aria-invalid={Boolean(
                           form.formState.errors.confirmPassword,
                         )}
-                        className="bg-white"
                         required={false}
                       />
                     </FormControl>
