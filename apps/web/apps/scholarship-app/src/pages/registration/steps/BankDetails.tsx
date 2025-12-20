@@ -1,19 +1,10 @@
-import { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import {
-    Stack,
-    TextField,
-    Dropdown,
-    IDropdownOption,
-    IStackStyles,
-    IStackTokens,
-    mergeStyles,
-    FontWeights,
-} from '@fluentui/react';
-import { Label } from '@shared/components';
-import { useRegistration } from '@/contexts/RegistrationContext';
+import { IDropdownOption } from '@fluentui/react';
+import { useRegistrationForm } from '../hooks/useRegistrationForm';
+import { StepLayout } from '../components/StepLayout';
+import { getStringValue } from '../utils/registrationHelpers';
+import { STACK_TOKENS } from '../utils/registrationConstants';
+import { TextInputField, DropdownField, FormRowContainer, FormRow, IfscCodeField } from '../components';
 
 // --- Validation Schema ---
 const bankSchema = z.object({
@@ -43,260 +34,121 @@ const BRANCH_OPTIONS: IDropdownOption[] = [
     // Add more branches as needed
 ];
 
-// --- Styles (Matching IdentityDetails) ---
-const containerStyles: IStackStyles = {
-    root: {
-        width: '80%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-    },
-};
-
-const stackTokens: IStackTokens = { childrenGap: 24 };
-const rowTokens: IStackTokens = { childrenGap: 24 };
-
-const titleStyles = mergeStyles({
-    fontSize: 24,
-    fontWeight: FontWeights.semibold,
-    color: '#111827',
-    marginBottom: 4,
-});
-
-const subtitleStyles = mergeStyles({
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 32, // Gap for layout
-});
-
-const labelStyles = mergeStyles({
-    fontWeight: 600,
-    fontSize: 14,
-    color: '#374151',
-    marginBottom: 6,
-    display: 'block'
-});
-
-const asteriskStyle = { color: '#ef4444' };
-const lookupLinkStyle = mergeStyles({
-    float: 'right',
-    color: '#ef4444', // Red-ish check for 'Lookup IFSC Code'
-    fontSize: 12,
-    cursor: 'pointer',
-    fontWeight: 500,
-    textDecoration: 'none'
-});
-
-const dropdownStyles = {
-    dropdown: { width: '100%' },
-    title: { height: 42, lineHeight: 40, borderRadius: 4, borderColor: '#d1d5db' },
-};
-
-const textFieldStyles = {
-    fieldGroup: { height: 42, borderRadius: 4, borderColor: '#d1d5db' }
-};
 
 const BankDetails = () => {
-    const { formData, updateFormData, nextStep, markStepComplete, setIsLoading } = useRegistration();
-
-    const {
-        control,
-        handleSubmit,
-        getValues,
-        formState: { errors },
-    } = useForm<BankFormData>({
-        resolver: zodResolver(bankSchema),
-        defaultValues: {
-            bankAccountName: formData.bankAccountName || '',
-            bankAccountNumber: formData.bankAccountNumber || '',
-            bankName: formData.bankName || '',
-            bankBranch: formData.bankBranch || '',
-            bankRequestAmount: formData.bankRequestAmount || '',
-            bankScholarshipSeekingFor: formData.bankScholarshipSeekingFor || '',
-            bankIfscCode: formData.bankIfscCode || '',
-        },
+    const { form, onSubmit } = useRegistrationForm({
+        schema: bankSchema,
+        stepNumber: 4,
+        defaultValues: (formData) => ({
+            bankAccountName: getStringValue(formData, 'bankAccountName'),
+            bankAccountNumber: getStringValue(formData, 'bankAccountNumber'),
+            bankName: getStringValue(formData, 'bankName'),
+            bankBranch: getStringValue(formData, 'bankBranch'),
+            bankRequestAmount: getStringValue(formData, 'bankRequestAmount'),
+            bankScholarshipSeekingFor: getStringValue(formData, 'bankScholarshipSeekingFor'),
+            bankIfscCode: getStringValue(formData, 'bankIfscCode'),
+        }),
     });
 
-    // Save data to context on unmount
-    useEffect(() => {
-        return () => {
-            updateFormData(getValues());
-        };
-    }, [updateFormData, getValues]);
-
-    const onSubmit = async (data: BankFormData) => {
-        console.log('Bank Step Data:', data);
-        setIsLoading(true);
-        try {
-            // Show loading for a few seconds before moving to next step
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            updateFormData(data);
-            markStepComplete(4);
-            nextStep();
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const { control, handleSubmit, formState: { errors } } = form;
 
     return (
-        <Stack className="w-4/5 h-full flex flex-col">
-            <Stack grow verticalAlign="start">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-1">Bank details of Applicant (Student)</h2>
-                <p className="text-sm text-gray-500 mb-8">Provide accurate bank information for scholarship disbursement.</p>
-
-                <form className="w-full h-full flex flex-col" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
-                    <Stack tokens={stackTokens}>
-
+        <StepLayout
+            title="Bank details of Applicant (Student)"
+            subtitle="Provide accurate bank information for scholarship disbursement."
+        >
+            <form className="w-full h-full flex flex-col" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
+                <Stack tokens={STACK_TOKENS}>
                         {/* Row 1: Name and Account Number */}
-                        <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Controller
+                    <FormRowContainer>
+                        <FormRow>
+                            <TextInputField
                                     name="bankAccountName"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Stack>
-                                            <Label required>Name (As per passbook)</Label>
-                                            <TextField
-                                                {...field}
+                                errors={errors}
+                                label="Name (As per passbook)"
+                                required
                                                 placeholder="Enter name"
-                                                errorMessage={errors.bankAccountName?.message}
-                                                styles={textFieldStyles}
                                             />
-                                        </Stack>
-                                    )}
-                                />
-                            </Stack.Item>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Controller
+                        </FormRow>
+                        <FormRow>
+                            <TextInputField
                                     name="bankAccountNumber"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Stack>
-                                            <Label required>Account Number</Label>
-                                            <TextField
-                                                {...field}
+                                errors={errors}
+                                label="Account Number"
+                                required
                                                 placeholder="Enter account number"
-                                                errorMessage={errors.bankAccountNumber?.message}
-                                                styles={textFieldStyles}
                                             />
-                                        </Stack>
-                                    )}
-                                />
-                            </Stack.Item>
-                        </Stack>
+                        </FormRow>
+                    </FormRowContainer>
 
                         {/* Row 2: Bank and Branch */}
-                        <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Controller
+                    <FormRowContainer>
+                        <FormRow>
+                            <DropdownField
                                     name="bankName"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Stack>
-                                            <Label required>Bank Name</Label>
-                                            <Dropdown
-                                                selectedKey={field.value}
-                                                onChange={(_, opt) => field.onChange(opt?.key)}
+                                errors={errors}
+                                label="Bank Name"
+                                required
+                                options={BANK_OPTIONS}
                                                 placeholder="Select"
-                                                options={BANK_OPTIONS}
-                                                errorMessage={errors.bankName?.message}
-                                                styles={dropdownStyles}
-                                            />
-                                        </Stack>
-                                    )}
-                                />
-                            </Stack.Item>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Controller
+                            />
+                        </FormRow>
+                        <FormRow>
+                            <DropdownField
                                     name="bankBranch"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Stack>
-                                            <Label required>Branch</Label>
-                                            <Dropdown
-                                                selectedKey={field.value}
-                                                onChange={(_, opt) => field.onChange(opt?.key)}
+                                errors={errors}
+                                label="Branch"
+                                required
+                                options={BRANCH_OPTIONS}
                                                 placeholder="Select"
-                                                options={BRANCH_OPTIONS}
-                                                errorMessage={errors.bankBranch?.message}
-                                                styles={dropdownStyles}
                                             />
-                                        </Stack>
-                                    )}
-                                />
-                            </Stack.Item>
-                        </Stack>
+                        </FormRow>
+                    </FormRowContainer>
 
                         {/* Row 3: Request Amount & Scholarship Seeking For */}
-                        <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Controller
+                    <FormRowContainer>
+                        <FormRow>
+                            <TextInputField
                                     name="bankRequestAmount"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Stack>
-                                            <Label required>Request Amount</Label>
-                                            <TextField
-                                                {...field}
+                                errors={errors}
+                                label="Request Amount"
+                                required
                                                 placeholder="Enter Request amount"
-                                                errorMessage={errors.bankRequestAmount?.message}
-                                                styles={textFieldStyles}
                                             />
-                                        </Stack>
-                                    )}
-                                />
-                            </Stack.Item>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Controller
+                        </FormRow>
+                        <FormRow>
+                            <TextInputField
                                     name="bankScholarshipSeekingFor"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Stack>
-                                            <Label required>Scholarship Seeking For</Label>
-                                            <TextField
-                                                {...field}
+                                errors={errors}
+                                label="Scholarship Seeking For"
+                                required
                                                 placeholder="Enter Scholarship Seeking For"
-                                                errorMessage={errors.bankScholarshipSeekingFor?.message}
-                                                styles={textFieldStyles}
                                             />
-                                        </Stack>
-                                    )}
-                                />
-                            </Stack.Item>
-                        </Stack>
+                        </FormRow>
+                    </FormRowContainer>
 
                         {/* Row 4: IFSC Code (Half width) */}
-                        <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} className="w-1/2 min-w-[250px]">
-                                <Controller
+                    <FormRowContainer>
+                        <FormRow className="w-1/2 min-w-[250px]">
+                            <IfscCodeField
                                     name="bankIfscCode"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Stack>
-                                            <div className="flex justify-between items-center">
-                                                <Label required className="mb-0">IFSC Code</Label>
-                                                <span className="float-right text-[#ef4444] text-xs cursor-pointer font-medium no-underline">(Lookup IFSC Code)</span>
-                                            </div>
-                                            <TextField
-                                                {...field}
+                                errors={errors}
+                                label="IFSC Code"
+                                required
                                                 placeholder="Enter IFSC code"
-                                                errorMessage={errors.bankIfscCode?.message}
-                                                styles={{
-                                                    ...textFieldStyles,
-                                                    root: { marginTop: 6 } // manual spacing since label wrapper is custom
-                                                }}
-                                                className="mt-1.5"
                                             />
-                                        </Stack>
-                                    )}
-                                />
-                            </Stack.Item>
-                        </Stack>
-
+                        </FormRow>
+                    </FormRowContainer>
                     </Stack>
                 </form>
-            </Stack>
-        </Stack>
+        </StepLayout>
     );
 };
 

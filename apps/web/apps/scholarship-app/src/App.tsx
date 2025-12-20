@@ -12,7 +12,7 @@ const queryClient = createQueryClient();
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+      <ThemeProvider defaultTheme="light">
         <div className="font-inter">
           <ThemeSync />
           <AuthProvider>

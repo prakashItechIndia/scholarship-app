@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Input, InputProps } from "./input";
 import { Search20Regular } from "@fluentui/react-icons";
+import { cn } from "../lib/utils";
 
 export interface SearchProps extends Omit<InputProps, "onChange"> {
   searchPlaceHolder?: string;

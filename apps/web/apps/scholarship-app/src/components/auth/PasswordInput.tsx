@@ -63,10 +63,10 @@ export const PasswordInput = ({
           {label}
         </Label>
         <Input
-          id={id}
-          type={showPassword ? 'text' : 'password'}
-          autoComplete={autoComplete}
-          placeholder={placeholder}
+                  id={id}
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete={autoComplete}
+                  placeholder={placeholder}
           errorMessage={error}
           suffixIcon={
             <IconButton
@@ -82,14 +82,14 @@ export const PasswordInput = ({
               className="w-auto h-auto min-w-0 p-1 bg-transparent border-none hover:bg-transparent active:bg-transparent"
             />
           }
-          {...register}
-          onChange={(e) => {
-            void register.onChange(e);
-            if (showStrengthIndicator) {
-              setPassword(e.target.value);
-            }
-          }}
-        />
+                  {...register}
+                  onChange={(e) => {
+                    void register.onChange(e);
+                    if (showStrengthIndicator) {
+                      setPassword(e.target.value);
+                    }
+                  }}
+                />
       </div>
 
       {showStrengthIndicator && password && (

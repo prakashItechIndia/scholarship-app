@@ -1,8 +1,8 @@
 import * as React from "react";
-import { Shimmer, ShimmerElementsGroup, ShimmerElementType } from "@fluentui/react";
+import { Skeleton as FluentSkeleton, SkeletonProps as FluentSkeletonProps } from "@fluentui/react-components";
 import { cn } from "../lib/utils";
 
-export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SkeletonProps extends Omit<FluentSkeletonProps, "shape"> {
   variant?: "default" | "circle" | "rounded" | "square";
   width?: number | string;
   height?: number | string;
@@ -10,34 +10,28 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
   ({ className, variant = "default", width, height, ...props }, ref) => {
-    const getBorderRadius = () => {
-      switch (variant) {
-        case "circle":
-          return "50%";
-        case "rounded":
-          return "8px";
-        case "square":
-          return "0";
-        default:
-          return "4px";
-      }
+    const getShape = (): "rectangle" | "circle" => {
+      return variant === "circle" ? "circle" : "rectangle";
     };
 
     const style: React.CSSProperties = {
       width: width || "100%",
       height: height || "20px",
-      borderRadius: getBorderRadius(),
+      borderRadius: variant === "rounded" ? "8px" : variant === "square" ? "0" : undefined,
     };
 
     return (
-      <div ref={ref} className={cn("animate-pulse bg-gray-200", className)} style={style} {...props}>
-        <Shimmer shimmerElements={[{ type: ShimmerElementType.line, width: "100%" }]} />
-      </div>
+      <FluentSkeleton
+        ref={ref}
+        shape={getShape()}
+        className={cn(className)}
+        style={style}
+        {...props}
+      />
     );
-  },
+  }
 );
 
 Skeleton.displayName = "Skeleton";
 
 export { Skeleton };
-

@@ -22,20 +22,17 @@ const schema = z
     password: z
       .string()
       .default('')
-      .refine((val) => val.length >= 12, {
-        message: 'Password must be at least 12 characters long',
+      .refine((val) => val.length >= 8, {
+        message: 'Password must be at least 8 characters long',
       })
-      .refine((val) => /[A-Z]/.test(val), {
-        message: 'Password must contain at least one uppercase letter (A-Z)',
+      .refine((val) => val.length <= 16, {
+        message: 'Password cannot exceed 16 characters',
       })
-      .refine((val) => /[a-z]/.test(val), {
-        message: 'Password must contain at least one lowercase letter (a-z)',
+      .refine((val) => /[a-zA-Z]/.test(val), {
+        message: 'Password must contain at least one letter (a-z, A-Z)',
       })
       .refine((val) => /[0-9]/.test(val), {
         message: 'Password must contain at least one number (0-9)',
-      })
-      .refine((val) => /[!@#$%^&*]/.test(val), {
-        message: 'Password must contain at least one special character (!@#$%^&*)',
       }),
     confirmPassword: z.string().default(''),
   })
@@ -167,14 +164,14 @@ const CreatePasswordPage = () => {
     <>
       <SEO
         title="Create Password"
-        description="Create a secure password for your iCaptur account. Password must be at least 12 characters with uppercase, lowercase, number, and special character."
+        description="Create a secure password for your Leo Muthu Scholarship account. Password must be 8-16 characters with at least one letter and one number."
         url="/create-password"
-        keywords="create password, account setup, secure password, iCaptur account"
+        keywords="create password, account setup, secure password, Leo Muthu Scholarship account"
         noindex={true}
       />
       <AuthWrapper
         title="Create Your Password"
-        subtitle="Create a secure password with at least 12 characters, including uppercase, lowercase, number, and special character (!@#$%^&*)."
+        subtitle="Create a secure password (8-16 characters) with at least one letter (a-z, A-Z) and one number (0-9). Special characters are allowed but not required."
       >
         <Form {...form}>
           <form

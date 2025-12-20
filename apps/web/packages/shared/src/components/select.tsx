@@ -1,8 +1,10 @@
 import * as React from "react";
-import { Dropdown, IDropdownProps, IDropdownOption } from "@fluentui/react";
+import { Dropdown, Option, DropdownProps } from "@fluentui/react-components";
 import { cn } from "../lib/utils";
+import { useDarkMode } from "../hooks/useDarkMode";
+import { getThemeTokens } from "../config/theme";
 
-export interface SelectProps extends Omit<IDropdownProps, "onChange" | "options" | "styles"> {
+export interface SelectProps extends Omit<DropdownProps, "onChange" | "value"> {
   options?: Array<{ value: string; label: string }>;
   onValueChange?: (value: string) => void;
   selectedKey?: string | number;
@@ -12,80 +14,75 @@ export interface SelectProps extends Omit<IDropdownProps, "onChange" | "options"
 
 const Select = React.forwardRef<HTMLDivElement, SelectProps>(
   ({ className, onValueChange, options = [], selectedKey, placeholder, errorMessage, ...props }, ref) => {
+    const isDark = useDarkMode();
+    
     const handleChange = React.useCallback(
-      (_event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption) => {
-        if (onValueChange && option) {
-          onValueChange(String(option.key));
+      (_event: any, data: { optionValue?: string; optionText?: string }) => {
+        if (onValueChange && data.optionValue) {
+          onValueChange(data.optionValue);
         }
       },
       [onValueChange]
     );
 
-    const dropdownOptions: IDropdownOption[] = options.map((opt) => ({
-      key: opt.value,
-      text: opt.label,
-    }));
+    // Get theme tokens for styling
+    const tokens = React.useMemo(() => getThemeTokens(isDark ? 'dark' : 'light'), [isDark]);
 
-    // Internal styles - maintained within component for consistency (matching Input component)
-    const internalStyles = React.useMemo(() => {
-      const borderColor = errorMessage ? "#B10E1C" : "#d1d5db"; // Red border when error, gray otherwise
-      
-      return {
-        dropdown: {
-          width: "100%",
-        },
-        root: {
-          width: "100%",
-        },
-        title: {
-          height: "45px",
-          minHeight: "45px",
-          lineHeight: "45px",
-          borderRadius: "6px",
-          border: `1px solid ${borderColor}`, // Use border shorthand for consistency
-          backgroundColor: "#ffffff",
-          fontSize: "14px",
-          display: "flex",
-          alignItems: "center",
-        },
-        titleHovered: {
-          border: `1px solid ${borderColor}`, // Keep same border on hover
-        },
-        titleFocused: {
-          border: `1px solid ${borderColor}`, // Keep same border on focus (no color change)
-          outline: 'none', // Remove default focus outline
-          boxShadow: 'none', // Remove any box shadow on focus
-        },
-        caretDown: {
-          fontSize: "14px",
-          lineHeight: "45px",
-          height: "45px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        },
-        dropdownItem: {
-          fontSize: "14px",
-        },
-        errorMessage: {
-          fontSize: "12px",
-          color: "#B10E1C",
-        },
-      } as any;
-    }, [errorMessage]);
+    const borderColor = React.useMemo(() => {
+      return errorMessage 
+        ? (tokens as any).colorStatusDangerBorder2 || "#d13438"
+        : tokens.colorNeutralStroke1 || "#d1d5db";
+    }, [tokens, errorMessage]);
 
     return (
-      <Dropdown
-        componentRef={ref as any}
-        className={cn(className)}
-        options={dropdownOptions}
-        selectedKey={selectedKey}
-        onChange={handleChange}
-        placeholder={placeholder}
-        errorMessage={errorMessage}
-        styles={internalStyles}
-        {...props}
-      />
+      <div className="relative w-full">
+        {errorMessage && (
+          <div 
+            className="text-xs mb-1" 
+            style={{ 
+              fontSize: tokens.fontSizeBase200, 
+              color: (tokens as any).colorStatusDangerForeground3 || "#d13438" 
+            }}
+          >
+            {errorMessage}
+          </div>
+        )}
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+          }}
+        >
+          <Dropdown
+            ref={ref}
+            className={cn(className)}
+            placeholder={placeholder}
+            selectedOptions={selectedKey ? [String(selectedKey)] : []}
+            onOptionSelect={handleChange}
+            style={{
+              width: "100%",
+              border: `1px solid ${borderColor}`,
+              borderRadius: tokens.borderRadiusLarge,
+              backgroundColor: tokens.colorNeutralBackground1,
+              color: tokens.colorNeutralForeground1,
+              fontSize: tokens.fontSizeBase300,
+              height: "45px",
+              minHeight: "45px",
+              paddingLeft: "12px",
+              paddingRight: "12px",
+              paddingTop: "8px",
+              paddingBottom: "8px",
+            }}
+            {...props}
+          >
+            {options.map((opt) => (
+              <Option key={opt.value} value={opt.value}>
+                {opt.label}
+              </Option>
+            ))}
+          </Dropdown>
+        </div>
+      </div>
     );
   }
 );

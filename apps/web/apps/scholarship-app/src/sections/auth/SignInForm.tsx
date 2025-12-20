@@ -121,7 +121,7 @@ const experienceAppUrl: string =
               {...register('rememberMe')}
             />
             <Label htmlFor="rememberMe" className="text-sm text-gray-600 mb-0 cursor-pointer">
-              Remember me on this device
+            Remember me on this device
             </Label>
           </div>
           <a

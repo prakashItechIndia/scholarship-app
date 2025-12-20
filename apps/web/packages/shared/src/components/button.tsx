@@ -1,53 +1,32 @@
 import * as React from "react";
-import { PrimaryButton, DefaultButton, IButtonProps } from "@fluentui/react";
+import { Button as FluentButton, ButtonProps as FluentButtonProps } from "@fluentui/react-components";
 import { cn } from "../lib/utils";
 
-export interface ButtonProps extends Omit<IButtonProps, "onClick" | "styles"> {
+export type ButtonProps = Omit<FluentButtonProps, "size" | "appearance"> & {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "text";
   size?: "default" | "sm" | "lg" | "icon";
-  form?: string;
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-}
+  appearance?: FluentButtonProps["appearance"];
+};
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "default", size = "default", children, text, ...props }, ref) => {
-    // Internal styles - maintained within component for consistency
-    const internalStyles = React.useMemo(() => {
-      const baseStyles: any = {
-        root: {
-          height: size === "sm" ? "32px" : size === "lg" ? "48px" : "40px",
-          borderRadius: "6px",
-          minWidth: size === "sm" ? "70px" : size === "lg" ? "110px" : "90px",
-        },
-      };
-
-      if (variant === "outline" || variant === "secondary") {
-        baseStyles.root.borderColor = "#d1d5db";
-      }
-
-      if (variant === "default" || variant === "destructive") {
-        baseStyles.root.backgroundColor = variant === "destructive" ? "#dc2626" : "#1d4ed8";
-        baseStyles.rootDisabled = {
-          backgroundColor: variant === "destructive" ? "#dc2626" : "#1d4ed8",
-          opacity: 0.7,
-        };
-      }
-
-      return baseStyles;
-    }, [variant, size]);
-
-    // Map variants to Fluent UI button types
-    const ButtonComponent = variant === "default" || variant === "destructive" ? PrimaryButton : DefaultButton;
-    const displayText = text || children;
+  ({ className, variant = "default", size = "default", children, appearance, ...props }, ref) => {
+    // Map variant to Fluent UI appearance if not explicitly provided
+    const fluentAppearance = appearance || (variant === "default" ? "primary" : variant === "outline" ? "outline" : variant === "secondary" ? "secondary" : variant === "ghost" ? "subtle" : "primary");
+    
+    // Map size to Fluent UI size if not explicitly provided
+    // For "icon" size, use "small" and let className handle the icon styling
+    const fluentSize = size === "sm" ? "small" : size === "lg" ? "large" : size === "icon" ? "small" : "medium";
 
     return (
-      <ButtonComponent
-        componentRef={ref as any}
-        styles={internalStyles}
-        {...(props as any)}
+      <FluentButton
+        ref={ref}
+        appearance={fluentAppearance}
+        size={fluentSize}
+        className={cn(className)}
+        {...props}
       >
-        {displayText}
-      </ButtonComponent>
+        {children}
+      </FluentButton>
     );
   }
 );

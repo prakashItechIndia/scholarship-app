@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { LoadingScreen } from '../components/layout/LoadingScreen';
 import { AuthenticatedRedirect } from '../components/auth/AuthenticatedRedirect';
 import { ErrorBoundary } from '../components/common/ErrorBoundary';
+import { ProcessLayout } from '../components/layout/ProcessLayout';
 
 // Lazy load pages with code splitting
 const SignInPage = lazy(() => import('../pages/auth/SignIn.tsx'));
@@ -126,11 +127,13 @@ export const Router = () => {
         <Route
           path="/process"
           element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <ProcessPage />
-              </ErrorBoundary>
-            </Suspense>
+            <ProcessLayout>
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <ProcessPage />
+                </ErrorBoundary>
+              </Suspense>
+            </ProcessLayout>
           }
         />
         <Route

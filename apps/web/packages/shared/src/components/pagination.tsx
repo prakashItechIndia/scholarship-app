@@ -1,6 +1,5 @@
 import * as React from "react";
-import { Button } from "./button";
-import { Select, SelectItem } from "./select";
+import { Button, Dropdown, Option, Text } from "@fluentui/react-components";
 import { ChevronLeft20Regular, ChevronRight20Regular } from "@fluentui/react-icons";
 import { cn } from "../lib/utils";
 
@@ -71,56 +70,54 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
 
     const pageNumbers = getPageNumbers();
 
+    const handlePageSizeChange = React.useCallback(
+      (_event: any, data: { optionValue?: string; optionText?: string }) => {
+        if (onPageSizeChange && data.optionValue) {
+          onPageSizeChange(Number(data.optionValue));
+        }
+      },
+      [onPageSizeChange]
+    );
+
     return (
       <div
         ref={ref}
-        className={cn(
-          "flex items-center justify-between gap-4 pt-4 pb-4 flex-wrap",
-          className
-        )}
+        className={cn("flex items-center justify-between gap-4 flex-wrap", className)}
       >
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span>
-            {startItem}-{endItem} of {totalItems} items
-          </span>
-        </div>
+        <Text>{startItem}-{endItem} of {totalItems} items</Text>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-4">
           {showPageNumbers && (
-            <>
+            <div className="flex items-center gap-1">
               {showFirstLast && (
                 <Button
-                  variant="outline"
-                  size="sm"
+                  appearance="subtle"
+                  size="small"
                   onClick={() => onPageChange(1)}
                   disabled={currentPage === 1}
                   aria-label="First page"
                 >
-                  <span style={{ display: "flex", alignItems: "center" }}>
-                    <ChevronLeft20Regular style={{ marginRight: "-4px" }} />
-                    <ChevronLeft20Regular />
-                  </span>
+                  &laquo;
                 </Button>
               )}
               <Button
-                variant="outline"
-                size="sm"
+                appearance="subtle"
+                size="small"
+                icon={<ChevronLeft20Regular />}
                 onClick={() => onPageChange(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
                 aria-label="Previous page"
-              >
-                <ChevronLeft20Regular />
-              </Button>
+              />
 
               {pageNumbers.map((page, index) => {
                 if (index > 0 && pageNumbers[index - 1] !== page - 1) {
                   return (
                     <React.Fragment key={`ellipsis-${page}`}>
-                      <span style={{ padding: "0 8px", color: "#707070" }}>...</span>
+                      <Text style={{ padding: "0 8px", color: "#707070" }}>...</Text>
                       <Button
                         key={page}
-                        variant={currentPage === page ? "default" : "outline"}
-                        size="sm"
+                        appearance={currentPage === page ? "primary" : "subtle"}
+                        size="small"
                         onClick={() => onPageChange(page)}
                         aria-label={`Go to page ${page}`}
                         aria-current={currentPage === page ? "page" : undefined}
@@ -133,8 +130,8 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
                 return (
                   <Button
                     key={page}
-                    variant={currentPage === page ? "default" : "outline"}
-                    size="sm"
+                    appearance={currentPage === page ? "primary" : "subtle"}
+                    size="small"
                     onClick={() => onPageChange(page)}
                     aria-label={`Go to page ${page}`}
                     aria-current={currentPage === page ? "page" : undefined}
@@ -145,50 +142,47 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
               })}
 
               <Button
-                variant="outline"
-                size="sm"
+                appearance="subtle"
+                size="small"
+                icon={<ChevronRight20Regular />}
                 onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
                 aria-label="Next page"
-              >
-                <ChevronRight20Regular />
-              </Button>
+              />
               {showFirstLast && (
                 <Button
-                  variant="outline"
-                  size="sm"
+                  appearance="subtle"
+                  size="small"
                   onClick={() => onPageChange(totalPages)}
                   disabled={currentPage === totalPages}
                   aria-label="Last page"
                 >
-                  <span style={{ display: "flex", alignItems: "center" }}>
-                    <ChevronRight20Regular style={{ marginRight: "-4px" }} />
-                    <ChevronRight20Regular />
-                  </span>
+                  &raquo;
                 </Button>
               )}
-            </>
+            </div>
+          )}
+
+          {showPageSize && onPageSizeChange && (
+            <div className="flex items-center gap-2">
+              <Dropdown
+                value={String(pageSize)}
+                onOptionSelect={handlePageSizeChange}
+                style={{ minWidth: 60 }}
+              >
+                {pageSizeOptions.map((size) => (
+                  <Option key={size} text={String(size)} value={String(size)}>
+                    {size}
+                  </Option>
+                ))}
+              </Dropdown>
+              <Text style={{ whiteSpace: "nowrap" }}>Items per page</Text>
+            </div>
           )}
         </div>
-
-        {showPageSize && onPageSizeChange && (
-          <div className="flex items-center gap-2">
-            <Select
-              value={String(pageSize)}
-              onValueChange={(value) => onPageSizeChange(Number(value))}
-              options={pageSizeOptions.map((size) => ({
-                value: String(size),
-                label: String(size),
-              }))}
-              className="min-w-[60px]"
-            />
-            <span className="text-sm text-gray-600 whitespace-nowrap">Items per page</span>
-          </div>
-        )}
       </div>
     );
   }
 );
 
 Pagination.displayName = "Pagination";
-

@@ -207,9 +207,9 @@ const ChangePasswordPage = () => {
                             ariaLabel={showCurrentPassword ? 'Hide password' : 'Show password'}
                             onRenderIcon={() => 
                               showCurrentPassword ? (
-                                <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest" />
-                              ) : (
-                                <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest" />
+                              <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest" />
+                            ) : (
+                              <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest" />
                               )
                             }
                             styles={{
@@ -257,7 +257,7 @@ const ChangePasswordPage = () => {
                             onRenderIcon={() => 
                               showNewPassword ? (
                                 <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
-                              ) : (
+                            ) : (
                                 <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
                               )
                             }
@@ -293,7 +293,7 @@ const ChangePasswordPage = () => {
                             onRenderIcon={() => 
                               showConfirmPassword ? (
                                 <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
-                              ) : (
+                            ) : (
                                 <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
                               )
                             }

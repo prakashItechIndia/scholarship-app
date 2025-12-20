@@ -1,43 +1,47 @@
-import { useEffect, useState } from 'react';
-// import ProfileImage from '../../../assets/ProfileImage.svg';
-// import Avatar from '../../../assets/Avatar.svg';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { z } from 'zod';
-import {
-    Stack,
-    IStackStyles,
-    IStackTokens,
-    mergeStyles,
-    FontWeights,
-    ChoiceGroup,
-    IChoiceGroupOption,
-    Text,
-    Image,
-    ImageFit,
-} from '@fluentui/react';
-import { Input, Select, DatePicker, Label } from '@shared/components';
-import { useRegistration, type RegistrationFormData } from '@/contexts/RegistrationContext';
+import { Stack, IChoiceGroupOption, Text, Image, ImageFit } from '@fluentui/react';
+import { useRegistrationForm } from '../hooks/useRegistrationForm';
+import { StepLayout } from '../components/StepLayout';
+import { getStringValue, getDateValue } from '../utils/registrationHelpers';
+import { STACK_TOKENS, SECTION_HEADER_CLASS } from '../utils/registrationConstants';
+import { InputField, SelectField, DatePickerField, ChoiceGroupField, FormRowContainer, FormRow } from '../components';
 
 // --- Validation Schema ---
 const personalSchema = z.object({
     scholarshipApplied: z.string().min(1, 'Selection required'),
     gender: z.string().min(1, 'Gender required'),
     community: z.string().min(1, 'Community required'),
-    caste: z.string().min(1, 'Caste required'),
-    dob: z.date({ required_error: 'Date of Birth required' }),
+    caste: z.string().optional(), // Optional field
+    dob: z.date({ 
+        required_error: 'Date of Birth required',
+    }).refine((date) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return date <= today;
+    }, {
+        message: 'Date of Birth cannot be a future date',
+    }).refine((date) => {
+        const today = new Date();
+        const age = today.getFullYear() - date.getFullYear();
+        const monthDiff = today.getMonth() - date.getMonth();
+        const dayDiff = today.getDate() - date.getDate();
+        const actualAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
+        return actualAge >= 15;
+    }, {
+        message: 'Applicant must be at least 15 years old',
+    }),
     email: z.string().email('Invalid email').min(1, 'Email is required'),
-    mobile: z.string().min(10, 'Invalid mobile number').min(1, 'Mobile number is required'),
+    mobile: z.string().length(10, 'Mobile number must be exactly 10 digits').regex(/^\d+$/, 'Mobile number must contain only digits'),
     addressLine1: z.string().min(1, 'Address Line 1 required'),
-    addressLine2: z.string().optional(),
+    addressLine2: z.string().optional(), // Optional field
     city: z.string().min(1, 'City required'),
     district: z.string().min(1, 'District required'),
     state: z.string().min(1, 'State required'),
-    pincode: z.string().min(6, 'Invalid Pincode'),
+    pincode: z.string().min(6, 'Invalid Pincode. Must be at least 6 digits').regex(/^\d+$/, 'Pincode must contain only digits'),
     country: z.string().min(1, 'Country required'),
 });
 
-type PersonalFormData = z.infer<typeof personalSchema>;
 
 // --- Constants ---
 const YES_NO_OPTIONS: IChoiceGroupOption[] = [
@@ -48,6 +52,7 @@ const YES_NO_OPTIONS: IChoiceGroupOption[] = [
 const GENDER_OPTIONS: IChoiceGroupOption[] = [
     { key: 'male', text: 'Male' },
     { key: 'female', text: 'Female' },
+    { key: 'other', text: 'Other' },
 ];
 
 const COMMUNITY_OPTIONS = [
@@ -65,158 +70,44 @@ const STATE_OPTIONS = [{ value: 'tn', label: 'Tamil Nadu' }, { value: 'ka', labe
 const COUNTRY_OPTIONS = [{ value: 'in', label: 'India' }];
 
 
-// --- Styles (Matching IdentityDetails) ---
-const containerStyles: IStackStyles = {
-    root: {
-        width: '80%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        selectors: {
-            '& .ms-TextField-wrapper': { width: '100%' },
-        },
-    },
-};
-
-const stackTokens: IStackTokens = { childrenGap: 24 };
-const rowTokens: IStackTokens = { childrenGap: 24 };
-
-const titleStyles = mergeStyles({
-    fontSize: 24,
-    fontWeight: FontWeights.semibold,
-    color: '#111827',
-    marginBottom: 4,
-});
-
-const subtitleStyles = mergeStyles({
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 32,
-});
-
-const sectionHeaderStyles = mergeStyles({
-    fontSize: 18,
-    fontWeight: FontWeights.semibold,
-    color: '#111827',
-    marginTop: 16,
-    marginBottom: 16,
-});
-
-const labelStyles = mergeStyles({
-    fontWeight: 600,
-    fontSize: 14,
-    color: '#374151',
-    marginBottom: 6,
-    display: 'block'
-});
 
 
 
 const PersonalDetails = () => {
-    // Direct destructuring with explicit type annotations to help TypeScript
-    const { formData, updateFormData, nextStep, markStepComplete, setIsLoading } = useRegistration();
-
-    // Helper to safely get string value from formData
-    const getStringValue = (key: string): string => {
-        const value: string | number | Date | undefined | null = formData[key];
-        return typeof value === 'string' ? value : '';
-    };
-
-    // Helper to safely convert formData dob to Date
-    const getDobFromFormData = (): Date | undefined => {
-        const dobValue: string | number | Date | undefined | null = formData.dob;
-        if (!dobValue) return undefined;
-        if (dobValue instanceof Date) return dobValue;
-        if (typeof dobValue === 'string') {
-            const date = new Date(dobValue);
-            return isNaN(date.getTime()) ? undefined : date;
-        }
-        return undefined;
-    };
-
-    const { control, handleSubmit, getValues, formState: { errors } } = useForm<PersonalFormData>({
-        resolver: zodResolver(personalSchema),
-        defaultValues: {
-            scholarshipApplied: getStringValue('scholarshipApplied'),
-            gender: getStringValue('gender'),
-            community: getStringValue('community'),
-            caste: getStringValue('caste'),
-            dob: getDobFromFormData(),
-            email: getStringValue('email'),
-            mobile: getStringValue('mobile'),
-            addressLine1: getStringValue('addressLine1'),
-            addressLine2: getStringValue('addressLine2'),
-            city: getStringValue('city'),
-            district: getStringValue('district'),
-            state: getStringValue('state'),
-            pincode: getStringValue('pincode'),
-            country: getStringValue('country'),
+    const { form, onSubmit } = useRegistrationForm({
+        schema: personalSchema,
+        stepNumber: 2,
+        defaultValues: (formData) => {
+            const dobValue = getDateValue(formData, 'dob');
+            return {
+                scholarshipApplied: getStringValue(formData, 'scholarshipApplied'),
+                gender: getStringValue(formData, 'gender'),
+                community: getStringValue(formData, 'community'),
+                caste: getStringValue(formData, 'caste'),
+                dob: dobValue ?? new Date(),
+                email: getStringValue(formData, 'email'),
+                mobile: getStringValue(formData, 'mobile'),
+                addressLine1: getStringValue(formData, 'addressLine1'),
+                addressLine2: getStringValue(formData, 'addressLine2'),
+                city: getStringValue(formData, 'city'),
+                district: getStringValue(formData, 'district'),
+                state: getStringValue(formData, 'state'),
+                pincode: getStringValue(formData, 'pincode'),
+                country: getStringValue(formData, 'country'),
+            };
         },
     });
 
+    const { control, handleSubmit, formState: { errors } } = form;
     const [isHovered, setIsHovered] = useState(false);
 
-    // Save data to context on unmount
-    useEffect(() => {
-        return () => {
-            const data = getValues();
-            const dobValue = data.dob instanceof Date ? data.dob.toISOString() : undefined;
-            updateFormData({
-                scholarshipApplied: data.scholarshipApplied,
-                gender: data.gender,
-                community: data.community,
-                caste: data.caste,
-                dob: dobValue,
-                email: data.email,
-                mobile: data.mobile,
-                addressLine1: data.addressLine1,
-                addressLine2: data.addressLine2,
-                city: data.city,
-                district: data.district,
-                state: data.state,
-                pincode: data.pincode,
-                country: data.country,
-            });
-        };
-    }, [updateFormData, getValues]);
-
-    const onSubmit = async (data: PersonalFormData) => {
-        console.log('Personal Step Data:', data);
-        setIsLoading(true);
-        try {
-            // Show loading for a few seconds before moving to next step
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            updateFormData({
-                scholarshipApplied: data.scholarshipApplied,
-                gender: data.gender,
-                community: data.community,
-                caste: data.caste,
-                dob: data.dob instanceof Date ? data.dob.toISOString() : undefined,
-                email: data.email,
-                mobile: data.mobile,
-                addressLine1: data.addressLine1,
-                addressLine2: data.addressLine2,
-                city: data.city,
-                district: data.district,
-                state: data.state,
-                pincode: data.pincode,
-                country: data.country,
-            });
-            markStepComplete(2);
-            nextStep();
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     return (
-        <Stack className="w-4/5 h-full flex flex-col [&_.ms-TextField-wrapper]:w-full">
-            <Stack grow verticalAlign="start">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-1">Personal Details</h2>
-                <p className="text-sm text-gray-500 mb-8">Fill In Your Essential Personal Information</p>
-
-                <form className="w-full h-full flex flex-col" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
-                    <Stack tokens={stackTokens}>
+        <StepLayout
+            title="Personal Details"
+            subtitle="Fill In Your Essential Personal Information"
+        >
+            <form className="w-full h-full flex flex-col" onSubmit={(e) => void handleSubmit(onSubmit)(e)} id="current-step-form">
+                <Stack tokens={STACK_TOKENS}>
 
                         {/* Profile Photo */}
                         <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 16 }}>
@@ -240,236 +131,187 @@ const PersonalDetails = () => {
                                 />
                             </div>
                             <Stack>
-                                <Text variant="medium" className="font-semibold text-gray-700">Profile Photo</Text>
-                                <Text variant="small" className="text-gray-500">Supported formats: PNG, JPG and JPEG (up to 5MB)</Text>
+                                <Text variant="medium" className="font-semibold text-gray-700 dark:text-gray-300">Profile Photo</Text>
+                                <Text variant="small" className="text-gray-500 dark:text-gray-400">Supported formats: PNG, JPG and JPEG (up to 5MB)</Text>
                             </Stack>
                         </Stack>
 
                         {/* Row 1: Scholarship & Gender */}
-                        <Stack horizontal tokens={rowTokens} wrap verticalAlign="start">
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Label required>Applied for any other scholarship</Label>
-                                <Controller
+                        <FormRowContainer wrap>
+                            <FormRow>
+                                <ChoiceGroupField
                                     name="scholarshipApplied"
                                     control={control}
-                                    render={({ field }) => (
-                                        <ChoiceGroup
-                                            selectedKey={field.value}
-                                            options={YES_NO_OPTIONS}
-                                            onChange={(_, option) => field.onChange(option?.key)}
-                                            className="flex flex-row gap-6"
-                                        />
-                                    )}
+                                    errors={errors}
+                                    label="Applied for any other scholarship"
+                                    required
+                                    options={YES_NO_OPTIONS}
                                 />
-                                {errors.scholarshipApplied && <p className="text-red-500 text-xs mt-1">{errors.scholarshipApplied.message}</p>}
-                            </Stack.Item>
-
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Label required>Gender</Label>
-                                <Controller
+                            </FormRow>
+                            <FormRow>
+                                <ChoiceGroupField
                                     name="gender"
                                     control={control}
-                                    render={({ field }) => (
-                                        <ChoiceGroup
-                                            selectedKey={field.value}
-                                            options={GENDER_OPTIONS}
-                                            onChange={(_, option) => field.onChange(option?.key)}
-                                            className="flex flex-row gap-6"
-                                        />
-                                    )}
+                                    errors={errors}
+                                    label="Gender"
+                                    required
+                                    options={GENDER_OPTIONS}
                                 />
-                                {errors.gender && <p className="text-red-500 text-xs mt-1">{errors.gender.message}</p>}
-                            </Stack.Item>
-                        </Stack>
+                            </FormRow>
+                        </FormRowContainer>
 
                         {/* Community */}
-                        <Stack>
-                            <Label required>Community</Label>
-                            <Controller
-                                name="community"
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        placeholder="Select your community"
-                                        selectedKey={field.value}
-                                        onValueChange={field.onChange}
-                                        options={COMMUNITY_OPTIONS}
-                                        errorMessage={errors.community?.message}
-                                    />
-                                )}
-                            />
-                        </Stack>
+                        <SelectField
+                            name="community"
+                            control={control}
+                            errors={errors}
+                            label="Community"
+                            required
+                            options={COMMUNITY_OPTIONS}
+                            placeholder="Select your community"
+                        />
 
                         {/* Row 2: Caste & DOB */}
-                        <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Label required>Caste</Label>
-                                <Controller
+                        <FormRowContainer>
+                            <FormRow>
+                                <SelectField
                                     name="caste"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Select
-                                            placeholder="Select your caste"
-                                            selectedKey={field.value}
-                                            onValueChange={field.onChange}
-                                            options={CASTE_OPTIONS}
-                                            errorMessage={errors.caste?.message}
-                                        />
-                                    )}
+                                    errors={errors}
+                                    label="Caste"
+                                    options={CASTE_OPTIONS}
+                                    placeholder="Select your caste"
                                 />
-                            </Stack.Item>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Label required>Date of Birth</Label>
-                                <Controller
+                            </FormRow>
+                            <FormRow>
+                                <DatePickerField
                                     name="dob"
                                     control={control}
-                                    render={({ field }) => (
-                                        <DatePicker
-                                            placeholder="Select Date of birth"
-                                            value={field.value}
-                                            onSelectDate={(date) => field.onChange(date)}
-                                            errorMessage={errors.dob?.message}
-                                        />
-                                    )}
+                                    errors={errors}
+                                    label="Date of Birth"
+                                    required
                                 />
-                            </Stack.Item>
-                        </Stack>
+                            </FormRow>
+                        </FormRowContainer>
 
 
                         {/* Row 3: Email & Mobile */}
-                        <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Label required>Email</Label>
-                                <Controller
+                        <FormRowContainer>
+                            <FormRow>
+                                <InputField
                                     name="email"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Input {...field} value={field.value ?? ''} placeholder="Enter email ID" type="email" errorMessage={errors.email?.message} />
-                                    )}
+                                    errors={errors}
+                                    label="Email"
+                                    required
+                                    placeholder="Enter email ID"
                                 />
-                            </Stack.Item>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Label required>Mobile Number</Label>
-                                <Controller
+                            </FormRow>
+                            <FormRow>
+                                <InputField
                                     name="mobile"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Input {...field} value={field.value ?? ''} placeholder="Enter mobile number" type="tel" errorMessage={errors.mobile?.message} />
-                                    )}
+                                    errors={errors}
+                                    label="Mobile Number"
+                                    required
+                                    placeholder="Enter mobile number"
                                 />
-                            </Stack.Item>
-                        </Stack>
+                            </FormRow>
+                        </FormRowContainer>
 
-                        <div className="text-base font-semibold text-gray-900 mt-2 mb-4">Address Details</div>
+                        <div className={SECTION_HEADER_CLASS}>Address Details</div>
 
                         {/* Row 4: Address Lines */}
-                        <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Label required>Address Line 1</Label>
-                                <Controller
+                        <FormRowContainer>
+                            <FormRow>
+                                <InputField
                                     name="addressLine1"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Input {...field} value={field.value ?? ''} placeholder="Address line 1" errorMessage={errors.addressLine1?.message} />
-                                    )}
+                                    errors={errors}
+                                    label="Address Line 1"
+                                    required
+                                    placeholder="Address line 1"
                                 />
-                            </Stack.Item>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Label>Address Line 2</Label>
-                                <Controller
+                            </FormRow>
+                            <FormRow>
+                                <InputField
                                     name="addressLine2"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Input {...field} value={field.value ?? ''} placeholder="Address line 2" />
-                                    )}
+                                    errors={errors}
+                                    label="Address Line 2"
+                                    placeholder="Address line 2"
                                 />
-                            </Stack.Item>
-                        </Stack>
+                            </FormRow>
+                        </FormRowContainer>
 
                         {/* Row 5: City & District */}
-                        <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Label required>City</Label>
-                                <Controller
+                        <FormRowContainer>
+                            <FormRow>
+                                <InputField
                                     name="city"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Input {...field} value={field.value ?? ''} placeholder="Enter city" errorMessage={errors.city?.message} />
-                                    )}
+                                    errors={errors}
+                                    label="City"
+                                    required
+                                    placeholder="Enter city"
                                 />
-                            </Stack.Item>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Label required>District</Label>
-                                <Controller
+                            </FormRow>
+                            <FormRow>
+                                <SelectField
                                     name="district"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Select
-                                            placeholder="Select"
-                                            selectedKey={field.value}
-                                            onValueChange={field.onChange}
-                                            options={DISTRICT_OPTIONS}
-                                            errorMessage={errors.district?.message}
-                                        />
-                                    )}
+                                    errors={errors}
+                                    label="District"
+                                    required
+                                    options={DISTRICT_OPTIONS}
+                                    placeholder="Select"
                                 />
-                            </Stack.Item>
-                        </Stack>
+                            </FormRow>
+                        </FormRowContainer>
 
 
                         {/* Row 6: State & Pincode */}
-                        <Stack horizontal tokens={rowTokens} wrap>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Label required>State</Label>
-                                <Controller
+                        <FormRowContainer>
+                            <FormRow>
+                                <SelectField
                                     name="state"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Select
-                                            placeholder="Select"
-                                            selectedKey={field.value}
-                                            onValueChange={field.onChange}
-                                            options={STATE_OPTIONS}
-                                            errorMessage={errors.state?.message}
-                                        />
-                                    )}
+                                    errors={errors}
+                                    label="State"
+                                    required
+                                    options={STATE_OPTIONS}
+                                    placeholder="Select"
                                 />
-                            </Stack.Item>
-                            <Stack.Item grow={1} className="min-w-[250px]">
-                                <Label required>Pincode</Label>
-                                <Controller
+                            </FormRow>
+                            <FormRow>
+                                <InputField
                                     name="pincode"
                                     control={control}
-                                    render={({ field }) => (
-                                        <Input {...field} value={field.value ?? ''} placeholder="Enter pincode" errorMessage={errors.pincode?.message} />
-                                    )}
+                                    errors={errors}
+                                    label="Pincode"
+                                    required
+                                    placeholder="Enter pincode"
                                 />
-                            </Stack.Item>
-                        </Stack>
+                            </FormRow>
+                        </FormRowContainer>
 
                         {/* Country */}
-                        <Stack className="max-w-[50%]">
-                            <Label required>Country</Label>
-                            <Controller
+                        <div className="max-w-[50%]">
+                            <SelectField
                                 name="country"
                                 control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        placeholder="Select"
-                                        selectedKey={field.value}
-                                        onValueChange={field.onChange}
-                                        options={COUNTRY_OPTIONS}
-                                        errorMessage={errors.country?.message}
-                                    />
-                                )}
+                                errors={errors}
+                                label="Country"
+                                required
+                                options={COUNTRY_OPTIONS}
+                                placeholder="Select"
                             />
-                        </Stack>
+                        </div>
                         <div className="h-5"></div>
 
                     </Stack>
                 </form>
-            </Stack>
-        </Stack>
+        </StepLayout>
     );
 }
 
