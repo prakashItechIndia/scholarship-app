@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { LoadingScreen } from '../components/layout/LoadingScreen';
 import { AuthenticatedRedirect } from '../components/auth/AuthenticatedRedirect';
 import { ErrorBoundary } from '../components/common/ErrorBoundary';
+import { ProcessLayout } from '../components/layout/ProcessLayout';
 
 // Lazy load pages with code splitting
 const SignInPage = lazy(() => import('../pages/auth/SignIn.tsx'));
@@ -15,6 +16,9 @@ const RegistrationPage = lazy(() => import('../pages/registration/RegistrationFo
 const VerificationPage = lazy(() => import('../pages/auth/Verification'));
 const SetPasswordPage = lazy(() => import('../pages/auth/SetPassword'));
 const ProcessPage = lazy(() => import('../pages/process'));
+const LandingPage = lazy(() => import('../pages/Landing'));
+const UserDashboardPage = lazy(() => import('../pages/userDashboard'));
+const AdminDashboardPage = lazy(() => import('../pages/adminDashboard/AdminDashboard'));
 
 export const Router = () => {
   return (
@@ -130,6 +134,42 @@ export const Router = () => {
                 <ProcessPage />
               </ErrorBoundary>
             </Suspense>
+          }
+        />
+        <Route
+          path="/user-dashboard"
+          element={
+            <ProcessLayout hideSidebar={true}>
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <UserDashboardPage />
+                </ErrorBoundary>
+              </Suspense>
+            </ProcessLayout>
+          }
+        />
+        <Route
+          path="/admin-dashboard"
+          element={
+            <ProcessLayout>
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <AdminDashboardPage />
+                </ErrorBoundary>
+              </Suspense>
+            </ProcessLayout>
+          }
+        />
+        <Route
+          path="/home"
+          element={
+            <ProcessLayout>
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <AdminDashboardPage />
+                </ErrorBoundary>
+              </Suspense>
+            </ProcessLayout>
           }
         />
         {/* Redirect authenticated users to registration */}

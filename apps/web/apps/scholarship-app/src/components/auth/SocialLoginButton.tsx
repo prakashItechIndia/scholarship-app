@@ -44,7 +44,6 @@ export const SocialLoginButton = ({ provider, onClick }: SocialLoginButtonProps)
   return (
     <Button
       type="button"
-      appearance="primary"
       onClick={onClick}
       className={buttonStyles}
     >

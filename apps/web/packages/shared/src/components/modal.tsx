@@ -8,14 +8,13 @@ import {
   DialogContent,
   DialogProps as FluentDialogProps,
 } from "@fluentui/react-components";
-import { Button } from "./button";
 import { cn } from "../lib/utils";
 
-export interface ModalProps extends Omit<FluentDialogProps, "open" | "onOpenChange"> {
+export interface ModalProps extends Omit<FluentDialogProps, "open" | "onOpenChange" | "children"> {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  title?: string;
-  children: React.ReactNode;
+  title?: string | React.ReactNode;
+  children?: React.ReactNode;
   footer?: React.ReactNode;
   size?: "sm" | "md" | "lg" | "xl" | "full";
   className?: string;
@@ -43,26 +42,25 @@ const Modal = ({
     <Dialog
       open={open}
       onOpenChange={(_, data) => onOpenChange?.(data.open || false)}
+      modalType="modal"
       {...props}
     >
-      <DialogSurface>
-        <div className={cn(sizeClasses[size], className)}>
+      <DialogSurface className={cn("bg-white rounded-lg shadow-xl", sizeClasses[size], className)}>
+        <DialogBody className="bg-white">
           {title && (
             <DialogTitle className="text-lg font-semibold text-gray-900">
               {title}
             </DialogTitle>
           )}
-          <DialogBody>
-            <DialogContent className="text-gray-700">
-              {children}
-            </DialogContent>
-            {footer && (
-              <DialogActions className="flex justify-end gap-2 mt-4">
-                {footer}
-              </DialogActions>
-            )}
-          </DialogBody>
-        </div>
+          <DialogContent className="text-gray-700 bg-white">
+            {children}
+          </DialogContent>
+          {footer && (
+            <DialogActions className="flex justify-end gap-2 mt-4 bg-white">
+              {footer}
+            </DialogActions>
+          )}
+        </DialogBody>
       </DialogSurface>
     </Dialog>
   );

@@ -10,8 +10,7 @@
     "dev": "tsc -w -p tsconfig.json",
     "lint": "eslint \"src/**/*.ts\"",
     "type-check": "tsc --noEmit",
-    "test": "echo 'No tests'",
-    "prepare": "tsc -p tsconfig.json"
+    "test": "echo 'No tests'"
   },
   "dependencies": {
     "drizzle-orm": "^0.44.7"

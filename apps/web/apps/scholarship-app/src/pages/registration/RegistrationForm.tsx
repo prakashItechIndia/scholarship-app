@@ -33,16 +33,25 @@ const STEPS: Step[] = [
 
 const headerStyles: IStackStyles = {
   root: {
-    backgroundImage: `url(${background})`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'repeat',
     position: 'relative',
     borderBottom: '1px solid var(--gray-200, #fafafa)', // gray-200
     width: '100%',
-    opacity: 0.8,
+    overflow: 'hidden',
   },
 };
+
+const backgroundImageStyles = mergeStyles({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundImage: `url(${background})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'repeat',
+  zIndex: 1,
+});
 
 const headerContentStyles: IStackStyles = {
   root: {
@@ -59,8 +68,9 @@ const overlayStyles = mergeStyles({
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: 'rgba(255, 255, 255, 0.1)', // bg-white/10
-  backdropFilter: 'blur(2px)',
+  // backgroundColor: 'rgba(245, 245, 250, 0.57)', // Light blue-gray overlay for banner
+  // backdropFilter: 'blur(1px)',
+  zIndex: 2,
 });
 
 const logoContainerStyles = mergeStyles({
@@ -167,6 +177,7 @@ const RegistrationContent = () => {
 
         {/* Header - Fixed Height */}
         <Stack horizontal verticalAlign="center" styles={headerStyles} disableShrink>
+          <div className={backgroundImageStyles}></div>
           <div className={overlayStyles}></div>
           <Stack horizontal horizontalAlign="space-between" verticalAlign="center" styles={headerContentStyles}>
             {/* Logo */}
