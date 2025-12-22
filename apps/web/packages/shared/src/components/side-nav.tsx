@@ -17,11 +17,10 @@ const getSidebarStyles = (expanded: boolean): React.CSSProperties => ({
   height: "calc(100vh - 52px)",
   maxHeight: "calc(100vh - 52px)",
   top: 52,
-  background: "linear-gradient(to bottom, #020763, #040b80, #07119e)",
+  backgroundColor: "#2453C3", // Solid dark blue background
   overflowY: "auto",
   overflowX: "hidden",
   position: "fixed",
-  // top: 0,
   left: 0,
   zIndex: 1000,
   paddingTop: "16px",
@@ -130,32 +129,11 @@ export const SideNav = React.forwardRef<HTMLDivElement, SideNavProps>(
             )}
           </div>
         )}
-        <nav
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            gap: "6px",
-            width: "100%",
-            paddingTop: "16px",
-            paddingBottom: "16px",
-            alignItems: expanded ? "stretch" : "center",
-          }}
-        >
+        <nav className="flex-1 flex flex-col gap-1.5 w-full pt-4 pb-4 items-center">
           {children}
         </nav>
         {footer && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-              alignItems: "center",
-              width: "100%",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
+          <div className="flex flex-col gap-2 items-center w-full justify-center flex-shrink-0 mt-auto pt-4">
             {footer}
           </div>
         )}
@@ -182,25 +160,12 @@ export const SideNavItem = React.forwardRef<HTMLDivElement, SideNavItemProps>(
       <div
         ref={ref}
         onClick={onClick}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "4px",
-          width: "100%",
-          paddingTop: "8px",
-          paddingBottom: "8px",
-          paddingLeft: "6px",
-          paddingRight: "6px",
-          borderRadius: "8px",
-          cursor: "pointer",
-          position: "relative",
-          backgroundColor: active ? "#0e1cdd" : "transparent",
-          transition: "background-color 0.2s",
-          ...style,
-        }}
-        className={cn(className)}
+        className={cn(
+          "flex flex-col items-center justify-center gap-1 w-full py-1 px-2 rounded-lg cursor-pointer transition-colors",
+          active ? "bg-[#0A3FBC] !rounded-md" : "bg-transparent hover:bg-[#0A3FBC]/20",
+          className
+        )}
+        style={style}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
@@ -209,49 +174,17 @@ export const SideNavItem = React.forwardRef<HTMLDivElement, SideNavItemProps>(
             onClick?.();
           }
         }}
-        onMouseEnter={(e) => {
-          if (!active) {
-            e.currentTarget.style.backgroundColor = "rgba(14, 28, 221, 0.2)";
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!active) {
-            e.currentTarget.style.backgroundColor = "transparent";
-          }
-        }}
         {...props}
       >
         {icon && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "20px",
-              height: "20px",
-              color: "#ffffff",
-              flexShrink: 0,
-            }}
-          >
+          <div className="flex items-center justify-center w-5 h-5 text-white flex-shrink-0">
             {icon}
           </div>
         )}
-        <span
-          style={{
-            fontSize: "10px",
-            lineHeight: "10px",
-            color: "#ffffff",
-            fontWeight: 400,
-            textAlign: "center",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            maxWidth: "100%",
-          }}
-        >
+        <span className="text-[6px] leading-[10px] text-white font-normal text-center whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
           {label}
         </span>
-        {badge && <span style={{ flexShrink: 0 }}>{badge}</span>}
+        {badge && <span className="flex-shrink-0">{badge}</span>}
       </div>
     );
   }

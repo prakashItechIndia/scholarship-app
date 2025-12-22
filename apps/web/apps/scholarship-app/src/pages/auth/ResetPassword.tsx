@@ -84,22 +84,22 @@ const ResetPasswordPage = () => {
     },
   });
 
-  useEffect(() => {
-    if (!token) {
-      const signInUrl = preserveQueryParams('/signin', [
-        'returnUrl',
-        'product',
-        'state',
-      ]);
-      // Properly append error parameter
-      const separator = signInUrl.includes('?') ? '&' : '?';
-      void navigate(`${signInUrl}${separator}error=missing-token`);
-    }
-  }, [token, navigate]);
+  // useEffect(() => {
+  //   if (!token) {
+  //     const signInUrl = preserveQueryParams('/signin', [
+  //       'returnUrl',
+  //       'product',
+  //       'state',
+  //     ]);
+  //     // Properly append error parameter
+  //     const separator = signInUrl.includes('?') ? '&' : '?';
+  //     void navigate(`${signInUrl}${separator}error=missing-token`);
+  //   }
+  // }, [token, navigate]);
 
   const onSubmit = (values: ResetPasswordFormData) => {
     if (!token) return;
-    mutation.mutate({ token, newPassword: values.password });
+    // mutation.mutate({ token, newPassword: values.password });
   };
 
   return (
