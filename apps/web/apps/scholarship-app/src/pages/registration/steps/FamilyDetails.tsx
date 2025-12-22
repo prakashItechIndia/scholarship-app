@@ -89,7 +89,7 @@ const FamilyDetails = () => {
             title="Family details"
             subtitle="Provide Information About Your Immediate Family Members"
         >
-            <form className="w-full h-full flex flex-col" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
+            <form className="w-full h-full flex flex-col -mt-4" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
                 <Stack tokens={STACK_TOKENS}>
 
                     {/* Applicant & ID Row */}
@@ -116,16 +116,19 @@ const FamilyDetails = () => {
                     </FormRowContainer>
 
                     {/* Father Details */}
-                    <FamilyMemberSection
-                        title="Father Details"
-                        prefix="father"
-                                        control={control}
-                        errors={errors}
-                        occupationOptions={OCCUPATION_OPTIONS}
-                        incomeOptions={INCOME_OPTIONS}
-                    />
+                    <div style={{ marginTop: '8px' }}>
+                        <FamilyMemberSection
+                            title="Father Details"
+                            prefix="father"
+                            control={control}
+                            errors={errors}
+                            occupationOptions={OCCUPATION_OPTIONS}
+                            incomeOptions={INCOME_OPTIONS}
+                        />
+                    </div>
 
                     {/* Mother Details */}
+                    <div style={{ marginTop: '8px' }}>
                     <FamilyMemberSection
                         title="Mother Details"
                         prefix="mother"
@@ -134,8 +137,10 @@ const FamilyDetails = () => {
                         occupationOptions={OCCUPATION_OPTIONS}
                         incomeOptions={INCOME_OPTIONS}
                     />
+                    </div>
 
                     {/* Guardian Details */}
+                    <div style={{ marginTop: '8px' }}>
                     <FamilyMemberSection
                         title="Guardian Details"
                         prefix="guardian"
@@ -145,6 +150,7 @@ const FamilyDetails = () => {
                         incomeOptions={INCOME_OPTIONS}
                         isOptional
                                                 />
+                                                </div>
 
                 </Stack>
             </form>

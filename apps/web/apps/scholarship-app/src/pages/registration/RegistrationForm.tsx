@@ -12,6 +12,7 @@ import DocumentsUpload from './steps/DocumentsUpload';
 // import ReviewSubmit from './steps/ReviewSubmit';
 import logo from '@shared/assets/icons/Logo.svg';
 import background from '@shared/assets/icons/header-bg.png';
+import checkmarkIcon from '@shared/assets/icons/Checkmark.svg';
 
 interface Step {
   id: number;
@@ -105,7 +106,7 @@ const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: 
         }`} style={{ lineHeight: '32px' }} >
           <div>
             {isCompleted ? (
-              <span style={{ color: 'white', fontSize: '14px', lineHeight: '1' }}>✓</span>
+              <Image src={checkmarkIcon} alt="Completed" width={26} height={26} imageFit={ImageFit.contain} />
             ) : isFinalStep && !isActive ? (
               <RocketRegular className="font-bold text-gray-400" style={{ width: '18px', height: '18px', color: '#616161' }} />
             ) : (
