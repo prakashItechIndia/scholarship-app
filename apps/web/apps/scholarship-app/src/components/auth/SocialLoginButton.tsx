@@ -1,4 +1,4 @@
-import { Stack, Text } from '@fluentui/react';
+import { Stack, Text, mergeStyles } from '@fluentui/react';
 import { Button } from '@shared/components';
 import microsoftIcon from '@shared/assets/icons/microsoft.svg';
 import googleIcon from '@shared/assets/icons/google.svg';
@@ -27,20 +27,36 @@ const PROVIDER_CONFIG = {
 export const SocialLoginButton = ({ provider, onClick }: SocialLoginButtonProps) => {
   const config = PROVIDER_CONFIG[provider];
 
+  const buttonStyles = mergeStyles({
+    flex: 1,
+    height: '34px !important',
+    padding: '10px 0px !important',
+    backgroundColor: '#ffffff',
+    border: '0.53px solid #4D4D4D !important',
+    borderRadius: '6.38px !important',
+    ':hover': {
+      backgroundColor: '#f9fafb',
+      border: '1px solid #4D4D4D',
+    },
+   
+  });
+
   return (
     <Button
       type="button"
-      variant="outline"
       onClick={onClick}
-      className="flex-1 h-auto p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300"
+      className={buttonStyles}
     >
-      <Stack horizontal tokens={{ childrenGap: 8 }} verticalAlign="center" horizontalAlign="start"  >
+      <Stack horizontal tokens={{ childrenGap: 10}} verticalAlign="center" horizontalAlign="start" >
         <img
           src={config.icon}
           alt={config.name}
-          className="w-[15px] h-[15px]"
+          style={{
+            width: '18px',
+            height: '18px',
+          }}
         />
-        <Text variant="small" className="font-medium text-gray-700">
+        <Text variant="small" styles={{ root: { fontWeight: 400, color: '#424242',fontSize: '10px' } }}>
           {config.name}
         </Text>
       </Stack>

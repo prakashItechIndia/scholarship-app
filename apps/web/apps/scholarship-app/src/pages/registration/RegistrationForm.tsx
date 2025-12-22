@@ -10,7 +10,7 @@ import FamilyDetails from './steps/FamilyDetails';
 import BankDetails from './steps/BankDetails';
 import DocumentsUpload from './steps/DocumentsUpload';
 // import ReviewSubmit from './steps/ReviewSubmit';
-import logo from '@shared/assets/icons/Logo.png';
+import logo from '@shared/assets/icons/Logo.svg';
 import background from '@shared/assets/icons/header-bg.png';
 
 interface Step {
@@ -32,16 +32,25 @@ const STEPS: Step[] = [
 
 const headerStyles: IStackStyles = {
   root: {
-    backgroundImage: `url(${background})`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'repeat',
     position: 'relative',
     borderBottom: '1px solid var(--gray-200, #fafafa)', // gray-200
     width: '100%',
-    opacity: 0.8,
+    overflow: 'hidden',
   },
 };
+
+const backgroundImageStyles = mergeStyles({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundImage: `url(${background})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'repeat',
+  zIndex: 1,
+});
 
 const headerContentStyles: IStackStyles = {
   root: {
@@ -58,13 +67,14 @@ const overlayStyles = mergeStyles({
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: 'rgba(255, 255, 255, 0.1)', // bg-white/10
-  backdropFilter: 'blur(2px)',
+  // backgroundColor: 'rgba(245, 245, 250, 0.57)', // Light blue-gray overlay for banner
+  // backdropFilter: 'blur(1px)',
+  zIndex: 2,
 });
 
 const logoContainerStyles = mergeStyles({
-  width: 140,
-  height: 140,
+  width: 120,
+  height: 120,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -92,29 +102,35 @@ const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: 
   const isFinalStep = step.id === STEPS.length;
   
   return (
-    <Stack horizontal tokens={{ childrenGap: 16 }} verticalAlign="start" className={isActive ? '' : !isCompleted ? 'opacity-70' : ''}>
-      <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold border-2 transition-all ${
-        isActive 
-          ? 'bg-gray-900 text-white border-gray-900' 
-          : isCompleted 
-            ? 'bg-green-500 text-white border-green-500' 
-            : isFinalStep
-              ? 'bg-gray-100 border-gray-300'
-              : 'bg-transparent border-gray-300'
-      }`} style={{ lineHeight: '32px' }}>
-        {isCompleted ? (
-          <span style={{ color: 'white', fontSize: '14px', lineHeight: '1' }}>✓</span>
-        ) : isFinalStep && !isActive ? (
-          <RocketRegular style={{ width: '16px', height: '16px', color: tokens.colorNeutralForeground3 }} />
-        ) : (
-          <span className={`text-sm font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>{step.id}</span>
-        )}
+    <Stack horizontal tokens={{ childrenGap: 14 }} verticalAlign="start">
+      {/* <div className="rounded-full flex-shrink-0 flex items-center justify-center p-0.5 border-4"> */}
+        <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold border-2 transition-all mt-1 border-none ${
+         isActive 
+            ? 'bg-gray-900 text-white !border-none' 
+            : isCompleted 
+              ? 'bg-green-500 text-white border-green-500' 
+              : isFinalStep
+                ? 'bg-gray-100 border-none'
+                : 'bg-transparent  bg-[#EBEBEB]'
+        }`} style={{ lineHeight: '32px' }} >
+          <div>
+            {isCompleted ? (
+              <span style={{ color: 'white', fontSize: '14px', lineHeight: '1' }}>✓</span>
+            ) : isFinalStep && !isActive ? (
+              <RocketRegular className="font-bold text-gray-400" style={{ width: '18px', height: '18px', color: '#616161' }} />
+            ) : (
+              <div className="flex items-center justify-center">   
+                <span className={`text-[12px] font-bold flex items-center justify-center w-6 h-6 rounded-full 
+                  ${isActive ? 'text-white border-2 ' : 'text-[#616161] border-[#616161] border-2'}`}>{step.id}</span>
+              </div>
+            )}
+          </div>
       </div>
       <Stack style={{ paddingTop: '2px', justifyContent: 'center' }}>
-        <Text variant="small" className={`uppercase tracking-wider font-semibold mb-1 ${isFinalStep ? 'text-gray-500' : 'text-gray-500'}`} style={{ fontSize: '11px', lineHeight: '16px' }}>
+        <Text variant="small" className={`uppercase tracking-wider font-semibold mb-1 ${isFinalStep ? 'text-[#707070]' : 'text-[#707070]'}`} style={{ fontSize: '11px', lineHeight: '16px' }}>
           {isFinalStep ? 'FINAL' : `STEP ${step.id}`}
         </Text>
-        <Text variant="large" className={`font-bold ${isActive ? 'text-gray-900' : 'text-gray-600'}`} style={{ lineHeight: '24px', fontSize: '16px' }}>
+        <Text variant="large" className={`font-bold ${isActive ? 'text-[#242424]' : 'text-[#242424]'}`} style={{ lineHeight: '24px', fontSize: '16px' }}>
           {step.title}
         </Text>
       </Stack>
@@ -154,12 +170,13 @@ const RegistrationContent = () => {
       <SEO
         title="Leo Muthu Scholarship Application"
         description="Online Registration for Scholarship Assistance - Academic Year 2025-2026"
-        url="/registration"
+        url=" /registration"
       />
       <Stack className="h-screen overflow-hidden bg-gray-50 dark:bg-gray-900">
 
         {/* Header - Fixed Height */}
         <Stack horizontal verticalAlign="center" styles={headerStyles} disableShrink>
+          <div className={backgroundImageStyles}></div>
           <div className={overlayStyles}></div>
           <Stack horizontal horizontalAlign="space-between" verticalAlign="center" styles={headerContentStyles}>
             {/* Logo */}
@@ -172,13 +189,13 @@ const RegistrationContent = () => {
             {/* Title */}
             <Stack.Item grow>
               <Stack horizontalAlign="center" tokens={{ childrenGap: 8 }}>
-                <Text variant="xxLarge" className="font-semibold text-gray-900">
+                <Text variant="xxLarge" className="text-[#242424] font-bold text-[28px] font-weight-600">
                   Leo Muthu Scholarship Application
                 </Text>
-                <Text variant="large" className="font-medium text-gray-800">
+                <Text variant="large" className="!text-[#242424] !text-[16px] font-weight-600">
                   Online Registration for Scholarship Assistance - Academic Year 2025-2026
                 </Text>
-                <Text variant="medium" className="text-gray-700 mt-1">
+                <Text variant="medium" className="!text-[#242424] !text-[14px] font-weight-400">  
                   Complete the form below to apply for our scholarship program
                 </Text>
               </Stack>
@@ -196,18 +213,18 @@ const RegistrationContent = () => {
 
           {/* Sidebar - Fixed Width, Scrollable inside if needed */}
           <Stack styles={sidebarStyles} className="bg-gray-50 dark:bg-gray-800" disableShrink>
-            <Stack tokens={{ childrenGap: 24 }} style={{ marginBottom: 32 }}>
+            <Stack tokens={{ childrenGap: 10 }} style={{ marginBottom: 32,marginLeft: '18px' }}>
               <Stack horizontal horizontalAlign="space-between" verticalAlign="center" style={{ marginBottom: 32 }}>
                 <Stack style={{ marginBottom: 0 }}>
-                  <Text variant="xLarge" className="font-bold text-[30px] mb-0" style={{ lineHeight: '36px' }}>
+                  <Text variant="xLarge" className="font-bold text-[20px] mb-0" style={{ lineHeight: '36px' }}>
                     Online registration
                   </Text>
-                  <Text variant="small" className="text-gray-400 text-sm mt-1" style={{ lineHeight: '16px' }}>Getting started</Text>
+                  <Text variant="small" className="text-[#707070] text-sm mt-1" style={{ lineHeight: '16px' }}>Getting started</Text>
                 </Stack>
 
                 {/* Progress Circle - SVG Implementation */}
-                <div className="relative w-[60px] h-[60px] flex items-center justify-center" style={{ flexShrink: 0 }}>
-                  <svg width="60" height="60" viewBox="0 0 72 72" className="rotate-[-90deg]">
+                <div className="relative w-[60px] h-[60px] flex items-center justify-center mr-[20px]" style={{ flexShrink: 0 }}>
+                  <svg width="50" height="50" viewBox="0 0 72 72" className="rotate-[-90deg]">
                     {/* Track */}
                     <circle
                       cx="36" cy="36" r="32"
@@ -227,13 +244,13 @@ const RegistrationContent = () => {
                       className="transition-[stroke-dashoffset] duration-500 ease-out"
                     />
                   </svg>
-                  <div className="absolute text-gray-800 font-bold text-base" style={{ lineHeight: '20px' }}>
+                  <div className="absolute text-gray-800 font-semibold text-[13px]" style={{ lineHeight: '20px' }}>
                     {completedSteps.length}/{STEPS.length}
                   </div>
                 </div>
               </Stack>
 
-              <Stack tokens={{ childrenGap: 24 }}>
+              <Stack tokens={{ childrenGap: 24 }} style={{fontSize: '10px' }}>
                 {STEPS.map(step => (
                   <StepIndicator
                     key={step.id}
@@ -250,9 +267,9 @@ const RegistrationContent = () => {
           <Stack grow className="flex flex-col h-full bg-white rounded-tr-xl">
 
             {/* Scrollable Content Area */}
-            <Stack grow className="overflow-y-auto py-8 px-10">
-              <Stack style={{ marginBottom: 24 }}>
-                <Text className="text-blue-600 text-[0.625rem] font-bold uppercase tracking-wider mb-0" style={{ lineHeight: '12px', letterSpacing: '0.05em' }}>
+            <Stack grow className="overflow-y-auto py-10 px-10">
+              <Stack style={{ marginBottom: 8 }}>
+                <Text className="text-[#2453C3] text-[10px] uppercase tracking-wider mb-0" style={{ lineHeight: '12px', letterSpacing: '0.05em' }}>
                   STEP {currentStep}/{STEPS.length}
                 </Text>
               </Stack>
@@ -268,25 +285,33 @@ const RegistrationContent = () => {
               className="py-6 px-10 border-t border-gray-200 bg-white z-10 shrink-0"
             >
               <Button
-                variant="outline"
+                appearance="primary"
                 onClick={handleCancel}
+                style={{border:'1px solid #D1D1D1', height:'40px',borderRadius:'10px' }}
               >
                 Cancel
               </Button>
 
               <Stack horizontal tokens={{ childrenGap: 16 }}>
                 <Button
-                  variant="outline"
+                  appearance="outline"
                   onClick={prevStep}
                   disabled={currentStep === 1}
+                  className="!bg-[#E0E0E0] h-10 text-[12px] font-semibold !text-[#BDBDBD] !rounded-lg"
                 >
                   Previous
                 </Button>
                 <Button
-                  type="submit"
-                  form="current-step-form"
-                  variant="default"
+                  type="button"
+                  appearance="primary"
                   disabled={isLoading || !isDocumentsStepValid}
+                  className='!bg-[#2453C3] !text-white !rounded-lg'
+                  onClick={() => {
+                    const form = document.getElementById('current-step-form') as HTMLFormElement;
+                    if (form) {
+                      form.requestSubmit();
+                    }
+                  }}
                 >
                   {isLoading ? (
                     <Stack horizontal tokens={{ childrenGap: 8 }} verticalAlign="center" horizontalAlign="center">

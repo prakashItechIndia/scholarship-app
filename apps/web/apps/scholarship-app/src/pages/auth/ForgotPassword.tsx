@@ -121,9 +121,9 @@ const ForgotPasswordPage = () => {
     <>
       <SEO
         title="Forgot Password"
-        description="Reset your iCaptur account password. Enter your email address and we'll send you a secure password reset link."
+        description="Reset your Leo Muthu Scholarship account password. Enter your email address and we'll send you a secure password reset link."
         url="/forgot-password"
-        keywords="forgot password, password reset, recover account, iCaptur password"
+        keywords="forgot password, password reset, recover account, Leo Muthu Scholarship password"
         noindex={true}
       />
       <AuthWrapper

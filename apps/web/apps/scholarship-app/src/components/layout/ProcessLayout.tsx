@@ -17,6 +17,7 @@ import { Button, TopNavProps, Popover, PopoverTrigger, PopoverContent, Modal } f
 import * as React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PageLayout, SideNavConfig } from "./PageLayout";
+import { NavbarLogo } from "../common";
 
 interface ProcessLayoutProps {
   children: React.ReactNode;
@@ -30,8 +31,8 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
   const [logoutModalOpen, setLogoutModalOpen] = React.useState(false);
 
   // Mock user data - replace with actual user data from context/API
-  const userName = "Saravanan";
-  const userEmail = "saravanan@gmail.com";
+  const userName = "Aakash";
+  const userRole = "Administrator";
 
   const sideNavConfig: SideNavConfig = {
     // logo,
@@ -85,120 +86,132 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
   };
 
   const topNavConfig: TopNavProps = {
-    left: (
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-semibold text-sm">
-          LM
-        </div>
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold text-gray-900">
-            LEO MUTHU Scholarship
-          </span>
-          <span className="text-xs text-gray-600">
-            An Initiative of ARAM Foundation
-          </span>
-        </div>
-      </div>
-    ),
+    left: <NavbarLogo />,
     right: (
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <Button
           variant="ghost"
-          size="icon"
           onClick={() => console.log("Search clicked")}
           aria-label="Search"
-          className="w-10 h-10"
+          className="w-9 h-9 rounded-md bg-white hover:bg-gray-50 p-0 flex items-center justify-center"
         >
           <SearchRegular className="w-5 h-5 text-gray-600" />
         </Button>
         <Button
           variant="ghost"
-          size="icon"
           onClick={() => console.log("Notifications clicked")}
           aria-label="Notifications"
-          className="w-10 h-10 relative"
+          className="w-9 h-9 rounded-md bg-white hover:bg-gray-50 p-0 flex items-center justify-center relative"
         >
           <AlertRegular className="w-5 h-5 text-gray-600" />
           {/* Notification badge dot */}
-          <span className="absolute top-2 right-2 w-2 h-2 bg-gray-900 rounded-full"></span>
+          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-gray-900 rounded-full"></span>
         </Button>
         {/* Vertical separator */}
         <div className="h-6 w-px bg-gray-300"></div>
-        <Popover open={profilePopoverOpen} onOpenChange={setProfilePopoverOpen}>
-          <PopoverTrigger>
+        <Popover 
+          open={profilePopoverOpen} 
+          onOpenChange={(_, data) => {
+            const openState = (data as { open?: boolean })?.open ?? false;
+            setProfilePopoverOpen(openState);
+          }}
+        >
+          <PopoverTrigger disableButtonEnhancement>
             <Button
               variant="ghost"
-              size="icon"
-              onClick={() => setProfilePopoverOpen(!profilePopoverOpen)}
-              className="w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 p-0"
+              className={`w-9 h-9 rounded-full p-0 transition-colors flex items-center justify-center ${
+                profilePopoverOpen 
+                  ? "bg-blue-100" 
+                  : "bg-blue-50 hover:bg-blue-100"
+              }`}
               aria-label="User menu"
             >
-              <PersonRegular className="w-5 h-5 text-blue-600" />
+              <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center">
+                <span className="text-white text-xs font-semibold">
+                  {userName.charAt(0).toUpperCase()}
+                </span>
+              </div>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[280px] p-0 rounded-lg shadow-md bg-white z-[9999]">
-            {/* User Info Section */}
-            <div className="p-4 border-b border-gray-200">
+          <PopoverContent className="w-[280px] p-0">
+            {/* User Info Section - Light gray background */}
+            <div className="p-4 border-b border-gray-200 bg-gray-50">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#115ea3] flex items-center justify-center text-white text-base font-semibold">
-                  {userName.charAt(0).toUpperCase()}
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <PersonRegular className="w-6 h-6 text-gray-500" />
                 </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-sm leading-5 font-semibold text-gray-900 font-inter">
+                <div className="flex flex-col gap-0.5 min-w-0">
+                  <span 
+                    className="text-sm font-semibold text-gray-900 truncate" 
+                    style={{ fontFamily: "Inter, sans-serif", lineHeight: "20px" }}
+                  >
                     {userName}
                   </span>
-                  <span className="text-xs leading-4 font-normal text-gray-500 font-inter">
-                    {userEmail}
+                  <span 
+                    className="text-xs font-normal text-gray-500 truncate" 
+                    style={{ fontFamily: "Inter, sans-serif", lineHeight: "16px" }}
+                  >
+                    {userRole}
                   </span>
                 </div>
               </div>
             </div>
 
             {/* Menu Items */}
-            <div className="py-2">
-              <Button
-                variant="ghost"
+            <div className="py-1">
+              <button
                 onClick={() => {
                   setProfilePopoverOpen(false);
                   console.log("My Profile clicked");
                   // Navigate to profile page
                 }}
-                className="w-full justify-start gap-3 px-4 py-2.5 hover:bg-gray-100"
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left focus:outline-none focus:bg-gray-50"
               >
-                <PersonRegular className="w-5 h-5 text-gray-500" />
-                <span className="text-sm leading-5 font-normal text-gray-900">
-                  My Profile 
+                <PersonRegular className="w-5 h-5 text-gray-600 flex-shrink-0" />
+                <span 
+                  className="text-sm font-normal text-gray-900" 
+                  style={{ fontFamily: "Inter, sans-serif", lineHeight: "20px" }}
+                >
+                  My Profile
                 </span>
-              </Button>
+              </button>
+              
+              <div className="h-px bg-gray-200 mx-0"></div>
 
-              <Button
-                variant="ghost"
+              <button
                 onClick={() => {
                   setProfilePopoverOpen(false);
                   console.log("Change Password clicked");
                   // Navigate to change password page
                 }}
-                className="w-full justify-start gap-3 px-4 py-2.5 hover:bg-gray-100"
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left focus:outline-none focus:bg-gray-50"
               >
-                <LockClosedRegular className="w-5 h-5 text-gray-500" />
-                <span className="text-sm leading-5 font-normal text-gray-900">
+                <LockClosedRegular className="w-5 h-5 text-gray-600 flex-shrink-0" />
+                <span 
+                  className="text-sm font-normal text-gray-900" 
+                  style={{ fontFamily: "Inter, sans-serif", lineHeight: "20px" }}
+                >
                   Change Password
                 </span>
-              </Button>
+              </button>
+              
+              <div className="h-px bg-gray-200 mx-0"></div>
 
-              <Button
-                variant="ghost"
+              <button
                 onClick={() => {
                   setProfilePopoverOpen(false);
                   setLogoutModalOpen(true);
                 }}
-                className="w-full justify-start gap-3 px-4 py-2.5 hover:bg-gray-100"
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 active:bg-red-100 transition-colors text-left focus:outline-none focus:bg-red-50"
               >
-                <SignOutRegular className="w-5 h-5 text-red-600" />
-                <span className="text-sm leading-5 font-normal text-red-600">
+                <SignOutRegular className="w-5 h-5 text-red-600 flex-shrink-0" />
+                <span 
+                  className="text-sm font-normal text-red-600" 
+                  style={{ fontFamily: "Inter, sans-serif", lineHeight: "20px" }}
+                >
                   Logout
                 </span>
-              </Button>
+              </button>
             </div>
           </PopoverContent>
         </Popover>
@@ -235,7 +248,6 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
             </span>
             <Button
               variant="ghost"
-              size="icon"
               onClick={() => setLogoutModalOpen(false)}
               className="absolute top-0 right-0 w-8 h-8 hover:bg-gray-100 rounded"
               aria-label="Close"

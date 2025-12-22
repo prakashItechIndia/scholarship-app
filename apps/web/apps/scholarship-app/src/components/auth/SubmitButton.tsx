@@ -22,14 +22,14 @@ export const SubmitButton = ({
   onClick,
 }: SubmitButtonProps) => {
   const baseClasses = variant === 'password'
-    ? 'w-full rounded bg-[#2453C3] px-3 py-1.5 text-white text-xs font-semibold font-sans leading-5 border-none hover:bg-[#1e42a0] disabled:cursor-not-allowed disabled:opacity-70'
-    : 'w-full h-11 text-base font-semibold disabled:opacity-70';
+    ? 'w-full rounded !bg-[#2453C3] px-3 py-1.5 text-white text-xs font-semibold font-sans leading-5 border-none hover:bg-[#1e42a0] disabled:cursor-not-allowed disabled:opacity-70'
+    : 'w-full h-11 !text-white text-xs font-semibold disabled:opacity-70 !bg-[#2453C3] !rounded-lg';
 
   return (
     <Button
       type={type}
       disabled={disabled || isLoading}
-      variant="default"
+      appearance="primary"
       className={`${baseClasses} ${className}`}
       onClick={onClick}
     >
