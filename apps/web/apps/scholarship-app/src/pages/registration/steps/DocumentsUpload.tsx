@@ -11,6 +11,7 @@ import {
 } from '@fluentui/react';
 import { useRegistration } from '@/contexts/RegistrationContext';
 import { useThemeTokens } from '@/hooks/useThemeTokens';
+// import { usePreviousButton } from '../hooks/usePreviousButton'; // Uncomment to use dynamic previous button
 import { PdfIcon, CloseIcon, UploadIcon } from '@shared/components';
 
 // --- Constants ---
@@ -37,7 +38,7 @@ function formatBytes(bytes: number, decimals = 2) {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
-function truncateFileName(fileName: string, maxLength: number = 10): string {
+function truncateFileName(fileName: string, maxLength = 10): string {
     if (fileName.length <= maxLength) {
         return fileName;
     }
@@ -62,6 +63,26 @@ const containerStyles: IStackStyles = {
 const DocumentsUpload = () => {
     const { formData, updateFormData, nextStep, markStepComplete, setIsLoading } = useRegistration();
     const tokens = useThemeTokens();
+    
+    // Example: Configure previous button dynamically with styling
+    // import { usePreviousButton } from '../hooks/usePreviousButton';
+    // const { setStep } = useRegistration();
+    // usePreviousButton({
+    //   onPrevious: async () => {
+    //     // Custom logic before going back
+    //     console.log('Going back from documents step');
+    //     setStep(4); // Go to a specific step
+    //   },
+    //   disabled: false, // Enable/disable the button
+    //   label: 'Back', // Custom label
+    //   bgColor: '#F0F0F0', // Custom background color (hex)
+    //   textColor: '#666666', // Custom text color (hex)
+    //   // OR use Tailwind classes:
+    //   // bgColor: 'bg-gray-200',
+    //   // textColor: 'text-gray-600',
+    //   // OR use full custom className:
+    //   // className: '!bg-blue-500 !text-white hover:!bg-blue-600 h-10 rounded-lg'
+    // });
     
     // Type guard to check if documents is File[]
     const getDocumentsFromFormData = (): File[] => {
@@ -340,7 +361,7 @@ const fileItemStyles = mergeStyles({
                                         (Any 3 documents are mandatory)
                                     </Text>
                                 </div>
-                                <ul className={`${sideCardListStyles}`}>
+                                <ul className={sideCardListStyles}>
                                     {REQUIRED_DOCUMENTS.map((doc, idx) => (
                                         <li key={idx} className={`${sideCardItemStyles} border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-[12px] font-regular py-1.5`}>
                                             {doc}

@@ -155,7 +155,7 @@ const SignInPage = () => {
     } else {
       // Store email in localStorage and redirect to verification page
       localStorage.setItem('verification_email', email);
-      void navigate('/verification');
+      void navigate('/registration');
     }
   };
 

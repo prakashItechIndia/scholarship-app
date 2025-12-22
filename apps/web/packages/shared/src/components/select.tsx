@@ -57,8 +57,8 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
               fontSize: tokens.fontSizeBase300,
               height: "45px",
               minHeight: "45px",
-              paddingLeft: "12px",
-              paddingRight: "12px",
+              // paddingLeft: "12px",
+              // paddingRight: "12px",
               paddingTop: "8px",
               paddingBottom: "8px",
             }}
