@@ -207,19 +207,24 @@ const SignInPage = () => {
 
           <Form {...emailForm}>
             <form onSubmit={(e) => void handleEmailSubmit(onEmailSubmit)(e)} noValidate>
-              <Stack tokens={{ childrenGap: 24 }}>
+              <Stack tokens={{ childrenGap: 24 }} >
                 <EmailField control={emailForm.control} name="email" variant="email" />
 
-                <SubmitButton
-                  type="submit"
-                  disabled={emailForm.formState.isSubmitting}
-                  isLoading={emailForm.formState.isSubmitting}
-                  loadingText="Loading..."
-                >
-                  Continue
-                </SubmitButton>
+                <Stack tokens={{ childrenGap: 8 }}>
+                  <SubmitButton
+                  
+                    type="submit"
+                    disabled={emailForm.formState.isSubmitting}
+                    isLoading={emailForm.formState.isSubmitting}
+                    loadingText="Loading..."
+                    // className='text-white'
+                    // className='!bg-[#2453C3]'
+                  >
+                    Continue
+                  </SubmitButton>
 
-                <TermsOfServiceText />
+                  <TermsOfServiceText />
+                </Stack>
               </Stack>
             </form>
           </Form>
@@ -228,7 +233,7 @@ const SignInPage = () => {
           <Stack tokens={{ childrenGap: 16 }}>
             <DividerWithText />
 
-            <Stack horizontal tokens={{ childrenGap: 12 }}>
+            <Stack horizontal tokens={{ childrenGap: 12 }} >
               <SocialLoginButton provider="microsoft" />
               <SocialLoginButton provider="google" />
               <SocialLoginButton provider="apple" />
@@ -296,6 +301,7 @@ const SignInPage = () => {
                       showPassword={showPassword}
                       onTogglePassword={() => setShowPassword(!showPassword)}
                       variant="password"
+                      
                     />
 
                     <Stack className="mt-0">

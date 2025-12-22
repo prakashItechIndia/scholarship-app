@@ -184,7 +184,7 @@ const ProcessPage: React.FC = () => {
             onOpenChange={setFilterPopoverOpen} 
           />
           <Button
-            variant="ghost"
+            appearance="subtle"
             onClick={() => console.log("More options clicked")}
             aria-label="More options"
             style={{
@@ -239,10 +239,10 @@ const ProcessPage: React.FC = () => {
         size={"lg" as const}
         footer={
           <>
-            <Button variant="outline" onClick={() => setViewModalOpen(false)}>
+            <Button appearance="outline" onClick={() => setViewModalOpen(false)}>
               Close
             </Button>
-            <Button variant="default" onClick={() => {
+            <Button appearance="primary" onClick={() => {
               setViewModalOpen(false);
               if (selectedApplication) handleEdit(selectedApplication);
             }}>
@@ -290,11 +290,11 @@ const ProcessPage: React.FC = () => {
         size={"lg" as const}
         footer={
           <>
-            <Button variant="outline" onClick={() => setEditModalOpen(false)}>
+            <Button appearance="outline" onClick={() => setEditModalOpen(false)}>
               Cancel
             </Button>
             <Button
-              variant="default"
+              appearance="primary"
               onClick={() => {
                 console.log("Save changes", selectedApplication);
                 setEditModalOpen(false);
@@ -326,11 +326,11 @@ const ProcessPage: React.FC = () => {
         size={"md" as const}
         footer={
           <>
-            <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
+            <Button appearance="outline" onClick={() => setDeleteModalOpen(false)}>
               Cancel
             </Button>
             <Button
-              variant="destructive"
+              appearance="primary"
               onClick={() => {
                 console.log("Delete application", selectedApplication);
                 setDeleteModalOpen(false);

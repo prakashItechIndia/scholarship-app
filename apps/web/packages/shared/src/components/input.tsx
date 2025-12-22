@@ -89,7 +89,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               backgroundColor: tokens.colorNeutralBackground1,
               color: tokens.colorNeutralForeground1,
               fontSize: tokens.fontSizeBase300,
-              height: "45px",
+              height: "32px",
               minHeight: "45px",
               paddingLeft: paddingLeft,
               paddingRight: paddingRight,

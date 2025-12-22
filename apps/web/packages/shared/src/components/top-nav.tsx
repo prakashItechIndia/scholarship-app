@@ -98,7 +98,7 @@ export const TopNav = React.forwardRef<HTMLElement, TopNavProps>(
           <>
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <Button variant="ghost" style={{ padding: 0, minWidth: "auto", height: "auto" }}>
+                <Button appearance="subtle" style={{ padding: 0, minWidth: "auto", height: "auto" }}>
                   <div className="flex items-center gap-2">
                     <Avatar name={userAvatar.name} size="sm">
                       {userAvatar.imageUrl && (

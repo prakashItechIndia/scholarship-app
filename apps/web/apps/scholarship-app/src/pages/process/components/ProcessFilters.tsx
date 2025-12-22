@@ -91,16 +91,16 @@ const ProcessFilters: React.FC<ProcessFiltersProps> = ({ open, onOpenChange }) =
           </div>
           <div style={{ display: "flex", gap: "8px", paddingTop: "8px" }}>
             <Button
-              variant="default"
-              size="sm"
+              appearance="primary"
+              size="small"
               onClick={() => onOpenChange(false)}
               style={{ flex: 1 }}
             >
               Apply
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              appearance="outline"
+              size="small"
               onClick={() => onOpenChange(false)}
               style={{ flex: 1 }}
             >

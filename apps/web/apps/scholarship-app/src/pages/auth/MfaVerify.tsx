@@ -256,7 +256,7 @@ export default function MfaVerify() {
                 </PrimaryButton>
 
                 <p className="text-[10px] text-Neutral-Foreground-2-Rest leading-[16px]">
-                  <span>By continuing, you agree to our </span>
+                  <span>By continuing, you agree to our</span>
                   <span className="text-[10px] font-bold text-Neutral-Foreground-2-Rest leading-[16px]">
                     Terms of Service
                   </span>
