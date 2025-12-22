@@ -199,16 +199,14 @@ interface IfscCodeFieldProps extends BaseFormFieldProps {
 }
 
 export const IfscCodeField = ({ name, control, errors, label, required, placeholder, onLookupClick }: IfscCodeFieldProps) => {
-    const tokens = useThemeTokens();
-    const fieldStyles = getFieldStyles(tokens);
-    
     return (
+        <div className="w-full">
         <Controller
             name={name}
             control={control}
-            render={({ field }) => (
-                <FormField label={label} required={required} error={errors[name]?.message as string}>
-                    <div className="flex justify-end mb-1.5">
+                render={({ field }) => (
+                <FormField label={label} required={required} error={errors[name]?.message as string} className="w-full">
+                        <div className="flex justify-end mb-1.5 w-full">
                         <span 
                             className="text-red-600 dark:text-red-400 text-xs cursor-pointer font-medium hover:underline"
                             onClick={onLookupClick}
@@ -216,15 +214,19 @@ export const IfscCodeField = ({ name, control, errors, label, required, placehol
                             (Lookup IFSC Code)
                         </span>
                     </div>
-                    <TextField
-                        {...field}
+                        <div className="w-full">
+                            <Input
+                                {...field}
+                                value={field.value ?? ''}
                         placeholder={placeholder}
-                        errorMessage={errors[name]?.message as string}
-                        styles={fieldStyles}
+                                errorMessage={errors[name]?.message as string}
+                                className="w-full"
                     />
+                        </div>
                 </FormField>
             )}
         />
+        </div>
     );
 };
 

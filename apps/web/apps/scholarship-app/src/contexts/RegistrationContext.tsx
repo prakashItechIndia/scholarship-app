@@ -17,6 +17,7 @@ export interface RegistrationContextType {
   setIsLoading: (loading: boolean) => void;
   nextStep: () => void;
   prevStep: () => void;
+  setStep: (step: number) => void;
   markStepComplete: (step: number) => void;
   updateFormData: (data: Partial<RegistrationFormData>) => void;
 }
@@ -26,7 +27,7 @@ const RegistrationContext = createContext<RegistrationContextType | undefined>(
 ) as React.Context<RegistrationContextType | undefined>;
 
 export const RegistrationProvider = ({ children }: { children: ReactNode }) => {
-  const [currentStep, setCurrentStep] = useState(3);
+  const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [formData, setFormData] = useState<RegistrationFormData>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +38,10 @@ export const RegistrationProvider = ({ children }: { children: ReactNode }) => {
 
   const prevStep = useCallback(() => {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
+  }, []);
+
+  const setStep = useCallback((step: number) => {
+    setCurrentStep(Math.max(1, Math.min(step, 6)));
   }, []);
 
   const markStepComplete = useCallback((step: number) => {
@@ -65,6 +70,7 @@ export const RegistrationProvider = ({ children }: { children: ReactNode }) => {
         setIsLoading,
         nextStep,
         prevStep,
+        setStep,
         markStepComplete,
         updateFormData,
       }}

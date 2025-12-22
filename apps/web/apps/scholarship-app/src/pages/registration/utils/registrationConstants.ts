@@ -34,6 +34,7 @@ export const getFieldStyles = (tokens: ThemeTokens) => ({
         height: 42, 
         borderRadius: parseInt(tokens.borderRadiusMedium), 
         borderColor: tokens.colorNeutralStroke1 ,
+        width: '100%',
     }
 });
 

@@ -13,6 +13,7 @@ import DocumentsUpload from './steps/DocumentsUpload';
 import logo from '@shared/assets/icons/Logo.svg';
 import background from '@shared/assets/icons/header-bg.png';
 import checkmarkIcon from '@shared/assets/icons/Checkmark.svg';
+import ReviewSubmit from './steps/ReviewSubmit';
 
 interface Step {
   id: number;
@@ -36,7 +37,11 @@ const headerStyles: IStackStyles = {
     position: 'relative',
     borderBottom: '1px solid var(--gray-200, #fafafa)', // gray-200
     width: '100%',
+    height: '200px', // Fixed height for header
+    minHeight: '200px', // Ensure minimum height
+    maxHeight: '200px', // Ensure maximum height
     overflow: 'hidden',
+    flexShrink: 0, // Prevent shrinking
   },
 };
 
@@ -56,9 +61,12 @@ const backgroundImageStyles = mergeStyles({
 const headerContentStyles: IStackStyles = {
   root: {
     width: '100%',
+    height: '100%', // Take full height of parent
     padding: '24px 40px', // py-6 px-10
     position: 'relative',
     zIndex: 10,
+    overflow: 'hidden', // Prevent content overflow
+    boxSizing: 'border-box', // Include padding in height calculation
   },
 };
 
@@ -112,7 +120,7 @@ const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: 
               ? 'bg-green-500 text-white border-green-500' 
               : isFinalStep
                 ? 'bg-gray-100 border-none'
-                : 'bg-transparent  bg-[#EBEBEB]'
+                : 'bg-transparent  !bg-[#EBEBEB]'
         }`} style={{ lineHeight: '32px' }} >
           <div>
             {isCompleted ? (
@@ -159,7 +167,7 @@ const RegistrationContent = () => {
       case 3: return <FamilyDetails />;
       case 4: return <BankDetails />;
       case 5: return <DocumentsUpload />;
-      // case 6: return <ReviewSubmit />;
+      case 6: return <ReviewSubmit />;
       default: return <IdentityDetails />;
     }
   };
@@ -189,14 +197,14 @@ const RegistrationContent = () => {
 
             {/* Title */}
             <Stack.Item grow>
-              <Stack horizontalAlign="center" tokens={{ childrenGap: 8 }}>
-                <Text variant="xxLarge" className="text-[#242424] font-bold text-[28px] font-weight-600">
+              <Stack horizontalAlign="center" tokens={{ childrenGap: 8 }} style={{ overflow: 'hidden', maxHeight: '100%' }}>
+                <Text variant="xxLarge" className="text-[#242424] font-bold text-[28px] font-weight-600" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   Leo Muthu Scholarship Application
                 </Text>
-                <Text variant="large" className="!text-[#242424] !text-[16px] font-weight-600">
+                <Text variant="large" className="!text-[#242424] !text-[16px] font-weight-600" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   Online Registration for Scholarship Assistance - Academic Year 2025-2026
                 </Text>
-                <Text variant="medium" className="!text-[#242424] !text-[14px] font-weight-400">  
+                <Text variant="medium" className="!text-[#242424] !text-[14px] font-weight-400" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>  
                   Complete the form below to apply for our scholarship program
                 </Text>
               </Stack>
@@ -286,7 +294,7 @@ const RegistrationContent = () => {
               className="py-6 px-10 border-t border-gray-200 bg-white z-10 shrink-0"
             >
               <Button
-                appearance="primary"
+                // appearance="primary"
                 onClick={handleCancel}
                 style={{border:'1px solid #D1D1D1', height:'40px',borderRadius:'10px' }}
               >
