@@ -52,46 +52,6 @@ export const TopNav = React.forwardRef<HTMLElement, TopNavProps>(
     },
     ref
   ) => {
-    const defaultLeft = company ? (
-      <div className="flex items-center">
-        <div className="relative w-8 h-8 rounded overflow-hidden">
-          {company.logoUrl ? (
-            <img
-              src={company.logoUrl}
-              alt={company.name || "Company"}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          ) : (
-            <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
-              {company.name
-                ?.split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2) || "C"}
-            </div>
-          )}
-        </div>
-        {company.name && <span className="text-sm font-semibold">{company.name}</span>}
-        {company.onMoreClick && (
-          <div
-            className="flex items-center justify-center w-4 h-4 cursor-pointer text-gray-500"
-            onClick={company.onMoreClick}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                company.onMoreClick?.();
-              }
-            }}
-          >
-            ⋯
-          </div>
-        )}
-      </div>
-    ) : null;
-
     const defaultRight = (
       <>
         {userAvatar && (
@@ -166,13 +126,13 @@ export const TopNav = React.forwardRef<HTMLElement, TopNavProps>(
       <header
         ref={ref}
         className={cn(
-          "flex items-center justify-between w-full h-[52px] min-h-[52px] pl-0 pr-4 py-2 bg-white border-b border-gray-200 sticky top-0 left-0 z-50 m-0",
+          "flex items-center justify-between w-full h-[52px] min-h-[52px] pl-0 pr-4 py-2 bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50 m-0",
           className
         )}
         {...props}
       >
         <div className="flex items-center gap-4 flex-1">
-          {left || defaultLeft}
+          <div className="ml-4">{left||''}</div>
           {title && !center && (
             <h1 className="text-base font-semibold">{title}</h1>
           )}

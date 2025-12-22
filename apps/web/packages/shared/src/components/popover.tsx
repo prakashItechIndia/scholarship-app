@@ -1,43 +1,35 @@
 import * as React from "react";
-import { Popover as FluentPopover, PopoverSurface, PopoverTrigger, PopoverProps as FluentPopoverProps } from "@fluentui/react-components";
+import {
+  Popover,
+  PopoverSurface,
+  PopoverTrigger,
+  type PopoverProps,
+} from "@fluentui/react-components";
 import { cn } from "../lib/utils";
 
-export interface PopoverProps extends Omit<FluentPopoverProps, "open" | "onOpenChange"> {
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  children: React.ReactNode;
-}
+// Re-export Fluent UI Popover components directly
+export { Popover, PopoverSurface, PopoverTrigger };
+export type { PopoverProps };
 
-const Popover = ({ open, onOpenChange, children, ...props }: PopoverProps) => {
-  return (
-    <FluentPopover
-      open={open}
-      onOpenChange={(_, data) => onOpenChange?.(data.open || false)}
-      {...props}
-    >
-      {children}
-    </FluentPopover>
-  );
-};
-
-Popover.displayName = "Popover";
-
-const PopoverTriggerComponent = PopoverTrigger;
-PopoverTriggerComponent.displayName = "PopoverTrigger";
-
-const PopoverContent = React.forwardRef<
+// PopoverContent is an alias for PopoverSurface with default styling
+// Fluent UI's PopoverSurface already has default styles (shadow, border, background, etc.)
+// We only add custom className if provided, without overriding Fluent UI defaults
+export const PopoverContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
     align?: "start" | "end" | "center";
   }
->(({ className, children, align, ...props }, ref) => {
+>(({ className, children, ...props }, ref) => {
   return (
-    <PopoverSurface ref={ref} className={cn("z-50 w-72 rounded-md border bg-white p-4 shadow-md", className)} {...props}>
+    <PopoverSurface 
+      ref={ref} 
+      tabIndex={-1}
+      className={cn(className)} 
+      {...props}
+    >
       {children}
     </PopoverSurface>
   );
 });
 
 PopoverContent.displayName = "PopoverContent";
-
-export { Popover, PopoverTriggerComponent as PopoverTrigger, PopoverContent };

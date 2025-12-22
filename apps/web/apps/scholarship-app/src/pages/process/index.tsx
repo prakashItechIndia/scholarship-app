@@ -377,7 +377,7 @@ const ProcessPage: React.FC = () => {
           name: doc.name,
           type: doc.type,
           url: doc.url,
-          size: (doc.size as string | undefined) ?? "120 KB",
+          size: (doc.size as string) ?? "120 KB",
           uploadedDate: doc.uploadedDate,
           status: doc.status,
         }))}
