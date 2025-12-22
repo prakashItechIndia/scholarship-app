@@ -3,7 +3,6 @@ import { RocketRegular } from '@fluentui/react-icons';
 import { Button } from '@shared/components';
 import { SEO } from '../../components/seo/SEO';
 import { RegistrationProvider, useRegistration } from '@/contexts/RegistrationContext';
-import { useThemeTokens } from '@/hooks/useThemeTokens';
 import IdentityDetails from './steps/IdentityDetails';
 import PersonalDetails from './steps/PersonalDetails';
 import FamilyDetails from './steps/FamilyDetails';
@@ -107,7 +106,6 @@ const sidebarStyles: IStackStyles = {
 // --- Sub-components ---
 
 const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: boolean, isCompleted: boolean }) => {
-  const tokens = useThemeTokens();
   const isFinalStep = step.id === STEPS.length;
   
   return (
@@ -149,12 +147,60 @@ const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: 
 
 const RegistrationContent = () => {
   // Direct destructuring - TypeScript should infer types from the hook's return type
-  const { currentStep, completedSteps, prevStep, isLoading, formData } = useRegistration();
+  const { currentStep, completedSteps, prevStep, isLoading, formData, previousButtonConfig } = useRegistration();
   
   // Check if documents step has minimum 3 files (step 5 is DocumentsUpload)
   const isDocumentsStepValid = currentStep === 5 
     ? (formData?.documents && Array.isArray(formData.documents) && formData.documents.length >= 3)
     : true;
+
+  // Determine previous button state from config or defaults
+  const isPreviousDisabled = previousButtonConfig?.disabled ?? (currentStep === 1);
+  const previousButtonLabel = previousButtonConfig?.label ?? 'Previous';
+
+  // Build dynamic className for previous button
+  const getPreviousButtonClassName = (): string => {
+    const baseClasses = 'h-10 text-[12px] font-semibold !rounded-lg';
+    
+    // If disabled, always use disabled styling (overrides custom colors)
+    if (isPreviousDisabled) {
+      // If custom className is provided, merge with disabled styles
+      if (previousButtonConfig?.className) {
+        const customClass = previousButtonConfig.className;
+        // Check if disabled styles are already in the custom class
+        const hasDisabledStyles = customClass.includes('opacity') || customClass.includes('cursor-not-allowed');
+        return hasDisabledStyles 
+          ? customClass 
+          : `${customClass} opacity-50 cursor-not-allowed`;
+      }
+      // Default disabled styling
+      return `${baseClasses} !bg-[#E0E0E0] !text-[#BDBDBD] opacity-50 cursor-not-allowed`;
+    }
+
+    // Normal (enabled) state
+    // If custom className is provided, use it
+    if (previousButtonConfig?.className) {
+      return previousButtonConfig.className;
+    }
+
+    // Build className from bgColor and textColor if provided
+    const bgColor = previousButtonConfig?.bgColor;
+    const textColor = previousButtonConfig?.textColor;
+    
+    if (bgColor || textColor) {
+      const bgClass = bgColor 
+        ? (bgColor.startsWith('#') ? `!bg-[${bgColor}]` : (bgColor.startsWith('bg-') ? `!${bgColor}` : `!bg-${bgColor}`))
+        : '';
+      const textClass = textColor
+        ? (textColor.startsWith('#') ? `!text-[${textColor}]` : (textColor.startsWith('text-') ? `!${textColor}` : `!text-${textColor}`))
+        : '';
+      
+      return `${baseClasses} ${bgClass} ${textClass}`.trim().replace(/\s+/g, ' ');
+    }
+
+    // Default enabled styling
+    return `${baseClasses} !text-[#000]`;
+  };
 
   const handleCancel = () => {
     window.location.href = '/user-login';
@@ -304,11 +350,13 @@ const RegistrationContent = () => {
               <Stack horizontal tokens={{ childrenGap: 16 }}>
                 <Button
                   appearance="outline"
-                  onClick={prevStep}
-                  disabled={currentStep === 1}
-                  className="!bg-[#E0E0E0] h-10 text-[12px] font-semibold !text-[#BDBDBD] !rounded-lg"
+                  onClick={() => {
+                    void prevStep();
+                  }}
+                  disabled={isPreviousDisabled}
+                  className={getPreviousButtonClassName()}
                 >
-                  Previous
+                  {previousButtonLabel}
                 </Button>
                 <Button
                   type="button"
