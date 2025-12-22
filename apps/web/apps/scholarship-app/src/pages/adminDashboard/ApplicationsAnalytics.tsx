@@ -27,39 +27,34 @@ export const ApplicationsAnalytics: React.FC<ApplicationsAnalyticsProps> = ({
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          icon={
-            <div className="relative w-6 h-6">
-              <PeopleRegular className="w-6 h-6 absolute top-0 left-0" />
-              <PeopleRegular className="w-5 h-5 absolute bottom-0 right-0 text-blue-500" style={{ transform: 'translate(2px, 2px)' }} />
-            </div>
-          }
+          icon={"$"}
           value={totalApplications}
           label="Total Applications"
+          color="#EFF6FF"
         />
         <StatCard
-          icon={<DocumentRegular className="w-6 h-6" />}
+                    icon={"$"}
           value={submitted}
           label="Submitted"
+          color="#F0FDF4"
         />
         <StatCard
-          icon={
-            <div className="relative w-6 h-6">
-              <DocumentRegular className="w-6 h-6" />
-              <CheckmarkCircleRegular className="w-4 h-4 absolute -bottom-0.5 -right-0.5 text-green-600 bg-white rounded-full" style={{ transform: 'scale(0.8)' }} />
-            </div>
-          }
+          icon={"$"}
           value={approved}
           label="Approved"
+          color="#FAF5FF"
         />
         <StatCard
-          icon={
-            <div className="relative w-6 h-6">
-              <DocumentRegular className="w-6 h-6" />
-              <SearchRegular className="w-4 h-4 absolute -bottom-0.5 -right-0.5 text-blue-600 bg-white rounded-full" style={{ transform: 'scale(0.8)' }} />
-            </div>
-          }
+          icon={"$"}
           value={underReview}
           label="Under Review"
+          color="#FFFBEB"
+        />
+        <StatCard
+          icon={"$"}
+          value={underReview}
+          label="Under Review"
+          color="#FFEFEE"
         />
       </div>
     </div>

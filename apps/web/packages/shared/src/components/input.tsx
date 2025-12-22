@@ -53,8 +53,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ) : undefined;
 
     // Calculate padding - if no prefix/suffix, use 12px, otherwise use 32px for icon space
-    const paddingLeft = hasPrefix ? "32px" : "12px";
-    const paddingRight = hasSuffix ? "32px" : "12px";
+    const paddingLeft = hasPrefix ? "32px" : "0px";
+    const paddingRight = hasSuffix ? "32px" : "0px";
 
     return (
       <div className="relative w-full">

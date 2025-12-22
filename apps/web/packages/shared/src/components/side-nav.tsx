@@ -129,7 +129,7 @@ export const SideNav = React.forwardRef<HTMLDivElement, SideNavProps>(
             )}
           </div>
         )}
-        <nav className="flex-1 flex flex-col gap-1.5 w-full pt-4 pb-4 items-center">
+        <nav className="flex-1 flex flex-col gap-1.5 w-full pt-2 pb-4 items-center">
           {children}
         </nav>
         {footer && (

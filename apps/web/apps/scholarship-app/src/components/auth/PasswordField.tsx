@@ -11,9 +11,13 @@ interface PasswordFieldProps {
   showPassword: boolean;
   onTogglePassword: () => void;
   variant?: 'email' | 'password';
+  placeholder?: string;
+  hideprefixIcon?: boolean;
 }
 
-export const PasswordField = ({ control, name, showPassword, onTogglePassword, variant = 'password' }: PasswordFieldProps) => {
+export const PasswordField = ({ control, name, showPassword, onTogglePassword, variant = 'password', placeholder,
+  hideprefixIcon = false,
+ }: PasswordFieldProps) => {
   const isPasswordVariant = variant === 'password';
 
   return (
@@ -27,8 +31,8 @@ export const PasswordField = ({ control, name, showPassword, onTogglePassword, v
                   {...field}
                   value={field.value ?? ''}
                   type={showPassword ? 'text' : 'password'}
-                  placeholder=""
-              prefixIcon={<KeyIcon style={{ width: '16px', height: '16px', color: '#616161' }} />}
+                  placeholder={placeholder}
+              prefixIcon={!hideprefixIcon ? <KeyIcon style={{ width: '16px', height: '16px', color: '#616161' }} /> : undefined}
               suffixIcon={
                 <IconButton
                   onClick={onTogglePassword}

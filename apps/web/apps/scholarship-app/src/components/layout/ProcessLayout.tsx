@@ -1,23 +1,23 @@
 import {
-    AlertRegular,
-    DataBarVerticalRegular,
-    DocumentAddRegular,
-    HomeRegular,
-    PersonRegular,
-    QuestionCircleRegular,
-    SearchRegular,
-    SettingsRegular,
-    LockClosedRegular,
-    SignOutRegular,
-    DismissRegular,
-    WrenchScrewdriverRegular,
-    ClipboardTaskRegular,
+  AlertRegular,
+  ClipboardTaskRegular,
+  DataBarVerticalRegular,
+  DismissRegular,
+  DocumentAddRegular,
+  HomeRegular,
+  LockClosedRegular,
+  PersonRegular,
+  QuestionCircleRegular,
+  SearchRegular,
+  SettingsRegular,
+  SignOutRegular,
+  WrenchScrewdriverRegular,
 } from "@fluentui/react-icons";
-import { Button, TopNavProps, Popover, PopoverTrigger, PopoverContent, Modal } from "@shared/components";
+import { Button, Modal, Popover, PopoverContent, PopoverTrigger, TopNavProps } from "@shared/components";
 import * as React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { PageLayout, SideNavConfig } from "./PageLayout";
 import { NavbarLogo } from "../common";
+import { PageLayout, SideNavConfig } from "./PageLayout";
 
 interface ProcessLayoutProps {
   children: React.ReactNode;
@@ -89,24 +89,17 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
     left: <NavbarLogo />,
     right: (
       <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
+        <div
           onClick={() => console.log("Search clicked")}
           aria-label="Search"
-          className="w-9 h-9 rounded-md bg-white hover:bg-gray-50 p-0 flex items-center justify-center"
         >
           <SearchRegular className="w-5 h-5 text-gray-600" />
-        </Button>
-        <Button
-          variant="ghost"
+        </div>
+        <div
           onClick={() => console.log("Notifications clicked")}
-          aria-label="Notifications"
-          className="w-9 h-9 rounded-md bg-white hover:bg-gray-50 p-0 flex items-center justify-center relative"
         >
           <AlertRegular className="w-5 h-5 text-gray-600" />
-          {/* Notification badge dot */}
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-gray-900 rounded-full"></span>
-        </Button>
+        </div>
         {/* Vertical separator */}
         <div className="h-6 w-px bg-gray-300"></div>
         <Popover 
@@ -117,21 +110,12 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           }}
         >
           <PopoverTrigger disableButtonEnhancement>
-            <Button
-              variant="ghost"
-              className={`w-9 h-9 rounded-full p-0 transition-colors flex items-center justify-center ${
-                profilePopoverOpen 
-                  ? "bg-blue-100" 
-                  : "bg-blue-50 hover:bg-blue-100"
-              }`}
-              aria-label="User menu"
-            >
+            
               <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center">
                 <span className="text-white text-xs font-semibold">
                   {userName.charAt(0).toUpperCase()}
                 </span>
               </div>
-            </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[280px] p-0">
             {/* User Info Section - Light gray background */}

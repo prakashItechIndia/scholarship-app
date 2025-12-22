@@ -78,7 +78,7 @@ export default function MfaVerify() {
       if (!data.success || !data.accessToken || !data.user) {
         // Verification failed or incomplete response
         error('Verification Failed', 'Invalid verification code. Please try again.');
-        void navigate('/signin');
+        void navigate('/user-login');
         return;
       }
 
@@ -178,7 +178,7 @@ export default function MfaVerify() {
         <div className="text-center">
           <button
             onClick={() => {
-              void navigate('/signin');
+              void navigate('/user-login');
             }}
             className="text-[12px] font-medium text-[#0f6cbd] hover:text-[#0e5ca8] underline"
           >
@@ -277,7 +277,7 @@ export default function MfaVerify() {
               <span>Having trouble? </span>
               <button
                 onClick={() => {
-                  void navigate('/signin');
+                  void navigate('/user-login');
                 }}
                 className="text-[12px] font-medium text-Neutral-Foreground-2-Rest underline decoration-solid underline-offset-0 leading-[20px] hover:text-Neutral-Foreground-1-Rest"
               >
