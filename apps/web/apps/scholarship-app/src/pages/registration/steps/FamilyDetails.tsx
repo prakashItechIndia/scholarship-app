@@ -1,10 +1,8 @@
 import { z } from 'zod';
-import { Stack } from '@fluentui/react';
 import { useRegistrationForm } from '../hooks/useRegistrationForm';
 import { StepLayout } from '../components/StepLayout';
 import { getStringValue } from '../utils/registrationHelpers';
-import { STACK_TOKENS } from '../utils/registrationConstants';
-import { InputField, FormRowContainer, FormRow, FamilyMemberSection } from '../components';
+import { InputField, SelectField } from '../components';
 
 // --- Validation Schema ---
 const familySchema = z.object({
@@ -89,64 +87,196 @@ const FamilyDetails = () => {
             title="Family details"
             subtitle="Provide Information About Your Immediate Family Members"
         >
-            <form className="w-full h-full flex flex-col" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
-                <Stack tokens={STACK_TOKENS}>
+            <form className="w-full h-full flex flex-col -mt-4" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
+                <div className="grid grid-cols-2 gap-4">
 
-                    {/* Applicant & ID Row */}
-                    <FormRowContainer>
-                        <FormRow>
-                            <InputField
-                                name="fullName"
-                                control={control}
-                                errors={errors}
-                                label="Name of Applicant"
-                                required
-                                            placeholder="Enter the name"
-                                        />
-                        </FormRow>
-                        <FormRow>
-                            <InputField
-                                name="studentId"
-                                control={control}
-                                errors={errors}
-                                label="Student ID (if known)"
-                                            placeholder="Enter student ID"
-                            />
-                        </FormRow>
-                    </FormRowContainer>
+                    {/* Applicant Details */}
+                    <div className="col-span-2">
+                        <h3 className="text-[16px] font-semibold text-[#242424] mb-2">Applicant Details</h3>
+                    </div>
+                    <div className="col-span-1">
+                        <InputField
+                            name="fullName"
+                            control={control}
+                            errors={errors}
+                            label="Name of Applicant"
+                            required
+                            placeholder="Enter the name"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <InputField
+                            name="studentId"
+                            control={control}
+                            errors={errors}
+                            label="Student ID (if known)"
+                            placeholder="Enter student ID"
+                        />
+                    </div>
 
                     {/* Father Details */}
-                    <FamilyMemberSection
-                        title="Father Details"
-                        prefix="father"
-                                        control={control}
-                        errors={errors}
-                        occupationOptions={OCCUPATION_OPTIONS}
-                        incomeOptions={INCOME_OPTIONS}
-                    />
+                    <div className="col-span-2 mt-2">
+                        <h3 className="text-[16px] font-semibold text-[#242424] mb-2">Father Details</h3>
+                    </div>
+                    <div className="col-span-1">
+                        <InputField
+                            name="fatherName"
+                            control={control}
+                            errors={errors}
+                            label="Name"
+                            required
+                            placeholder="Enter father name"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <SelectField
+                            name="fatherOccupation"
+                            control={control}
+                            errors={errors}
+                            label="Occupation"
+                            required
+                            options={OCCUPATION_OPTIONS}
+                            placeholder="Select"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <InputField
+                            name="fatherDesignation"
+                            control={control}
+                            errors={errors}
+                            label="Designation"
+                            placeholder="Enter designation"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <InputField
+                            name="fatherOrganization"
+                            control={control}
+                            errors={errors}
+                            label="Organization Name"
+                            placeholder="Enter organization name"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <SelectField
+                            name="fatherIncome"
+                            control={control}
+                            errors={errors}
+                            label="Annual Income"
+                            required
+                            options={INCOME_OPTIONS}
+                            placeholder="Select"
+                        />
+                    </div>
 
                     {/* Mother Details */}
-                    <FamilyMemberSection
-                        title="Mother Details"
-                        prefix="mother"
-                                        control={control}
-                        errors={errors}
-                        occupationOptions={OCCUPATION_OPTIONS}
-                        incomeOptions={INCOME_OPTIONS}
-                    />
+                    <div className="col-span-2 mt-2">
+                        <h3 className="text-[16px] font-semibold text-[#242424] mb-2">Mother Details</h3>
+                    </div>
+                    <div className="col-span-1">
+                        <InputField
+                            name="motherName"
+                            control={control}
+                            errors={errors}
+                            label="Name"
+                            required
+                            placeholder="Enter mother name"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <SelectField
+                            name="motherOccupation"
+                            control={control}
+                            errors={errors}
+                            label="Occupation"
+                            required
+                            options={OCCUPATION_OPTIONS}
+                            placeholder="Select"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <InputField
+                            name="motherDesignation"
+                            control={control}
+                            errors={errors}
+                            label="Designation"
+                            placeholder="Enter designation"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <InputField
+                            name="motherOrganization"
+                            control={control}
+                            errors={errors}
+                            label="Organization Name"
+                            placeholder="Enter organization name"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <SelectField
+                            name="motherIncome"
+                            control={control}
+                            errors={errors}
+                            label="Annual Income"
+                            required
+                            options={INCOME_OPTIONS}
+                            placeholder="Select"
+                        />
+                    </div>
 
                     {/* Guardian Details */}
-                    <FamilyMemberSection
-                        title="Guardian Details"
-                        prefix="guardian"
-                                        control={control}
-                        errors={errors}
-                        occupationOptions={OCCUPATION_OPTIONS}
-                        incomeOptions={INCOME_OPTIONS}
-                        isOptional
-                                                />
+                    <div className="col-span-2 mt-2">
+                        <h3 className="text-[16px] font-semibold text-[#242424] mb-2">Guardian Details</h3>
+                    </div>
+                    <div className="col-span-1">
+                        <InputField
+                            name="guardianName"
+                            control={control}
+                            errors={errors}
+                            label="Name"
+                            placeholder="Enter guardian name"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <SelectField
+                            name="guardianOccupation"
+                            control={control}
+                            errors={errors}
+                            label="Occupation"
+                            options={OCCUPATION_OPTIONS}
+                            placeholder="Select"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <InputField
+                            name="guardianDesignation"
+                            control={control}
+                            errors={errors}
+                            label="Designation"
+                            placeholder="Enter designation"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <InputField
+                            name="guardianOrganization"
+                            control={control}
+                            errors={errors}
+                            label="Organization Name"
+                            placeholder="Enter organization name"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <SelectField
+                            name="guardianIncome"
+                            control={control}
+                            errors={errors}
+                            label="Annual Income"
+                            options={INCOME_OPTIONS}
+                            placeholder="Select"
+                        />
+                    </div>
 
-                </Stack>
+                </div>
             </form>
         </StepLayout>
     );

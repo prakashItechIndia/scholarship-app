@@ -4,7 +4,7 @@ import { useRegistrationForm } from '../hooks/useRegistrationForm';
 import { StepLayout } from '../components/StepLayout';
 import { getStringValue } from '../utils/registrationHelpers';
 import { STACK_TOKENS } from '../utils/registrationConstants';
-import { DropdownField, TextInputField, FormRowContainer, FormRow } from '../components';
+import { DropdownField, TextInputField, FormRowContainer, FormRow, InputField } from '../components';
 
 // --- Validation Schema ---
 const identitySchema = z
@@ -73,7 +73,7 @@ const IdentityDetails = () => {
                         {/* IDs Row (Side by Side) */}
                     <FormRowContainer>
                         <FormRow>
-                            <TextInputField
+                            <InputField
                                     name="aadhaarId"
                                     control={control}
                                 errors={errors}
@@ -83,7 +83,7 @@ const IdentityDetails = () => {
                                             />
                         </FormRow>
                         <FormRow>
-                            <TextInputField
+                            <InputField
                                     name="panId"
                                     control={control}
                                 errors={errors}
