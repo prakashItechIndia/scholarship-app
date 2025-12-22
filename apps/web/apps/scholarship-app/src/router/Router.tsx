@@ -1,8 +1,9 @@
+import AdminSignInPage from '@/pages/auth/adminLogin.tsx';
 import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { LoadingScreen } from '../components/layout/LoadingScreen';
 import { AuthenticatedRedirect } from '../components/auth/AuthenticatedRedirect';
 import { ErrorBoundary } from '../components/common/ErrorBoundary';
+import { LoadingScreen } from '../components/layout/LoadingScreen';
 import { ProcessLayout } from '../components/layout/ProcessLayout';
 
 // Lazy load pages with code splitting
@@ -26,11 +27,31 @@ export const Router = () => {
       <Routes>
         {/* Public auth routes */}
         <Route
-          path="/signin"
+          path="/user-login"
           element={
             <Suspense fallback={<LoadingScreen message="Loading..." />}>
               <ErrorBoundary>
                 <SignInPage />
+              </ErrorBoundary>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/admin-login"
+          element={
+            <Suspense fallback={<LoadingScreen message="Loading..." />}>
+              <ErrorBoundary>
+                <AdminSignInPage />
+              </ErrorBoundary>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/landing"
+          element={
+            <Suspense fallback={<LoadingScreen message="Loading..." />}>
+              <ErrorBoundary>
+                <LandingPage />
               </ErrorBoundary>
             </Suspense>
           }

@@ -144,7 +144,7 @@ const CreatePasswordPage = () => {
           </p>
           <button
             onClick={() => {
-              const signInUrl = preserveQueryParams('/signin', [
+              const signInUrl = preserveQueryParams('/user-login', [
                 'returnUrl',
                 'product',
                 'state',

@@ -15,6 +15,8 @@ export const TermsOfServiceText = ({
 
   const linkClasses = variant === 'small'
     ? 'text-[#2453C3] text-[10px] font-medium font-sans underline leading-4'
+    : variant === 'link'
+    ? 'text-[#2453C3] font-medium font-sans underline cursor-pointer hover:text-[#1e42a0]'
     : 'text-black no-underline ';
 
   return (

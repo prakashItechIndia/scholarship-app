@@ -148,7 +148,7 @@ const RegistrationContent = () => {
     : true;
 
   const handleCancel = () => {
-    window.location.href = '/signin';
+    window.location.href = '/user-login';
   };
 
   const renderStepObject = () => {
