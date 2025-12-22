@@ -3,8 +3,7 @@ import { IDropdownOption } from '@fluentui/react';
 import { useRegistrationForm } from '../hooks/useRegistrationForm';
 import { StepLayout } from '../components/StepLayout';
 import { getStringValue } from '../utils/registrationHelpers';
-import { STACK_TOKENS } from '../utils/registrationConstants';
-import { TextInputField, DropdownField, FormRowContainer, FormRow, IfscCodeField } from '../components';
+import { InputField, DropdownField, IfscCodeField } from '../components';
 
 // --- Validation Schema ---
 const bankSchema = z.object({
@@ -16,8 +15,6 @@ const bankSchema = z.object({
     bankScholarshipSeekingFor: z.string().min(1, 'This field is required'),
     bankIfscCode: z.string().min(1, 'IFSC Code is required'),
 });
-
-type BankFormData = z.infer<typeof bankSchema>;
 
 // --- Constants ---
 const BANK_OPTIONS: IDropdownOption[] = [
@@ -57,97 +54,89 @@ const BankDetails = () => {
             title="Bank details of Applicant (Student)"
             subtitle="Provide accurate bank information for scholarship disbursement."
         >
-            <form className="w-full h-full flex flex-col" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
-                <Stack tokens={STACK_TOKENS}>
-                        {/* Row 1: Name and Account Number */}
-                    <FormRowContainer>
-                        <FormRow>
-                            <TextInputField
-                                    name="bankAccountName"
-                                    control={control}
-                                errors={errors}
-                                label="Name (As per passbook)"
-                                required
-                                                placeholder="Enter name"
-                                            />
-                        </FormRow>
-                        <FormRow>
-                            <TextInputField
-                                    name="bankAccountNumber"
-                                    control={control}
-                                errors={errors}
-                                label="Account Number"
-                                required
-                                                placeholder="Enter account number"
-                                            />
-                        </FormRow>
-                    </FormRowContainer>
+            <form className="w-full h-full flex flex-col -mt-4" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
+                <div className="grid grid-cols-2 gap-4">
+                    {/* Row 1: Name and Account Number */}
+                    <div className="col-span-1">
+                        <InputField
+                            name="bankAccountName"
+                            control={control}
+                            errors={errors}
+                            label="Name (As per passbook)"
+                            required
+                            placeholder="Enter name"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <InputField
+                            name="bankAccountNumber"
+                            control={control}
+                            errors={errors}
+                            label="Account Number"
+                            required
+                            placeholder="Enter account number"
+                        />
+                    </div>
 
-                        {/* Row 2: Bank and Branch */}
-                    <FormRowContainer>
-                        <FormRow>
-                            <DropdownField
-                                    name="bankName"
-                                    control={control}
-                                errors={errors}
-                                label="Bank Name"
-                                required
-                                options={BANK_OPTIONS}
-                                                placeholder="Select"
-                            />
-                        </FormRow>
-                        <FormRow>
-                            <DropdownField
-                                    name="bankBranch"
-                                    control={control}
-                                errors={errors}
-                                label="Branch"
-                                required
-                                options={BRANCH_OPTIONS}
-                                                placeholder="Select"
-                                            />
-                        </FormRow>
-                    </FormRowContainer>
+                    {/* Row 2: Bank and Branch */}
+                    <div className="col-span-1">
+                        <DropdownField
+                            name="bankName"
+                            control={control}
+                            errors={errors}
+                            label="Bank Name"
+                            required
+                            options={BANK_OPTIONS}
+                            placeholder="Select"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <DropdownField
+                            name="bankBranch"
+                            control={control}
+                            errors={errors}
+                            label="Branch"
+                            required
+                            options={BRANCH_OPTIONS}
+                            placeholder="Select"
+                        />
+                    </div>
 
-                        {/* Row 3: Request Amount & Scholarship Seeking For */}
-                    <FormRowContainer>
-                        <FormRow>
-                            <TextInputField
-                                    name="bankRequestAmount"
-                                    control={control}
-                                errors={errors}
-                                label="Request Amount"
-                                required
-                                                placeholder="Enter Request amount"
-                                            />
-                        </FormRow>
-                        <FormRow>
-                            <TextInputField
-                                    name="bankScholarshipSeekingFor"
-                                    control={control}
-                                errors={errors}
-                                label="Scholarship Seeking For"
-                                required
-                                                placeholder="Enter Scholarship Seeking For"
-                                            />
-                        </FormRow>
-                    </FormRowContainer>
+                    {/* Row 3: Request Amount & Scholarship Seeking For */}
+                    <div className="col-span-1">
+                        <InputField
+                            name="bankRequestAmount"
+                            control={control}
+                            errors={errors}
+                            label="Request Amount"
+                            required
+                            placeholder="Enter Request amount"
+                        />
+                    </div>
+                    <div className="col-span-1">
+                        <InputField
+                            name="bankScholarshipSeekingFor"
+                            control={control}
+                            errors={errors}
+                            label="Scholarship Seeking For"
+                            required
+                            placeholder="Enter Scholarship Seeking For"
+                        />
+                    </div>
 
-                        {/* Row 4: IFSC Code (Half width) */}
-                    <FormRowContainer>
-                        <FormRow className="w-1/2 min-w-[250px]">
-                            <IfscCodeField
-                                    name="bankIfscCode"
-                                    control={control}
-                                errors={errors}
-                                label="IFSC Code"
-                                required
-                                                placeholder="Enter IFSC code"
-                                            />
-                        </FormRow>
-                    </FormRowContainer>
-                    </Stack>
-                </form>
+                    {/* Row 4: IFSC Code */}
+                    <div className="col-span-1 w-full">
+                        <IfscCodeField
+                            name="bankIfscCode"
+                            control={control}
+                            errors={errors}
+                            label="IFSC Code"
+                            required
+                            placeholder="Enter IFSC code"
+                        />
+                    </div>
+                </div>
+            </form>
         </StepLayout>
     );
 };
