@@ -2,44 +2,225 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== INTER FONT FAMILY ===== */
+/* All weights and styles included for use in iCaptur and other applications */
+/* Note: Font files should be placed in public/fonts/ or referenced from itech-fluentui package */
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-ThinItalic.ttf') format('truetype');
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-ExtraLightItalic.ttf') format('truetype');
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-SemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-ExtraBoldItalic.ttf') format('truetype');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-BlackItalic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ===== INTER FONT UTILITY CLASSES ===== */
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Base Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-  font-family:
-    'Inter',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    'Roboto',
-    'Oxygen',
-    'Ubuntu',
-    'Cantarell',
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Apply Inter font globally */
+/* Apply Inter font globally to all elements */
 html,
 body,
-#root {
-  font-family:
-    'Inter',
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
+#root,
+input,
+textarea,
+select,
+button {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
   width: 100%;
   min-height: 100vh;
 }
+/* Make required indicator (asterisk) red for all Label components - Only target the asterisk, not the label text */
+label[required]::after,
+[class*="fui-Label"]::after,
+[class*="fui-Label"][required]::after,
+[data-required="true"]::after,
+.required-label-wrapper label[required]::after,
+.required-label-wrapper [data-required="true"]::after,
+.label-required-red::after,
+[class*="fui-Label"].label-required-red::after,
+label.label-required-red::after,
+.label-required-red[class*="fui-Label"]::after {
+  color: #dc2626 !important;
+}
+
+/* Target only the required indicator span, not all spans */
+[class*="fui-Label"] [class*="required"]:not([class*="fui-Label"]),
+[class*="fui-Label"] span[aria-label*="Required"],
+span[aria-label*="Required"],
+.required-label-wrapper [class*="required"]:not(label),
+.required-label-wrapper span[aria-label*="Required"],
+.label-required-red span[aria-label*="Required"],
+[class*="fui-Label"].label-required-red span[aria-label*="Required"],
+label.label-required-red span[aria-label*="Required"],
+.label-required-red[class*="fui-Label"] span[aria-label*="Required"],
+.label-required-red [class*="required-indicator"],
+[class*="fui-Label"].label-required-red [class*="required-indicator"] {
+  color: #dc2626 !important;
+}
+
+/* Ensure label text itself is not red - override any red color on the label element */
+label[required],
+label[required] > *:first-child:not([aria-label*="Required"]),
+label[required] > *:not([aria-label*="Required"]):not(::after) {
+  color: inherit !important;
+}
+
+/* More specific: ensure text content is not red */
+label[required] {
+  color: #242424 !important;
+}
+
+label[required] > *:not([aria-label*="Required"]):not(::after) {
+  color: #242424 !important;
+}
+
