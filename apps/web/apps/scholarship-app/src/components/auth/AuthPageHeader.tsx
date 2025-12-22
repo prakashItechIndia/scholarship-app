@@ -16,18 +16,14 @@ export const AuthPageHeader = ({
   subtitleSize = 'medium',
   className = '',
 }: AuthPageHeaderProps) => {
-  const titleClasses = titleSize === 'xxLarge'
-    ? 'font-bold text-[#111827] leading-[1.25] text-xl'
-    : titleSize === 'xLarge'
-    ? 'font-bold text-[#111827] leading-[1.25] text-2xl'
-    : 'font-bold text-[#111827] leading-[1.25]';
+  const titleClasses = 'font-bold text-[#242424] leading-[1.25] text-xl font-inter';
 
   const subtitleClasses = subtitleSize === 'medium'
-    ? 'text-[#707070] leading-[1.5] text-base'
-    : 'text-[#707070] leading-[1.5] text-sm';
+    ? 'text-[#707070] leading-[1.5] text-[12px]'
+    : 'text-[#707070] leading-[1.5] text-[12px]';
 
   return (
-    <Stack tokens={{ childrenGap: 24 }} className={className}>
+    <Stack tokens={{ childrenGap: 8 }} className={className}>
       <Text variant={titleSize} className={titleClasses}>
         {title}
       </Text>

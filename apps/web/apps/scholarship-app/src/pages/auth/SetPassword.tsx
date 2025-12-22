@@ -104,9 +104,14 @@ const SetPasswordPage = () => {
                   render={({ field }: { field: any }) => (
                     <FormItem>
                       <div className="flex flex-col gap-[4px]">
-                        <Label required className="text-[12px] font-normal text-Neutral-Foreground-1-Rest leading-[16px]">
-                          New Password
-                        </Label>
+                        <div className="required-label-wrapper">
+                          <Label 
+                            required 
+                            // className="text-[12px] text-[#242424] leading-[16px] font-inter [&>*:not([aria-label*='Required'])]:text-[#242424]"
+                          >
+                            New Password
+                          </Label>
+                        </div>
                         <FormControl>
                           <Input
                             {...field}
@@ -117,9 +122,9 @@ const SetPasswordPage = () => {
                                 ariaLabel={showPassword ? 'Hide password' : 'Show password'}
                                 onRenderIcon={() => 
                                   showPassword ? (
-                                    <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                                    <EyeIcon className="w-4 h-8 !text-[#272727]" />
                                   ) : (
-                                    <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                                    <EyeOffIcon className="w-4 h-4 !text-[#272727]" />
                                   )
                                 }
                                 className="w-auto h-auto min-w-0 p-1 bg-transparent border-none hover:bg-transparent active:bg-transparent"
@@ -145,9 +150,14 @@ const SetPasswordPage = () => {
                   render={({ field }: { field: any }) => (
                     <FormItem>
                       <div className="flex flex-col gap-[4px]">
-                        <Label required className="text-[12px] font-normal text-Neutral-Foreground-1-Rest leading-[16px]">
-                          Confirm Password
-                        </Label>
+                        <div className="required-label-wrapper">
+                          <Label 
+                            required 
+                            className="text-[12px] text-[#242424] leading-[16px] [&>*:not([aria-label*='Required'])]:text-[#242424]"
+                          >
+                            Confirm Password
+                          </Label>
+                        </div>
                         <FormControl>
                           <Input
                             {...field}
@@ -158,9 +168,9 @@ const SetPasswordPage = () => {
                                 ariaLabel={showConfirmPassword ? 'Hide password' : 'Show password'}
                                 onRenderIcon={() => 
                                   showConfirmPassword ? (
-                                    <EyeIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                                    <EyeIcon className="w-4 h-4 !text-[#272727]" />
                                   ) : (
-                                    <EyeOffIcon className="w-4 h-4 text-Neutral-Foreground-2-Rest hover:text-Neutral-Foreground-1-Rest" />
+                                    <EyeOffIcon className="w-4 h-4 !text-[#272727]" />
                                   )
                                 }
                                 className="w-auto h-auto min-w-0 p-1 bg-transparent border-none hover:bg-transparent active:bg-transparent"
@@ -178,7 +188,7 @@ const SetPasswordPage = () => {
                     </FormItem>
                   )}
                 />
-
+                <Stack tokens={{ childrenGap: 8 }}>
                 <SubmitButton
                   type="submit"
                   disabled={form.formState.isSubmitting}
@@ -189,6 +199,7 @@ const SetPasswordPage = () => {
                 </SubmitButton>
 
                 <TermsOfServiceText />
+                </Stack>
               </Stack>
             </form>
           </Form>

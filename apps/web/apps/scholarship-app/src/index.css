@@ -179,3 +179,59 @@ button {
   width: 100%;
   min-height: 100vh;
 }
+
+/* Make required indicator (asterisk) red for all Label components - Only target the asterisk, not the label text */
+label[required]::after,
+[class*="fui-Label"]::after,
+[class*="fui-Label"][required]::after,
+[data-required="true"]::after,
+.required-label-wrapper label[required]::after,
+.required-label-wrapper [data-required="true"]::after,
+.label-required-red::after,
+[class*="fui-Label"].label-required-red::after,
+label.label-required-red::after,
+.label-required-red[class*="fui-Label"]::after,
+label[class*="fui-Label"].label-required-red::after {
+  color: #dc2626 !important;
+}
+
+/* Target only the required indicator span, not all spans */
+[class*="fui-Label"] [class*="required"]:not([class*="fui-Label"]),
+[class*="fui-Label"] span[aria-label*="Required"],
+span[aria-label*="Required"],
+.required-label-wrapper [class*="required"]:not(label),
+.required-label-wrapper span[aria-label*="Required"],
+.label-required-red span[aria-label*="Required"],
+[class*="fui-Label"].label-required-red span[aria-label*="Required"],
+label.label-required-red span[aria-label*="Required"],
+.label-required-red[class*="fui-Label"] span[aria-label*="Required"],
+label[class*="fui-Label"].label-required-red span[aria-label*="Required"],
+.label-required-red [class*="required-indicator"],
+[class*="fui-Label"].label-required-red [class*="required-indicator"],
+label[class*="fui-Label"].label-required-red [class*="required-indicator"],
+/* Target any element that contains the required indicator within label-required-red */
+.label-required-red *[aria-label*="Required"],
+/* Catch-all for FluentUI Label required indicator - target any child that follows the label text */
+[class*="fui-Label"].label-required-red > *:not(:first-child),
+label.label-required-red > *:not(:first-child),
+/* Target the required indicator using attribute selectors */
+[class*="fui-Label"][required] > *:last-child,
+.label-required-red[required] > *:last-child {
+  color: #dc2626 !important;
+}
+
+/* Ensure label text itself is not red - override any red color on the label element */
+label[required],
+label[required] > *:first-child:not([aria-label*="Required"]),
+label[required] > *:not([aria-label*="Required"]):not(::after) {
+  color: inherit !important;
+}
+
+/* More specific: ensure text content is not red */
+label[required] {
+  color: #242424 !important;
+}
+
+label[required] > *:not([aria-label*="Required"]):not(::after) {
+  color: #242424 !important;
+}

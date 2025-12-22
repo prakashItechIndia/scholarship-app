@@ -1,9 +1,20 @@
 import { Stack, Text, mergeStyles } from '@fluentui/react';
-import logo from '@shared/assets/icons/Logo.png';
+import logoImage from '@shared/assets/icons/Logo.svg';
 
 interface LogoHeaderProps {
   variant?: 'email' | 'password';
 }
+
+// Simple JS function to return SVG logo
+const LogoSVG = ({ width = '56', height = '56' }: { width?: string; height?: string }) => {
+  return (
+    <img 
+      src={logoImage} 
+      alt="Leo Muthu Scholarship Logo" 
+      style={{ width, height, display: 'block' }} 
+    />
+  );
+};
 
 export const LogoHeader = ({ variant = 'email' }: LogoHeaderProps) => {
   const isPasswordVariant = variant === 'password';
@@ -25,7 +36,7 @@ export const LogoHeader = ({ variant = 'email' }: LogoHeaderProps) => {
             })}
           />
           <Stack className={mergeStyles({ border: '2px solid red' })}>
-            <Text variant="medium" styles={{ root: { color: '#242424', fontWeight: 600, fontFamily: 'Inter, sans-serif', lineHeight: '22px' } }}>
+            <Text variant="medium" styles={{ root: { color: '#242424', fontWeight: 600, fontFamily: 'Inter, sans-serif', lineHeight: '22px', } }}>
               Shri. Leo Muthu Scholarship (LMS)
             </Text>
             <Text variant="small" styles={{ root: { color: '#707070', fontFamily: 'Inter, sans-serif', lineHeight: '16px' } }}>
@@ -44,19 +55,19 @@ export const LogoHeader = ({ variant = 'email' }: LogoHeaderProps) => {
           horizontalAlign="center"
           verticalAlign="center"
           className={mergeStyles({
-            width: '56px',
-            height: '56px',
+            width: '45px',
+            height: '45px',
             borderRadius: '50%',
             flexShrink: 0,
           })}
         >
-          <img src={logo} alt="Leo Muthu Scholarship" style={{ width: '56px', height: '56px', display: 'block' }} />
+          <LogoSVG width="45px" height="45px" />
         </Stack>
         <Stack>
-          <Text variant="large" styles={{ root: { fontWeight: 'semibold',  color: '#1f2937', lineHeight: '1.25' } }}>
+          <Text variant="large" styles={{ root: { fontWeight: '600',  color: '#242424', lineHeight: '1.25',fontFamily: 'Inter, sans-serif',fontSize: '16px' } }}>
             Shri. Leo Muthu Scholarship (LMS)
           </Text>
-          <Text variant="small" styles={{ root: { color: '#4b5563', marginTop: '2px' } }}>
+          <Text variant="small" styles={{ root: { color: '#707070', marginTop: '2px',fontFamily: 'Inter, sans-serif',fontSize: '12px' } }}>
             An Initiative of ARAM Foundation
           </Text>
         </Stack>

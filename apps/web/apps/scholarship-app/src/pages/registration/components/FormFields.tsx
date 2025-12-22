@@ -84,7 +84,7 @@ export const DropdownField = ({ name, control, errors, label, required, options,
                         placeholder={placeholder}
                         options={options}
                         errorMessage={errors[name]?.message as string}
-                        className="w-full"
+                        className="w-full !text-[#242424] !text-[13px]"
                         styles={fieldStyles}
                     />
                 </FormField>

@@ -22,7 +22,7 @@ export const TenantsTable = () => {
         Unable to load tenant list.{' '}
         <Button
           type="button"
-          variant="link"
+          appearance="transparent"
           onClick={handleRetry}
           className="font-medium underline underline-offset-4 p-0 h-auto min-w-0 text-red-700"
         >
