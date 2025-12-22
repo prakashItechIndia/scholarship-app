@@ -1,11 +1,26 @@
 import { useState } from 'react';
 import { z } from 'zod';
-import { Stack, IChoiceGroupOption, Text, Image, ImageFit } from '@fluentui/react';
+import { Stack, IChoiceGroupOption, Text } from '@fluentui/react';
 import { useRegistrationForm } from '../hooks/useRegistrationForm';
 import { StepLayout } from '../components/StepLayout';
 import { getStringValue, getDateValue } from '../utils/registrationHelpers';
 import { STACK_TOKENS, SECTION_HEADER_CLASS } from '../utils/registrationConstants';
 import { InputField, SelectField, DatePickerField, ChoiceGroupField, FormRowContainer, FormRow } from '../components';
+// ProfileAvatar component - SVG as React component
+export const ProfileAvatar = ({ width = 80, height = 80, className = '' }: { width?: number; height?: number; className?: string }) => {
+  return (
+    <svg 
+      width={width} 
+      height={height} 
+      viewBox="0 0 50 50" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path d="M17.1875 25C12.8728 25 9.375 21.5022 9.375 17.1875C9.375 12.8728 12.8728 9.375 17.1875 9.375C21.5022 9.375 25 12.8728 25 17.1875C25 21.5022 21.5022 25 17.1875 25ZM18.2292 12.2396C18.2292 11.8081 17.8794 11.4583 17.4479 11.4583C17.0164 11.4583 16.6667 11.8081 16.6667 12.2396V16.1458H12.7604C12.3289 16.1458 11.9792 16.4956 11.9792 16.9271C11.9792 17.3586 12.3289 17.7083 12.7604 17.7083H16.6667V21.6146C16.6667 22.0461 17.0164 22.3958 17.4479 22.3958C17.8794 22.3958 18.2292 22.0461 18.2292 21.6146V17.7083H22.1354C22.5669 17.7083 22.9167 17.3586 22.9167 16.9271C22.9167 16.4956 22.5669 16.1458 22.1354 16.1458H18.2292V12.2396ZM12.5 25.3083C12.8347 25.5019 13.1825 25.6754 13.5417 25.8272V34.8958C13.5417 35.5113 13.6942 36.0912 13.9635 36.5997L24.1923 26.282C25.2111 25.2543 26.8723 25.2543 27.891 26.282L38.1199 36.5997C38.3892 36.0912 38.5417 35.5113 38.5417 34.8958V17.1875C38.5417 15.174 36.9094 13.5417 34.8958 13.5417H25.8272C25.6754 13.1825 25.5019 12.8347 25.3083 12.5H34.8958C37.4847 12.5 39.5833 14.5987 39.5833 17.1875V34.8958C39.5833 37.4847 37.4847 39.5833 34.8958 39.5833H17.1875C14.5987 39.5833 12.5 37.4847 12.5 34.8958V25.3083ZM17.1875 38.5417H34.8958C35.9143 38.5417 36.8352 38.1241 37.4967 37.4507L27.1513 27.0153C26.54 26.3987 25.5433 26.3987 24.932 27.0153L14.5866 37.4507C15.2481 38.1241 16.169 38.5417 17.1875 38.5417ZM35.4167 20.8333C35.4167 22.8469 33.7844 24.4792 31.7708 24.4792C29.7573 24.4792 28.125 22.8469 28.125 20.8333C28.125 18.8198 29.7573 17.1875 31.7708 17.1875C33.7844 17.1875 35.4167 18.8198 35.4167 20.8333ZM34.375 20.8333C34.375 19.3951 33.2091 18.2292 31.7708 18.2292C30.3326 18.2292 29.1667 19.3951 29.1667 20.8333C29.1667 22.2716 30.3326 23.4375 31.7708 23.4375C33.2091 23.4375 34.375 22.2716 34.375 20.8333Z" fill="white"/>
+    </svg>
+  );
+};
 
 // --- Validation Schema ---
 const personalSchema = z.object({
@@ -114,21 +129,22 @@ const PersonalDetails = () => {
                             <div
                                 onMouseEnter={() => setIsHovered(true)}
                                 onMouseLeave={() => setIsHovered(false)}
-                                className={`w-20 h-20 rounded-full cursor-pointer overflow-hidden relative transition-all duration-300 ease-in-out ${isHovered ? 'scale-105' : 'scale-100'}`}
+                                className="w-20 h-20 rounded-full cursor-pointer overflow-hidden relative bg-[#242424] opacity-50 flex items-center justify-center"
                             >
-                                <Image
-                                    // src={isHovered ? Avatar : ProfileImage}
-                                    // src={Avatar}
-                                    alt="Profile Photo"
-                                    width={80}
-                                    height={80}
-                                    imageFit={ImageFit.cover}
-                                    styles={{
-                                        image: {
-                                            transition: 'opacity 0.3s ease-in-out',
-                                        }
-                                    }}
-                                />
+                                {!isHovered && (
+                                    <ProfileAvatar 
+                                        width={80} 
+                                        height={80} 
+                                        className="w-full h-full"
+                                    />
+                                )}
+                                {isHovered && (
+                                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full transition-opacity duration-300">
+                                        <Text variant="small" className="text-white font-semibold text-center px-2" style={{ fontSize: '10px', lineHeight: '12px' }}>
+                                            Click to Add Photo
+                                        </Text>
+                                    </div>
+                                )}
                             </div>
                             <Stack>
                                 <Text variant="medium" className="font-semibold text-gray-700 dark:text-gray-300">Profile Photo</Text>
@@ -173,7 +189,7 @@ const PersonalDetails = () => {
 
                         {/* Row 2: Caste & DOB */}
                         <FormRowContainer>
-                            <FormRow>
+                            <FormRow className="!flex-[0_0_auto] !w-[calc(50%-12px)]">
                                 <SelectField
                                     name="caste"
                                     control={control}
@@ -197,7 +213,7 @@ const PersonalDetails = () => {
 
                         {/* Row 3: Email & Mobile */}
                         <FormRowContainer>
-                            <FormRow>
+                            <FormRow className="!flex-[0_0_auto] !w-[calc(50%-12px)]">
                                 <InputField
                                     name="email"
                                     control={control}
@@ -222,8 +238,8 @@ const PersonalDetails = () => {
                         <div className={SECTION_HEADER_CLASS}>Address Details</div>
 
                         {/* Row 4: Address Lines */}
-                        <FormRowContainer>
-                            <FormRow>
+                        <FormRowContainer >
+                            <FormRow className="!flex-[0_0_auto] !w-[calc(50%-12px)]">
                                 <InputField
                                     name="addressLine1"
                                     control={control}
@@ -246,7 +262,7 @@ const PersonalDetails = () => {
 
                         {/* Row 5: City & District */}
                         <FormRowContainer>
-                            <FormRow>
+                            <FormRow className="!flex-[0_0_auto] !w-[calc(50%-12px)]">
                                 <InputField
                                     name="city"
                                     control={control}
@@ -272,7 +288,7 @@ const PersonalDetails = () => {
 
                         {/* Row 6: State & Pincode */}
                         <FormRowContainer>
-                            <FormRow>
+                            <FormRow className="!flex-[0_0_auto] !w-[calc(50%-12px)]">
                                 <SelectField
                                     name="state"
                                     control={control}
@@ -296,7 +312,7 @@ const PersonalDetails = () => {
                         </FormRowContainer>
 
                         {/* Country */}
-                        <div className="max-w-[50%]">
+                        <div className="!flex-[0_0_auto] !w-[calc(50%-12px)]">
                             <SelectField
                                 name="country"
                                 control={control}

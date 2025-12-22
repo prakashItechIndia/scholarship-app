@@ -4,8 +4,8 @@ import { getThemeTokens, type ThemeTokens } from '@shared/config/theme';
 /**
  * Common stack tokens used across registration steps
  */
-export const STACK_TOKENS: IStackTokens = { childrenGap: 24 };
-export const ROW_TOKENS: IStackTokens = { childrenGap: 24 };
+export const STACK_TOKENS: IStackTokens = { childrenGap: 20 };
+export const ROW_TOKENS: IStackTokens = { childrenGap: 20 };
 
 /**
  * Common container class for step components
@@ -52,5 +52,5 @@ export const FORM_FIELD_WRAPPER_CLASS = "min-w-[250px] ";
 /**
  * Section header styles
  */
-export const SECTION_HEADER_CLASS = "text-base font-semibold text-gray-900 mt-2 mb-4";
+export const SECTION_HEADER_CLASS = "text-[16px] font-semibold text-[#242424] mt-2 -mb-2";
 

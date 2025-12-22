@@ -35,18 +35,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
     }, [tokens, errorMessage]);
 
     return (
-      <div className="relative w-full">
-        {errorMessage && (
-          <div 
-            className="text-xs mb-1" 
-            style={{ 
-              fontSize: tokens.fontSizeBase200, 
-              color: (tokens as any).colorStatusDangerForeground3 || "#d13438" 
-            }}
-          >
-            {errorMessage}
-          </div>
-        )}
+      <div className="relative w-full" style={{ marginTop: 0, paddingTop: 0 }}>
         <div
           style={{
             position: "relative",
@@ -82,6 +71,17 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
             ))}
           </Dropdown>
         </div>
+        {errorMessage && (
+          <div 
+            className="text-xs mt-1" 
+            style={{ 
+              fontSize: tokens.fontSizeBase200, 
+              color: (tokens as any).colorStatusDangerForeground3 || "#d13438" 
+            }}
+          >
+            {errorMessage}
+          </div>
+        )}
       </div>
     );
   }

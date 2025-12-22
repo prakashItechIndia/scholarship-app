@@ -1,7 +1,7 @@
-import { Control, FieldErrors, Controller, ControllerRenderProps } from 'react-hook-form';
+import { Control, FieldErrors, Controller } from 'react-hook-form';
 import { Stack, TextField, Dropdown, IDropdownOption, ChoiceGroup, IChoiceGroupOption } from '@fluentui/react';
 import { Input, Select, DatePicker } from '@shared/components';
-import { FormField, FormRow } from './FormField';
+import { FormField } from './FormField';
 import { getFieldStyles, ROW_TOKENS } from '../utils/registrationConstants';
 import { useThemeTokens } from '@/hooks/useThemeTokens';
 
@@ -131,7 +131,7 @@ export const DatePickerField = ({ name, control, errors, label, required }: Base
             render={({ field }) => (
                 <FormField label={label} required={required} error={errors[name]?.message as string}>
                     <DatePicker
-                        selectedDate={field.value}
+                        value={field.value}
                         onSelectDate={(date) => field.onChange(date)}
                         errorMessage={errors[name]?.message as string}
                     />
@@ -149,7 +149,7 @@ interface ChoiceGroupFieldProps extends BaseFormFieldProps {
     className?: string;
 }
 
-export const ChoiceGroupField = ({ name, control, errors, label, required, options, className }: ChoiceGroupFieldProps) => {
+export const ChoiceGroupField = ({ name, control, errors, label, required, options }: ChoiceGroupFieldProps) => {
     const errorMessage = errors[name]?.message as string;
     return (
         <FormField label={label} required={required} error={errorMessage}>
@@ -157,21 +157,18 @@ export const ChoiceGroupField = ({ name, control, errors, label, required, optio
                 name={name}
                 control={control}
                 render={({ field }) => (
-                    <>
-                        <ChoiceGroup
-                            selectedKey={field.value}
-                            options={options}
-                            onChange={(_, option) => field.onChange(option?.key)}
-                            styles={{
-                                flexContainer: {
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    gap: '24px',
-                                },
-                            }}
-                        />
-                        {errorMessage && <p className="text-red-600 dark:text-red-400 text-xs mt-1">{errorMessage}</p>}
-                    </>
+                    <ChoiceGroup
+                        selectedKey={field.value}
+                        options={options}
+                        onChange={(_, option) => field.onChange(option?.key)}
+                        styles={{
+                            flexContainer: {
+                                display: 'flex',
+                                flexDirection: 'row',
+                                gap: '24px',
+                            },
+                        }}
+                    />
                 )}
             />
         </FormField>
@@ -188,7 +185,7 @@ interface FormRowContainerProps {
 
 export const FormRowContainer = ({ children, wrap = true }: FormRowContainerProps) => {
     return (
-        <Stack horizontal tokens={ROW_TOKENS} wrap={wrap}>
+        <Stack horizontal tokens={ROW_TOKENS} wrap={wrap} verticalAlign="start">
             {children}
         </Stack>
     );
