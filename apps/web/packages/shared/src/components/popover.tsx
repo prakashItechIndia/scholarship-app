@@ -2,10 +2,10 @@ import * as React from "react";
 import { Popover as FluentPopover, PopoverSurface, PopoverTrigger, PopoverProps as FluentPopoverProps } from "@fluentui/react-components";
 import { cn } from "../lib/utils";
 
-export interface PopoverProps extends Omit<FluentPopoverProps, "open" | "onOpenChange"> {
+export interface PopoverProps extends Omit<FluentPopoverProps, "open" | "onOpenChange" | "children"> {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const Popover = ({ open, onOpenChange, children, ...props }: PopoverProps) => {
@@ -15,7 +15,7 @@ const Popover = ({ open, onOpenChange, children, ...props }: PopoverProps) => {
       onOpenChange={(_, data) => onOpenChange?.(data.open || false)}
       {...props}
     >
-      {children}
+      {children as React.ReactElement}
     </FluentPopover>
   );
 };
@@ -32,7 +32,7 @@ const PopoverContent = React.forwardRef<
   }
 >(({ className, children, align, ...props }, ref) => {
   return (
-    <PopoverSurface ref={ref} className={cn("z-50 w-72 rounded-md border bg-white p-4 shadow-md", className)} {...props}>
+    <PopoverSurface ref={ref} className={cn("z-[9999] w-72 rounded-md border bg-white p-4 shadow-md", className)} {...props}>
       {children}
     </PopoverSurface>
   );

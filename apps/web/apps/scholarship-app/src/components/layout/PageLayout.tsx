@@ -77,15 +77,22 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
   const hasSideNav = sideNav !== null && sideNav !== undefined;
   const hasTopNav = topNav !== null && topNav !== undefined;
 
+  const sidebarWidth = hasSideNav 
+    ? (sideNav?.expanded ? 256 : 56)
+    : 0;
+
   return (
     <div
       className={cn(
-        "flex flex-col min-h-screen bg-gray-50 overflow-x-hidden",
+        "flex flex-col min-h-screen bg-gray-50",
         containerClassName
       )}
       style={{
         width: "100vw",
         maxWidth: "100vw",
+        height: "100vh",
+        overflowX: "hidden",
+        overflowY: "hidden",
       }}
     >
       {/* Top Navigation - Renders if topNav is provided */}
@@ -130,23 +137,24 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
       <div
         className="flex-1 flex flex-col min-w-0"
         style={{
-          marginLeft: hasSideNav 
-            ? (sideNav?.expanded ? '256px' : '56px')
-            : '0',
-          width: hasSideNav 
-            ? `calc(100vw - ${sideNav?.expanded ? '256px' : '56px'})`
-            : '100vw',
-          maxWidth: hasSideNav
-            ? `calc(100vw - ${sideNav?.expanded ? '256px' : '56px'})`
-            : '100vw',
+          marginLeft: `${sidebarWidth}px`,
+          marginTop: hasTopNav ? '52px' : '0',
+          width: `calc(100vw - ${sidebarWidth}px)`,
+          maxWidth: `calc(100vw - ${sidebarWidth}px)`,
+          height: hasTopNav 
+            ? `calc(100vh - 52px)`
+            : '100vh',
+          overflowX: "hidden",
+          overflowY: "hidden",
         }}
       >
         {/* Page Content */}
         <main 
-          className={cn("flex-1 overflow-y-auto overflow-x-hidden p-6", contentClassName)}
+          className={cn("flex-1 overflow-y-auto overflow-x-hidden", contentClassName)}
           style={{
             width: "100%",
             maxWidth: "100%",
+            height: "100%",
           }}
         >
           {children}
