@@ -129,21 +129,9 @@ export const Router = () => {
         <Route
           path="/process"
           element={
-            <ProcessLayout>
-              <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                <ErrorBoundary>
-                  <ProcessPage />
-                </ErrorBoundary>
-              </Suspense>
-            </ProcessLayout>
-          }
-        />
-        <Route
-          path="/landing"
-          element={
             <Suspense fallback={<LoadingScreen message="Loading..." />}>
               <ErrorBoundary>
-                <LandingPage />
+                <ProcessPage />
               </ErrorBoundary>
             </Suspense>
           }

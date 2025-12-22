@@ -14,7 +14,7 @@ export const WelcomeText = ({
   if (variant === 'password') {
     return (
       <Stack tokens={{ childrenGap: 4 }} className={`w-full max-w-[340px] mt-12 mb-0 ${className}`}>
-        <Text variant="xLarge" className="text-[#242424] font-semibold font-sans leading-8">
+        <Text variant="xLarge" className="text-[#242424] font-semibold font-sans leading-8 ">
           Welcome to<br />Leo Muthu Scholarship
         </Text>
         <Text variant="small" className="text-[#707070] font-sans leading-4">
@@ -26,13 +26,13 @@ export const WelcomeText = ({
 
   return (
     <Stack tokens={{ childrenGap: 8 }} className={className}>
-      <Text variant="xxLarge" className="font-bold text-[#111827] leading-[1.25]">
+      <Text variant="xxLarge" className="font-bold text-[#242424] leading-[1.25] font-inter text-[1.5rem]">
         Welcome to
       </Text>
-      <Text variant="xxLarge" className="font-bold text-[#111827] leading-[1.25]">
+      <Text variant="xxLarge" className="font-bold text-[#242424] leading-[1.25] font-inter text-[1.5rem]">
         Leo Muthu Scholarship
       </Text>
-      <Text variant="small" className="text-[#4b5563] mt-2">
+      <Text variant="small" className="text-[#707070] mt-2">
         {subtitle}
       </Text>
     </Stack>

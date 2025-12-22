@@ -68,7 +68,7 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
       size={"xl" as const}
       className="max-w-[90vw]"
       footer={
-        <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <Button appearance="outline" onClick={() => onOpenChange(false)}>
           Close
         </Button>
       }

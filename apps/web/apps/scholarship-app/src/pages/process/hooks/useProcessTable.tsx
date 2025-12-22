@@ -85,8 +85,8 @@ export const useProcessTable = ({
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Button
-              variant="ghost"
-              size="icon"
+              appearance="subtle"
+              size="small"
               style={{
                 width: "32px",
                 height: "32px",

@@ -19,7 +19,7 @@ interface FormFieldProps {
 export const FormField = ({ label, required = false, error, children, className }: FormFieldProps) => {
     return (
         <Stack>
-            <Label required={required}>{label}</Label>
+            <Label required={required} className="!text-[#242424] !text-[13px]">{label}</Label>
             {children}
         </Stack>
     );

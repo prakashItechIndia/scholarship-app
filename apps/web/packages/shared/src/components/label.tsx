@@ -12,11 +12,11 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
     return (
       <FluentLabel
         ref={ref}
-        className={cn("dark:text-gray-300", className)}
+        className={cn("dark:text-gray-300", className, required && "label-required-red")}
         required={required}
         {...props}
       >
-        {children}
+        {required ? <span className="mr-1">{children}</span> : children}
       </FluentLabel>
     );
   }

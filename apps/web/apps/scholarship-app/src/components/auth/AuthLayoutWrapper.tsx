@@ -18,7 +18,7 @@ export const AuthLayoutWrapper = ({ children, footerVariant = 'email' }: AuthLay
         '@media (max-width: 1023px)': {
           flexDirection: 'column',
         },
-        backgroundColor: 'blue',
+        backgroundColor: '#0078D4',
       })}
     >
       {/* Left Panel - Memorial Section */}
@@ -40,6 +40,7 @@ export const AuthLayoutWrapper = ({ children, footerVariant = 'email' }: AuthLay
           padding: '20px',
           paddingRight: '0px',
         })}
+        
       >
         <div className="relative w-full h-full p-12 rounded-[40px] border-8 border-white overflow-hidden">
           {/* Background Image */}
@@ -52,21 +53,21 @@ export const AuthLayoutWrapper = ({ children, footerVariant = 'email' }: AuthLay
           
           {/* Content Overlay */}
           <Stack horizontalAlign="center" className="relative z-10">
-            <Text variant="small" styles={{ root: { color: '#374151', marginBottom: '16px', fontSize: '1rem' } }}>
+            <Text variant="small" styles={{ root: { color: '#374151', marginBottom: '10px', fontSize: '1rem' } }}>
               In Fond Remembrance of
             </Text>
-            <Stack tokens={{ childrenGap: 4 }}>
-              <Text variant="xxLarge" styles={{ root: { fontWeight: 600, color: '#1e3a8a', fontSize: '1.5rem', alignSelf: 'center' } }}>
+            <Stack>
+              <Text variant="xxLarge" styles={{ root: { fontWeight: 600, color: '#0F548C', fontSize: '1.5rem', alignSelf: 'center',fontFamily: 'Inter, sans-serif',lineHeight: '2.5rem' } }}>
                 Our Guiding Star
               </Text>
-              <Text variant="xxLarge" styles={{ root: { fontWeight: 800, color: '#1e3a8a', fontSize: '1.8rem' } }}>
+              <Text variant="xxLarge" styles={{ root: { fontWeight: 800, color: '#0F548C', fontSize: '2rem',fontFamily: 'Inter, sans-serif',lineHeight: '2.5rem' } }}>
                 Shri. MJF. Ln. Leo Muthu
               </Text>
             </Stack>
-            <Text variant="small" styles={{ root: { color: '#374151', fontStyle: 'italic', fontWeight: 500, marginTop: '8px', fontSize: '0.875rem' } }}>
+            <Text variant="small" styles={{ root: { color: '#242424', fontStyle: "Inter, sans-serif", marginTop: '8px', fontSize: '0.875rem' } }}>
               A Visionary philanthropist and educationist.
             </Text>
-            <Text variant="small" styles={{ root: { color: '#4b5563', fontWeight: 500, fontSize: '0.875rem' } }}>
+            <Text variant="small" styles={{ root: { color: '#242424',fontFamily: 'Inter, sans-serif', fontSize: '0.875rem' } }}>
               02-04-1952 - 10-07-2015
             </Text>
           </Stack>

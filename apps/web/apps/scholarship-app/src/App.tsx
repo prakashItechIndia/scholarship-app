@@ -1,4 +1,4 @@
-import { FluentProvider } from '@fluentui/react-components';
+import { FluentProvider, webLightTheme } from '@fluentui/react-components';
 import { createQueryClient } from '@shared/lib/react-query-config';
 import { QueryClientProvider } from '@tanstack/react-query';
 
@@ -11,7 +11,7 @@ const queryClient = createQueryClient();
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <FluentProvider>
+      <FluentProvider theme={webLightTheme}>
         {/* <ThemeProvider defaultTheme="light"> */}
             {/* <ThemeSync /> */}
             <AuthProvider>

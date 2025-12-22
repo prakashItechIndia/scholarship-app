@@ -52,53 +52,13 @@ export const TopNav = React.forwardRef<HTMLElement, TopNavProps>(
     },
     ref
   ) => {
-    const defaultLeft = company ? (
-      <div className="flex items-center">
-        <div className="relative w-8 h-8 rounded overflow-hidden">
-          {company.logoUrl ? (
-            <img
-              src={company.logoUrl}
-              alt={company.name || "Company"}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          ) : (
-            <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
-              {company.name
-                ?.split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2) || "C"}
-            </div>
-          )}
-        </div>
-        {company.name && <span className="text-sm font-semibold">{company.name}</span>}
-        {company.onMoreClick && (
-          <div
-            className="flex items-center justify-center w-4 h-4 cursor-pointer text-gray-500"
-            onClick={company.onMoreClick}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                company.onMoreClick?.();
-              }
-            }}
-          >
-            ⋯
-          </div>
-        )}
-      </div>
-    ) : null;
-
     const defaultRight = (
       <>
         {userAvatar && (
           <>
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <Button variant="ghost" style={{ padding: 0, minWidth: "auto", height: "auto" }}>
+                <Button appearance="subtle" style={{ padding: 0, minWidth: "auto", height: "auto" }}>
                   <div className="flex items-center gap-2">
                     <Avatar name={userAvatar.name} size="sm">
                       {userAvatar.imageUrl && (
@@ -172,7 +132,7 @@ export const TopNav = React.forwardRef<HTMLElement, TopNavProps>(
         {...props}
       >
         <div className="flex items-center gap-4 flex-1">
-          {left || defaultLeft}
+          <div className="ml-4">{left||''}</div>
           {title && !center && (
             <h1 className="text-base font-semibold">{title}</h1>
           )}
