@@ -24,7 +24,7 @@ const LogoSVG = ({ width = "45", height = "45" }: { width?: string; height?: str
 };
 
 export const LogoWithText: React.FC<LogoWithTextProps> = ({
-  logoSize = "45px",
+  logoSize = "42px",
   titleSize = "md",
   subtitleSize = "xs",
   showLogo = true,
@@ -77,8 +77,9 @@ export const LogoWithText: React.FC<LogoWithTextProps> = ({
           className="font-semibold text-gray-900"
           style={{
             ...titleStyles[titleSize],
-            fontFamily: "Inter, sans-serif",
             color: "#242424",
+            fontSize: "16px",
+            fontWeight: 'semibold',
           }}
         >
           Shri. Leo Muthu Scholarship (LMS)
@@ -87,8 +88,9 @@ export const LogoWithText: React.FC<LogoWithTextProps> = ({
           className="text-gray-600"
           style={{
             ...subtitleStyles[subtitleSize],
-            fontFamily: "Inter, sans-serif",
             color: "#707070",
+            fontSize: "12px",
+            fontWeight: 400,
             marginTop: subtitleSize === "xs" ? "2px" : "4px",
           }}
         >

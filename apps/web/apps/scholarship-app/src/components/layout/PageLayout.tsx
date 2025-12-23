@@ -87,7 +87,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
         "flex flex-col min-h-screen bg-gray-50",
         containerClassName
       )}
-      style={{
+      style={{  
         width: "100vw",
         maxWidth: "100vw",
         height: "100vh",
