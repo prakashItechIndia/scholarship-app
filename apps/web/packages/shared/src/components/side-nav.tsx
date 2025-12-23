@@ -129,7 +129,7 @@ export const SideNav = React.forwardRef<HTMLDivElement, SideNavProps>(
             )}
           </div>
         )}
-        <nav className="flex-1 flex flex-col gap-1.5 w-full pt-4 pb-4 items-center">
+        <nav className="flex-1 flex flex-col gap-1.5 w-full pt-1 pb-4 pl-2 pr-2 items-center">
           {children}
         </nav>
         {footer && (
@@ -161,8 +161,8 @@ export const SideNavItem = React.forwardRef<HTMLDivElement, SideNavItemProps>(
         ref={ref}
         onClick={onClick}
         className={cn(
-          "flex flex-col items-center justify-center gap-1 w-full py-1 px-2 rounded-lg cursor-pointer transition-colors",
-          active ? "bg-[#0A3FBC] !rounded-md" : "bg-transparent hover:bg-[#0A3FBC]/20",
+          "flex flex-col items-center justify-center gap-0  py-2 px-2 rounded-lg cursor-pointer transition-colors ",
+          active ? "bg-[#0A3FBC] !rounded-md  w-[42px]" : "bg-transparent hover:bg-[#0A3FBC]/20 padding-2",
           className
         )}
         style={style}
@@ -177,14 +177,14 @@ export const SideNavItem = React.forwardRef<HTMLDivElement, SideNavItemProps>(
         {...props}
       >
         {icon && (
-          <div className="flex items-center justify-center w-5 h-5 text-white flex-shrink-0">
+          <div className="flex items-center justify-center w-[20px] h-[20px] text-white flex-shrink-0">
             {icon}
           </div>
         )}
         <span className="text-[6px] leading-[10px] text-white font-normal text-center whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
           {label}
         </span>
-        {badge && <span className="flex-shrink-0">{badge}</span>}
+        {/* {badge && <span className="flex-shrink-0">{badge}</span>} */}
       </div>
     );
   }
