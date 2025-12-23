@@ -153,7 +153,7 @@ const PersonalDetails = () => {
                         </Stack>
 
                         {/* Row 1: Scholarship & Gender */}
-                        <FormRowContainer wrap>
+                        <FormRowContainer>
                             <FormRow>
                                 <ChoiceGroupField
                                     name="scholarshipApplied"

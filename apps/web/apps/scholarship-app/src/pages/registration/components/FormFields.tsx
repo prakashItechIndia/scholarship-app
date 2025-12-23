@@ -215,15 +215,15 @@ export const IfscCodeField = ({ name, control, errors, label, required, placehol
                             (Lookup IFSC Code)
                         </span>
                     </div>
-                    <div className="w-full">
-                        <Input
-                            {...field}
-                            value={field.value ?? ''}
-                            placeholder={placeholder}
-                            errorMessage={errors[name]?.message as string}
-                            className="w-full"
-                        />
-                    </div>
+                        <div className="w-full">
+                            <Input
+                                {...field}
+                                value={field.value ?? ''}
+                        placeholder={placeholder}
+                                errorMessage={errors[name]?.message as string}
+                                className="w-full"
+                    />
+                        </div>
                 </Stack>
             )}
         />

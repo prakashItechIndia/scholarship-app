@@ -12,7 +12,7 @@ export interface SelectProps extends Omit<DropdownProps, "onChange" | "value"> {
   errorMessage?: string;
 }
 
-const Select = React.forwardRef<HTMLDivElement, SelectProps>(
+const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
   ({ className, onValueChange, options = [], selectedKey, placeholder, errorMessage, ...props }, ref) => {
     const isDark = useDarkMode();
     
