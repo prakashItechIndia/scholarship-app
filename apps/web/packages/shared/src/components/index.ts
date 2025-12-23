@@ -28,4 +28,6 @@ export * from "./more-icon";
 export * from "./reopen-icon";
 export * from "./print-icon";
 export * from "./filter-icon";
+export * from "./page-action-buttons";
+export * from "./data-table";
 

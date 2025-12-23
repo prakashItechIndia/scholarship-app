@@ -1,11 +1,11 @@
 import * as React from "react";
 import { User } from "../types";
 import {
-  MoreVerticalRegular,
+  MoreHorizontalRegular,
   ArrowUp20Regular,
   ArrowDown20Regular,
-  EditRegular,
-  DeleteRegular,
+  PersonEditRegular,
+  PersonDeleteRegular,
 } from "@fluentui/react-icons";
 import { Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@shared/components";
 
@@ -36,13 +36,12 @@ export const useUserTable = ({
           gap: "4px",
           cursor: "pointer",
         }}
-        className="hover:opacity-80"
       >
         <span style={{
-          fontSize: "14px",
+          fontSize: "13px",
           lineHeight: "20px",
           fontWeight: 600,
-          color: "#242424",
+          color: "#424242",
           fontFamily: "'Inter', sans-serif",
         }}>
           {name}
@@ -69,17 +68,17 @@ export const useUserTable = ({
               }}
               aria-label="More options"
             >
-              <MoreVerticalRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
+              <MoreHorizontalRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem
-              icon={<EditRegular style={{ width: "16px", height: "16px" }} />}
+              icon={<PersonEditRegular style={{ width: "16px", height: "16px" }} />}
               label="Edit User Profile"
               onClick={() => handleEdit(item)}
             />
             <DropdownMenuItem
-              icon={<DeleteRegular style={{ width: "16px", height: "16px" }} />}
+              icon={<PersonDeleteRegular style={{ width: "16px", height: "16px" }} />}
               label="Delete User Profile"
               onClick={() => handleDelete(item)}
               style={{ color: "#c50f1f" }}
@@ -112,7 +111,7 @@ export const useUserTable = ({
     // Common text renderer
     const renderText = (value: string | undefined) => (
       <span style={{
-        fontSize: "14px",
+        fontSize: "13px",
         lineHeight: "20px",
         color: "#242424",
         fontFamily: "'Inter', sans-serif",
