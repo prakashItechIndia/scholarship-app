@@ -2,10 +2,9 @@ import * as React from "react";
 import { User } from "../types";
 import {
   MoreHorizontalRegular,
-  ArrowUp20Regular,
-  ArrowDown20Regular,
   PersonEditRegular,
   PersonDeleteRegular,
+  ArrowSortRegular,
 } from "@fluentui/react-icons";
 import { Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@shared/components";
 
@@ -47,15 +46,14 @@ export const useUserTable = ({
           {name}
         </span>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <ArrowUp20Regular style={{ width: "12px", height: "12px", color: "#616161" }} />
-          <ArrowDown20Regular style={{ width: "12px", height: "12px", color: "#616161", marginTop: "-4px" }} />
+         <ArrowSortRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
         </div>
       </div>
     );
 
     // Action column renderer
     const renderActions = (item: User) => (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Button
@@ -81,7 +79,6 @@ export const useUserTable = ({
               icon={<PersonDeleteRegular style={{ width: "16px", height: "16px" }} />}
               label="Delete User Profile"
               onClick={() => handleDelete(item)}
-              style={{ color: "#c50f1f" }}
               className="hover:text-red-700"
             />
           </DropdownMenuContent>
@@ -98,7 +95,7 @@ export const useUserTable = ({
           fontWeight: 500,
           color: status === "Active" ? "#16a34a" : "#dc2626",
           backgroundColor: status === "Active" ? "#dcfce7" : "#fee2e2",
-          padding: "4px 12px",
+          padding: "4px 30px",
           borderRadius: "12px",
           fontFamily: "'Inter', sans-serif",
           display: "inline-block",
@@ -231,7 +228,7 @@ export const useUserTable = ({
       },
       {
         key: "actions",
-        name: "Actions",
+        name: "",
         fieldName: "actions",
         minWidth: 80,
         maxWidth: 80,

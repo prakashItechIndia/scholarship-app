@@ -244,9 +244,11 @@ const RoleForm: React.FC = () => {
     {
       key: "select",
       name: "",
-      width: "auto",
-      cellPaddingLeft: "20px",
-      cellPaddingRight: "4px",
+      width: 250,
+      minWidth: 250,
+      maxWidth: 250,
+      cellPaddingLeft: "8px",
+      cellPaddingRight: "0px",
       onRenderHeader: () => (
         <div style={{ 
           textAlign: "left",
@@ -296,8 +298,8 @@ const RoleForm: React.FC = () => {
       key: "menu",
       name: "Menu",
       width: "auto",
-      cellPaddingLeft: "10px",
-      // cellPaddingRight: "16px",
+      cellPaddingLeft: "2px",
+      cellPaddingRight: "16px",
       onRender: (item: RolePermission) => (
         <span style={{
           fontSize: "13px",
@@ -312,9 +314,11 @@ const RoleForm: React.FC = () => {
     {
       key: "create",
       name: "Create",
-      width: "auto",
-      cellPaddingLeft: "16px",
-      cellPaddingRight: "16px",
+      width: 200,
+      minWidth: 200,
+      maxWidth: 200,
+      cellPaddingLeft: 4,
+      cellPaddingRight: 4,
       onRenderHeader: () => (
         <div style={{ 
           textAlign: "center",
@@ -350,9 +354,11 @@ const RoleForm: React.FC = () => {
     {
       key: "update",
       name: "Update",
-      width: "auto",
-      cellPaddingLeft: "16px",
-      cellPaddingRight: "16px",
+      width: 200,
+      minWidth: 200,
+      maxWidth: 200,
+      cellPaddingLeft: 4,
+      cellPaddingRight: 4,
       onRenderHeader: () => (
         <div style={{ 
           textAlign: "center",
@@ -388,9 +394,11 @@ const RoleForm: React.FC = () => {
     {
       key: "view",
       name: "View",
-      width: "auto",
-      cellPaddingLeft: "16px",
-      cellPaddingRight: "16px",
+      width: 200,
+      minWidth: 200,
+      maxWidth: 200,
+      cellPaddingLeft: 4,
+      cellPaddingRight: 4,
       onRenderHeader: () => (
         <div style={{ 
           textAlign: "center",
@@ -426,9 +434,11 @@ const RoleForm: React.FC = () => {
     {
       key: "delete",
       name: "Delete",
-      width: "auto",
-      cellPaddingLeft: "16px",
-      cellPaddingRight: "16px",
+      width: 200,
+      minWidth: 200,
+      maxWidth: 200,
+      cellPaddingLeft: 4,
+      cellPaddingRight: 4,
       onRenderHeader: () => (
         <div style={{ 
           textAlign: "center",
