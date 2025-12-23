@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Tabs, TabsTrigger } from "@shared/components";
+
 import { tabLabels } from "../constants";
 
 interface ProcessTabsProps {
@@ -9,44 +9,40 @@ interface ProcessTabsProps {
 
 const ProcessTabs: React.FC<ProcessTabsProps> = ({ activeTab, onTabChange }) => {
   return (
-    <div style={{ flex: 1 }}>
-      <Tabs
-        value={activeTab}
-        defaultValue="overview"
-        onValueChange={onTabChange}
-        style={{ width: "100%" }}
-      >
-        <div style={{
-          display: "flex",
-          gap: "24px",
-          borderBottom: "1px solid #e0e0e0",
-        }}>
-          {tabLabels.map((tab) => (
-            <TabsTrigger 
+    <div style={{ width: "38.71875rem" }}>
+      <div style={{
+        display: "flex",
+        gap: "24px",
+        borderBottom: "none",
+      }}>
+        {tabLabels.map((tab) => {
+          const isActive = activeTab === tab.value;
+          return (
+            <button
               key={tab.value}
-              value={tab.value}
+              onClick={() => onTabChange(tab.value)}
               style={{
-                paddingBottom: "12px",
-                paddingLeft: 0,
-                paddingRight: 0,
-                borderBottom: `2px solid ${activeTab === tab.value ? "#0f6cbd" : "transparent"}`,
-                fontSize: "14px",
+                padding: "12px 0",
+                fontSize: "13px", // matching 13px request
                 lineHeight: "20px",
-                fontWeight: activeTab === tab.value ? 600 : 400,
-                color: activeTab === tab.value ? "#0f6cbd" : "#616161",
+                fontWeight: 600,  // matching 600 request
                 fontFamily: "'Inter', sans-serif",
-                transition: "all 0.2s",
-                cursor: "pointer",
+                color: isActive ? "#0f6cbd" : "#616161",
                 backgroundColor: "transparent",
                 border: "none",
+                borderBottom: `2px solid ${isActive ? "#0f6cbd" : "transparent"}`,
+                cursor: "pointer",
+                marginBottom: "-1px", // Pull border down to overlap container border
+                transition: "all 0.2s",
+                outline: "none",
               }}
-              className={activeTab !== tab.value ? "hover:text-[#242424]" : ""}
+              className="hover:text-[#242424]"
             >
               {tab.label}
-            </TabsTrigger>
-          ))}
-        </div>
-      </Tabs>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };
