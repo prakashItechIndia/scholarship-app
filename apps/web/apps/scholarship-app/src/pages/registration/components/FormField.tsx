@@ -37,9 +37,9 @@ interface FormRowProps {
  */
 export const FormRow = ({ children, className }: FormRowProps) => {
     return (
-        <Stack.Item grow={1} className={className || FORM_FIELD_WRAPPER_CLASS} styles={{ root: { alignSelf: 'flex-start' } }}>
+        <div className={`col-span-1 md:col-span-6 ${className || FORM_FIELD_WRAPPER_CLASS}`}>
             {children}
-        </Stack.Item>
+        </div>
     );
 };
 

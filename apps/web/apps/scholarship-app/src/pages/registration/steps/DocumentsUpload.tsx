@@ -261,7 +261,7 @@ const fileItemStyles = mergeStyles({
     };
 
     return (
-        <Stack className="w-4/5 h-full flex flex-col">
+        <Stack className="w-full md:w-4/5 h-full flex flex-col">
             <Stack grow verticalAlign="start" className="flex-1" style={{ minHeight: 0 }}>
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-1">Documents to be uploaded</h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Provide the requested documents to complete your application.</p>
@@ -274,10 +274,16 @@ const fileItemStyles = mergeStyles({
 
                 <form id="current-step-form" className="w-full flex-1 flex flex-col" style={{ minHeight: 0 }} onSubmit={handleSubmit(onFormSubmit)}>
                     {/* Main Layout: Grid - 70% upload area, 30% documents required initially */}
+                    <style>{`
+                        @media (min-width: 768px) {
+                            .documents-grid {
+                                grid-template-columns: ${uploadedFiles.length > 0 ? '60% 30% 30%' : '90% 33%'};
+                            }
+                        }
+                    `}</style>
                     <div 
-                        className="grid gap-8 w-full" 
+                        className="grid grid-cols-1 gap-4 md:gap-8 w-full documents-grid" 
                         style={{ 
-                            gridTemplateColumns: uploadedFiles.length > 0 ? '60% 30% 30%' : '90% 33%',
                             alignItems: 'stretch'
                         }}
                     >
@@ -305,7 +311,7 @@ const fileItemStyles = mergeStyles({
                         {/* Column 2: Uploaded Files List - Only shown when files are uploaded */}
                         {uploadedFiles.length > 0 && (
                             <div className="flex flex-col h-full" style={{ minHeight: 0 }}>
-                                <div className="overflow-y-auto pr-2 h-full" style={{ maxHeight: '100%' }}>
+                                <div className="overflow-y-auto pr-0 md:pr-2 h-full" style={{ maxHeight: '100%' }}>
                                     <div className="grid grid-cols-1 gap-3">
                                         {uploadedFiles.map((file, idx) => (
                                             <div key={idx} className={`${fileItemStyles} bg-[#F5F5F5] dark:bg-gray-800 border-gray-200 dark:border-gray-700 border h-[56px]`}>
