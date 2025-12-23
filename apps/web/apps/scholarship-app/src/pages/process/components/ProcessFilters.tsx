@@ -12,13 +12,17 @@ const ProcessFilters: React.FC<ProcessFiltersProps> = ({ open, onOpenChange }) =
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger>
         <Button
-          variant="ghost"
+          appearance="outline"
           onClick={() => onOpenChange(!open)}
           aria-label="Filter"
           style={{
-            width: "36px",
-            height: "36px",
+            width: "32px",
+            minWidth: "32px",
+            maxWidth: "32px",
+            height: "32px",
             padding: 0,
+            borderColor: "#d1d5db",
+            backgroundColor: "#fff",
           }}
         >
           <FilterRegular style={{ width: "20px", height: "20px", color: "#616161" }} />

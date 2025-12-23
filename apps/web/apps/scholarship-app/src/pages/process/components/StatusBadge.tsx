@@ -1,44 +1,35 @@
 import * as React from "react";
-import {
-  CheckmarkCircleRegular,
-  ClockRegular,
-  DismissCircleRegular,
-} from "@fluentui/react-icons";
+
 
 interface StatusBadgeProps {
   status: string;
 }
 
 const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
-  const statusConfig: Record<string, { 
-    bgColor: string; 
-    textColor: string; 
-    borderColor: string; 
-    icon: React.ReactNode 
+  const statusConfig: Record<string, {
+    bgColor: string;
+    textColor: string;
+    borderColor: string;
   }> = {
-    Verified: {
+    Completed: {
       bgColor: "#f1faf1",
       textColor: "#0e700e",
       borderColor: "#9fd89f",
-      icon: <CheckmarkCircleRegular style={{ width: "16px", height: "16px" }} />,
     },
-    Pending: {
+    Review: {
       bgColor: "#fff9f5",
       textColor: "#bc4b09",
       borderColor: "#fdcfb4",
-      icon: <ClockRegular style={{ width: "16px", height: "16px" }} />,
     },
-    Approved: {
+    Registered: {
       bgColor: "#ebf3fc",
       textColor: "#115ea3",
       borderColor: "#b4d6fa",
-      icon: <CheckmarkCircleRegular style={{ width: "16px", height: "16px" }} />,
     },
     Rejected: {
-      bgColor: "#fdf3f4",
-      textColor: "#b10e1c",
-      borderColor: "#eeacb2",
-      icon: <DismissCircleRegular style={{ width: "16px", height: "16px" }} />,
+      bgColor: "#ffffff",
+      textColor: "#616161",
+      borderColor: "#e0e0e0",
     },
   };
 
@@ -46,7 +37,6 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
     bgColor: "#f5f5f5",
     textColor: "#424242",
     borderColor: "#d1d1d1",
-    icon: null,
   };
 
   return (
@@ -54,7 +44,6 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
       style={{
         display: "inline-flex",
         alignItems: "center",
-        gap: "6px",
         padding: "4px 10px",
         borderRadius: "10000px",
         fontSize: "12px",
@@ -66,7 +55,6 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
         fontFamily: "'Inter', sans-serif",
       }}
     >
-      {config.icon}
       {status}
     </span>
   );
