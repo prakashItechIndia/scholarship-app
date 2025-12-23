@@ -75,7 +75,7 @@ export const PageActionButtons = React.forwardRef<
       }}>
         {onPrimaryAction && (
           <Button
-            appearance="primary"
+            // appearance="primary"
             onClick={onPrimaryAction}
             style={{
               backgroundColor: "#0f6cbd",
@@ -83,6 +83,10 @@ export const PageActionButtons = React.forwardRef<
               display: "flex",
               alignItems: "center",
               gap: "8px",
+              borderRadius: "7px",
+              // padding:"3px",
+              width: "120px",
+              height: "40px",
             }}
           >
             <AddRegular style={{ width: "16px", height: "16px" }} />

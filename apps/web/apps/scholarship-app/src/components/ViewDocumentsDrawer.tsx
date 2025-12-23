@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Drawer } from "@shared/components";
 import { Button } from "@shared/components";
-import { 
+import {
   DismissRegular,
   ArrowDownRegular,
   OpenRegular,
@@ -30,8 +30,6 @@ const ViewDocumentsDrawer: React.FC<ViewDocumentsDrawerProps> = ({
   open,
   onOpenChange,
   documents,
-  applicationNo,
-  studentName,
   onViewDocument,
   onDownloadDocument,
 }) => {
@@ -100,35 +98,7 @@ const ViewDocumentsDrawer: React.FC<ViewDocumentsDrawerProps> = ({
       </div>
 
       {/* Application Info (if provided) */}
-      {(applicationNo || studentName) && (
-        <div style={{
-          padding: "16px 24px",
-          backgroundColor: "#fafafa",
-          borderBottom: "1px solid #e0e0e0",
-        }}>
-          {applicationNo && (
-            <div style={{
-              fontSize: "12px",
-              lineHeight: "16px",
-              color: "#616161",
-              fontFamily: "'Inter', sans-serif",
-              marginBottom: "4px",
-            }}>
-              Application: <span style={{ fontWeight: 500, color: "#242424" }}>{applicationNo}</span>
-            </div>
-          )}
-          {studentName && (
-            <div style={{
-              fontSize: "12px",
-              lineHeight: "16px",
-              color: "#616161",
-              fontFamily: "'Inter', sans-serif",
-            }}>
-              Student: <span style={{ fontWeight: 500, color: "#242424" }}>{studentName}</span>
-            </div>
-          )}
-        </div>
-      )}
+
 
       {/* Documents List */}
       <div style={{
@@ -165,36 +135,52 @@ const ViewDocumentsDrawer: React.FC<ViewDocumentsDrawerProps> = ({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "12px",
-                  padding: "12px 16px",
+                  gap: "16px",
+                  padding: "16px",
                   backgroundColor: "#ffffff",
                   border: "1px solid #e0e0e0",
                   borderRadius: "8px",
-                  transition: "all 0.2s",
+                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.05)",
                 }}
-                className="hover:shadow-sm"
               >
-                {/* PDF Icon */}
+                {/* PDF Icon - Simulated look matching screenshot */}
                 <div style={{
-                  width: "40px",
+                  position: "relative",
+                  width: "32px",
                   height: "40px",
-                  borderRadius: "6px",
-                  backgroundColor: "#c50f1f",
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #e0e0e0",
+                  borderRadius: "4px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0,
                 }}>
-                  <span style={{
-                    fontSize: "10px",
-                    lineHeight: "12px",
-                    fontWeight: 600,
-                    color: "#ffffff",
-                    fontFamily: "'Inter', sans-serif",
-                    textTransform: "uppercase",
+                  {/* Folded corner effect (css triangle) */}
+                  <div style={{
+                    position: "absolute",
+                    top: "-1px",
+                    right: "-1px",
+                    width: "10px",
+                    height: "10px",
+                    backgroundColor: "#f5f5f5",
+                    borderBottom: "1px solid #e0e0e0",
+                    borderLeft: "1px solid #e0e0e0",
+                    borderRadius: "0 0 0 4px",
+                  }} />
+
+                  {/* PDF Label */}
+                  <div style={{
+                    backgroundColor: "#d13438",
+                    color: "white",
+                    fontSize: "8px",
+                    fontWeight: "bold",
+                    padding: "2px 4px",
+                    borderRadius: "2px",
+                    marginTop: "8px",
                   }}>
                     PDF
-                  </span>
+                  </div>
                 </div>
 
                 {/* Document Info */}
@@ -202,13 +188,13 @@ const ViewDocumentsDrawer: React.FC<ViewDocumentsDrawerProps> = ({
                   flex: 1,
                   display: "flex",
                   flexDirection: "column",
-                  gap: "4px",
+                  gap: "2px",
                   minWidth: 0,
                 }}>
                   <span style={{
                     fontSize: "14px",
                     lineHeight: "20px",
-                    fontWeight: 500,
+                    fontWeight: 600,
                     color: "#242424",
                     fontFamily: "'Inter', sans-serif",
                     overflow: "hidden",
@@ -235,36 +221,38 @@ const ViewDocumentsDrawer: React.FC<ViewDocumentsDrawerProps> = ({
                   flexShrink: 0,
                 }}>
                   <Button
-                    variant="ghost"
+                    appearance="primary"
                     size="icon"
                     onClick={() => handleView(doc)}
                     style={{
-                      width: "32px",
-                      height: "32px",
+                      width: "36px",
+                      height: "36px",
                       padding: 0,
-                      backgroundColor: "#ebf3fc",
-                      color: "#0f6cbd",
+                      backgroundColor: "#0f6cbd", // Primary Blue
+                      color: "#ffffff",
+                      borderRadius: "4px",
+                      border: "none",
                     }}
                     aria-label="View document"
-                    className="hover:bg-[#cfe4fa]"
                   >
-                    <OpenRegular style={{ width: "16px", height: "16px" }} />
+                    <OpenRegular style={{ width: "20px", height: "20px" }} />
                   </Button>
                   <Button
-                    variant="ghost"
+                    appearance="outline"
                     size="icon"
                     onClick={() => handleDownload(doc)}
                     style={{
-                      width: "32px",
-                      height: "32px",
+                      width: "36px",
+                      height: "36px",
                       padding: 0,
-                      backgroundColor: "#ebf3fc",
-                      color: "#0f6cbd",
+                      backgroundColor: "#ffffff",
+                      color: "#242424",
+                      borderRadius: "4px",
+                      border: "1px solid #d1d1d1",
                     }}
                     aria-label="Download document"
-                    className="hover:bg-[#cfe4fa]"
                   >
-                    <ArrowDownRegular style={{ width: "16px", height: "16px" }} />
+                    <ArrowDownRegular style={{ width: "20px", height: "20px" }} />
                   </Button>
                 </div>
               </div>

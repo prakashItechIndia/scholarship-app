@@ -32,6 +32,9 @@ export interface TableProps {
     cellPaddingRight?: string | number;
     isResizable?: boolean;
     isSortable?: boolean;
+    style?: React.CSSProperties;
+    headerClassName?: string;
+    cellClassName?: string;
     onRender?: (item?: any, index?: number) => React.ReactNode;
     onRenderHeader?: () => React.ReactNode;
   }[];
@@ -39,20 +42,23 @@ export interface TableProps {
   data: any[];
   /** Additional CSS class name */
   className?: string;
+  /** Disable internal scrolling */
+  disableScroll?: boolean;
 }
 
 export const Table = React.forwardRef<HTMLDivElement, TableProps>(
-  ({ className, columns, data }, ref) => {
+  ({ className, columns, data, disableScroll = false }, ref) => {
     return (
       <div ref={ref} className={cn("relative w-full overflow-auto", className)} style={{ padding: 0, margin: 0 }}>
         <FluentTable style={{ width: "100%", borderCollapse: "collapse", margin: 0, padding: 0 }}>
           <TableHeader>
             <TableRow style={{ backgroundColor: "#FAFAFA" }}>
               {columns.map((col) => (
-                <TableHeaderCell 
-                  key={col.key} 
-                  style={{ 
-                    minWidth: col.minWidth, 
+                <TableHeaderCell
+                  key={col.key}
+                  className={cn(col.headerClassName, "hover:bg-[#FAFAFA] hover:text-[#424242]")}
+                  style={{
+                    minWidth: col.minWidth,
                     maxWidth: col.maxWidth,
                     width: col.width,
                     paddingTop: "12px",
@@ -67,7 +73,6 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
                     borderBottom: "1px solid #e0e0e0",
                     backgroundColor: "#FAFAFA",
                   }}
-                  className="hover:bg-[#FAFAFA] hover:text-[#424242]"
                 >
                   {col.onRenderHeader ? col.onRenderHeader() : col.name}
                 </TableHeaderCell>
@@ -76,7 +81,7 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
           </TableHeader>
           <TableBody>
             {data.map((item, rowIndex) => (
-              <TableRow 
+              <TableRow
                 key={rowIndex}
                 style={{
                   backgroundColor: "transparent",
@@ -96,10 +101,11 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
                     : item[fieldName];
 
                   return (
-                    <TableCell 
-                      key={col.key} 
-                      style={{ 
-                        minWidth: col.minWidth, 
+                    <TableCell
+                      key={col.key}
+                      className={col.cellClassName}
+                      style={{
+                        minWidth: col.minWidth,
                         maxWidth: col.maxWidth,
                         width: col.width,
                         paddingTop: "12px",
@@ -110,6 +116,7 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
                         lineHeight: "20px",
                         color: "#242424",
                         fontFamily: "'Inter', sans-serif",
+                        ...col.style,
                       }}
                       onClick={(e) => {
                         // Prevent cell click from triggering actions
