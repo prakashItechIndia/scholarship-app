@@ -68,6 +68,9 @@ export const ScholarshipFooter = ({ variant = 'email' }: ScholarshipFooterProps)
                 padding: '0',
                 '@media (max-width: 639px)': {
                   flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
                 },
               })}
               tokens={{ childrenGap: 16 }}
@@ -82,7 +85,16 @@ export const ScholarshipFooter = ({ variant = 'email' }: ScholarshipFooterProps)
           >
             Copyright © {currentYear} LEO MUTHU Scholarship
           </Text>
-          <Stack horizontal tokens={{ childrenGap: 4 }} verticalAlign="center">
+          <Stack 
+            horizontal 
+            tokens={{ childrenGap: 4 }} 
+            verticalAlign="center"
+            className={mergeStyles({
+              '@media (max-width: 639px)': {
+                justifyContent: 'center',
+              },
+            })}
+          >
             <Text
               variant="small"
               styles={{
@@ -132,6 +144,9 @@ export const ScholarshipFooter = ({ variant = 'email' }: ScholarshipFooterProps)
         }),
         '@media (max-width: 639px)': {
           flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
         },
       })}
       tokens={{ childrenGap: 16 }}
@@ -149,7 +164,16 @@ export const ScholarshipFooter = ({ variant = 'email' }: ScholarshipFooterProps)
       >
         Copyright © 2025 LEO MUTHU Scholarship
       </Text>
-      <Stack horizontal tokens={{ childrenGap: isPasswordVariant ? 3 : 8 }} verticalAlign="center">
+      <Stack 
+        horizontal 
+        tokens={{ childrenGap: isPasswordVariant ? 3 : 8 }} 
+        verticalAlign="center"
+        className={mergeStyles({
+          '@media (max-width: 639px)': {
+            justifyContent: 'center',
+          },
+        })}
+      >
         <Text
           variant="small"
           styles={{

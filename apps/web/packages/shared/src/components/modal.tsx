@@ -51,8 +51,8 @@ const Modal = ({
     >
       <DialogSurface className={cn("bg-white rounded-lg shadow-xl", sizeClasses[size], className)}>
         <DialogBody className="bg-white">
-          {!hideDefaultHeader && title && (
-            <DialogTitle className="text-lg font-semibold text-gray-900">
+          {title && (
+            <DialogTitle className={typeof title === "string" ? "text-lg font-semibold text-gray-900" : ""}>
               {title}
             </DialogTitle>
           )}

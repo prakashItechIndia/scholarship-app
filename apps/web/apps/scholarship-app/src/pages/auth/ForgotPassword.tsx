@@ -70,7 +70,7 @@ const ForgotPasswordPage = () => {
     mutation.mutate(values.email);
   };
 
-  const signInUrl = preserveQueryParams('/signin', [
+  const signInUrl = preserveQueryParams('/user-login', [
     'returnUrl',
     'product',
     'state',

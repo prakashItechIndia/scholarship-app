@@ -12,7 +12,7 @@ export interface SelectProps extends Omit<DropdownProps, "onChange" | "value"> {
   errorMessage?: string;
 }
 
-const Select = React.forwardRef<HTMLDivElement, SelectProps>(
+const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
   ({ className, onValueChange, options = [], selectedKey, placeholder, errorMessage, ...props }, ref) => {
     const isDark = useDarkMode();
     
@@ -35,18 +35,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
     }, [tokens, errorMessage]);
 
     return (
-      <div className="relative w-full">
-        {errorMessage && (
-          <div 
-            className="text-xs mb-1" 
-            style={{ 
-              fontSize: tokens.fontSizeBase200, 
-              color: (tokens as any).colorStatusDangerForeground3 || "#d13438" 
-            }}
-          >
-            {errorMessage}
-          </div>
-        )}
+      <div className="relative w-full" style={{ marginTop: 0, paddingTop: 0 }}>
         <div
           style={{
             position: "relative",
@@ -68,8 +57,8 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
               fontSize: tokens.fontSizeBase300,
               height: "45px",
               minHeight: "45px",
-              paddingLeft: "12px",
-              paddingRight: "12px",
+              // paddingLeft: "12px",
+              // paddingRight: "12px",
               paddingTop: "8px",
               paddingBottom: "8px",
             }}
@@ -82,6 +71,17 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
             ))}
           </Dropdown>
         </div>
+        {errorMessage && (
+          <div 
+            className="text-xs mt-1" 
+            style={{ 
+              fontSize: tokens.fontSizeBase200, 
+              color: (tokens as any).colorStatusDangerForeground3 || "#d13438" 
+            }}
+          >
+            {errorMessage}
+          </div>
+        )}
       </div>
     );
   }

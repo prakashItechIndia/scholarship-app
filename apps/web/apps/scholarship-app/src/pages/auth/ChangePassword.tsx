@@ -129,7 +129,7 @@ const ChangePasswordPage = () => {
       if (returnUrl) {
         window.location.href = returnUrl;
       } else {
-        void navigate('/signin');
+        void navigate('/user-login');
       }
     },
     onError: (err: Error) => {
@@ -150,8 +150,8 @@ const ChangePasswordPage = () => {
   // Redirect to sign in if not authenticated
   if (!loading && !isAuthenticated) {
     const signInUrl = returnUrl
-      ? `/signin?returnUrl=${encodeURIComponent(returnUrl)}`
-      : '/signin';
+      ? `/user-login?returnUrl=${encodeURIComponent(returnUrl)}`
+      : '/user-login';
     void navigate(signInUrl);
     return null;
   }

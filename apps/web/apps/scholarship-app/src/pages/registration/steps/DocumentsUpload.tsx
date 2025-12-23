@@ -8,10 +8,11 @@ import {
     IStackStyles,
     MessageBar,
     MessageBarType,
-    IconButton,
 } from '@fluentui/react';
 import { useRegistration } from '@/contexts/RegistrationContext';
 import { useThemeTokens } from '@/hooks/useThemeTokens';
+// import { usePreviousButton } from '../hooks/usePreviousButton'; // Uncomment to use dynamic previous button
+import { PdfIcon, CloseIcon, UploadIcon } from '@shared/components';
 
 // --- Constants ---
 const REQUIRED_DOCUMENTS = [
@@ -37,6 +38,18 @@ function formatBytes(bytes: number, decimals = 2) {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
+function truncateFileName(fileName: string, maxLength = 10): string {
+    if (fileName.length <= maxLength) {
+        return fileName;
+    }
+    const extension = fileName.substring(fileName.lastIndexOf('.'));
+    const nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.'));
+    if (nameWithoutExt.length <= maxLength) {
+        return fileName;
+    }
+    return `${nameWithoutExt.substring(0, maxLength)}...${extension}`;
+}
+
 // --- Styles ---
 const containerStyles: IStackStyles = {
     root: {
@@ -47,35 +60,29 @@ const containerStyles: IStackStyles = {
     },
 };
 
-// --- Icons ---
-const UploadIcon = () => (
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-gray-400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-        <polyline points="17 8 12 3 7 8" />
-        <line x1="12" y1="3" x2="12" y2="15" />
-    </svg>
-);
-
-const PdfIcon = () => (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-red-500">
-        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="var(--red-50, #fef2f2)" />
-        <path d="M14 2V8H20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M8 13H10.5C11.328 13 12 13.672 12 14.5C12 15.328 11.328 16 10.5 16H8V13Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M8 13V18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-);
-
-const ImageIcon = () => (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-blue-500">
-        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="1.5" fill="var(--blue-50, #eff6ff)" />
-        <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
-        <polyline points="21 15 16 10 5 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-);
-
 const DocumentsUpload = () => {
     const { formData, updateFormData, nextStep, markStepComplete, setIsLoading } = useRegistration();
     const tokens = useThemeTokens();
+    
+    // Example: Configure previous button dynamically with styling
+    // import { usePreviousButton } from '../hooks/usePreviousButton';
+    // const { setStep } = useRegistration();
+    // usePreviousButton({
+    //   onPrevious: async () => {
+    //     // Custom logic before going back
+    //     console.log('Going back from documents step');
+    //     setStep(4); // Go to a specific step
+    //   },
+    //   disabled: false, // Enable/disable the button
+    //   label: 'Back', // Custom label
+    //   bgColor: '#F0F0F0', // Custom background color (hex)
+    //   textColor: '#666666', // Custom text color (hex)
+    //   // OR use Tailwind classes:
+    //   // bgColor: 'bg-gray-200',
+    //   // textColor: 'text-gray-600',
+    //   // OR use full custom className:
+    //   // className: '!bg-blue-500 !text-white hover:!bg-blue-600 h-10 rounded-lg'
+    // });
     
     // Type guard to check if documents is File[]
     const getDocumentsFromFormData = (): File[] => {
@@ -116,9 +123,9 @@ const uploadAreaStyles = mergeStyles({
     justifyContent: 'center',
     cursor: 'pointer',
     transition: 'all 0.2s',
-        minHeight: 400,
         padding: '40px 20px',
         width: '100%',
+        height: '100%',
     selectors: {
         '&:hover': {
                 borderColor: tokens.colorBrandStroke1,
@@ -133,7 +140,8 @@ const sideCardStyles = mergeStyles({
         borderRadius: parseInt(tokens.borderRadiusXLarge),
         backgroundColor: tokens.colorNeutralBackground1,
     overflow: 'hidden',
-    height: 'fit-content',
+    display: 'flex',
+    flexDirection: 'column',
 });
 
 const sideCardHeaderStyles = mergeStyles({
@@ -165,8 +173,8 @@ const fileItemStyles = mergeStyles({
         backgroundColor: tokens.colorNeutralBackground1,
         borderRadius: parseInt(tokens.borderRadiusLarge),
         border: `1px solid ${tokens.colorNeutralStroke2}`,
-        padding: '10px 12px',
-        marginBottom: 10,
+        padding: '6px 12px',
+        marginBottom: 8,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -182,22 +190,36 @@ const fileItemStyles = mergeStyles({
     }, [formData.documents]);
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            const newFiles = Array.from(event.target.files);
+        const files = event.target.files;
+        if (files && files.length > 0) {
+            const newFiles = Array.from(files);
             const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
             
             // Validate file sizes
             const oversizedFiles = newFiles.filter(file => file.size > MAX_FILE_SIZE);
             if (oversizedFiles.length > 0) {
                 setError(`The following file(s) exceed the 2MB limit: ${oversizedFiles.map(f => f.name).join(', ')}`);
+                // Reset input
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
                 return;
             }
             
             const validFiles = newFiles.filter(file => file.size <= MAX_FILE_SIZE);
-            const updated = [...uploadedFiles, ...validFiles];
-            setUploadedFiles(updated);
-            updateFormData({ documents: updated });
-            setError(null);
+            if (validFiles.length > 0) {
+                const updated = [...uploadedFiles, ...validFiles];
+                console.log('Files selected:', validFiles.map(f => f.name));
+                console.log('Updated files array:', updated.length);
+                setUploadedFiles(updated);
+                updateFormData({ documents: updated });
+                setError(null);
+            }
+            
+            // Reset input to allow selecting the same file again
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
         }
     };
 
@@ -238,16 +260,10 @@ const fileItemStyles = mergeStyles({
         }
     };
 
-    // Helper to check file type
-    const isImage = (file: File) => {
-        // Check MIME type or extension fallback
-        return file.type.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name);
-    };
-
     return (
-        <Stack className="w-4/5 h-full flex flex-col">
-            <Stack grow verticalAlign="start">
-                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-1">STEP 5/5 Documents to be uploaded</h2>
+        <Stack className="w-full md:w-4/5 h-full flex flex-col">
+            <Stack grow verticalAlign="start" className="flex-1" style={{ minHeight: 0 }}>
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-1">Documents to be uploaded</h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Provide the requested documents to complete your application.</p>
 
                 {error && (
@@ -256,13 +272,24 @@ const fileItemStyles = mergeStyles({
                     </MessageBar>
                 )}
 
-                <form id="current-step-form" className="w-full h-full" onSubmit={handleSubmit(onFormSubmit)}>
-                    {/* Main Layout: 3 Columns */}
-                    <Stack horizontal tokens={{ childrenGap: 20 }} wrap={false} className="w-full">
-
-                        {/* Column 1: Upload Area (Flexible width, maybe 40-50%) */}
-                        <Stack.Item grow={2} className="min-w-[300px]">
-                            <div className={uploadAreaStyles} onClick={onDropClick}>
+                <form id="current-step-form" className="w-full flex-1 flex flex-col" style={{ minHeight: 0 }} onSubmit={handleSubmit(onFormSubmit)}>
+                    {/* Main Layout: Grid - 70% upload area, 30% documents required initially */}
+                    <style>{`
+                        @media (min-width: 768px) {
+                            .documents-grid {
+                                grid-template-columns: ${uploadedFiles.length > 0 ? '60% 30% 30%' : '90% 33%'};
+                            }
+                        }
+                    `}</style>
+                    <div 
+                        className="grid grid-cols-1 gap-4 md:gap-8 w-full documents-grid" 
+                        style={{ 
+                            alignItems: 'stretch'
+                        }}
+                    >
+                        {/* Column 1: Upload Area (70% initially, 40% when files are uploaded) */}
+                        <div className="flex flex-col h-full">
+                            <div className={`${uploadAreaStyles} h-full`} onClick={onDropClick} style={{ height: '100%' }}>
                                 <input
                                     type="file"
                                     multiple
@@ -271,7 +298,7 @@ const fileItemStyles = mergeStyles({
                                     onChange={handleFileSelect}
                                     accept=".jpg,.jpeg,.png,.pdf"
                                 />
-                                <UploadIcon />
+                                <UploadIcon width={40} height={40} />
                                 <Text className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1" style={{ marginTop: '8px' }}>
                                     Click to select files
                                 </Text>
@@ -279,79 +306,78 @@ const fileItemStyles = mergeStyles({
                                     Supported formats: JPG, PNG and PDF (max 2MB per file, minimum 3 files required)
                                 </Text>
                             </div>
-                        </Stack.Item>
+                        </div>
 
-                        {/* Column 2: Uploaded Files List (Fixed width or percentage, maybe 25%) */}
+                        {/* Column 2: Uploaded Files List - Only shown when files are uploaded */}
                         {uploadedFiles.length > 0 && (
-                            <Stack.Item className="w-[320px] min-w-[280px]">
-                                <Stack tokens={{ childrenGap: 0 }}>
-                                    {uploadedFiles.map((file, idx) => (
-                                        <div key={idx} className={`${fileItemStyles} bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700`}>
-                                            <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 12 }} className="overflow-hidden" style={{ flex: 1 }}>
-                                                <div className="shrink-0">
-                                                    {isImage(file) ? <ImageIcon /> : <PdfIcon />}
-                                                </div>
-                                                <Stack className="overflow-hidden" style={{ minWidth: 0, flex: 1 }}>
-                                                    <Text
-                                                        className="font-semibold text-gray-900 dark:text-gray-100 text-sm whitespace-nowrap overflow-hidden text-ellipsis"
-                                                        title={file.name}
-                                                        style={{ lineHeight: '20px' }}
+                            <div className="flex flex-col h-full" style={{ minHeight: 0 }}>
+                                <div className="overflow-y-auto pr-0 md:pr-2 h-full" style={{ maxHeight: '100%' }}>
+                                    <div className="grid grid-cols-1 gap-3">
+                                        {uploadedFiles.map((file, idx) => (
+                                            <div key={idx} className={`${fileItemStyles} bg-[#F5F5F5] dark:bg-gray-800 border-gray-200 dark:border-gray-700 border h-[56px]`}>
+                                                <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 12 }} style={{ width: '100%' }}>
+                                                    <div className="shrink-0">
+                                                        <PdfIcon width={28} height={28} />
+                                                    </div>
+                                                    <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                                                        <Text
+                                                            className="font-semibold  dark:text-gray-100 text-[12px]"
+                                                            title={file.name}
+                                                            style={{ 
+                                                                lineHeight: '18px', 
+                                                                wordBreak: 'break-word',
+                                                                display: 'block',
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis'
+                                                            }}
+                                                        >
+                                                            {truncateFileName(file.name, 15)}
+                                                        </Text>
+                                                        <Text 
+                                                            className="text-xs text-gray-500 dark:text-gray-400" 
+                                                            style={{ lineHeight: '14px', marginTop: '2px', display: 'block' }}
+                                                        >
+                                                            {formatBytes(file.size)}
+                                                        </Text>
+                                                    </div>
+                                                    <div 
+                                                        className="shrink-0 cursor-pointer hover:opacity-70 transition-opacity"
+                                                        onClick={() => handleRemoveFile(idx)}
+                                                        title="Remove file"
+                                                        aria-label="Remove file"
                                                     >
-                                                        {file.name}
-                                                    </Text>
-                                                    <Text className="text-xs text-gray-500 dark:text-gray-400" style={{ lineHeight: '16px', marginTop: '2px' }}>
-                                                        {formatBytes(file.size)}
-                                                    </Text>
+                                                        <CloseIcon width={18} height={18} />
+                                                    </div>
                                                 </Stack>
-                                            </Stack>
-                                            <IconButton
-                                                iconProps={{ iconName: 'Cancel' }}
-                                                title="Remove file"
-                                                ariaLabel="Remove file"
-                                                onClick={() => handleRemoveFile(idx)}
-                                                className="shrink-0"
-                                                styles={{
-                                                    root: { 
-                                                        color: tokens.colorNeutralForeground4,
-                                                        height: 24, 
-                                                        width: 24,
-                                                        minWidth: 24
-                                                    },
-                                                    rootHovered: { 
-                                                        color: (tokens as any).colorStatusDangerForeground3,
-                                                        backgroundColor: 'transparent' 
-                                                    },
-                                                    icon: { fontSize: parseInt(tokens.fontSizeBase300) }
-                                                }}
-                                            />
-                                        </div>
-                                    ))}
-                                </Stack>
-                            </Stack.Item>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         )}
 
-                        {/* Column 3: Requirements List (Fixed width, maybe 25%) */}
-                        <Stack.Item className="w-[300px] min-w-[280px]">
-                            <div className={`${sideCardStyles} border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800`}>
-                                <div className={`${sideCardHeaderStyles} bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700`}>
-                                    <Text className="font-semibold text-gray-900 dark:text-gray-100 text-base block">
+                        {/* Column 3: Requirements List (30% width) - Height based on content */}
+                        <div className="flex flex-col">
+                            <div className={`${sideCardStyles} border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col`}>
+                                <div className={`${sideCardHeaderStyles} bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 flex-shrink-0`}>
+                                    <Text className=" dark:text-gray-100  text-[#424242] text-[16px] font-semibold">
                                         Documents required
                                     </Text>
-                                    <Text className="text-sm text-gray-500 dark:text-gray-400 block mt-0.5">
+                                    <Text className="text-sm text-[#707070] dark:text-gray-400 block mt-0.5">
                                         (Any 3 documents are mandatory)
                                     </Text>
                                 </div>
                                 <ul className={sideCardListStyles}>
                                     {REQUIRED_DOCUMENTS.map((doc, idx) => (
-                                        <li key={idx} className={`${sideCardItemStyles} border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-300`}>
+                                        <li key={idx} className={`${sideCardItemStyles} border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-[12px] font-regular py-1.5`}>
                                             {doc}
                                         </li>
                                     ))}
                                 </ul>
                             </div>
-                        </Stack.Item>
+                        </div>
 
-                    </Stack>
+                    </div>
                 </form>
             </Stack>
         </Stack>

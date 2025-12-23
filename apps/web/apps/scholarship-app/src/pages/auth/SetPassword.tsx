@@ -72,7 +72,7 @@ const SetPasswordPage = () => {
     // Show loading for a few seconds before showing success
     await new Promise(resolve => setTimeout(resolve, 2000));
     success('Success', 'Password set successfully!');
-    setTimeout(() => void navigate('/signin'), 1000);
+    setTimeout(() => void navigate('/user-login'), 1000);
   };
 
   return (

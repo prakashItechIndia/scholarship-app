@@ -1,14 +1,15 @@
 import { ReactNode } from 'react';
 import { Stack, Text, mergeStyles } from '@fluentui/react';
 import { ScholarshipFooter } from './ScholarshipFooter';
-import loginBanner from '@shared/assets/icons/LoginPageLeftSideBanner.png';
+import defaultLoginBanner from '@shared/assets/icons/LoginPageLeftSideBanner.png';
 
 interface AuthLayoutWrapperProps {
   children: ReactNode;
   footerVariant?: 'email' | 'password';
+  bannerImage?: string;
 }
 
-export const AuthLayoutWrapper = ({ children, footerVariant = 'email' }: AuthLayoutWrapperProps) => {
+export const AuthLayoutWrapper = ({ children, footerVariant = 'email', bannerImage }: AuthLayoutWrapperProps) => {
   return (
     <Stack
       horizontal
@@ -42,17 +43,28 @@ export const AuthLayoutWrapper = ({ children, footerVariant = 'email' }: AuthLay
         })}
         
       >
-        <div className="relative w-full h-full p-12 rounded-[40px] border-8 border-white overflow-hidden">
+        <div 
+          className="relative w-full h-full p-12 rounded-[40px] border-8 border-white overflow-hidden"
+        >
           {/* Background Image */}
           <img
-            src={loginBanner}
-            alt="Login Banner Background"
+            src={bannerImage||defaultLoginBanner}
+              alt="Login Banner Background"
             className="absolute inset-0 w-full h-full object-fill object-center"
             aria-hidden="true"
           />
           
+          {/* Gradient Overlay */}
+          <div
+            className="absolute inset-0 w-full h-full"
+            style={{
+              background: !bannerImage?'linear-gradient(180deg, rgba(10, 224, 231, 0.15) 22.66%, rgba(0, 0, 0, 0) 43.38%)':
+              "linear-gradient(195.44deg, rgba(0, 0, 0, 0) 34.46%, rgba(208, 231, 248, 0.15) 67.61%)"
+            }}
+          />
+          
           {/* Content Overlay */}
-          <Stack horizontalAlign="center" className="relative z-10">
+         {bannerImage ? null : <Stack horizontalAlign="center" className="relative z-10">
             <Text variant="small" styles={{ root: { color: '#374151', marginBottom: '10px', fontSize: '1rem' } }}>
               In Fond Remembrance of
             </Text>
@@ -70,7 +82,7 @@ export const AuthLayoutWrapper = ({ children, footerVariant = 'email' }: AuthLay
             <Text variant="small" styles={{ root: { color: '#242424',fontFamily: 'Inter, sans-serif', fontSize: '0.875rem' } }}>
               02-04-1952 - 10-07-2015
             </Text>
-          </Stack>
+          </Stack>}
         </div>
       </Stack>
 

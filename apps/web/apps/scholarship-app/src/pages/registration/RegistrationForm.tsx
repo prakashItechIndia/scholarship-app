@@ -3,15 +3,16 @@ import { RocketRegular } from '@fluentui/react-icons';
 import { Button } from '@shared/components';
 import { SEO } from '../../components/seo/SEO';
 import { RegistrationProvider, useRegistration } from '@/contexts/RegistrationContext';
-import { useThemeTokens } from '@/hooks/useThemeTokens';
 import IdentityDetails from './steps/IdentityDetails';
 import PersonalDetails from './steps/PersonalDetails';
 import FamilyDetails from './steps/FamilyDetails';
 import BankDetails from './steps/BankDetails';
 import DocumentsUpload from './steps/DocumentsUpload';
 // import ReviewSubmit from './steps/ReviewSubmit';
-import logo from '@shared/assets/icons/Logo.svg';
+import logo from '@shared/assets/icons/LMS Logo.png';
 import background from '@shared/assets/icons/header-bg.png';
+import checkmarkIcon from '@shared/assets/icons/Checkmark.svg';
+import ReviewSubmit from './steps/ReviewSubmit';
 
 interface Step {
   id: number;
@@ -35,7 +36,11 @@ const headerStyles: IStackStyles = {
     position: 'relative',
     borderBottom: '1px solid var(--gray-200, #fafafa)', // gray-200
     width: '100%',
+    height: '200px', // Fixed height for header
+    minHeight: '200px', // Ensure minimum height
+    maxHeight: '200px', // Ensure maximum height
     overflow: 'hidden',
+    flexShrink: 0, // Prevent shrinking
   },
 };
 
@@ -55,9 +60,13 @@ const backgroundImageStyles = mergeStyles({
 const headerContentStyles: IStackStyles = {
   root: {
     width: '100%',
+    height: '100%', // Take full height of parent
     padding: '24px 40px', // py-6 px-10
     position: 'relative',
     zIndex: 10,
+    overflow: 'hidden', // Prevent content overflow
+    boxSizing: 'border-box', // Include padding in height calculation
+    backgroundColor: '#e7eef980',
   },
 };
 
@@ -98,7 +107,6 @@ const sidebarStyles: IStackStyles = {
 // --- Sub-components ---
 
 const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: boolean, isCompleted: boolean }) => {
-  const tokens = useThemeTokens();
   const isFinalStep = step.id === STEPS.length;
   
   return (
@@ -111,11 +119,11 @@ const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: 
               ? 'bg-green-500 text-white border-green-500' 
               : isFinalStep
                 ? 'bg-gray-100 border-none'
-                : 'bg-transparent  bg-[#EBEBEB]'
+                : 'bg-transparent  !bg-[#EBEBEB]'
         }`} style={{ lineHeight: '32px' }} >
           <div>
             {isCompleted ? (
-              <span style={{ color: 'white', fontSize: '14px', lineHeight: '1' }}>✓</span>
+              <Image src={checkmarkIcon} alt="Completed" width={26} height={26} imageFit={ImageFit.contain} />
             ) : isFinalStep && !isActive ? (
               <RocketRegular className="font-bold text-gray-400" style={{ width: '18px', height: '18px', color: '#616161' }} />
             ) : (
@@ -130,7 +138,7 @@ const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: 
         <Text variant="small" className={`uppercase tracking-wider font-semibold mb-1 ${isFinalStep ? 'text-[#707070]' : 'text-[#707070]'}`} style={{ fontSize: '11px', lineHeight: '16px' }}>
           {isFinalStep ? 'FINAL' : `STEP ${step.id}`}
         </Text>
-        <Text variant="large" className={`font-bold ${isActive ? 'text-[#242424]' : 'text-[#242424]'}`} style={{ lineHeight: '24px', fontSize: '16px' }}>
+        <Text variant="large" className={`font-semibold ${isActive ? 'text-[#242424]' : 'text-[#242424]'}`} style={{ lineHeight: '24px', fontSize: '16px' }}>
           {step.title}
         </Text>
       </Stack>
@@ -140,15 +148,63 @@ const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: 
 
 const RegistrationContent = () => {
   // Direct destructuring - TypeScript should infer types from the hook's return type
-  const { currentStep, completedSteps, prevStep, isLoading, formData } = useRegistration();
+  const { currentStep, completedSteps, prevStep, isLoading, formData, previousButtonConfig } = useRegistration();
   
   // Check if documents step has minimum 3 files (step 5 is DocumentsUpload)
   const isDocumentsStepValid = currentStep === 5 
     ? (formData?.documents && Array.isArray(formData.documents) && formData.documents.length >= 3)
     : true;
 
+  // Determine previous button state from config or defaults
+  const isPreviousDisabled = previousButtonConfig?.disabled ?? (currentStep === 1);
+  const previousButtonLabel = previousButtonConfig?.label ?? 'Previous';
+
+  // Build dynamic className for previous button
+  const getPreviousButtonClassName = (): string => {
+    const baseClasses = 'h-10 text-[12px] font-semibold !rounded-lg';
+    
+    // If disabled, always use disabled styling (overrides custom colors)
+    if (isPreviousDisabled) {
+      // If custom className is provided, merge with disabled styles
+      if (previousButtonConfig?.className) {
+        const customClass = previousButtonConfig.className;
+        // Check if disabled styles are already in the custom class
+        const hasDisabledStyles = customClass.includes('opacity') || customClass.includes('cursor-not-allowed');
+        return hasDisabledStyles 
+          ? customClass 
+          : `${customClass} opacity-50 cursor-not-allowed`;
+      }
+      // Default disabled styling
+      return `${baseClasses} !bg-[#E0E0E0] !text-[#BDBDBD] opacity-50 cursor-not-allowed`;
+    }
+
+    // Normal (enabled) state
+    // If custom className is provided, use it
+    if (previousButtonConfig?.className) {
+      return previousButtonConfig.className;
+    }
+
+    // Build className from bgColor and textColor if provided
+    const bgColor = previousButtonConfig?.bgColor;
+    const textColor = previousButtonConfig?.textColor;
+    
+    if (bgColor || textColor) {
+      const bgClass = bgColor 
+        ? (bgColor.startsWith('#') ? `!bg-[${bgColor}]` : (bgColor.startsWith('bg-') ? `!${bgColor}` : `!bg-${bgColor}`))
+        : '';
+      const textClass = textColor
+        ? (textColor.startsWith('#') ? `!text-[${textColor}]` : (textColor.startsWith('text-') ? `!${textColor}` : `!text-${textColor}`))
+        : '';
+      
+      return `${baseClasses} ${bgClass} ${textClass}`.trim().replace(/\s+/g, ' ');
+    }
+
+    // Default enabled styling
+    return `${baseClasses} !text-[#000]`;
+  };
+
   const handleCancel = () => {
-    window.location.href = '/signin';
+    window.location.href = '/user-login';
   };
 
   const renderStepObject = () => {
@@ -158,7 +214,7 @@ const RegistrationContent = () => {
       case 3: return <FamilyDetails />;
       case 4: return <BankDetails />;
       case 5: return <DocumentsUpload />;
-      // case 6: return <ReviewSubmit />;
+      case 6: return <ReviewSubmit />;
       default: return <IdentityDetails />;
     }
   };
@@ -175,7 +231,7 @@ const RegistrationContent = () => {
       <Stack className="h-screen overflow-hidden bg-gray-50 dark:bg-gray-900">
 
         {/* Header - Fixed Height */}
-        <Stack horizontal verticalAlign="center" styles={headerStyles} disableShrink>
+        <Stack horizontal verticalAlign="center" styles={headerStyles} disableShrink className="hidden md:flex">
           <div className={backgroundImageStyles}></div>
           <div className={overlayStyles}></div>
           <Stack horizontal horizontalAlign="space-between" verticalAlign="center" styles={headerContentStyles}>
@@ -188,14 +244,14 @@ const RegistrationContent = () => {
 
             {/* Title */}
             <Stack.Item grow>
-              <Stack horizontalAlign="center" tokens={{ childrenGap: 8 }}>
-                <Text variant="xxLarge" className="text-[#242424] font-bold text-[28px] font-weight-600">
+              <Stack horizontalAlign="center" tokens={{ childrenGap: 8 }} style={{ maxHeight: '100%' }}>
+                <Text variant="xxLarge" className="text-[#242424] font-bold text-[28px] font-weight-600" style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap',marginBottom: '10px' }}>
                   Leo Muthu Scholarship Application
                 </Text>
-                <Text variant="large" className="!text-[#242424] !text-[16px] font-weight-600">
+                <Text variant="large" className="!text-[#242424] !text-[16px] font-weight-600" style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   Online Registration for Scholarship Assistance - Academic Year 2025-2026
                 </Text>
-                <Text variant="medium" className="!text-[#242424] !text-[14px] font-weight-400">  
+                <Text variant="medium" className="!text-[#242424] !text-[14px] font-weight-400" style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>  
                   Complete the form below to apply for our scholarship program
                 </Text>
               </Stack>
@@ -212,7 +268,7 @@ const RegistrationContent = () => {
         <Stack horizontal grow className="overflow-hidden w-full">
 
           {/* Sidebar - Fixed Width, Scrollable inside if needed */}
-          <Stack styles={sidebarStyles} className="bg-gray-50 dark:bg-gray-800" disableShrink>
+          <Stack styles={sidebarStyles} className="bg-gray-50 dark:bg-gray-800 hidden md:flex" disableShrink>
             <Stack tokens={{ childrenGap: 10 }} style={{ marginBottom: 32,marginLeft: '18px' }}>
               <Stack horizontal horizontalAlign="space-between" verticalAlign="center" style={{ marginBottom: 32 }}>
                 <Stack style={{ marginBottom: 0 }}>
@@ -285,7 +341,7 @@ const RegistrationContent = () => {
               className="py-6 px-10 border-t border-gray-200 bg-white z-10 shrink-0"
             >
               <Button
-                appearance="primary"
+                // appearance="primary"
                 onClick={handleCancel}
                 style={{border:'1px solid #D1D1D1', height:'40px',borderRadius:'10px' }}
               >
@@ -295,11 +351,13 @@ const RegistrationContent = () => {
               <Stack horizontal tokens={{ childrenGap: 16 }}>
                 <Button
                   appearance="outline"
-                  onClick={prevStep}
-                  disabled={currentStep === 1}
-                  className="!bg-[#E0E0E0] h-10 text-[12px] font-semibold !text-[#BDBDBD] !rounded-lg"
+                  onClick={() => {
+                    void prevStep();
+                  }}
+                  disabled={isPreviousDisabled}
+                  className={getPreviousButtonClassName()}
                 >
-                  Previous
+                  {previousButtonLabel}
                 </Button>
                 <Button
                   type="button"

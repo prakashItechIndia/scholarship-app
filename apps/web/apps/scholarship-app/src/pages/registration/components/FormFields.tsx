@@ -1,8 +1,8 @@
-import { Control, FieldErrors, Controller, ControllerRenderProps } from 'react-hook-form';
+import { Control, FieldErrors, Controller } from 'react-hook-form';
 import { Stack, TextField, Dropdown, IDropdownOption, ChoiceGroup, IChoiceGroupOption } from '@fluentui/react';
-import { Input, Select, DatePicker } from '@shared/components';
-import { FormField, FormRow } from './FormField';
-import { getFieldStyles, ROW_TOKENS } from '../utils/registrationConstants';
+import { Input, Select, DatePicker, Label } from '@shared/components';
+import { FormField } from './FormField';
+import { getFieldStyles } from '../utils/registrationConstants';
 import { useThemeTokens } from '@/hooks/useThemeTokens';
 
 interface BaseFormFieldProps {
@@ -97,7 +97,7 @@ export const DropdownField = ({ name, control, errors, label, required, options,
  * Select Field Component (using shared Select component)
  */
 interface SelectFieldProps extends BaseFormFieldProps {
-    options: Array<{ value: string; label: string }>;
+    options: { value: string; label: string }[];
 }
 
 export const SelectField = ({ name, control, errors, label, required, options, placeholder }: SelectFieldProps) => {
@@ -131,7 +131,7 @@ export const DatePickerField = ({ name, control, errors, label, required }: Base
             render={({ field }) => (
                 <FormField label={label} required={required} error={errors[name]?.message as string}>
                     <DatePicker
-                        selectedDate={field.value}
+                        value={field.value}
                         onSelectDate={(date) => field.onChange(date)}
                         errorMessage={errors[name]?.message as string}
                     />
@@ -149,7 +149,7 @@ interface ChoiceGroupFieldProps extends BaseFormFieldProps {
     className?: string;
 }
 
-export const ChoiceGroupField = ({ name, control, errors, label, required, options, className }: ChoiceGroupFieldProps) => {
+export const ChoiceGroupField = ({ name, control, errors, label, required, options }: ChoiceGroupFieldProps) => {
     const errorMessage = errors[name]?.message as string;
     return (
         <FormField label={label} required={required} error={errorMessage}>
@@ -157,21 +157,18 @@ export const ChoiceGroupField = ({ name, control, errors, label, required, optio
                 name={name}
                 control={control}
                 render={({ field }) => (
-                    <>
-                        <ChoiceGroup
-                            selectedKey={field.value}
-                            options={options}
-                            onChange={(_, option) => field.onChange(option?.key)}
-                            styles={{
-                                flexContainer: {
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    gap: '24px',
-                                },
-                            }}
-                        />
-                        {errorMessage && <p className="text-red-600 dark:text-red-400 text-xs mt-1">{errorMessage}</p>}
-                    </>
+                    <ChoiceGroup
+                        selectedKey={field.value}
+                        options={options}
+                        onChange={(_, option) => field.onChange(option?.key)}
+                        styles={{
+                            flexContainer: {
+                                display: 'flex',
+                                flexDirection: 'row',
+                                gap: '24px',
+                            },
+                        }}
+                    />
                 )}
             />
         </FormField>
@@ -183,14 +180,13 @@ export const ChoiceGroupField = ({ name, control, errors, label, required, optio
  */
 interface FormRowContainerProps {
     children: React.ReactNode;
-    wrap?: boolean;
 }
 
-export const FormRowContainer = ({ children, wrap = true }: FormRowContainerProps) => {
+export const FormRowContainer = ({ children }: FormRowContainerProps) => {
     return (
-        <Stack horizontal tokens={ROW_TOKENS} wrap={wrap}>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
             {children}
-        </Stack>
+        </div>
     );
 };
 
@@ -202,16 +198,16 @@ interface IfscCodeFieldProps extends BaseFormFieldProps {
 }
 
 export const IfscCodeField = ({ name, control, errors, label, required, placeholder, onLookupClick }: IfscCodeFieldProps) => {
-    const tokens = useThemeTokens();
-    const fieldStyles = getFieldStyles(tokens);
-    
     return (
+        <div className="w-full">
         <Controller
             name={name}
             control={control}
-            render={({ field }) => (
-                <FormField label={label} required={required} error={errors[name]?.message as string}>
-                    <div className="flex justify-end mb-1.5">
+                render={({ field }) => (
+                <Stack tokens={{ childrenGap: 4 }} className="w-full" styles={{ root: { alignItems: 'flex-start' } }}>
+                    {/* Label and Lookup Link on same line with justify-between */}
+                    <div className="flex justify-between items-center w-full" style={{ minHeight: '20px' }}>
+                        <Label required={required} className="!text-[#242424] !text-[13px] !mb-0 !font-medium">{label}</Label>
                         <span 
                             className="text-red-600 dark:text-red-400 text-xs cursor-pointer font-medium hover:underline"
                             onClick={onLookupClick}
@@ -219,15 +215,19 @@ export const IfscCodeField = ({ name, control, errors, label, required, placehol
                             (Lookup IFSC Code)
                         </span>
                     </div>
-                    <TextField
-                        {...field}
+                        <div className="w-full">
+                            <Input
+                                {...field}
+                                value={field.value ?? ''}
                         placeholder={placeholder}
-                        errorMessage={errors[name]?.message as string}
-                        styles={fieldStyles}
+                                errorMessage={errors[name]?.message as string}
+                                className="w-full"
                     />
-                </FormField>
+                        </div>
+                </Stack>
             )}
         />
+        </div>
     );
 };
 

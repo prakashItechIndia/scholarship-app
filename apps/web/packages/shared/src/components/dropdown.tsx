@@ -2,8 +2,8 @@ import * as React from "react";
 import { Menu, MenuTrigger, MenuPopover, MenuList, MenuItem, MenuProps } from "@fluentui/react-components";
 import { cn } from "../lib/utils";
 
-export interface DropdownMenuProps extends Omit<MenuProps, "open" | "onOpenChange"> {
-  children: React.ReactNode;
+export interface DropdownMenuProps extends Omit<MenuProps, "open" | "onOpenChange" | "children"> {
+  children: React.ReactElement | [React.ReactElement, React.ReactElement];
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -38,7 +38,7 @@ DropdownMenuContent.displayName = "DropdownMenuContent";
 
 const DropdownMenuItem = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & { icon?: React.ReactNode; label?: string }
+  React.HTMLAttributes<HTMLDivElement> & { icon?: React.ReactElement; label?: string }
 >(({ className, children, icon, label, onClick, ...props }, ref) => {
   return (
     <MenuItem
