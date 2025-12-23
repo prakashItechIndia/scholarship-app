@@ -1,7 +1,6 @@
 import {
     AlertRegular,
     DataBarVerticalRegular,
-    DocumentAddRegular,
     HomeRegular,
     PersonRegular,
     QuestionCircleRegular,
@@ -12,8 +11,12 @@ import {
     DismissRegular,
     WrenchScrewdriverRegular,
     ClipboardTaskRegular,
+    TaskListSquareAdd24Regular,
+    PeopleTeam24Regular,
+    DocumentDataRegular,
+    DocumentOnePageSparkleRegular,
 } from "@fluentui/react-icons";
-import { Button, TopNavProps, Popover, PopoverTrigger, PopoverContent, Modal } from "@shared/components";
+import { Button, TopNavProps, Popover, PopoverTrigger, PopoverContent, Modal, ProcessIcon } from "@shared/components";
 import * as React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PageLayout, SideNavConfig } from "./PageLayout";
@@ -45,25 +48,25 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
         onClick: () => { void navigate("/home"); },
       },
       {
-        icon: <DocumentAddRegular className="w-5 h-5" />,
+        icon: <DocumentOnePageSparkleRegular  className="w-5 h-5" />,
         label: "Process",
         active: location.pathname === "/process",
         onClick: () => { void navigate("/process"); },
       },
       {
-        icon: <WrenchScrewdriverRegular className="w-5 h-5" />,
+        icon: <TaskListSquareAdd24Regular className="w-5 h-5" />,
         label: "Setup",
         active: location.pathname === "/setup",
         onClick: () => { void navigate("/setup"); },
       },
       {
-        icon: <ClipboardTaskRegular className="w-5 h-5" />,
+        icon: <PeopleTeam24Regular className="w-5 h-5" />,
         label: "Task",
         active: location.pathname === "/task",
         onClick: () => { void navigate("/task"); },
       },
       {
-        icon: <DataBarVerticalRegular className="w-5 h-5" />,
+        icon: <DocumentDataRegular className="w-5 h-5" />,
         label: "Reports",
         active: location.pathname === "/reports",
         onClick: () => { void navigate("/reports"); },
