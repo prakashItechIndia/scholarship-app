@@ -14,10 +14,9 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
     const isDark = useDarkMode();
     
     // Internal styles - maintained within component for consistency (matching Input component exactly)
+    const tokens = React.useMemo(() => getThemeTokens(isDark ? 'dark' : 'light'), [isDark]);
+    
     const internalStyles = React.useMemo(() => {
-      // Get theme tokens based on dark mode
-      const tokens = getThemeTokens(isDark ? 'dark' : 'light');
-      
       // Use theme tokens for colors
       const borderColor = errorMessage 
         ? (tokens as any).colorStatusDangerBorder2
@@ -27,13 +26,24 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       const textColor = tokens.colorNeutralForeground1;
       
       return {
+        root: {
+          margin: 0,
+          padding: 0,
+        },
         textField: {
+          root: {
+            margin: 0,
+            padding: 0,
+          },
           fieldGroup: {
             height: "45px",
             minHeight: "45px",
+            maxHeight: "45px",
             borderRadius: tokens.borderRadiusLarge,
             backgroundColor,
             border: `1px solid ${borderColor}`,
+            margin: 0,
+            padding: 0,
           },
           fieldGroupFocused: {
             border: `1px solid ${borderColor}`, // Keep same border on focus (no color change)
@@ -46,28 +56,43 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
           field: {
             height: "45px",
             minHeight: "45px",
+            maxHeight: "45px",
             lineHeight: "45px",
             fontSize: tokens.fontSizeBase300,
             color: textColor,
-          },
-          errorMessage: {
-            fontSize: tokens.fontSizeBase200,
-            color: (tokens as any).colorStatusDangerForeground3,
+            margin: 0,
+            paddingTop: "8px",
+            paddingBottom: "8px",
+            paddingLeft: "12px",
+            paddingRight: "12px",
           },
         },
       } as any;
-    }, [errorMessage, isDark]);
+    }, [errorMessage, tokens]);
 
     return (
-      <FluentDatePicker
-        componentRef={ref as any}
-        styles={internalStyles}
-        textField={{
-          errorMessage,
-          ...(typeof textField === 'object' ? textField : {}),
-        } as any}
-        {...props}
-      />
+      <div className="relative w-full" style={{ marginTop: 0, paddingTop: 0, marginBottom: 0, paddingBottom: 0 }}>
+        <FluentDatePicker
+          componentRef={ref as any}
+          styles={internalStyles}
+          className="!m-0 !p-0"
+          textField={{
+            ...(typeof textField === 'object' ? textField : {}),
+          } as any}
+          {...props}
+        />
+        {errorMessage && (
+          <div 
+            className="text-xs mt-1" 
+            style={{ 
+              fontSize: tokens.fontSizeBase200, 
+              color: (tokens as any).colorStatusDangerForeground3 || "#d13438" 
+            }}
+          >
+            {errorMessage}
+          </div>
+        )}
+      </div>
     );
   }
 );

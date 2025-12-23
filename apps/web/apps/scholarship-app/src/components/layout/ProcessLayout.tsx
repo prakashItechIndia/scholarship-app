@@ -1,23 +1,23 @@
 import {
-    AlertRegular,
-    DataBarVerticalRegular,
-    DocumentAddRegular,
     HomeRegular,
     PersonRegular,
     QuestionCircleRegular,
     SearchRegular,
     SettingsRegular,
     LockClosedRegular,
-    SignOutRegular,
     DismissRegular,
-    WrenchScrewdriverRegular,
-    ClipboardTaskRegular,
+    TaskListSquareAdd24Regular,
+    PeopleTeam24Regular,
+    DocumentDataRegular,
+    DocumentOnePageSparkleRegular,
+    AlertBadgeRegular,
+    ArrowExit24Regular,
 } from "@fluentui/react-icons";
 import { Button, TopNavProps, Popover, PopoverTrigger, PopoverContent, Modal } from "@shared/components";
 import * as React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { PageLayout, SideNavConfig } from "./PageLayout";
 import { NavbarLogo } from "../common";
+import { PageLayout, SideNavConfig } from "./PageLayout";
 
 interface ProcessLayoutProps {
   children: React.ReactNode;
@@ -45,25 +45,25 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
         onClick: () => { void navigate("/home"); },
       },
       {
-        icon: <DocumentAddRegular className="w-5 h-5" />,
+        icon: <DocumentOnePageSparkleRegular  className="w-5 h-5" />,
         label: "Process",
         active: location.pathname === "/process",
         onClick: () => { void navigate("/process"); },
       },
       {
-        icon: <WrenchScrewdriverRegular className="w-5 h-5" />,
-        label: "Setup",
-        active: location.pathname === "/setup",
-        onClick: () => { void navigate("/setup"); },
+        icon: <TaskListSquareAdd24Regular className="w-5 h-5" />,
+        label: "Roles",
+        active: location.pathname === "/role-management",
+        onClick: () => { void navigate("/role-management"); },
       },
       {
-        icon: <ClipboardTaskRegular className="w-5 h-5" />,
-        label: "Task",
-        active: location.pathname === "/task",
-        onClick: () => { void navigate("/task"); },
+        icon: <PeopleTeam24Regular className="w-5 h-5" />,
+        label: "Users",
+        active: location.pathname === "/user-management",
+        onClick: () => { void navigate("/user-management"); },
       },
       {
-        icon: <DataBarVerticalRegular className="w-5 h-5" />,
+        icon: <DocumentDataRegular className="w-5 h-5" />,
         label: "Reports",
         active: location.pathname === "/reports",
         onClick: () => { void navigate("/reports"); },
@@ -88,25 +88,18 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
   const topNavConfig: TopNavProps = {
     left: <NavbarLogo />,
     right: (
-      <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
+      <div className="flex items-center gap-6">
+        <div
           onClick={() => console.log("Search clicked")}
           aria-label="Search"
-          className="w-9 h-9 rounded-md bg-white hover:bg-gray-50 p-0 flex items-center justify-center"
         >
           <SearchRegular className="w-5 h-5 text-gray-600" />
-        </Button>
-        <Button
-          variant="ghost"
+        </div>
+        <div
           onClick={() => console.log("Notifications clicked")}
-          aria-label="Notifications"
-          className="w-9 h-9 rounded-md bg-white hover:bg-gray-50 p-0 flex items-center justify-center relative"
         >
-          <AlertRegular className="w-5 h-5 text-gray-600" />
-          {/* Notification badge dot */}
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-gray-900 rounded-full"></span>
-        </Button>
+          <AlertBadgeRegular className="w-5 h-5 text-gray-600" />
+        </div>
         {/* Vertical separator */}
         <div className="h-6 w-px bg-gray-300"></div>
         <Popover 
@@ -117,39 +110,57 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           }}
         >
           <PopoverTrigger disableButtonEnhancement>
-            <Button
-              variant="ghost"
-              className={`w-9 h-9 rounded-full p-0 transition-colors flex items-center justify-center ${
-                profilePopoverOpen 
-                  ? "bg-blue-100" 
-                  : "bg-blue-50 hover:bg-blue-100"
-              }`}
-              aria-label="User menu"
-            >
-              <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center">
-                <span className="text-white text-xs font-semibold">
-                  {userName.charAt(0).toUpperCase()}
-                </span>
+            
+              <div className="w-9 h-9 rounded-full bg-[#C8D1FA] flex items-center justify-center">
+                <PersonRegular className="w-5 h-5 text-[#2C3C85]" />
               </div>
-            </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[280px] p-0">
+          <PopoverContent 
+            className="w-[280px] p-0"
+            style={{
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+            }}
+          >
             {/* User Info Section - Light gray background */}
-            <div className="p-4 border-b border-gray-200 bg-gray-50">
+            <div 
+              className="p-4"
+              style={{
+                // backgroundColor: "#F5F5F5",
+                borderBottom: "1px solid #E0E0E0",
+                marginLeft: 0,
+                marginRight: 0,
+              }}
+            >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                  <PersonRegular className="w-6 h-6 text-gray-500" />
+                <div 
+                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{
+                    backgroundColor: "#E5E5E5",
+                  }}
+                >
+                  <PersonRegular className="w-6 h-6" style={{ color: "#707070" }} />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0">
                   <span 
                     className="text-sm font-semibold text-gray-900 truncate" 
-                    style={{ fontFamily: "Inter, sans-serif", lineHeight: "20px" }}
+                    style={{ 
+                      fontFamily: "'Inter', sans-serif", 
+                      lineHeight: "20px",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                    }}
                   >
                     {userName}
                   </span>
                   <span 
                     className="text-xs font-normal text-gray-500 truncate" 
-                    style={{ fontFamily: "Inter, sans-serif", lineHeight: "16px" }}
+                    style={{ 
+                      fontFamily: "'Inter', sans-serif", 
+                      lineHeight: "16px",
+                      fontSize: "12px",
+                      fontWeight: 400,
+                    }}
                   >
                     {userRole}
                   </span>
@@ -158,7 +169,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
             </div>
 
             {/* Menu Items */}
-            <div className="py-1">
+            <div>
               <button
                 onClick={() => {
                   setProfilePopoverOpen(false);
@@ -166,17 +177,23 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
                   // Navigate to profile page
                 }}
                 className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left focus:outline-none focus:bg-gray-50"
+                style={{
+                  fontFamily: "'Inter', sans-serif",
+                }}
               >
-                <PersonRegular className="w-5 h-5 text-gray-600 flex-shrink-0" />
+                <PersonRegular className="w-5 h-5 flex-shrink-0" style={{ color: "#424242" }} />
                 <span 
                   className="text-sm font-normal text-gray-900" 
-                  style={{ fontFamily: "Inter, sans-serif", lineHeight: "20px" }}
+                  style={{ 
+                    fontFamily: "'Inter', sans-serif", 
+                    lineHeight: "20px",
+                    fontSize: "14px",
+                    fontWeight: 400,
+                  }}
                 >
                   My Profile
                 </span>
               </button>
-              
-              <div className="h-px bg-gray-200 mx-0"></div>
 
               <button
                 onClick={() => {
@@ -185,29 +202,47 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
                   // Navigate to change password page
                 }}
                 className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left focus:outline-none focus:bg-gray-50"
+                style={{
+                  fontFamily: "'Inter', sans-serif",
+                  borderBottom: "1px solid #E0E0E0",
+                  marginLeft: 0,
+                  marginRight: 0,
+                }}
               >
-                <LockClosedRegular className="w-5 h-5 text-gray-600 flex-shrink-0" />
+                <LockClosedRegular className="w-5 h-5 flex-shrink-0" style={{ color: "#424242" }} />
                 <span 
                   className="text-sm font-normal text-gray-900" 
-                  style={{ fontFamily: "Inter, sans-serif", lineHeight: "20px" }}
+                  style={{ 
+                    fontFamily: "'Inter', sans-serif", 
+                    lineHeight: "20px",
+                    fontSize: "14px",
+                    fontWeight: 400,
+                  }}
                 >
                   Change Password
                 </span>
               </button>
-              
-              <div className="h-px bg-gray-200 mx-0"></div>
 
               <button
                 onClick={() => {
                   setProfilePopoverOpen(false);
                   setLogoutModalOpen(true);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 active:bg-red-100 transition-colors text-left focus:outline-none focus:bg-red-50"
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left focus:outline-none focus:bg-gray-50"
+                style={{
+                  fontFamily: "'Inter', sans-serif",
+                  paddingBottom: 0,
+                }}
               >
-                <SignOutRegular className="w-5 h-5 text-red-600 flex-shrink-0" />
+                <ArrowExit24Regular className="w-5 h-5 flex-shrink-0" style={{ color: "#B10E1C" }} />
                 <span 
-                  className="text-sm font-normal text-red-600" 
-                  style={{ fontFamily: "Inter, sans-serif", lineHeight: "20px" }}
+                  className="text-sm font-normal text-gray-900" 
+                  style={{ 
+                    fontFamily: "'Inter', sans-serif", 
+                    lineHeight: "20px",
+                    fontSize: "14px",
+                    fontWeight: 400,
+                  }}
                 >
                   Logout
                 </span>
@@ -241,43 +276,103 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
         open={logoutModalOpen}
         onOpenChange={setLogoutModalOpen}
         size="sm"
+        className="max-w-md"
         title={
-          <div className="relative w-full">
-            <span className="text-lg leading-6 font-semibold text-gray-900 font-inter">
+          <div 
+            className="relative w-full flex items-center justify-between"
+            style={{
+              padding: "20px 24px 16px 24px",
+            }}
+          >
+            <span 
+              style={{
+                fontSize: "18px",
+                lineHeight: "24px",
+                fontWeight: 600,
+                color: "#242424",
+                fontFamily: "'Inter', sans-serif",
+              }}
+            >
               Logout
             </span>
             <Button
               variant="ghost"
               onClick={() => setLogoutModalOpen(false)}
-              className="absolute top-0 right-0 w-8 h-8 hover:bg-gray-100 rounded"
+              style={{
+                width: "32px",
+                height: "32px",
+                padding: 0,
+                minWidth: "auto",
+                backgroundColor: "transparent",
+                border: "none",
+              }}
+              className="hover:bg-gray-100 rounded"
               aria-label="Close"
             >
-              <DismissRegular className="w-5 h-5 text-gray-500" />
+              <DismissRegular className="w-5 h-5" style={{ color: "#707070" }} />
             </Button>
           </div>
         }
         footer={
-          <>
-            <Button
-              variant="outline"
-              onClick={() => setLogoutModalOpen(false)}
-              className="px-4 py-2 text-sm leading-5 font-medium font-inter border-gray-300 text-gray-900"
-            >
-              Cancel
-            </Button>
+          <div 
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: 0,
+              padding: 0,
+            }}
+          >
             <Button
               variant="default"
               onClick={handleLogout}
-              className="px-4 py-2 text-sm leading-5 font-medium font-inter bg-[#115ea3] text-white border-none"
+              style={{
+                padding: "8px 16px",
+                fontSize: "14px",
+                lineHeight: "20px",
+                fontWeight: 500,
+                fontFamily: "'Inter', sans-serif",
+                backgroundColor: "#2453C3",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "8px",
+              }}
             >
               Logout
             </Button>
-          </>
+            <Button
+              variant="outline"
+              onClick={() => setLogoutModalOpen(false)}
+              style={{
+                padding: "8px 16px",
+                fontSize: "14px",
+                lineHeight: "20px",
+                fontWeight: 500,
+                fontFamily: "'Inter', sans-serif",
+                backgroundColor: "#ffffff",
+                color: "#242424",
+                border: "1px solid #d1d1d1",
+                borderRadius: "8px",
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
         }
       >
-        <p className="text-sm leading-5 font-normal text-gray-500 font-inter m-0">
-          Are you sure to logout from current session?
-        </p>
+        <div style={{ padding: "0 24px" }}>
+          <p 
+            style={{
+              fontSize: "14px",
+              lineHeight: "20px",
+              fontWeight: 400,
+              color: "#707070",
+              fontFamily: "'Inter', sans-serif",
+              margin: 0,
+            }}
+          >
+            Are you sure to logout from current session?
+          </p>
+        </div>
       </Modal>
     </>
   );

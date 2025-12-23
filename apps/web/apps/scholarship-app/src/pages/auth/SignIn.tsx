@@ -155,7 +155,7 @@ const SignInPage = () => {
     } else {
       // Store email in localStorage and redirect to verification page
       localStorage.setItem('verification_email', email);
-      void navigate('/verification');
+      void navigate('/registration');
     }
   };
 
@@ -190,7 +190,7 @@ const SignInPage = () => {
         <SEO
           title="Sign In - Leo Muthu Scholarship"
           description="Apply online for the Leo Muthu Scholarship and secure your educational support. An initiative of ARAM Foundation."
-          url="/signin"
+          url="/user-login"
           keywords="Leo Muthu Scholarship, LMS, ARAM Foundation, scholarship application, education support"
           schema={organizationSchema}
         />
@@ -250,7 +250,7 @@ const SignInPage = () => {
       <SEO
         title="Sign In - Leo Muthu Scholarship"
         description="Log in to administer and monitor scholarship applications. An initiative of ARAM Foundation."
-        url="/signin"
+        url="/user-login"
         keywords="Leo Muthu Scholarship, LMS, ARAM Foundation, admin login"
         schema={organizationSchema}
       />
@@ -263,7 +263,10 @@ const SignInPage = () => {
           className="hidden lg:flex w-[472px] relative overflow-hidden"
         >
           <Stack
-            className="w-full h-full relative bg-gradient-to-b from-transparent via-transparent to-black/80 bg-[linear-gradient(193deg,rgba(0,0,0,0)_33%,rgba(208,231,248,1)_73%)] rounded-[40px] border-4 border-white m-5"
+            className="w-full h-full relative rounded-[40px] border-4 border-white m-5"
+            style={{
+              background: 'linear-gradient(180deg, rgba(10, 224, 231, 0.15) 22.66%, rgba(0, 0, 0, 0) 43.38%)'
+            }}
           >
             <Stack horizontalAlign="center" verticalAlign="center" className="w-full h-full">
               <Stack horizontalAlign="center" tokens={{ childrenGap: 16 }} className="text-white text-center p-8">

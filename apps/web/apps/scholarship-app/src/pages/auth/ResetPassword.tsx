@@ -70,7 +70,7 @@ const ResetPasswordPage = () => {
     onSuccess: () => {
       success('Success', 'Password reset successfully. Please sign in with your new password.');
       // After password reset, redirect to sign-in which will then redirect back to product
-      const signInUrl = preserveQueryParams('/signin', [
+      const signInUrl = preserveQueryParams('/user-login', [
         'returnUrl',
         'product',
         'state',
@@ -222,7 +222,7 @@ const ResetPasswordPage = () => {
               </button>
 
               <Link
-                to={preserveQueryParams('/signin', [
+                to={preserveQueryParams('/user-login', [
                   'returnUrl',
                   'product',
                   'state',

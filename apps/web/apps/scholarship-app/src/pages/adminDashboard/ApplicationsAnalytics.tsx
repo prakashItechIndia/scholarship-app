@@ -1,17 +1,14 @@
 import * as React from "react";
-import {
-  PeopleRegular,
-  DocumentRegular,
-  CheckmarkCircleRegular,
-  SearchRegular,
-} from "@fluentui/react-icons";
 import { StatCard } from "./components";
+import { Select } from "@shared/components";
+import { WelcomeBanner } from "../../components/common";
 
 interface ApplicationsAnalyticsProps {
   totalApplications?: number;
   submitted?: number;
   approved?: number;
   underReview?: number;
+  userName?: string;
 }
 
 export const ApplicationsAnalytics: React.FC<ApplicationsAnalyticsProps> = ({
@@ -19,47 +16,105 @@ export const ApplicationsAnalytics: React.FC<ApplicationsAnalyticsProps> = ({
   submitted = 2658,
   approved = 15210,
   underReview = 12531,
+  userName = "Admin",
 }) => {
+  const [selectedAcademicYear, setSelectedAcademicYear] = React.useState<string>("");
+
+  const academicYearOptions = [
+    { value: "2024-2025", label: "2024-2025" },
+    { value: "2023-2024", label: "2023-2024" },
+    { value: "2022-2023", label: "2022-2023" },
+    { value: "2021-2022", label: "2021-2022" },
+  ];
+
   return (
-    <div className="w-full">
+    <div className="w-full" style={{ paddingLeft: 0, marginLeft: 0 }}>
+      {/* Header Section with Welcome Banner and Controls */}
+      <div
+        style={{
+          position: "relative",
+          marginBottom: "18px",
+          marginLeft: 0,
+          paddingLeft: 0,
+        }}
+      >
+        <WelcomeBanner 
+          userName={userName} 
+          style={{ 
+            marginLeft: 0,
+            paddingLeft: 0,
+            width: "100%",
+          }}
+        />
+        {/* Controls Section - Easy to add more buttons here */}
+        <div
+          style={{
+            position: "absolute",
+            right: "48px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+          }}
+        >
+          {/* Academic Year Dropdown */}
+          <div style={{ width: "180px" }}>
+            <Select
+              placeholder="Academic year"
+              options={academicYearOptions}
+              selectedKey={selectedAcademicYear}
+              onValueChange={(value) => setSelectedAcademicYear(value)}
+              style={{
+                backgroundColor: "#ffffff",
+                border: "1px solid #d1d1d1",
+                borderRadius: "8px",
+                height: "36px",
+                minHeight: "36px",
+              }}
+            />
+          </div>
+          {/* 
+            Future buttons/components can be added here, for example:
+            <Button onClick={handleExport}>Export</Button>
+            <Button onClick={handleFilter}>Filter</Button>
+          */}
+        </div>
+      </div>
+      
       <h2 className="text-xl font-semibold text-gray-900 mb-6">
         Applications Analytics & Reports
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          icon={
-            <div className="relative w-6 h-6">
-              <PeopleRegular className="w-6 h-6 absolute top-0 left-0" />
-              <PeopleRegular className="w-5 h-5 absolute bottom-0 right-0 text-blue-500" style={{ transform: 'translate(2px, 2px)' }} />
-            </div>
-          }
+          icon={"$"}
           value={totalApplications}
           label="Total Applications"
+          color="#EFF6FF"
         />
         <StatCard
-          icon={<DocumentRegular className="w-6 h-6" />}
+                    icon={"$"}
           value={submitted}
           label="Submitted"
+          color="#F0FDF4"
         />
         <StatCard
-          icon={
-            <div className="relative w-6 h-6">
-              <DocumentRegular className="w-6 h-6" />
-              <CheckmarkCircleRegular className="w-4 h-4 absolute -bottom-0.5 -right-0.5 text-green-600 bg-white rounded-full" style={{ transform: 'scale(0.8)' }} />
-            </div>
-          }
+          icon={"$"}
           value={approved}
           label="Approved"
+          color="#FAF5FF"
         />
         <StatCard
-          icon={
-            <div className="relative w-6 h-6">
-              <DocumentRegular className="w-6 h-6" />
-              <SearchRegular className="w-4 h-4 absolute -bottom-0.5 -right-0.5 text-blue-600 bg-white rounded-full" style={{ transform: 'scale(0.8)' }} />
-            </div>
-          }
+          icon={"$"}
           value={underReview}
           label="Under Review"
+          color="#FFFBEB"
+        />
+        <StatCard
+          icon={"$"}
+          value={underReview}
+          label="Under Review"
+          color="#FFEFEE"
         />
       </div>
     </div>
