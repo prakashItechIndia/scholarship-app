@@ -66,6 +66,7 @@ const headerContentStyles: IStackStyles = {
     zIndex: 10,
     overflow: 'hidden', // Prevent content overflow
     boxSizing: 'border-box', // Include padding in height calculation
+    backgroundColor: '#e7eef980',
   },
 };
 
@@ -137,7 +138,7 @@ const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: 
         <Text variant="small" className={`uppercase tracking-wider font-semibold mb-1 ${isFinalStep ? 'text-[#707070]' : 'text-[#707070]'}`} style={{ fontSize: '11px', lineHeight: '16px' }}>
           {isFinalStep ? 'FINAL' : `STEP ${step.id}`}
         </Text>
-        <Text variant="large" className={`font-bold ${isActive ? 'text-[#242424]' : 'text-[#242424]'}`} style={{ lineHeight: '24px', fontSize: '16px' }}>
+        <Text variant="large" className={`font-semibold ${isActive ? 'text-[#242424]' : 'text-[#242424]'}`} style={{ lineHeight: '24px', fontSize: '16px' }}>
           {step.title}
         </Text>
       </Stack>
@@ -230,7 +231,7 @@ const RegistrationContent = () => {
       <Stack className="h-screen overflow-hidden bg-gray-50 dark:bg-gray-900">
 
         {/* Header - Fixed Height */}
-        <Stack horizontal verticalAlign="center" styles={headerStyles} disableShrink>
+        <Stack horizontal verticalAlign="center" styles={headerStyles} disableShrink className="hidden md:flex">
           <div className={backgroundImageStyles}></div>
           <div className={overlayStyles}></div>
           <Stack horizontal horizontalAlign="space-between" verticalAlign="center" styles={headerContentStyles}>
@@ -243,14 +244,14 @@ const RegistrationContent = () => {
 
             {/* Title */}
             <Stack.Item grow>
-              <Stack horizontalAlign="center" tokens={{ childrenGap: 8 }} style={{ overflow: 'hidden', maxHeight: '100%' }}>
-                <Text variant="xxLarge" className="text-[#242424] font-bold text-[28px] font-weight-600" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <Stack horizontalAlign="center" tokens={{ childrenGap: 8 }} style={{ maxHeight: '100%' }}>
+                <Text variant="xxLarge" className="text-[#242424] font-bold text-[28px] font-weight-600" style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap',marginBottom: '10px' }}>
                   Leo Muthu Scholarship Application
                 </Text>
-                <Text variant="large" className="!text-[#242424] !text-[16px] font-weight-600" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <Text variant="large" className="!text-[#242424] !text-[16px] font-weight-600" style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   Online Registration for Scholarship Assistance - Academic Year 2025-2026
                 </Text>
-                <Text variant="medium" className="!text-[#242424] !text-[14px] font-weight-400" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>  
+                <Text variant="medium" className="!text-[#242424] !text-[14px] font-weight-400" style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>  
                   Complete the form below to apply for our scholarship program
                 </Text>
               </Stack>
@@ -267,7 +268,7 @@ const RegistrationContent = () => {
         <Stack horizontal grow className="overflow-hidden w-full">
 
           {/* Sidebar - Fixed Width, Scrollable inside if needed */}
-          <Stack styles={sidebarStyles} className="bg-gray-50 dark:bg-gray-800" disableShrink>
+          <Stack styles={sidebarStyles} className="bg-gray-50 dark:bg-gray-800 hidden md:flex" disableShrink>
             <Stack tokens={{ childrenGap: 10 }} style={{ marginBottom: 32,marginLeft: '18px' }}>
               <Stack horizontal horizontalAlign="space-between" verticalAlign="center" style={{ marginBottom: 32 }}>
                 <Stack style={{ marginBottom: 0 }}>
