@@ -20,6 +20,11 @@ const ProcessPage = lazy(() => import('../pages/process'));
 const LandingPage = lazy(() => import('../pages/Landing'));
 const UserDashboardPage = lazy(() => import('../pages/userDashboard'));
 const AdminDashboardPage = lazy(() => import('../pages/adminDashboard/AdminDashboard'));
+const ReportsPage = lazy(() => import('../pages/reports'));
+const RoleManagementPage = lazy(() => import('../pages/roleManagement'));
+const RoleFormPage = lazy(() => import('../pages/roleManagement/components/RoleForm'));
+const UserManagementPage = lazy(() => import('../pages/userManagement'));
+const UserFormPage = lazy(() => import('../pages/userManagement/components/UserForm'));
 
 export const Router = () => {
   return (
@@ -155,6 +160,90 @@ export const Router = () => {
                 <ProcessPage />
               </ErrorBoundary>
             </Suspense>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProcessLayout>
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <ReportsPage />
+                </ErrorBoundary>
+              </Suspense>
+            </ProcessLayout>
+          }
+        />
+        <Route
+          path="/role-management"
+          element={
+            <ProcessLayout>
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <RoleManagementPage />
+                </ErrorBoundary>
+              </Suspense>
+            </ProcessLayout>
+          }
+        />
+        <Route
+          path="/role-management/add"
+          element={
+            <ProcessLayout>
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <RoleFormPage />
+                </ErrorBoundary>
+              </Suspense>
+            </ProcessLayout>
+          }
+        />
+        <Route
+          path="/role-management/edit/:id"
+          element={
+            <ProcessLayout>
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <RoleFormPage />
+                </ErrorBoundary>
+              </Suspense>
+            </ProcessLayout>
+          }
+        />
+        <Route
+          path="/user-management"
+          element={
+            <ProcessLayout>
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <UserManagementPage />
+                </ErrorBoundary>
+              </Suspense>
+            </ProcessLayout>
+          }
+        />
+        <Route
+          path="/user-management/add"
+          element={
+            <ProcessLayout>
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <UserFormPage />
+                </ErrorBoundary>
+              </Suspense>
+            </ProcessLayout>
+          }
+        />
+        <Route
+          path="/user-management/edit/:id"
+          element={
+            <ProcessLayout>
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <UserFormPage />
+                </ErrorBoundary>
+              </Suspense>
+            </ProcessLayout>
           }
         />
         <Route

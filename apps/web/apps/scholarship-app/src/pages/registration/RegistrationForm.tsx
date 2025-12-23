@@ -9,7 +9,7 @@ import FamilyDetails from './steps/FamilyDetails';
 import BankDetails from './steps/BankDetails';
 import DocumentsUpload from './steps/DocumentsUpload';
 // import ReviewSubmit from './steps/ReviewSubmit';
-import logo from '@shared/assets/icons/Logo.svg';
+import logo from '@shared/assets/icons/LMS Logo.png';
 import background from '@shared/assets/icons/header-bg.png';
 import checkmarkIcon from '@shared/assets/icons/Checkmark.svg';
 import ReviewSubmit from './steps/ReviewSubmit';

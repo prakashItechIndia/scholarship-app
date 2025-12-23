@@ -4,7 +4,7 @@ import { useRegistrationForm } from '../hooks/useRegistrationForm';
 import { StepLayout } from '../components/StepLayout';
 import { getStringValue } from '../utils/registrationHelpers';
 import { STACK_TOKENS } from '../utils/registrationConstants';
-import { DropdownField, TextInputField, FormRowContainer, FormRow, InputField } from '../components';
+import { DropdownField, TextInputField, FormRowContainer, FormRow, InputField, SelectField } from '../components';
 
 // --- Validation Schema ---
 const identitySchema = z
@@ -31,11 +31,11 @@ const identitySchema = z
     }));
 
 // --- Constants ---
-const APPLICANT_OPTIONS: IDropdownOption[] = [
-    { key: 'research_scholar', text: 'I am a Research Scholar seeking Scholarship' },
-    { key: 'student', text: 'I am a College Student seeking Scholarship' },
-    { key: 'student', text: 'I am a School Student seeking Scholarship' },
-    { key: 'medical', text: 'I am a Medical Student seeking Scholarship' },
+const APPLICANT_OPTIONS: { value: string; label: string }[] = [
+    { value: 'research_scholar', label: 'I am a Research Scholar seeking Scholarship' },
+    { value: 'student', label: 'I am a College Student seeking Scholarship' },
+    { value: 'school_student', label: 'I am a School Student seeking Scholarship' },
+    { value: 'medical_student', label: 'I am a Medical Student seeking Scholarship' },
 
 ];
 
@@ -60,7 +60,7 @@ const IdentityDetails = () => {
             <form className="w-full h-full flex flex-col" onSubmit={(e) => void handleSubmit(onSubmit)(e)} id="current-step-form">
                 <Stack tokens={STACK_TOKENS}>
                         {/* Applicant Type Dropdown */}
-                    <DropdownField
+                    <SelectField
                             name="applicantType"
                             control={control}
                         errors={errors}
