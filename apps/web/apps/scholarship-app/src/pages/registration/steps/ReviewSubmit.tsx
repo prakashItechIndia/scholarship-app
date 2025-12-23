@@ -42,7 +42,6 @@ const sectionHeaderStyles = mergeStyles({
 const labelStyles = mergeStyles({
     fontSize: 14,
     color: '#6b7280', // Gray text for labels
-    width: 340, // Fixed width for alignment
 });
 
 const valueStyles = mergeStyles({
@@ -167,14 +166,14 @@ const ReviewSubmit = () => {
 
     const handleSuccessClose = () => {
         setIsSuccess(false);
-        window.location.href = '/signin';
+        window.location.href = '/user-dashboard';
     };
 
     const renderRow = (label: string, value: string | number | Date | File[] | undefined | null) => (
-        <Stack horizontal verticalAlign="start">
-            <Text className={labelStyles}>{label}</Text>
+        <div className="flex flex-col md:flex-row md:items-start gap-1 md:gap-0">
+            <Text className={`${labelStyles} w-full md:w-[340px]`}>{label}</Text>
             <Text className={valueStyles}>{displayValue(value)}</Text>
-        </Stack>
+        </div>
     );
 
     return (
@@ -384,6 +383,7 @@ const ReviewSubmit = () => {
                                 </Text>
                             </Stack>
                         </Stack>
+                        <div className="h-5"></div>
 
                     </Stack>
                 </Stack>

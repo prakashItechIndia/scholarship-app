@@ -11,6 +11,7 @@ import {
 } from '@fluentui/react';
 import { useRegistration } from '@/contexts/RegistrationContext';
 import { useThemeTokens } from '@/hooks/useThemeTokens';
+// import { usePreviousButton } from '../hooks/usePreviousButton'; // Uncomment to use dynamic previous button
 import { PdfIcon, CloseIcon, UploadIcon } from '@shared/components';
 
 // --- Constants ---
@@ -37,7 +38,7 @@ function formatBytes(bytes: number, decimals = 2) {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
-function truncateFileName(fileName: string, maxLength: number = 10): string {
+function truncateFileName(fileName: string, maxLength = 10): string {
     if (fileName.length <= maxLength) {
         return fileName;
     }
@@ -62,6 +63,26 @@ const containerStyles: IStackStyles = {
 const DocumentsUpload = () => {
     const { formData, updateFormData, nextStep, markStepComplete, setIsLoading } = useRegistration();
     const tokens = useThemeTokens();
+    
+    // Example: Configure previous button dynamically with styling
+    // import { usePreviousButton } from '../hooks/usePreviousButton';
+    // const { setStep } = useRegistration();
+    // usePreviousButton({
+    //   onPrevious: async () => {
+    //     // Custom logic before going back
+    //     console.log('Going back from documents step');
+    //     setStep(4); // Go to a specific step
+    //   },
+    //   disabled: false, // Enable/disable the button
+    //   label: 'Back', // Custom label
+    //   bgColor: '#F0F0F0', // Custom background color (hex)
+    //   textColor: '#666666', // Custom text color (hex)
+    //   // OR use Tailwind classes:
+    //   // bgColor: 'bg-gray-200',
+    //   // textColor: 'text-gray-600',
+    //   // OR use full custom className:
+    //   // className: '!bg-blue-500 !text-white hover:!bg-blue-600 h-10 rounded-lg'
+    // });
     
     // Type guard to check if documents is File[]
     const getDocumentsFromFormData = (): File[] => {
@@ -240,7 +261,7 @@ const fileItemStyles = mergeStyles({
     };
 
     return (
-        <Stack className="w-4/5 h-full flex flex-col">
+        <Stack className="w-full md:w-4/5 h-full flex flex-col">
             <Stack grow verticalAlign="start" className="flex-1" style={{ minHeight: 0 }}>
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-1">Documents to be uploaded</h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Provide the requested documents to complete your application.</p>
@@ -253,10 +274,16 @@ const fileItemStyles = mergeStyles({
 
                 <form id="current-step-form" className="w-full flex-1 flex flex-col" style={{ minHeight: 0 }} onSubmit={handleSubmit(onFormSubmit)}>
                     {/* Main Layout: Grid - 70% upload area, 30% documents required initially */}
+                    <style>{`
+                        @media (min-width: 768px) {
+                            .documents-grid {
+                                grid-template-columns: ${uploadedFiles.length > 0 ? '60% 30% 30%' : '90% 33%'};
+                            }
+                        }
+                    `}</style>
                     <div 
-                        className="grid gap-8 w-full" 
+                        className="grid grid-cols-1 gap-4 md:gap-8 w-full documents-grid" 
                         style={{ 
-                            gridTemplateColumns: uploadedFiles.length > 0 ? '60% 30% 30%' : '90% 33%',
                             alignItems: 'stretch'
                         }}
                     >
@@ -284,7 +311,7 @@ const fileItemStyles = mergeStyles({
                         {/* Column 2: Uploaded Files List - Only shown when files are uploaded */}
                         {uploadedFiles.length > 0 && (
                             <div className="flex flex-col h-full" style={{ minHeight: 0 }}>
-                                <div className="overflow-y-auto pr-2 h-full" style={{ maxHeight: '100%' }}>
+                                <div className="overflow-y-auto pr-0 md:pr-2 h-full" style={{ maxHeight: '100%' }}>
                                     <div className="grid grid-cols-1 gap-3">
                                         {uploadedFiles.map((file, idx) => (
                                             <div key={idx} className={`${fileItemStyles} bg-[#F5F5F5] dark:bg-gray-800 border-gray-200 dark:border-gray-700 border h-[56px]`}>
@@ -340,7 +367,7 @@ const fileItemStyles = mergeStyles({
                                         (Any 3 documents are mandatory)
                                     </Text>
                                 </div>
-                                <ul className={`${sideCardListStyles}`}>
+                                <ul className={sideCardListStyles}>
                                     {REQUIRED_DOCUMENTS.map((doc, idx) => (
                                         <li key={idx} className={`${sideCardItemStyles} border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-[12px] font-regular py-1.5`}>
                                             {doc}

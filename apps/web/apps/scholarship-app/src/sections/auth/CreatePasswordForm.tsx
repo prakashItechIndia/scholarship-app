@@ -50,7 +50,7 @@ export const CreatePasswordForm = () => {
     mutationFn: createPassword,
     onSuccess: () => {
       // Redirect to login or dashboard after successful password creation
-      void navigate('/signin?passwordCreated=true');
+      void navigate('/user-login?passwordCreated=true');
     },
   });
 
@@ -75,7 +75,7 @@ export const CreatePasswordForm = () => {
           a new activation link.
         </p>
         <a
-          href="/signin"
+          href="/user-login"
           className="inline-block rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
         >
           Go to Sign In

@@ -14,9 +14,9 @@ const getSidebarStyles = (expanded: boolean): React.CSSProperties => ({
   flexDirection: "column",
   width: expanded ? "256px" : "56px",
   minWidth: expanded ? "256px" : "56px",
-  height: "calc(100vh - 52px)",
-  maxHeight: "calc(100vh - 52px)",
-  top: 52,
+  height: "calc(100vh - 56px)",
+  maxHeight: "calc(100vh - 56px)",
+  top: 56,
   backgroundColor: "#2453C3", // Solid dark blue background
   overflowY: "auto",
   overflowX: "hidden",
@@ -24,10 +24,10 @@ const getSidebarStyles = (expanded: boolean): React.CSSProperties => ({
   left: 0,
   zIndex: 1000,
   paddingTop: "16px",
-  paddingBottom: "10px",
+  // paddingBottom: "10px",
   paddingLeft: expanded ? "16px" : "6px",
   paddingRight: expanded ? "16px" : "6px",
-  gap: "10px",
+  // gap: "10px",
   alignItems: expanded ? "flex-start" : "center",
 });
 

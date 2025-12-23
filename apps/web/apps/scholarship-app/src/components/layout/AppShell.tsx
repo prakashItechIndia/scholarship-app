@@ -11,7 +11,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { path: '/dashboard', label: 'Dashboard', icon: <HomeIcon /> },
-  { path: '/signin', label: 'Sign In', icon: <ArrowRightIcon /> },
+  { path: '/user-login', label: 'Sign In', icon: <ArrowRightIcon /> },
 ];
 
 const logo = (
@@ -62,7 +62,7 @@ export const AppShell = ({ children }: PropsWithChildren) => {
             </DefaultButton>
             <PrimaryButton
               onClick={() => {
-                void navigate('/signin');
+                void navigate('/user-login');
               }}
             >
               Sign In
