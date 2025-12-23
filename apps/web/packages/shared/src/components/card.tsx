@@ -23,7 +23,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={ref}
-        className={cn("rounded-lg", getVariantClasses(), className)}
+        className={cn("", getVariantClasses(), className)}
         {...props}
       >
         {children}

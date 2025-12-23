@@ -1,11 +1,10 @@
 import * as React from "react";
 import { Role } from "../types";
 import {
-  MoreVerticalRegular,
-  ArrowUp20Regular,
-  ArrowDown20Regular,
-  EditRegular,
-  DeleteRegular,
+  MoreHorizontalRegular,
+  ArrowSortRegular,
+  PersonEditRegular,
+  PersonDeleteRegular,
 } from "@fluentui/react-icons";
 import { Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@shared/components";
 
@@ -18,6 +17,38 @@ interface UseRoleTableProps {
   data?: Role[];
 }
 
+// Export functions for edit and delete actions
+export const handleEditRole = (item: Role, onEdit: (item: Role) => void) => {
+  onEdit(item);
+};
+
+export const handleDeleteRole = (item: Role, onDelete: (item: Role) => void) => {
+  onDelete(item);
+};
+
+// Export function for sortable header with ArrowSortRegular icon
+export const renderSortableHeader = (name: string) => (
+  <div 
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "4px",
+      cursor: "pointer",
+    }}
+  >
+    <span style={{
+      fontSize: "13px",
+      lineHeight: "20px",
+      fontWeight: 600,
+      color: "#424242",
+      fontFamily: "'Inter', sans-serif",
+    }}>
+      {name}
+    </span>
+    <ArrowSortRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
+  </div>
+);
+
 export const useRoleTable = ({
   handleEdit,
   handleDelete,
@@ -28,31 +59,7 @@ export const useRoleTable = ({
 }: UseRoleTableProps) => {
   const columns = React.useMemo(() => {
     // Helper function to create sortable header
-    const createSortableHeader = (name: string) => (
-      <div 
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "4px",
-          cursor: "pointer",
-        }}
-        className="hover:opacity-80"
-      >
-        <span style={{
-          fontSize: "14px",
-          lineHeight: "20px",
-          fontWeight: 600,
-          color: "#242424",
-          fontFamily: "'Inter', sans-serif",
-        }}>
-          {name}
-        </span>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <ArrowUp20Regular style={{ width: "12px", height: "12px", color: "#616161" }} />
-          <ArrowDown20Regular style={{ width: "12px", height: "12px", color: "#616161", marginTop: "-4px" }} />
-        </div>
-      </div>
-    );
+    const createSortableHeader = (name: string) => renderSortableHeader(name);
 
     // Action column renderer
     const renderActions = (item: Role) => (
@@ -69,19 +76,19 @@ export const useRoleTable = ({
               }}
               aria-label="More options"
             >
-              <MoreVerticalRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
+              <MoreHorizontalRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem
-              icon={<EditRegular style={{ width: "16px", height: "16px" }} />}
+              icon={<PersonEditRegular style={{ width: "16px", height: "16px" }} />}
               label="Edit Role"
-              onClick={() => handleEdit(item)}
+              onClick={() => handleEditRole(item, handleEdit)}
             />
             <DropdownMenuItem
-              icon={<DeleteRegular style={{ width: "16px", height: "16px" }} />}
+              icon={<PersonDeleteRegular style={{ width: "16px", height: "16px" }} />}
               label="Delete Role"
-              onClick={() => handleDelete(item)}
+              onClick={() => handleDeleteRole(item, handleDelete)}
               style={{ color: "#c50f1f" }}
               className="hover:text-red-700"
             />
@@ -195,14 +202,14 @@ export const useRoleTable = ({
         onRenderHeader: () => createSortableHeader("User Type"),
         onRender: (item: Role) => renderText(item.roleType),
       },
-      {
-        key: "description",
-        name: "Description",
-        fieldName: "description",
-        minWidth: 250,
-        isSortable: false,
-        onRender: (item: Role) => renderText(item.description),
-      },
+      // {
+      //   key: "description",
+      //   name: "Description",
+      //   fieldName: "description",
+      //   minWidth: 250,
+      //   isSortable: false,
+      //   onRender: (item: Role) => renderText(item.description),
+      // },
       {
         key: "status",
         name: "Status",
