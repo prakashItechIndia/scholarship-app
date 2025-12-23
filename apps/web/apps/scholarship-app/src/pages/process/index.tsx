@@ -27,6 +27,10 @@ import DocumentUploadPanel from "./components/DocumentUploadPanel";
 import ProcessHistoryModal from "./components/ProcessHistoryModal";
 import ScholarshipHistoryModal from "./components/ScholarshipHistoryModal";
 import PrintDetailsModal from "./components/PrintDetailsModal";
+import ApproveModal from "./components/ApproveModal";
+import IssueAmountModal from "./components/IssueAmountModal";
+import SuggestModal from "./components/SuggestModal";
+import VerifyModal from "./components/VerifyModal";
 
 const tabHeaderInfo: Record<string, { title: string; subtitle: string }> = {
   overview: {
@@ -43,7 +47,7 @@ const tabHeaderInfo: Record<string, { title: string; subtitle: string }> = {
   },
   suggest: {
     title: "Suggest",
-    subtitle: "Input the amount you’d like to suggest",
+    subtitle: "Input the amount you'd like to suggest",
   },
   approve: {
     title: "Approve",
@@ -80,6 +84,22 @@ const ProcessPage: React.FC = () => {
   const [printDetailsModalOpen, setPrintDetailsModalOpen] = React.useState(false);
   const [selectedPrintApplication, setSelectedPrintApplication] = React.useState<ApplicationData | null>(null);
 
+  // Issue Amount Modal State
+  const [issueAmountModalOpen, setIssueAmountModalOpen] = React.useState(false);
+  const [selectedIssueAmountApplication, setSelectedIssueAmountApplication] = React.useState<ApplicationData | null>(null);
+
+  // Approve Modal State
+  const [approveModalOpen, setApproveModalOpen] = React.useState(false);
+  const [selectedApproveApplication, setSelectedApproveApplication] = React.useState<ApplicationData | null>(null);
+
+  // Suggest Modal State
+  const [suggestModalOpen, setSuggestModalOpen] = React.useState(false);
+  const [selectedSuggestApplication, setSelectedSuggestApplication] = React.useState<ApplicationData | null>(null);
+
+  // Verify Modal State
+  const [verifyModalOpen, setVerifyModalOpen] = React.useState(false);
+  const [selectedVerifyApplication, setSelectedVerifyApplication] = React.useState<ApplicationData | null>(null);
+
   const [selectedDocument, setSelectedDocument] = React.useState<ApplicationData | null>(null);
   const [academicYear, setAcademicYear] = React.useState("Academic year");
 
@@ -112,7 +132,7 @@ const ProcessPage: React.FC = () => {
 
   // Handle PDF viewer action
   const handleViewPDF = React.useCallback((item: ApplicationData) => {
-    setSelectedPdfUrl("https://scholarship.leomuthu.com/Registered_Pdf_ScholerShip/AF2510004.pdf");
+    setSelectedPdfUrl(`https://scholarship.leomuthu.com/Registered_Pdf_ScholerShip/${item.applicationNo}.pdf`);
     setSelectedPdfApplicationNo(item.applicationNo);
     setPdfViewerOpen(true);
   }, []);
@@ -146,6 +166,33 @@ const ProcessPage: React.FC = () => {
     setPrintDetailsModalOpen(true);
   }, []);
 
+  // Handle process action
+  const handleProcess = React.useCallback((item: ApplicationData) => {
+    const actionLabel = item.processActionLabel;
+
+    if (actionLabel === "Issue Amount") {
+      setSelectedIssueAmountApplication(item);
+      setIssueAmountModalOpen(true);
+    } else if (actionLabel === "Approved") {
+      // For "Approved" status, directly open the PDF
+      setSelectedPdfUrl(`https://scholarship.leomuthu.com/Registered_Pdf_ScholerShip/${item.applicationNo}.pdf`);
+      setSelectedPdfApplicationNo(item.applicationNo);
+      setPdfViewerOpen(true);
+    } else if (actionLabel === "Approve") {
+      // For "Approve" action, open the approval modal
+      setSelectedApproveApplication(item);
+      setApproveModalOpen(true);
+    } else if (actionLabel === "Suggest 1" || actionLabel === "Suggest 2" || actionLabel?.startsWith("Suggest")) {
+      setSelectedSuggestApplication(item);
+      setSuggestModalOpen(true);
+    } else if (actionLabel === "Verified") {
+      setSelectedVerifyApplication(item);
+      setVerifyModalOpen(true);
+    } else {
+      console.log("Process action for:", item.applicationNo, item.processActionLabel);
+    }
+  }, []);
+
   // Handle viewing a specific document from the drawer - opens in new tab
   const handleViewSpecificDocument = React.useCallback((doc: { url: string; name: string }) => {
     // Open PDF in new tab
@@ -174,6 +221,7 @@ const ProcessPage: React.FC = () => {
     handleViewHistory,
     handleViewScholarshipHistory,
     handlePrintDetails,
+    handleProcess,
   });
 
   // Get current tab's data
@@ -580,6 +628,49 @@ const ProcessPage: React.FC = () => {
         onOpenChange={setScholarshipHistoryModalOpen}
         applicationNo={selectedScholarshipHistoryApplication?.applicationNo}
         studentName={selectedScholarshipHistoryApplication?.studentName}
+      />
+
+      <VerifyModal
+        open={verifyModalOpen}
+        onOpenChange={setVerifyModalOpen}
+        data={selectedVerifyApplication}
+        onPreviousScholarshipHistory={() => {
+          // Open scholarship history modal when button is clicked
+          if (selectedVerifyApplication) {
+            setSelectedScholarshipHistoryApplication(selectedVerifyApplication);
+            setScholarshipHistoryModalOpen(true);
+          }
+        }}
+      />
+
+      <SuggestModal
+        open={suggestModalOpen}
+        onOpenChange={setSuggestModalOpen}
+        data={selectedSuggestApplication}
+        onSuggestSuccess={(applicationNo) => {
+          // Open PDF viewer with the suggested application's PDF
+          setSelectedPdfUrl(`https://scholarship.leomuthu.com/Registered_Pdf_ScholerShip/${applicationNo}.pdf`);
+          setSelectedPdfApplicationNo(applicationNo);
+          setPdfViewerOpen(true);
+        }}
+      />
+
+      <ApproveModal
+        open={approveModalOpen}
+        onOpenChange={setApproveModalOpen}
+        data={selectedApproveApplication}
+        onApproveSuccess={(applicationNo) => {
+          // Open PDF viewer with the approved application's PDF
+          setSelectedPdfUrl(`https://scholarship.leomuthu.com/Registered_Pdf_ScholerShip/${applicationNo}.pdf`);
+          setSelectedPdfApplicationNo(applicationNo);
+          setPdfViewerOpen(true);
+        }}
+      />
+
+      <IssueAmountModal
+        open={issueAmountModalOpen}
+        onOpenChange={setIssueAmountModalOpen}
+        data={selectedIssueAmountApplication}
       />
       <PrintDetailsModal
         open={printDetailsModalOpen}
