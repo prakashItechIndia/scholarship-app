@@ -1,17 +1,11 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Table,
-  Pagination,
+  DataTable,
   Button,
-  Card,
   Modal,
+  PageActionButtons,
 } from "@shared/components";
-import {
-  AddRegular,
-  ArrowClockwiseRegular,
-  ArrowDownloadRegular,
-} from "@fluentui/react-icons";
 import { Role } from "./types";
 import { mockRoles } from "./constants";
 import { useRoleTable } from "./hooks/useRoleTable";
@@ -124,121 +118,67 @@ const RoleManagementPage: React.FC = () => {
     }
   };
 
-  const handleRefresh = () => {
-    // Refresh roles list - in real app, this would fetch from API
-    setRoles([...mockRoles]);
-    setCurrentPage(1);
-  };
-
-  const handleExport = () => {
-    // Export functionality - in real app, this would export to CSV/Excel
-    console.log("Exporting roles...", roles);
-  };
 
   return (
     <div style={{
       width: "100%",
       height: "100%",
       backgroundColor: "#fafafa",
-      padding: "24px",
       fontFamily: "'Inter', sans-serif",
+      boxSizing: "border-box",
     }}>
-      {/* Title Section */}
-      <div style={{ marginBottom: "24px" }}>
-        <h1 style={{
-          fontSize: "32px",
-          lineHeight: "40px",
-          fontWeight: 700,
-          color: "#242424",
-          marginBottom: "8px",
-          fontFamily: "'Inter', sans-serif",
-        }}>
-          Role and Permissions - Maintain Roles, Rights, and User Information
-        </h1>
+      {/* Title and Action Buttons */}
+      <div style={{ padding: "24px 24px 16px 24px" }}>
+        <PageActionButtons
+          title={
+            <div style={{ lineHeight: "1.2" }}>
+              <div style={{
+                fontSize: "16px",
+                fontWeight: 600,
+                color: "#242424",
+                fontFamily: "'Inter', sans-serif",
+              }}>
+                Role and Permissions
+              </div>
+              <div style={{
+                fontSize: "12px",
+                fontWeight: 400,
+                color: "#242424",
+                fontFamily: "'Inter', sans-serif",
+                marginTop: "2px",
+              }}>
+                Maintain Roles, Rights, and User Information
+              </div>
+            </div>
+          }
+          primaryButtonLabel="Add Role"
+          onPrimaryAction={handleAddRole}
+          onMoreClick={() => {
+            // Handle more options click - can be extended later
+            console.log("More options clicked");
+          }}
+        />
       </div>
 
-      {/* Action Buttons */}
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-end",
-        gap: "12px",
-        marginBottom: "16px",
-      }}>
-        <Button
-          appearance="primary"
-          onClick={handleAddRole}
-          style={{
-            backgroundColor: "#0f6cbd",
-            color: "#ffffff",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-          }}
-        >
-          <AddRegular style={{ width: "16px", height: "16px" }} />
-          Add Role
-        </Button>
-        <Button
-          appearance="subtle"
-          onClick={handleRefresh}
-          aria-label="Refresh"
-          style={{
-            width: "36px",
-            height: "36px",
-            padding: 0,
-          }}
-        >
-          <ArrowClockwiseRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
-        </Button>
-        <Button
-          appearance="subtle"
-          onClick={handleExport}
-          aria-label="Export"
-          style={{
-            width: "36px",
-            height: "36px",
-            padding: 0,
-          }}
-        >
-          <ArrowDownloadRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
-        </Button>
-      </div>
-
-      {/* Table Section */}
-      <Card variant="elevated" style={{
-        overflow: "hidden",
-        border: "1px solid #e0e0e0",
-        backgroundColor: "#ffffff",
-        borderRadius: "8px",
-      }}>
-        <div style={{ overflowX: "auto" }}>
-          <Table columns={columns} data={paginatedData} />
-        </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div style={{
-            padding: "16px",
-            borderTop: "1px solid #e0e0e0",
-            backgroundColor: "#ffffff",
-          }}>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              pageSize={pageSize}
-              totalItems={totalItems}
-              onPageChange={setCurrentPage}
-              onPageSizeChange={setPageSize}
-              pageSizeOptions={[5, 10, 20, 50, 100]}
-              showFirstLast={true}
-              showPageSize={true}
-              showPageNumbers={true}
-              maxPageButtons={7}
-            />
-          </div>
-        )}
-      </Card>
+      {/* Table Section - Full Width */}
+      <DataTable
+        columns={columns}
+        data={paginatedData}
+        fullWidth={true}
+        pagination={{
+          currentPage,
+          totalPages,
+          pageSize,
+          totalItems,
+          onPageChange: setCurrentPage,
+          onPageSizeChange: setPageSize,
+          pageSizeOptions: [5, 10, 20, 50, 100],
+          showFirstLast: true,
+          showPageSize: true,
+          showPageNumbers: true,
+          maxPageButtons: 7,
+        }}
+      />
 
       {/* Delete Confirmation Modal */}
       <Modal
