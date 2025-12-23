@@ -12,6 +12,7 @@ interface FamilyMemberSectionProps {
     occupationOptions: Array<{ value: string; label: string }>;
     incomeOptions: Array<{ value: string; label: string }>;
     isOptional?: boolean;
+    className?: string;
 }
 
 /**

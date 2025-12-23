@@ -4,6 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 
 import { AuthProvider } from './contexts/AuthContext';
 import { Router } from './router/Router';
+import { ToastProvider } from './components/ui/ToastProvider';
 
 // Create optimized query client with performance settings
 const queryClient = createQueryClient();
@@ -14,9 +15,11 @@ const App = () => {
       <FluentProvider theme={webLightTheme}>
         {/* <ThemeProvider defaultTheme="light"> */}
             {/* <ThemeSync /> */}
-            <AuthProvider>
-              <Router />
-            </AuthProvider>
+            <ToastProvider>
+              <AuthProvider>
+                <Router />
+              </AuthProvider>
+            </ToastProvider>
         {/* </ThemeProvider> */}
       </FluentProvider>
     </QueryClientProvider>

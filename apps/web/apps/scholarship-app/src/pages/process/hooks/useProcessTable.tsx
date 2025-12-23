@@ -82,10 +82,9 @@ export const useProcessTable = ({
           gap: "4px",
           cursor: "pointer",
         }}
-        className="hover:opacity-80"
       >
         <span style={{
-          fontSize: "14px",
+          fontSize: "13px",
           lineHeight: "20px",
           fontWeight: 600,
           color: "#616161",

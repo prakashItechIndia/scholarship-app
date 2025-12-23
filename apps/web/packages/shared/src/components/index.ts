@@ -19,4 +19,15 @@ export * from "./label";
 export * from "./divider";
 export * from "./modal";
 export * from "./drawer";
+export * from "./pdf-icon";
+export * from "./close-icon";
+export * from "./upload-icon";
+export * from "./pencil-icon";
+export * from "./document-icon";
+export * from "./more-icon";
+export * from "./reopen-icon";
+export * from "./print-icon";
+export * from "./filter-icon";
+export * from "./page-action-buttons";
+export * from "./data-table";
 

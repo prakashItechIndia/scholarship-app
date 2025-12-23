@@ -25,7 +25,7 @@ export const AuthenticatedRedirect = () => {
 
   if (!isAuthenticated) {
     // If not authenticated, redirect to sign in
-    window.location.href = '/signin';
+    window.location.href = '/user-login';
     return <LoadingScreen message="Redirecting to sign in..." />;
   }
 

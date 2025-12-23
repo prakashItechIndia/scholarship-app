@@ -4,13 +4,13 @@ import { getThemeTokens, type ThemeTokens } from '@shared/config/theme';
 /**
  * Common stack tokens used across registration steps
  */
-export const STACK_TOKENS: IStackTokens = { childrenGap: 24 };
-export const ROW_TOKENS: IStackTokens = { childrenGap: 24 };
+export const STACK_TOKENS: IStackTokens = { childrenGap: 20 };
+export const ROW_TOKENS: IStackTokens = { childrenGap: 20 };
 
 /**
  * Common container class for step components
  */
-export const STEP_CONTAINER_CLASS = "w-4/5 h-full flex flex-col [&_.ms-TextField-wrapper]:w-full text-[#242424] text=[20px]";
+export const STEP_CONTAINER_CLASS = "w-full md:w-4/5 h-full flex flex-col [&_.ms-TextField-wrapper]:w-full text-[#242424] text=[20px]";
 
 /**
  * Common title and subtitle styles as Tailwind classes
@@ -34,6 +34,7 @@ export const getFieldStyles = (tokens: ThemeTokens) => ({
         height: 42, 
         borderRadius: parseInt(tokens.borderRadiusMedium), 
         borderColor: tokens.colorNeutralStroke1 ,
+        width: '100%',
     }
 });
 
@@ -47,10 +48,10 @@ export const FIELD_STYLES = {
 /**
  * Common form field wrapper class
  */
-export const FORM_FIELD_WRAPPER_CLASS = "min-w-[250px] ";
+export const FORM_FIELD_WRAPPER_CLASS = "w-full md:min-w-[250px] ";
 
 /**
  * Section header styles
  */
-export const SECTION_HEADER_CLASS = "text-base font-semibold text-gray-900 mt-2 mb-4";
+export const SECTION_HEADER_CLASS = "text-[16px] font-semibold text-[#242424] mt-2 -mb-2";
 
