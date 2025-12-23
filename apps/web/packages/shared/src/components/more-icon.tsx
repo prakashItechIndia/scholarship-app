@@ -1,0 +1,30 @@
+import React from 'react';
+
+export interface MoreIconProps {
+  width?: number | string;
+  height?: number | string;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+export const MoreIcon: React.FC<MoreIconProps> = ({ 
+  width = 15, 
+  height = 15, 
+  className = '',
+  style
+}) => {
+  return (
+    <svg 
+      width={width} 
+      height={height} 
+      viewBox="0 0 15 15" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      style={style}
+    >
+      <path d="M5.75 8C5.75 8.41421 5.41421 8.75 5 8.75C4.58579 8.75 4.25 8.41421 4.25 8C4.25 7.58579 4.58579 7.25 5 7.25C5.41421 7.25 5.75 7.58579 5.75 8ZM8.75 8C8.75 8.41421 8.41421 8.75 8 8.75C7.58579 8.75 7.25 8.41421 7.25 8C7.25 7.58579 7.58579 7.25 8 7.25C8.41421 7.25 8.75 7.58579 8.75 8ZM11 8.75C11.4142 8.75 11.75 8.41421 11.75 8C11.75 7.58579 11.4142 7.25 11 7.25C10.5858 7.25 10.25 7.58579 10.25 8C10.25 8.41421 10.5858 8.75 11 8.75Z" fill="#242424"/>
+    </svg>
+  );
+};
+
