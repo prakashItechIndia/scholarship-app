@@ -5,7 +5,7 @@ import { AuthenticatedRedirect } from '../components/auth/AuthenticatedRedirect'
 import { ErrorBoundary } from '../components/common/ErrorBoundary';
 import { LoadingScreen } from '../components/layout/LoadingScreen';
 import { ProcessLayout } from '../components/layout/ProcessLayout';
-import LandingPage from '@/pages/Landing.tsx';
+// import LandingPage from '@/pages/Landing.tsx';
 
 // Lazy load pages with code splitting
 const SignInPage = lazy(() => import('../pages/auth/SignIn.tsx'));
@@ -19,6 +19,7 @@ const VerificationPage = lazy(() => import('../pages/auth/Verification'));
 const SetPasswordPage = lazy(() => import('../pages/auth/SetPassword'));
 const EmailVerificationPage = lazy(() => import('../pages/auth/EmailVerification'));
 const ProcessPage = lazy(() => import('../pages/process'));
+const LandingPage = lazy(() => import('../pages/Landing'));
 
 const UserDashboardPage = lazy(() => import('../pages/userDashboard'));
 const AdminDashboardPage = lazy(() => import('../pages/adminDashboard/AdminDashboard'));

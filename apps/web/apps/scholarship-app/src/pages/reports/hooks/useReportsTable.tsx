@@ -28,13 +28,12 @@ export const useReportsTable = ({
           gap: "4px",
           cursor: "pointer",
         }}
-        className="hover:opacity-80"
       >
         <span style={{
-          fontSize: "14px",
+          fontSize: "13px",
           lineHeight: "20px",
           fontWeight: 600,
-          color: "#242424",
+          color: "#424242",
           fontFamily: "'Inter', sans-serif",
         }}>
           {name}
