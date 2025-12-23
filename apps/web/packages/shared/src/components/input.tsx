@@ -53,18 +53,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const paddingRight = hasSuffix ? "32px" : "0px";
 
     return (
-      <div className="relative w-full">
-        {errorMessage && (
-          <div
-            className="text-xs mb-1"
-            style={{
-              fontSize: tokens.fontSizeBase200,
-              color: (tokens as any).colorStatusDangerForeground3 || "#d13438"
-            }}
-          >
-            {errorMessage}
-          </div>
-        )}
+      <div className="relative w-full" style={{ marginTop: 0, paddingTop: 0 }}>
         <div
           style={{
             position: "relative",

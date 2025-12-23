@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -14,7 +14,8 @@ import { Form, FormField, FormItem, FormControl, FormMessage, Input, Label } fro
 import { EyeIcon, EyeOffIcon } from '@/components/ui/icons';
 import { getBaseUrl } from '@/utils/signInUtils';
 import { useToast } from '@/components/ui/toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { scholarshipAuth } from '@/services/scholarship.service';
 
 const passwordSchema = z
   .object({
@@ -36,7 +37,7 @@ const passwordSchema = z
     confirmPassword: z.string().default(''),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: "Passwords do not match. Please re-enter.", // BRD Section 5.2.4
     path: ['confirmPassword'],
   });
 
@@ -44,9 +45,26 @@ type SetPasswordFormData = z.infer<typeof passwordSchema>;
 
 const SetPasswordPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { success } = useToast();
+  const [email, setEmail] = useState<string>('');
+  const { success, error: showError } = useToast();
+
+  useEffect(() => {
+    // Get email from localStorage or token
+    const storedEmail = localStorage.getItem('verification_email');
+    const token = searchParams.get('token') || localStorage.getItem('verification_token');
+    
+    if (storedEmail) {
+      setEmail(storedEmail);
+    }
+
+    // If no token and no email, redirect to login
+    if (!token && !storedEmail) {
+      void navigate('/user-login');
+    }
+  }, [searchParams, navigate]);
 
   const form = useForm<SetPasswordFormData>({
     resolver: zodResolver(passwordSchema),
@@ -67,12 +85,38 @@ const SetPasswordPage = () => {
     },
   });
 
-  const onSubmit = async (_values: SetPasswordFormData) => {
-    // TODO: Implement password setting logic
-    // Show loading for a few seconds before showing success
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    success('Success', 'Password set successfully!');
-    setTimeout(() => void navigate('/user-login'), 1000);
+  const onSubmit = async (values: SetPasswordFormData) => {
+    try {
+      if (!email) {
+        showError('Error', 'Email address is required. Please go back to login.');
+        return;
+      }
+
+      // Get verification token from URL or localStorage
+      const token = searchParams.get('token') || localStorage.getItem('verification_token') || undefined;
+
+      // Call API to set password
+      const { scholarshipApplication } = await import('../../services/scholarship.service');
+      const result = await scholarshipApplication.setNewPassword(email, values.password, token);
+
+      if (result.success) {
+        success('Success', result.message || 'Password set successfully! Redirecting to login...');
+        
+        // Clear verification token
+        localStorage.removeItem('verification_token');
+        localStorage.removeItem('verification_email');
+        
+        // Redirect to login with success message
+        setTimeout(() => {
+          void navigate('/user-login?passwordCreated=true');
+        }, 1000);
+      } else {
+        showError('Error', result.message || 'Failed to set password. Please try again.');
+      }
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to set password. Please try again.';
+      showError('Error', errorMessage);
+    }
   };
 
   return (
