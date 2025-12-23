@@ -95,7 +95,7 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
             }
             // Custom header to include actions
             headerContent={
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", gap: "20px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", gap: "60px" }}>
                     <span style={{ fontSize: "16px", fontWeight: 600, color: "#242424", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap" }}>
                         History Against Application Number : {applicationNo}
                     </span>

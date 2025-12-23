@@ -116,7 +116,7 @@ const ApplicationCard: React.FC<{ data: ApplicationCardData }> = ({ data }) => {
             fontSize: "16px",
             lineHeight: "24px",
             fontWeight: 600,
-            color: "#242424",
+            color: "",
             fontFamily: "'Inter', sans-serif",
           }}
         >
