@@ -16,7 +16,7 @@ const RegistrationPage = lazy(() => import('../pages/registration/RegistrationFo
 const VerificationPage = lazy(() => import('../pages/auth/Verification'));
 const SetPasswordPage = lazy(() => import('../pages/auth/SetPassword'));
 const ProcessPage = lazy(() => import('../pages/process'));
-const LandingPage = lazy(() => import('../pages/Landing'));
+
 const UserDashboardPage = lazy(() => import('../pages/userDashboard'));
 const AdminDashboardPage = lazy(() => import('../pages/adminDashboard/AdminDashboard'));
 
@@ -106,7 +106,7 @@ export const Router = () => {
           }
         />
 
-<Route
+        <Route
           path="/verification"
           element={
             <Suspense fallback={<LoadingScreen message="Loading..." />}>
@@ -129,11 +129,13 @@ export const Router = () => {
         <Route
           path="/process"
           element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <ProcessPage />
-              </ErrorBoundary>
-            </Suspense>
+            <ProcessLayout>
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <ProcessPage />
+                </ErrorBoundary>
+              </Suspense>
+            </ProcessLayout>
           }
         />
         <Route
