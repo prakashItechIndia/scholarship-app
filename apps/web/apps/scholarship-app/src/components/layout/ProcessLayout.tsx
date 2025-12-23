@@ -24,15 +24,52 @@ interface ProcessLayoutProps {
   hideSidebar?: boolean;
 }
 
+interface ScholarshipUser {
+  userId?: number;
+  userName?: string;
+  userType?: string;
+  roleId?: number;
+  [key: string]: unknown;
+}
+
+interface ScholarshipAuthData {
+  email: string;
+  cardcode?: string;
+  rememberMe?: boolean;
+  timestamp?: number;
+  user?: ScholarshipUser;
+}
+
 export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSidebar = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [profilePopoverOpen, setProfilePopoverOpen] = React.useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = React.useState(false);
+  const [userData, setUserData] = React.useState<ScholarshipAuthData | null>(null);
 
-  // Mock user data - replace with actual user data from context/API
-  const userName = "Aakash";
-  const userRole = "Administrator";
+  // Get user data from localStorage
+  React.useEffect(() => {
+    const loadUserData = () => {
+      try {
+        const authData = localStorage.getItem('scholarship_auth');
+        if (authData) {
+          const parsed = JSON.parse(authData) as ScholarshipAuthData;
+          setUserData(parsed);
+        }
+      } catch (error) {
+        console.error('Failed to load user data:', error);
+      }
+    };
+
+    loadUserData();
+    // Listen for storage changes (e.g., when user logs in from another tab)
+    window.addEventListener('storage', loadUserData);
+    return () => window.removeEventListener('storage', loadUserData);
+  }, []);
+
+  // Get user name and role from user data
+  const userName = userData?.user?.userName || userData?.email || 'User';
+  const userRole = userData?.user?.userType || 'User';
 
   const sideNavConfig: SideNavConfig = {
     // logo,
@@ -85,6 +122,18 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
     ],
   };
 
+  // Handle logout
+  const handleLogout = () => {
+    // Clear scholarship auth data
+    localStorage.removeItem('scholarship_auth');
+    localStorage.removeItem('scholarship_session_token');
+    sessionStorage.removeItem('scholarship_session_token');
+    sessionStorage.removeItem('scholarship_auth');
+    
+    // Redirect to sign in
+    void navigate('/user-login');
+  };
+
   const topNavConfig: TopNavProps = {
     left: <NavbarLogo />,
     right: (
@@ -110,10 +159,9 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           }}
         >
           <PopoverTrigger disableButtonEnhancement>
-            
-              <div className="w-9 h-9 rounded-full bg-[#C8D1FA] flex items-center justify-center">
-                <PersonRegular className="w-5 h-5 text-[#2C3C85]" />
-              </div>
+            <div className="w-9 h-9 rounded-full bg-[#C8D1FA] flex items-center justify-center">
+              <PersonRegular className="w-5 h-5 text-[#2C3C85]" />
+            </div>
           </PopoverTrigger>
           <PopoverContent 
             className="w-[280px] p-0"
@@ -126,7 +174,6 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
             <div 
               className="p-4"
               style={{
-                // backgroundColor: "#F5F5F5",
                 borderBottom: "1px solid #E0E0E0",
                 marginLeft: 0,
                 marginRight: 0,
@@ -198,8 +245,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
               <button
                 onClick={() => {
                   setProfilePopoverOpen(false);
-                  console.log("Change Password clicked");
-                  // Navigate to change password page
+                  void navigate('/change-password');
                 }}
                 className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left focus:outline-none focus:bg-gray-50"
                 style={{
@@ -254,11 +300,9 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
     ),
   };
 
-  const handleLogout = () => {
+  const handleLogoutConfirm = () => {
     setLogoutModalOpen(false);
-    console.log("Logout confirmed");
-    // Add logout logic here (clear tokens, redirect, etc.)
-    // navigate("/signin");
+    handleLogout();
   };
 
   return (
@@ -324,7 +368,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           >
             <Button
               variant="default"
-              onClick={handleLogout}
+              onClick={handleLogoutConfirm}
               style={{
                 padding: "8px 16px",
                 fontSize: "14px",

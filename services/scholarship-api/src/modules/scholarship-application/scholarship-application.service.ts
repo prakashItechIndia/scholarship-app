@@ -6,6 +6,43 @@ import { randomBytes } from 'crypto';
 import { EnvVars } from '../../config/env.validation';
 import { ScholarshipAuthService } from '../scholarship-auth/scholarship-auth.service';
 
+/**
+ * Helper function to get a value from a database record case-insensitively
+ * SQL Server can return column names in different cases (ISACTIVE, IsActive, etc.)
+ */
+function getCaseInsensitiveValue<T = unknown>(
+  record: Record<string, unknown>,
+  fieldName: string,
+): T | undefined {
+  // Try exact match first
+  if (fieldName in record) {
+    return record[fieldName] as T;
+  }
+
+  // Try case-insensitive match
+  const lowerFieldName = fieldName.toLowerCase();
+  for (const key in record) {
+    if (key.toLowerCase() === lowerFieldName) {
+      return record[key] as T;
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Helper function to convert a value to boolean, handling various formats
+ * (true, 1, '1', 'true', etc.)
+ */
+function toBoolean(value: unknown): boolean {
+  return (
+    value === true ||
+    value === 1 ||
+    String(value) === '1' ||
+    String(value).toLowerCase() === 'true'
+  );
+}
+
 interface RegistrationData {
   schYearId: number;
   schYear: string;
@@ -744,21 +781,23 @@ export class ScholarshipApplicationService {
 
       if (verifyResult.recordset && verifyResult.recordset.length > 0) {
         const user = verifyResult.recordset[0];
+        // Handle case-insensitive field access (ISACTIVE vs IsActive, ISDELETED vs IsDeleted)
+        const userUserId = getCaseInsensitiveValue<string>(user, 'User_ID') ?? '';
+        const userIsActive = getCaseInsensitiveValue(user, 'IsActive');
+        const userIsDeleted = getCaseInsensitiveValue(user, 'IsDeleted');
+        const userPassword = getCaseInsensitiveValue<string>(user, 'Password') ?? '';
+        const userRoleId = getCaseInsensitiveValue<number | null>(user, 'Role_Id') ?? null;
+
         this.logger.log(
-          `User verification - Email: ${user.User_ID}, IsActive: ${user.IsActive} (type: ${typeof user.IsActive}), IsDeleted: ${user.IsDeleted}, HasPassword: ${!!user.Password}, Role_Id: ${user.Role_Id}`,
+          `User verification - Email: ${userUserId}, IsActive: ${String(userIsActive)} (type: ${typeof userIsActive}), IsDeleted: ${String(userIsDeleted)}, HasPassword: ${!!userPassword}, Role_Id: ${String(userRoleId)}`,
         );
 
         // Double-check: If IsActive is not 1, force update it
-        const isActiveValue = user.IsActive;
-        const isActiveNumeric =
-          isActiveValue === 1 ||
-          isActiveValue === true ||
-          String(isActiveValue) === '1' ||
-          String(isActiveValue).toLowerCase() === 'true';
+        const isActiveNumeric = toBoolean(userIsActive);
 
         if (!isActiveNumeric) {
           this.logger.warn(
-            `IsActive is not set correctly for ${email}. Current value: ${isActiveValue}. Forcing update...`,
+            `IsActive is not set correctly for ${email}. Current value: ${String(userIsActive)}. Forcing update...`,
           );
           const forceUpdateQuery = `
             UPDATE Tbl_UserMaster

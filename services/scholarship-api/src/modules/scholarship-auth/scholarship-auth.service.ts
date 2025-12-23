@@ -17,6 +17,43 @@ interface User {
   isActive: boolean;
 }
 
+/**
+ * Helper function to get a value from a database record case-insensitively
+ * SQL Server can return column names in different cases (ISACTIVE, IsActive, etc.)
+ */
+function getCaseInsensitiveValue<T = unknown>(
+  record: Record<string, unknown>,
+  fieldName: string,
+): T | undefined {
+  // Try exact match first
+  if (fieldName in record) {
+    return record[fieldName] as T;
+  }
+
+  // Try case-insensitive match
+  const lowerFieldName = fieldName.toLowerCase();
+  for (const key in record) {
+    if (key.toLowerCase() === lowerFieldName) {
+      return record[key] as T;
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Helper function to convert a value to boolean, handling various formats
+ * (true, 1, '1', 'true', etc.)
+ */
+function toBoolean(value: unknown): boolean {
+  return (
+    value === true ||
+    value === 1 ||
+    String(value) === '1' ||
+    String(value).toLowerCase() === 'true'
+  );
+}
+
 @Injectable()
 export class ScholarshipAuthService {
   private readonly logger = new Logger(ScholarshipAuthService.name);
@@ -54,13 +91,9 @@ export class ScholarshipAuthService {
       this.logger.debug(`ValidateUser returned: ${JSON.stringify(userRecord)}`);
 
       // Check if account is active
-      // IsActive might be returned as bit (0/1), boolean, or string, so check all formats
-      const isActiveValue: unknown = userRecord.IsActive;
-      const isActive =
-        isActiveValue === true ||
-        isActiveValue === 1 ||
-        String(isActiveValue) === '1' ||
-        String(isActiveValue).toLowerCase() === 'true';
+      // Handle case-insensitive field access (ISACTIVE vs IsActive)
+      const isActiveValue: unknown = getCaseInsensitiveValue(userRecord, 'IsActive');
+      const isActive = toBoolean(isActiveValue);
 
       if (!isActive) {
         this.logger.warn(
@@ -96,24 +129,21 @@ export class ScholarshipAuthService {
 
           if (retryResult.recordset && retryResult.recordset.length > 0) {
             const retryUser = retryResult.recordset[0];
-            const retryIsActiveValue: unknown = retryUser.IsActive;
-            const retryIsActive =
-              retryIsActiveValue === true ||
-              retryIsActiveValue === 1 ||
-              String(retryIsActiveValue) === '1' ||
-              String(retryIsActiveValue).toLowerCase() === 'true';
+            // Handle case-insensitive field access (ISACTIVE vs IsActive)
+            const retryIsActiveValue: unknown = getCaseInsensitiveValue(retryUser, 'IsActive');
+            const retryIsActive = toBoolean(retryIsActiveValue);
 
             if (retryIsActive) {
               // User is now active, proceed with login
               return {
-                id: retryUser.ID,
-                userId: retryUser.User_ID,
-                userName: retryUser.User_Name,
-                roleId: retryUser.Role_Id,
-                password: retryUser.Password,
-                passwordChange: retryUser.Password_Change,
-                userType: retryUser.User_Type,
-                isActive: retryUser.IsActive,
+                id: getCaseInsensitiveValue<number>(retryUser, 'ID') ?? 0,
+                userId: getCaseInsensitiveValue<string>(retryUser, 'User_ID') ?? '',
+                userName: getCaseInsensitiveValue<string>(retryUser, 'User_Name') ?? '',
+                roleId: getCaseInsensitiveValue<number>(retryUser, 'Role_Id') ?? 0,
+                password: String(getCaseInsensitiveValue(retryUser, 'Password') ?? ''),
+                passwordChange: toBoolean(getCaseInsensitiveValue(retryUser, 'Password_Change')),
+                userType: String(getCaseInsensitiveValue(retryUser, 'User_Type') ?? ''),
+                isActive: retryIsActive,
               };
             }
           }
@@ -123,23 +153,20 @@ export class ScholarshipAuthService {
             activateError,
           );
         }
-
         throw new UnauthorizedException('Account is not active');
       }
 
       // Convert types to match User interface
-      const passwordChangeValue = userRecord.Password_Change;
+      // Handle case-insensitive field access for all fields
+      const passwordChangeValue = getCaseInsensitiveValue(userRecord, 'Password_Change');
       return {
-        id: userRecord.ID,
-        userId: userRecord.User_ID,
-        userName: userRecord.User_Name,
-        roleId: userRecord.Role_Id,
-        password: String(userRecord.Password),
-        passwordChange:
-          passwordChangeValue === true ||
-          passwordChangeValue === 1 ||
-          String(passwordChangeValue).toLowerCase() === 'true',
-        userType: String(userRecord.User_Type),
+        id: getCaseInsensitiveValue<number>(userRecord, 'ID') ?? 0,
+        userId: getCaseInsensitiveValue<string>(userRecord, 'User_ID') ?? '',
+        userName: getCaseInsensitiveValue<string>(userRecord, 'User_Name') ?? '',
+        roleId: getCaseInsensitiveValue<number>(userRecord, 'Role_Id') ?? 0,
+        password: String(getCaseInsensitiveValue(userRecord, 'Password') ?? ''),
+        passwordChange: toBoolean(passwordChangeValue),
+        userType: String(getCaseInsensitiveValue(userRecord, 'User_Type') ?? ''),
         isActive: isActive,
       };
     } catch (error) {
@@ -212,7 +239,16 @@ export class ScholarshipAuthService {
       return null;
     }
 
-    return result.recordset[0];
+    const record = result.recordset[0];
+    // Return with case-insensitive field access
+    return {
+      ID: getCaseInsensitiveValue<number>(record, 'ID') ?? 0,
+      User_ID: getCaseInsensitiveValue<string>(record, 'User_ID') ?? '',
+      Password: getCaseInsensitiveValue<string>(record, 'Password') ?? '',
+      Password_Change: toBoolean(getCaseInsensitiveValue(record, 'Password_Change')),
+      User_Type: getCaseInsensitiveValue<string>(record, 'User_Type') ?? '',
+      IsActive: toBoolean(getCaseInsensitiveValue(record, 'IsActive')),
+    };
   }
 
   /**
