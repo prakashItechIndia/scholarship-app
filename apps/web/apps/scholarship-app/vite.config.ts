@@ -2,9 +2,29 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import svgr from 'vite-plugin-svgr';
+import { statSync } from 'fs';
+
+// Helper to find node_modules
+function findNodeModules(startPath: string): string | null {
+  let currentPath = startPath;
+  while (currentPath !== path.dirname(currentPath)) {
+    const nodeModulesPath = path.join(currentPath, 'node_modules');
+    try {
+      if (statSync(nodeModulesPath).isDirectory()) {
+        return nodeModulesPath;
+      }
+    } catch {
+      // Continue searching
+    }
+    currentPath = path.dirname(currentPath);
+  }
+  return null;
+}
 
 // https://vite.dev/config/
 export default defineConfig(() => {
+  const appNodeModules = findNodeModules(__dirname) || path.resolve(__dirname, './node_modules');
+  
   return {
     plugins: [
       react(),
@@ -32,6 +52,16 @@ export default defineConfig(() => {
         '@': path.resolve(__dirname, './src'),
         '@shared': path.resolve(__dirname, '../../packages/shared/src'),
         '@ui': path.resolve(__dirname, '../../../../packages/ui'),
+        // Ensure react-hook-form is resolved from this app's node_modules
+        'react-hook-form': path.resolve(appNodeModules, 'react-hook-form'),
+      },
+      preserveSymlinks: false,
+      dedupe: ['react', 'react-dom', 'react-hook-form'],
+    },
+    optimizeDeps: {
+      include: ['react-hook-form'],
+      esbuildOptions: {
+        resolveExtensions: ['.tsx', '.ts', '.jsx', '.js'],
       },
     },
     build: {
