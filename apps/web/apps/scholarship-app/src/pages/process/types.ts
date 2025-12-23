@@ -12,6 +12,10 @@ export interface ApplicationData {
   verifiedBy?: string;
   verificationStatus?: string;
   verifiedDate?: string;
+  scholarshipNumber?: string;
+  scholarship?: string;
+  preparedBy?: string;
+  suggestedBy?: string;
   pdfUrl?: string;
   email?: string;
   dateOfBirth?: string;
@@ -29,6 +33,7 @@ export interface ApplicationData {
     status: string;
     size?: string;
   }>;
+  processActionLabel?: string;
   [key: string]: unknown;
 }
 

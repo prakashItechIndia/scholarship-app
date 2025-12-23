@@ -14,6 +14,8 @@ export interface ModalProps extends Omit<FluentDialogProps, "open" | "onOpenChan
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   title?: string | React.ReactNode;
+  headerContent?: React.ReactNode;
+  hideDefaultHeader?: boolean;
   children?: React.ReactNode;
   footer?: React.ReactNode;
   size?: "sm" | "md" | "lg" | "xl" | "full";
@@ -32,6 +34,8 @@ const Modal = ({
   open,
   onOpenChange,
   title,
+  headerContent,
+  hideDefaultHeader = false,
   children,
   footer,
   size = "md",
@@ -52,6 +56,7 @@ const Modal = ({
               {title}
             </DialogTitle>
           )}
+          {headerContent}
           <DialogContent className="text-gray-700 bg-white">
             {children}
           </DialogContent>
