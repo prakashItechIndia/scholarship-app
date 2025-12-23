@@ -1,0 +1,35 @@
+import React from 'react';
+
+export interface FilterIconProps {
+  width?: number | string;
+  height?: number | string;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+export const FilterIcon: React.FC<FilterIconProps> = ({ 
+  width = 32, 
+  height = 32, 
+  className = '',
+  style
+}) => {
+  return (
+    <svg 
+      width={width} 
+      height={height} 
+      viewBox="0 0 32 32" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      style={style}
+    >
+      <mask id="path-1-inside-1_922_26382" fill="white">
+        <path d="M0 4C0 1.79086 1.79086 0 4 0H28C30.2091 0 32 1.79086 32 4V28C32 30.2091 30.2091 32 28 32H4C1.79086 32 0 30.2091 0 28V4Z"/>
+      </mask>
+      <path d="M0 4C0 1.79086 1.79086 0 4 0H28C30.2091 0 32 1.79086 32 4V28C32 30.2091 30.2091 32 28 32H4C1.79086 32 0 30.2091 0 28V4Z" fill="white"/>
+      <path d="M4 0V1H28V0V-1H4V0ZM32 4H31V28H32H33V4H32ZM28 32V31H4V32V33H28V32ZM0 28H1V4H0H-1V28H0ZM4 32V31C2.34315 31 1 29.6569 1 28H0H-1C-1 30.7614 1.23858 33 4 33V32ZM32 28H31C31 29.6569 29.6569 31 28 31V32V33C30.7614 33 33 30.7614 33 28H32ZM28 0V1C29.6569 1 31 2.34315 31 4H32H33C33 1.23858 30.7614 -1 28 -1V0ZM4 0V-1C1.23858 -1 -1 1.23858 -1 4H0H1C1 2.34315 2.34315 1 4 1V0Z" fill="#D1D1D1" mask="url(#path-1-inside-1_922_26382)"/>
+      <path d="M13.5 19H18.5C18.7761 19 19 19.2239 19 19.5C19 19.7455 18.8231 19.9496 18.5899 19.9919L18.5 20H13.5C13.2239 20 13 19.7761 13 19.5C13 19.2545 13.1769 19.0504 13.4101 19.0081L13.5 19H18.5H13.5ZM11.5 15H20.5C20.7761 15 21 15.2239 21 15.5C21 15.7455 20.8231 15.9496 20.5899 15.9919L20.5 16H11.5C11.2239 16 11 15.7761 11 15.5C11 15.2545 11.1769 15.0504 11.4101 15.0081L11.5 15H20.5H11.5ZM9.5 11H22.5C22.7761 11 23 11.2239 23 11.5C23 11.7455 22.8231 11.9496 22.5899 11.9919L22.5 12H9.5C9.22386 12 9 11.7761 9 11.5C9 11.2545 9.17688 11.0504 9.41012 11.0081L9.5 11H22.5H9.5Z" fill="#242424"/>
+    </svg>
+  );
+};
+

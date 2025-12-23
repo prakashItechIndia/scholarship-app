@@ -1,10 +1,8 @@
 import * as React from "react";
-import { Button, Card } from "@shared/components";
+import { useNavigate } from "react-router-dom";
+import { Button, Card, DocumentIcon, MoreIcon, ReopenIcon, PrintIcon, FilterIcon } from "@shared/components";
 import {
-  DocumentRegular,
   AddRegular,
-  MoreHorizontalRegular,
-  SubtractRegular,
 } from "@fluentui/react-icons";
 
 interface ApplicationCardData {
@@ -42,106 +40,262 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
 };
 
 const ApplicationCard: React.FC<{ data: ApplicationCardData }> = ({ data }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
+  const handleToggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleReopen = () => {
+    console.log("Reopen application:", data.applicationNo);
+    setIsDropdownOpen(false);
+  };
+
+  const handlePrint = () => {
+    console.log("Print document:", data.applicationNo);
+    setIsDropdownOpen(false);
+  };
+
   return (
     <Card
       variant="outline"
       style={{
-        padding: "20px",
+        padding: 0,
         borderRadius: "8px",
         border: "1px solid #e0e0e0",
-        backgroundColor: "#ffffff",
         position: "relative",
+        display: "grid",
+        gridTemplateRows: "auto 1fr",
+        height: "100%",
+        overflow: "hidden",
+        gap: 0,
       }}
     >
-      {/* Header with Application No, Status, and Icons */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          marginBottom: "16px",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <DocumentRegular
-            style={{
-              width: "16px",
-              height: "16px",
-              color: "#616161",
-            }}
-          />
-          <span
-            style={{
-              fontSize: "14px",
-              lineHeight: "20px",
-              fontWeight: 500,
-              color: "#242424",
-              fontFamily: "'Inter', sans-serif",
-            }}
-          >
-            Application No.
-          </span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <StatusBadge status={data.status} />
-          <button
-            style={{
-              width: "24px",
-              height: "24px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "none",
-              backgroundColor: "transparent",
-              cursor: "pointer",
-              padding: 0,
-            }}
-            aria-label="Options"
-          >
-            <SubtractRegular
-              style={{
-                width: "16px",
-                height: "16px",
-                color: "#616161",
-              }}
-            />
-          </button>
-        </div>
-      </div>
-
-      {/* Application Number */}
-      <div style={{ marginBottom: "20px" }}>
-        <span
-          style={{
-            fontSize: "16px",
-            lineHeight: "24px",
-            fontWeight: 600,
-            color: "#242424",
-            fontFamily: "'Inter', sans-serif",
-          }}
-        >
-          {data.applicationNo}
-        </span>
-      </div>
-
-      {/* Application Details */}
+      {/* Top Section - 50% height with background color */}
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "12px",
+          justifyContent: "space-between",
+          backgroundColor: "#FAFAFA",
+          padding: "20px",
+          borderTopLeftRadius: "8px",
+          borderTopRightRadius: "8px",
+          height: "85%",
+          borderBottom: "1px solid #e0e0e0",
         }}
       >
-        <DetailRow label="Student Name" value={data.studentName} />
-        <DetailRow label="Studied" value={data.studied} />
-        <DetailRow label="Father Name" value={data.fatherName} />
-        <DetailRow label="Applied" value={data.applied} />
-        <DetailRow
-          label="Scholarship Number"
-          value={data.scholarshipNumber || "-"}
-        />
-        <DetailRow label="Mobile No." value={data.mobileNo} />
-        <DetailRow label="Prepared By" value={data.preparedBy || "-"} />
+        {/* Header with Application No, Status, and Icons */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <DocumentIcon
+              width={16}
+              height={16}
+              style={{
+                color: "#616161",
+              }}
+            />
+            <span
+              style={{
+                fontSize: "14px",
+                lineHeight: "20px",
+                fontWeight: 600,
+                color: "#242424",
+                fontFamily: "'Inter', sans-serif",
+              }}
+            >
+              Application No.
+            </span>
+            <span
+              style={{
+                fontSize: "14px",
+                lineHeight: "24px",
+                fontWeight: 600,
+                color: "#242424",
+                fontFamily: "'Inter', sans-serif",
+              }}
+            >
+              {data.applicationNo}
+            </span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", position: "relative" }}>
+            <StatusBadge status={data.status} />
+            <div ref={dropdownRef} style={{ position: "relative" }}>
+              <button
+                onClick={handleToggleDropdown}
+                style={{
+                  width: "24px",
+                  height: "24px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  cursor: "pointer",
+                  marginRight: "-5px",
+                }}
+                aria-label="Options"
+              >
+                <MoreIcon
+                  width={26}
+                  height={26}
+                  style={{border: "1px solid #e0e0e0", backgroundColor: '#ffffff',borderRadius: '20%'}}
+                />
+              </button>
+              
+              {isDropdownOpen && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    right: 0,
+                    marginTop: "8px",
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #e0e0e0",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+                    zIndex: 1000,
+                    minWidth: "200px",
+                    padding: "4px",
+                  }}
+                >
+                  <button
+                    onClick={handleReopen}
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "8px 12px",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      cursor: "pointer",
+                      borderRadius: "4px",
+                      fontFamily: "'Inter', sans-serif",
+                      fontSize: "14px",
+                      lineHeight: "20px",
+                      color: "#242424",
+                      textAlign: "left",
+                      whiteSpace: "nowrap",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#f5f5f5";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                    }}
+                  >
+                    <ReopenIcon width={16} height={16} />
+                    <span style={{ whiteSpace: "nowrap" }}>Reopen application</span>
+                  </button>
+                  <button
+                    onClick={handlePrint}
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "8px 12px",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      cursor: "pointer",
+                      borderRadius: "4px",
+                      fontFamily: "'Inter', sans-serif",
+                      fontSize: "14px",
+                      lineHeight: "20px",
+                      color: "#242424",
+                      textAlign: "left",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#f5f5f5";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                    }}
+                  >
+                    <PrintIcon width={16} height={16} />
+                    <span>Print Document</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Section - 50% height */}
+      <div
+        style={{
+          padding: "20px",
+          paddingTop: "12px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+        }}
+      >
+        {/* Application Details */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "20px",
+          }}
+        >
+          {/* First Row - 3 items */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "12px",
+            }}
+          >
+            <DetailRow label="Student Name" value={data.studentName} />
+            <DetailRow label="Studied" value={data.studied} />
+            <DetailRow label="Father Name" value={data.fatherName} />
+          </div>
+          {/* Second Row - 3 items */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "12px",
+            }}
+          >
+            <DetailRow label="Applied" value={data.applied} />
+            <DetailRow
+              label="Scholarship Number"
+              value={data.scholarshipNumber || "-"}
+            />
+            <DetailRow label="Mobile No." value={data.mobileNo} />
+          </div>
+          {/* Third Row - 1 item */}
+          <div>
+            <DetailRow label="Prepared By" value={data.preparedBy || "-"} />
+          </div>
+        </div>
       </div>
     </Card>
   );
@@ -162,9 +316,9 @@ const DetailRow: React.FC<{ label: string; value: string }> = ({
       <span
         style={{
           fontSize: "12px",
-          lineHeight: "16px",
+          lineHeight: "18px",
           fontWeight: 500,
-          color: "#616161",
+          color: "#707070",
           fontFamily: "'Inter', sans-serif",
         }}
       >
@@ -172,9 +326,9 @@ const DetailRow: React.FC<{ label: string; value: string }> = ({
       </span>
       <span
         style={{
-          fontSize: "14px",
+          fontSize: "13px",
           lineHeight: "20px",
-          fontWeight: 400,
+          fontWeight: 600,
           color: "#242424",
           fontFamily: "'Inter', sans-serif",
         }}
@@ -186,6 +340,7 @@ const DetailRow: React.FC<{ label: string; value: string }> = ({
 };
 
 const UserDashboard: React.FC = () => {
+  const navigate = useNavigate();
   // Mock data - replace with actual data from API
   const userName = "Saravanan";
   const applications: ApplicationCardData[] = [
@@ -218,31 +373,33 @@ const UserDashboard: React.FC = () => {
       style={{
         width: "100%",
         backgroundColor: "#fafafa",
-        padding: "24px",
+        // padding: "24px",
         fontFamily: "'Inter', sans-serif",
       }}
     >
       {/* Welcome Section */}
-      <div style={{ marginBottom: "32px" }}>
+      <div style={{marginBottom: "18px",backgroundColor: "#F5F5F5",paddingTop:"12px",paddingBottom: "10px" }}>
         <h1
           style={{
-            fontSize: "28px",
-            lineHeight: "36px",
+            fontSize: "20px",
+            // lineHeight: "36px",
             fontWeight: 700,
             color: "#242424",
             marginBottom: "4px",
             fontFamily: "'Inter', sans-serif",
+            paddingLeft: "24px",
           }}
         >
           Welcome {userName}!
         </h1>
         <p
           style={{
-            fontSize: "16px",
+            fontSize: "13px",
             lineHeight: "24px",
             fontWeight: 400,
-            color: "#616161",
+            color: "#707070",
             fontFamily: "'Inter', sans-serif",
+            paddingLeft: "25px",
           }}
         >
           Have a nice day!
@@ -250,16 +407,17 @@ const UserDashboard: React.FC = () => {
       </div>
 
       {/* Application Status Section */}
-      <div style={{ marginBottom: "24px" }}>
+      <div style={{  }}>
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "flex-start",
-            marginBottom: "16px",
+            // marginBottom: "16px",
+            // marginTop: "-12px",
           }}
         >
-          <div>
+          <div style={{paddingBottom: "18px"}}>
             <h2
               style={{
                 fontSize: "20px",
@@ -268,6 +426,8 @@ const UserDashboard: React.FC = () => {
                 color: "#242424",
                 marginBottom: "4px",
                 fontFamily: "'Inter', sans-serif",
+                paddingLeft: "24px",
+                
               }}
             >
               Your Application Status
@@ -279,12 +439,13 @@ const UserDashboard: React.FC = () => {
                 fontWeight: 400,
                 color: "#616161",
                 fontFamily: "'Inter', sans-serif",
+                paddingLeft: "24px",
               }}
             >
               Track the progress of your submitted application
             </p>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "4px",marginTop:"10px"}}>
             <Button
               variant="default"
               style={{
@@ -295,16 +456,16 @@ const UserDashboard: React.FC = () => {
                 fontSize: "14px",
                 lineHeight: "20px",
                 fontWeight: 500,
-                fontFamily: "'Inter', sans-serif",
-                backgroundColor: "#115ea3",
+                backgroundColor: "#2453C3",
                 color: "#ffffff",
                 border: "none",
-                borderRadius: "4px",
+                borderRadius: "8px",
                 cursor: "pointer",
+                marginRight: "-25px",
               }}
-              onClick={() => console.log("Create New Application")}
+              onClick={() => navigate("/registration")}
             >
-              <AddRegular style={{ width: "16px", height: "16px" }} />
+              <AddRegular style={{ width: "18px", height: "18px" }} />
               Create New Application
             </Button>
             <Button
@@ -319,16 +480,15 @@ const UserDashboard: React.FC = () => {
                 border: "none",
                 backgroundColor: "transparent",
                 cursor: "pointer",
+                marginLeft: "-6px",
               }}
               onClick={() => console.log("More options")}
               aria-label="More options"
             >
-              <MoreHorizontalRegular
-                style={{
-                  width: "20px",
-                  height: "20px",
-                  color: "#616161",
-                }}
+              <FilterIcon
+                width={32}
+                height={32}
+                style={{ marginLeft: "13px" }}
               />
             </Button>
           </div>
@@ -338,8 +498,11 @@ const UserDashboard: React.FC = () => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
+            gridTemplateColumns: "1fr 1fr",
             gap: "24px",
+            borderRadius: "18px",
+            paddingLeft: "24px",
+            paddingRight: "24px",
           }}
         >
           {applications.map((app) => (
