@@ -88,13 +88,13 @@ const FamilyDetails = () => {
             subtitle="Provide Information About Your Immediate Family Members"
         >
             <form className="w-full h-full flex flex-col -mt-4" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
 
                     {/* Applicant Details */}
-                    <div className="col-span-2">
+                    <div className="col-span-1 md:col-span-2">
                         <h3 className="text-[16px] font-semibold text-[#242424] mb-2">Applicant Details</h3>
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="fullName"
                             control={control}
@@ -104,7 +104,7 @@ const FamilyDetails = () => {
                             placeholder="Enter the name"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="studentId"
                             control={control}
@@ -115,10 +115,10 @@ const FamilyDetails = () => {
                     </div>
 
                     {/* Father Details */}
-                    <div className="col-span-2 mt-2">
+                    <div className="col-span-1 md:col-span-2 mt-2">
                         <h3 className="text-[16px] font-semibold text-[#242424] mb-2">Father Details</h3>
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="fatherName"
                             control={control}
@@ -128,7 +128,7 @@ const FamilyDetails = () => {
                             placeholder="Enter father name"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <SelectField
                             name="fatherOccupation"
                             control={control}
@@ -139,7 +139,7 @@ const FamilyDetails = () => {
                             placeholder="Select"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="fatherDesignation"
                             control={control}
@@ -148,7 +148,7 @@ const FamilyDetails = () => {
                             placeholder="Enter designation"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="fatherOrganization"
                             control={control}
@@ -157,7 +157,7 @@ const FamilyDetails = () => {
                             placeholder="Enter organization name"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <SelectField
                             name="fatherIncome"
                             control={control}
@@ -170,10 +170,10 @@ const FamilyDetails = () => {
                     </div>
 
                     {/* Mother Details */}
-                    <div className="col-span-2 mt-2">
+                    <div className="col-span-1 md:col-span-2 mt-2">
                         <h3 className="text-[16px] font-semibold text-[#242424] mb-2">Mother Details</h3>
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="motherName"
                             control={control}
@@ -183,7 +183,7 @@ const FamilyDetails = () => {
                             placeholder="Enter mother name"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <SelectField
                             name="motherOccupation"
                             control={control}
@@ -194,7 +194,7 @@ const FamilyDetails = () => {
                             placeholder="Select"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="motherDesignation"
                             control={control}
@@ -203,7 +203,7 @@ const FamilyDetails = () => {
                             placeholder="Enter designation"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="motherOrganization"
                             control={control}
@@ -212,7 +212,7 @@ const FamilyDetails = () => {
                             placeholder="Enter organization name"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <SelectField
                             name="motherIncome"
                             control={control}
@@ -225,10 +225,10 @@ const FamilyDetails = () => {
                     </div>
 
                     {/* Guardian Details */}
-                    <div className="col-span-2 mt-2">
+                    <div className="col-span-1 md:col-span-2 mt-2">
                         <h3 className="text-[16px] font-semibold text-[#242424] mb-2">Guardian Details</h3>
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="guardianName"
                             control={control}
@@ -237,7 +237,7 @@ const FamilyDetails = () => {
                             placeholder="Enter guardian name"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <SelectField
                             name="guardianOccupation"
                             control={control}
@@ -247,7 +247,7 @@ const FamilyDetails = () => {
                             placeholder="Select"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="guardianDesignation"
                             control={control}
@@ -256,7 +256,7 @@ const FamilyDetails = () => {
                             placeholder="Enter designation"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="guardianOrganization"
                             control={control}
@@ -265,7 +265,7 @@ const FamilyDetails = () => {
                             placeholder="Enter organization name"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <SelectField
                             name="guardianIncome"
                             control={control}
@@ -276,9 +276,10 @@ const FamilyDetails = () => {
                         />
                     </div>
 
-                </div>
+                    </div>
             </form>
-        </StepLayout>
+            <div className="h-5"></div>
+            </StepLayout>
     );
 };
 

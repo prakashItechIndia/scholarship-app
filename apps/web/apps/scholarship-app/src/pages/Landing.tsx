@@ -4,12 +4,23 @@ import { SEO } from '../components/seo/SEO';
 import logoAram from '@/assets/images/logo-aram.png';
 import landingBg from '@/assets/images/landing-bg.png';
 
+interface Role {
+  id: string;
+  label: string;
+}
+
+const roles: Role[] = [
+  { id: 'ceo-admin', label: 'CEO/Admin' },
+  { id: 'manager', label: 'Manager' },
+  { id: 'standard-user', label: 'Standard User' },
+];
+
 const LandingPage = () => {
   const navigate = useNavigate();
 
   const handleRoleClick = (role: string) => {
     // Navigate to signin with role parameter
-    void navigate(`/signin?role=${role.toLowerCase()}`);
+    void navigate(`/home?role=${role.toLowerCase()}`);
   };
 
   // Shared button styles - dynamically responsive
@@ -35,6 +46,35 @@ const LandingPage = () => {
     ':active': {
       transform: 'translateY(0px)',
     },
+  });
+
+  // Logo container styles
+  const logoContainerStyles = mergeStyles({
+    display: 'flex',
+    justifyContent: 'center',
+    width: '100%',
+    marginBottom: 'clamp(2rem, 6vh, 5rem)',
+    padding: '0 clamp(1rem, 4vw, 2rem)',
+  });
+
+  // Logo image styles
+  const logoImageStyles = mergeStyles({
+    width: 'clamp(80px, 12vw, 120px)',
+    height: 'auto',
+    aspectRatio: '1',
+    objectFit: 'cover',
+    flexShrink: 0,
+    marginRight: 'clamp(1rem, 3vh, 2rem)',
+  });
+
+  // Title container styles
+  const titleContainerStyles = mergeStyles({
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    minWidth: 0,
+    // gap: 'clamp(1rem, 3vh, 2rem)',
   });
 
   return (
@@ -113,26 +153,18 @@ const LandingPage = () => {
                 fontSize: 'clamp(1.5rem, 4vw, 2rem)',
                 lineHeight: 1.5,
                 color: '#FFFFFF',
-                marginBottom: 'clamp(1.5rem, 4vh, 2.5rem)',
+                // marginBottom: 'clamp(1.5rem, 4vh, 2.5rem)',
                 padding: '0 clamp(1rem, 4vw, 2rem)',
                 textAlign: 'center',
                 width: '100%',
               },
             }}
           >
-            LANDING PAGE
+         TEMPORARY LANDING PAGE  
           </Text>
 
           {/* Logo and Title Section */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              width: '100%',
-              marginBottom: 'clamp(2rem, 6vh, 5rem)',
-              padding: '0 clamp(1rem, 4vw, 2rem)',
-            }}
-          >
+          <div className={logoContainerStyles}>
             <Stack
               horizontal
               tokens={{ childrenGap: 'clamp(1rem, 2vw, 1.5rem)' }}
@@ -152,24 +184,9 @@ const LandingPage = () => {
             <img
               src={logoAram}
               alt="ARAM Foundation Logo"
-              style={{
-                width: 'clamp(80px, 12vw, 120px)',
-                height: 'auto',
-                aspectRatio: '1',
-                objectFit: 'cover',
-                flexShrink: 0,
-              }}
+              className={logoImageStyles}
             />
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minWidth: 0,
-                gap: 'clamp(1rem, 3vh, 2rem)',
-              }}
-            >
+            <div className={titleContainerStyles}>
               <Text
                 styles={{
                   root: {
@@ -178,7 +195,7 @@ const LandingPage = () => {
                     fontSize: 'clamp(1.5rem, 4vw, 2.625rem)',
                     lineHeight: 1.3,
                     color: '#FFFFFF',
-                    textAlign: 'center',
+                    textAlign: 'left',
                     wordWrap: 'break-word',
                     display: 'block',
                     margin: 0,
@@ -196,7 +213,7 @@ const LandingPage = () => {
                     fontSize: 'clamp(1.125rem, 3vw, 1.95rem)',
                     lineHeight: 1.5,
                     color: '#FFFFFF',
-                    textAlign: 'center',
+                    textAlign: 'left',
                     wordWrap: 'break-word',
                     display: 'block',
                     marginTop: '6vh',
@@ -222,74 +239,33 @@ const LandingPage = () => {
                 width: '100%',
                 padding: '0 clamp(1rem, 5vw, 2rem)',
                 gap: 'clamp(1rem, 3vw, 1.5rem)',
+                textAlign: 'left',
               },
             }}
           >
-            {/* CEO/Admin Button */}
-            <button
-              onClick={() => handleRoleClick('ceo-admin')}
-              className={buttonBaseStyles}
-            >
-              <Text
-                styles={{
-                  root: {
-                    fontFamily: 'Inter, sans-serif',
-                    fontWeight: 700,
-                    fontSize: 'clamp(1rem, 2vw, 1.3125rem)',
-                    lineHeight: 1.333,
-                    color: '#FFFFFF',
-                    textAlign: 'center',
-                    wordWrap: 'break-word',
-                  },
-                }}
+            {roles.map((role) => (
+              <button
+                key={role.id}
+                onClick={() => handleRoleClick(role.id)}
+                className={buttonBaseStyles}
               >
-                CEO/Admin
-              </Text>
-            </button>
-
-            {/* Manager Button */}
-            <button
-              onClick={() => handleRoleClick('manager')}
-              className={buttonBaseStyles}
-            >
-              <Text
-                styles={{
-                  root: {
-                    fontFamily: 'Inter, sans-serif',
-                    fontWeight: 700,
-                    fontSize: 'clamp(1rem, 2vw, 1.3125rem)',
-                    lineHeight: 1.429,
-                    color: '#FFFFFF',
-                    textAlign: 'center',
-                    wordWrap: 'break-word',
-                  },
-                }}
-              >
-                Manager
-              </Text>
-            </button>
-
-            {/* Standard User Button */}
-            <button
-              onClick={() => handleRoleClick('standard-user')}
-              className={buttonBaseStyles}
-            >
-              <Text
-                styles={{
-                  root: {
-                    fontFamily: 'Inter, sans-serif',
-                    fontWeight: 700,
-                    fontSize: 'clamp(1rem, 2vw, 1.3125rem)',
-                    lineHeight: 1.238,
-                    color: '#FFFFFF',
-                    textAlign: 'center',
-                    wordWrap: 'break-word',
-                  },
-                }}
-              >
-                Standard User
-              </Text>
-            </button>
+                <Text
+                  styles={{
+                    root: {
+                      fontFamily: 'Inter, sans-serif',
+                      fontWeight: 700,
+                      fontSize: 'clamp(1rem, 2vw, 1.3125rem)',
+                      lineHeight: 1.3,
+                      color: '#FFFFFF',
+                      textAlign: 'center',
+                      wordWrap: 'break-word',
+                    },
+                  }}
+                >
+                  {role.label}
+                </Text>
+              </button>
+            ))}
           </Stack>
         </div>
       </div>

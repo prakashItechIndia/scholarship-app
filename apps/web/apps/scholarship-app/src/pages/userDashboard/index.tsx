@@ -4,6 +4,7 @@ import { Button, Card, DocumentIcon, MoreIcon, ReopenIcon, PrintIcon, FilterIcon
 import {
   AddRegular,
 } from "@fluentui/react-icons";
+import { WelcomeBanner } from "../../components/common";
 
 interface ApplicationCardData {
   applicationNo: string;
@@ -378,33 +379,7 @@ const UserDashboard: React.FC = () => {
       }}
     >
       {/* Welcome Section */}
-      <div style={{marginBottom: "18px",backgroundColor: "#F5F5F5",paddingTop:"12px",paddingBottom: "10px" }}>
-        <h1
-          style={{
-            fontSize: "20px",
-            // lineHeight: "36px",
-            fontWeight: 700,
-            color: "#242424",
-            marginBottom: "4px",
-            fontFamily: "'Inter', sans-serif",
-            paddingLeft: "24px",
-          }}
-        >
-          Welcome {userName}!
-        </h1>
-        <p
-          style={{
-            fontSize: "13px",
-            lineHeight: "24px",
-            fontWeight: 400,
-            color: "#707070",
-            fontFamily: "'Inter', sans-serif",
-            paddingLeft: "25px",
-          }}
-        >
-          Have a nice day!
-        </p>
-      </div>
+      <WelcomeBanner userName={userName} />
 
       {/* Application Status Section */}
       <div style={{  }}>

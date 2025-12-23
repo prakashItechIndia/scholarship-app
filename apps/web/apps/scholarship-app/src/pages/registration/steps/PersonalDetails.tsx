@@ -189,7 +189,7 @@ const PersonalDetails = () => {
 
                         {/* Row 2: Caste & DOB */}
                         <FormRowContainer>
-                            <FormRow className="!flex-[0_0_auto] !w-[calc(50%-12px)]">
+                            <FormRow>
                                 <SelectField
                                     name="caste"
                                     control={control}
@@ -213,7 +213,7 @@ const PersonalDetails = () => {
 
                         {/* Row 3: Email & Mobile */}
                         <FormRowContainer>
-                            <FormRow className="!flex-[0_0_auto] !w-[calc(50%-12px)]">
+                            <FormRow>
                                 <InputField
                                     name="email"
                                     control={control}
@@ -239,7 +239,7 @@ const PersonalDetails = () => {
 
                         {/* Row 4: Address Lines */}
                         <FormRowContainer >
-                            <FormRow className="!flex-[0_0_auto] !w-[calc(50%-12px)]">
+                            <FormRow>
                                 <InputField
                                     name="addressLine1"
                                     control={control}
@@ -262,7 +262,7 @@ const PersonalDetails = () => {
 
                         {/* Row 5: City & District */}
                         <FormRowContainer>
-                            <FormRow className="!flex-[0_0_auto] !w-[calc(50%-12px)]">
+                            <FormRow>
                                 <InputField
                                     name="city"
                                     control={control}
@@ -288,7 +288,7 @@ const PersonalDetails = () => {
 
                         {/* Row 6: State & Pincode */}
                         <FormRowContainer>
-                            <FormRow className="!flex-[0_0_auto] !w-[calc(50%-12px)]">
+                            <FormRow>
                                 <SelectField
                                     name="state"
                                     control={control}
@@ -312,7 +312,7 @@ const PersonalDetails = () => {
                         </FormRowContainer>
 
                         {/* Country */}
-                        <div className="!flex-[0_0_auto] !w-[calc(50%-12px)]">
+                        <div className="w-full md:w-[calc(50%-12px)]">
                             <SelectField
                                 name="country"
                                 control={control}

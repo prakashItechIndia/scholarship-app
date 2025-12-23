@@ -3,7 +3,7 @@ import { IDropdownOption } from '@fluentui/react';
 import { useRegistrationForm } from '../hooks/useRegistrationForm';
 import { StepLayout } from '../components/StepLayout';
 import { getStringValue } from '../utils/registrationHelpers';
-import { InputField, DropdownField, IfscCodeField } from '../components';
+import { InputField, IfscCodeField, SelectField } from '../components';
 
 // --- Validation Schema ---
 const bankSchema = z.object({
@@ -17,17 +17,17 @@ const bankSchema = z.object({
 });
 
 // --- Constants ---
-const BANK_OPTIONS: IDropdownOption[] = [
-    { key: 'sbi', text: 'State Bank of India' },
-    { key: 'hdfc', text: 'HDFC Bank' },
-    { key: 'icici', text: 'ICICI Bank' },
-    { key: 'iob', text: 'Indian Overseas Bank' },
+const BANK_OPTIONS: { value: string; label: string }[] = [
+    { value: 'sbi', label: 'State Bank of India' },
+    { value: 'hdfc', label: 'HDFC Bank' },
+    { value: 'icici', label: 'ICICI Bank' },
+    { value: 'iob', label: 'Indian Overseas Bank' },
     // Add more banks as needed
 ];
 
-const BRANCH_OPTIONS: IDropdownOption[] = [
-    { key: 'main', text: 'Main Branch' },
-    { key: 'city', text: 'City Branch' },
+const BRANCH_OPTIONS: { value: string; label: string }[] = [
+    { value: 'main', label: 'Main Branch' },
+    { value: 'city', label: 'City Branch' },
     // Add more branches as needed
 ];
 
@@ -55,9 +55,9 @@ const BankDetails = () => {
             subtitle="Provide accurate bank information for scholarship disbursement."
         >
             <form className="w-full h-full flex flex-col -mt-4" onSubmit={handleSubmit(onSubmit)} id="current-step-form">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                     {/* Row 1: Name and Account Number */}
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="bankAccountName"
                             control={control}
@@ -67,7 +67,7 @@ const BankDetails = () => {
                             placeholder="Enter name"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="bankAccountNumber"
                             control={control}
@@ -79,8 +79,8 @@ const BankDetails = () => {
                     </div>
 
                     {/* Row 2: Bank and Branch */}
-                    <div className="col-span-1">
-                        <DropdownField
+                    <div className="col-span-1 w-full">
+                        <SelectField
                             name="bankName"
                             control={control}
                             errors={errors}
@@ -90,8 +90,8 @@ const BankDetails = () => {
                             placeholder="Select"
                         />
                     </div>
-                    <div className="col-span-1">
-                        <DropdownField
+                    <div className="col-span-1 w-full">
+                        <SelectField
                             name="bankBranch"
                             control={control}
                             errors={errors}
@@ -103,7 +103,7 @@ const BankDetails = () => {
                     </div>
 
                     {/* Row 3: Request Amount & Scholarship Seeking For */}
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="bankRequestAmount"
                             control={control}
@@ -113,7 +113,7 @@ const BankDetails = () => {
                             placeholder="Enter Request amount"
                         />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 w-full">
                         <InputField
                             name="bankScholarshipSeekingFor"
                             control={control}
@@ -125,7 +125,7 @@ const BankDetails = () => {
                     </div>
 
                     {/* Row 4: IFSC Code */}
-                    <div className="col-span-1 w-full">
+                    <div className="col-span-1 md:col-span-2 w-full">
                         <IfscCodeField
                             name="bankIfscCode"
                             control={control}

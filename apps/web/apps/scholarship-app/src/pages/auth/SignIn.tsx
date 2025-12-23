@@ -155,7 +155,7 @@ const SignInPage = () => {
     } else {
       // Store email in localStorage and redirect to verification page
       localStorage.setItem('verification_email', email);
-      void navigate('/verification');
+      void navigate('/registration');
     }
   };
 
@@ -190,7 +190,7 @@ const SignInPage = () => {
         <SEO
           title="Sign In - Leo Muthu Scholarship"
           description="Apply online for the Leo Muthu Scholarship and secure your educational support. An initiative of ARAM Foundation."
-          url="/signin"
+          url="/user-login"
           keywords="Leo Muthu Scholarship, LMS, ARAM Foundation, scholarship application, education support"
           schema={organizationSchema}
         />
@@ -250,7 +250,7 @@ const SignInPage = () => {
       <SEO
         title="Sign In - Leo Muthu Scholarship"
         description="Log in to administer and monitor scholarship applications. An initiative of ARAM Foundation."
-        url="/signin"
+        url="/user-login"
         keywords="Leo Muthu Scholarship, LMS, ARAM Foundation, admin login"
         schema={organizationSchema}
       />
