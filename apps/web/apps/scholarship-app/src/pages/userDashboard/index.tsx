@@ -4,6 +4,7 @@ import {
   AddRegular,
 } from "@fluentui/react-icons";
 import { WelcomeBanner } from "../../components/common";
+import React from "react";
 
 interface ApplicationCardData {
   applicationNo: string;

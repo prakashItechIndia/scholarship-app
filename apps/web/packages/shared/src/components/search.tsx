@@ -16,7 +16,7 @@ export const Search = React.forwardRef<HTMLInputElement, SearchProps>(
         ref={ref}
         placeholder={searchPlaceHolder || "Search"}
         {...(typeof searchValue !== "undefined" ? { value: searchValue } : {})}
-        className={cn("min-h-10 w-full max-w-[500px]", className)}
+        className={cn("w-full max-w-[500px]", className)}
         prefixIcon={<Search20Regular />}
         iconClassName="text-[#707070]"
         onChange={(e) => {
