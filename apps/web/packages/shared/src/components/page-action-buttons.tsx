@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button } from "./button";
-import { AddRegular } from "@fluentui/react-icons";
+import { AddFilled, AddRegular } from "@fluentui/react-icons";
 import { MoreIcon } from "./more-icon";
 
 export interface PageActionButtonsProps {
@@ -87,9 +87,10 @@ export const PageActionButtons = React.forwardRef<
               // padding:"3px",
               width: "120px",
               height: "40px",
+              border:"none"
             }}
           >
-            <AddRegular style={{ width: "16px", height: "16px" }} />
+            <AddFilled style={{ width: "16px", height: "16px",fontSize:"12px",fontWeight:600 }} />
             {primaryButtonLabel}
           </Button>
         )}
@@ -105,9 +106,10 @@ export const PageActionButtons = React.forwardRef<
               border: "1px solid #e0e0e0",
               minHeight: "35px",
               minWidth: "35px",
+              // border:"none"
             }}
           >
-            <MoreIcon width={20} height={20} />
+            <MoreIcon width={20} height={20} style={{width:"16px",height:"16px",fontSize:"12px",fontWeight:600}} />
           </Button>
         )}
         {children}

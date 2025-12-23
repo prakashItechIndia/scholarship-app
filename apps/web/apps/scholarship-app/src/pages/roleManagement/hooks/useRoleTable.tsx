@@ -63,7 +63,7 @@ export const useRoleTable = ({
 
     // Action column renderer
     const renderActions = (item: Role) => (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Button
@@ -106,7 +106,7 @@ export const useRoleTable = ({
           fontWeight: 500,
           color: status === "Active" ? "#16a34a" : "#6b7280",
           backgroundColor: status === "Active" ? "#dcfce7" : "#f3f4f6",
-          padding: "4px 12px",
+          padding: "4px 30px",
           borderRadius: "12px",
           fontFamily: "'Inter', sans-serif",
           display: "inline-block",
