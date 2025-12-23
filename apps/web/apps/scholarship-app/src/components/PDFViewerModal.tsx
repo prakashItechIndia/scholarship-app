@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Modal, Button } from "@shared/components";
-import { DismissRegular } from "@fluentui/react-icons";
+import { DismissRegular, ArrowDownloadRegular } from "@fluentui/react-icons";
+import Constants from "../pages/process/constants";
 
 interface PDFViewerModalProps {
   open: boolean;
@@ -18,7 +19,7 @@ try {
   // This will only work if the packages are installed
   const pdfViewerCore = require("@react-pdf-viewer/core");
   const pdfViewerDefaultLayout = require("@react-pdf-viewer/default-layout");
-  
+
   if (pdfViewerCore && pdfViewerDefaultLayout) {
     Viewer = pdfViewerCore.Viewer;
     defaultLayoutPlugin = pdfViewerDefaultLayout.defaultLayoutPlugin;
@@ -37,7 +38,6 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
 }) => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [zoomLevel, setZoomLevel] = React.useState(1);
 
   React.useEffect(() => {
     if (open && pdfUrl) {
@@ -46,8 +46,13 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
     }
   }, [open, pdfUrl]);
 
-  // Sample PDF URL - replace with actual PDF URL from your data
-  const displayUrl = pdfUrl || `https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf`;
+  // Use a fallback URL if none provided, for testing
+  const displayUrl = pdfUrl || Constants.samplePdfUrl;
+
+  // State to track current page and total pages if needed for custom toolbar
+  // (In this implementation, the default layout plugin handles state internally,
+  // but if we were building a fully custom toolbar from scratch we'd need these)
+  // For now, we rely on the slots provided by the default layout plugin.
 
   // Use react-pdf-viewer if available, otherwise use iframe
   const useReactPdfViewer = Viewer && defaultLayoutPlugin;
@@ -55,10 +60,104 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
   // Initialize plugins for react-pdf-viewer
   const plugins = React.useMemo(() => {
     if (defaultLayoutPlugin) {
-      return [defaultLayoutPlugin()];
+      return [
+        defaultLayoutPlugin({
+          renderToolbar: (Toolbar: any) => (
+            <Toolbar>
+              {(slots: any) => {
+                const {
+                  CurrentPageInput,
+                  GoToNextPage,
+                  GoToPreviousPage,
+                  NumberOfPages,
+                  Print,
+                  Rotate,
+                  Zoom,
+                  ZoomIn,
+                  ZoomOut,
+                } = slots;
+
+                const handleCustomDownload = async () => {
+                  try {
+                    const response = await fetch(displayUrl);
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = `${applicationNo || "document"}.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                  } catch (error) {
+                    console.error("Download failed:", error);
+                    // Fallback to direct link if fetch fails (might not rename correctly due to CORS)
+                    const link = document.createElement("a");
+                    link.href = displayUrl;
+                    link.download = `${applicationNo || "document"}.pdf`;
+                    link.target = "_blank";
+                    link.click();
+                  }
+                };
+
+                return (
+                  <div
+                    style={{
+                      alignItems: "center",
+                      display: "flex",
+                      width: "100%",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <div style={{ padding: "0 2px" }}>
+                        <GoToPreviousPage />
+                      </div>
+                      <div style={{ padding: "0 2px", display: "flex", alignItems: "center" }}>
+                        <CurrentPageInput /> <span style={{ margin: "0 4px" }}>/</span> <NumberOfPages />
+                      </div>
+                      <div style={{ padding: "0 2px" }}>
+                        <GoToNextPage />
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <div style={{ padding: "0 2px" }}>
+                        <ZoomOut />
+                      </div>
+                      <div style={{ padding: "0 2px" }}>
+                        <Zoom />
+                      </div>
+                      <div style={{ padding: "0 2px" }}>
+                        <ZoomIn />
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <div style={{ padding: "0 2px" }}>
+                        <Rotate />
+                      </div>
+                      <div style={{ padding: "0 2px" }}>
+                        <Print />
+                      </div>
+                      <div style={{ padding: "0 2px" }}>
+                        <Button
+                          appearance="subtle"
+                          icon={<ArrowDownloadRegular />}
+                          onClick={handleCustomDownload}
+                          aria-label="Download"
+                          style={{ minWidth: "32px" }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              }}
+            </Toolbar>
+          ),
+        }),
+      ];
     }
     return [];
-  }, []);
+  }, [displayUrl, applicationNo]);
 
   return (
     <Modal
@@ -82,45 +181,6 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
         borderRadius: "8px",
         overflow: "hidden",
       }}>
-        {/* PDF Viewer Header */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "12px 16px",
-          backgroundColor: "#ffffff",
-          borderBottom: "1px solid #e0e0e0",
-        }}>
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-          }}>
-            <span style={{
-              fontSize: "14px",
-              lineHeight: "20px",
-              fontWeight: 600,
-              color: "#242424",
-              fontFamily: "'Inter', sans-serif",
-            }}>
-              {applicationNo ? `Application: ${applicationNo}` : "Document Viewer"}
-            </span>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onOpenChange(false)}
-            style={{
-              width: "32px",
-              height: "32px",
-              padding: 0,
-            }}
-            aria-label="Close"
-          >
-            <DismissRegular style={{ width: "16px", height: "16px" }} />
-          </Button>
-        </div>
-
         {/* PDF Viewer Content */}
         <div style={{
           flex: 1,
@@ -222,59 +282,6 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
             />
           )}
         </div>
-
-        {/* PDF Viewer Footer with controls */}
-        {!useReactPdfViewer && (
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "8px 16px",
-            backgroundColor: "#ffffff",
-            borderTop: "1px solid #e0e0e0",
-          }}>
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setZoomLevel(prev => Math.max(0.5, prev - 0.1));
-                  const iframe = document.querySelector('iframe[title="PDF Viewer"]') as HTMLIFrameElement;
-                  if (iframe?.contentWindow) {
-                    iframe.contentWindow.postMessage({ type: 'zoom', value: zoomLevel - 0.1 }, '*');
-                  }
-                }}
-              >
-                Zoom Out
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setZoomLevel(prev => Math.min(2, prev + 0.1));
-                  const iframe = document.querySelector('iframe[title="PDF Viewer"]') as HTMLIFrameElement;
-                  if (iframe?.contentWindow) {
-                    iframe.contentWindow.postMessage({ type: 'zoom', value: zoomLevel + 0.1 }, '*');
-                  }
-                }}
-              >
-                Zoom In
-              </Button>
-            </div>
-            <div style={{
-              fontSize: "12px",
-              lineHeight: "16px",
-              color: "#616161",
-              fontFamily: "'Inter', sans-serif",
-            }}>
-              Use browser controls to navigate
-            </div>
-          </div>
-        )}
       </div>
 
       <style>{`

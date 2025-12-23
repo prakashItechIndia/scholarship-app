@@ -82,17 +82,19 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
     return (
       <div
         ref={ref}
-        className={cn("flex items-center justify-between gap-4 flex-wrap", className)}
+        className={cn("flex flex-row items-center justify-between gap-4 w-full px-4 py-2", className)}
       >
-        <Text>{startItem}-{endItem} of {totalItems} items</Text>
+        <div className="flex-1 text-left">
+          <Text className="whitespace-nowrap">{startItem}-{endItem} of {totalItems} items</Text>
+        </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-[3px] justify-center">
           {showPageNumbers && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-[3px]">
               {showFirstLast && (
                 <Button
                   appearance="subtle"
-                  size="small"
+                  style={{ minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0, backgroundColor: "#fff" }}
                   onClick={() => onPageChange(1)}
                   disabled={currentPage === 1}
                   aria-label="First page"
@@ -102,7 +104,7 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
               )}
               <Button
                 appearance="subtle"
-                size="small"
+                style={{ minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0, backgroundColor: "white" }}
                 icon={<ChevronLeft20Regular />}
                 onClick={() => onPageChange(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
@@ -113,11 +115,15 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
                 if (index > 0 && pageNumbers[index - 1] !== page - 1) {
                   return (
                     <React.Fragment key={`ellipsis-${page}`}>
-                      <Text style={{ padding: "0 8px", color: "#707070" }}>...</Text>
+                      <Text style={{ padding: "0 4px", color: "#707070" }}>...</Text>
                       <Button
                         key={page}
-                        appearance={currentPage === page ? "primary" : "subtle"}
-                        size="small"
+                        appearance="subtle"
+                        style={{
+                          minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0,
+                          backgroundColor: currentPage === page ? "#f5f5f5" : "white",
+                          fontWeight: currentPage === page ? "bold" : "normal"
+                        }}
                         onClick={() => onPageChange(page)}
                         aria-label={`Go to page ${page}`}
                         aria-current={currentPage === page ? "page" : undefined}
@@ -130,8 +136,12 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
                 return (
                   <Button
                     key={page}
-                    appearance={currentPage === page ? "primary" : "subtle"}
-                    size="small"
+                    appearance="subtle"
+                    style={{
+                      minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0,
+                      backgroundColor: currentPage === page ? "#f5f5f5" : "white",
+                      fontWeight: currentPage === page ? "bold" : "normal"
+                    }}
                     onClick={() => onPageChange(page)}
                     aria-label={`Go to page ${page}`}
                     aria-current={currentPage === page ? "page" : undefined}
@@ -143,7 +153,7 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
 
               <Button
                 appearance="subtle"
-                size="small"
+                style={{ minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0, backgroundColor: "white" }}
                 icon={<ChevronRight20Regular />}
                 onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
@@ -152,7 +162,7 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
               {showFirstLast && (
                 <Button
                   appearance="subtle"
-                  size="small"
+                  style={{ minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0, backgroundColor: "white" }}
                   onClick={() => onPageChange(totalPages)}
                   disabled={currentPage === totalPages}
                   aria-label="Last page"
@@ -162,9 +172,11 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
               )}
             </div>
           )}
+        </div>
 
+        <div className="flex-1 flex justify-end gap-2 items-center">
           {showPageSize && onPageSizeChange && (
-            <div className="flex items-center gap-2">
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <Dropdown
                 value={String(pageSize)}
                 onOptionSelect={handlePageSizeChange}

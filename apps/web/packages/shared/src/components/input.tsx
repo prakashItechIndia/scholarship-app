@@ -38,11 +38,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     // Get theme tokens for styling
     const tokens = React.useMemo(() => getThemeTokens(isDark ? 'dark' : 'light'), [isDark]);
 
-    const borderColor = React.useMemo(() => {
-      return errorMessage 
-        ? (tokens as any).colorStatusDangerBorder2 || "#d13438"
-        : tokens.colorNeutralStroke1 || "#d1d5db";
-    }, [tokens, errorMessage]);
+
 
     const contentAfter = suffixIcon ? (
       <span className={cn("flex items-center", iconClassName)}>{suffixIcon}</span>
@@ -59,11 +55,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="relative w-full">
         {errorMessage && (
-          <div 
-            className="text-xs mb-1" 
-            style={{ 
-              fontSize: tokens.fontSizeBase200, 
-              color: (tokens as any).colorStatusDangerForeground3 || "#d13438" 
+          <div
+            className="text-xs mb-1"
+            style={{
+              fontSize: tokens.fontSizeBase200,
+              color: (tokens as any).colorStatusDangerForeground3 || "#d13438"
             }}
           >
             {errorMessage}
@@ -76,6 +72,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         >
           <FluentInput
             ref={ref}
+            appearance="outline"
             type={type}
             value={value ?? ""}
             onChange={onChange as any}
@@ -84,13 +81,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className={cn(className)}
             style={{
               width: "100%",
-              border: `1px solid ${borderColor}`,
+              // border removed to let appearance="outline" handle it
               borderRadius: tokens.borderRadiusLarge,
               backgroundColor: tokens.colorNeutralBackground1,
               color: tokens.colorNeutralForeground1,
               fontSize: tokens.fontSizeBase300,
               height: "32px",
-              minHeight: "45px",
+              minHeight: "32px",
               paddingLeft: paddingLeft,
               paddingRight: paddingRight,
               paddingTop: "8px",
