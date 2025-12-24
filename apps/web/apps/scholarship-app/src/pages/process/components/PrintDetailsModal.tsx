@@ -135,7 +135,6 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
             open={open}
             onOpenChange={onOpenChange}
             size="lg"
-            title={`LEO MUTHU - Scholarship Print Details ( 2025-2026 )`}
             headerContent={
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", gap: "20px" }}>
                     <span style={{ fontSize: "16px", fontWeight: 600, color: "#242424", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap" }}>
