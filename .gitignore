@@ -27,3 +27,15 @@ lerna-debug.log*
 *firebase-adminsdk*.json
 *-firebase-adminsdk-*.json
 firebase-adminsdk-*.json
+
+# Config files with secrets (Web.config, app.config, etc.)
+**/Web.config
+**/bin/**/*.config
+**/obj/**/*.config
+**/*.config
+!**/tsconfig.json
+!**/tsconfig.*.json
+!**/package.json
+!**/package-lock.json
+!**/pnpm-lock.yaml
+!**/yarn.lock
