@@ -41,7 +41,7 @@ export const createSsoApiClients = (
   const hasBaseURL = !!axiosInstance.defaults.baseURL;
   // Use empty string when axios has baseURL, so the generated client creates relative URLs
   const effectiveBasePath = basePath ?? (hasBaseURL ? '' : undefined);
-  
+
   const config: ConfigurationParameters = {
     basePath: effectiveBasePath ?? '',
     baseOptions: axiosInstance.defaults,

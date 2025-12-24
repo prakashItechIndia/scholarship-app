@@ -2,29 +2,21 @@ import * as React from "react";
 import {
   Table,
   Pagination,
-  Button,
   Card,
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
 } from "@shared/components";
-import {
-  MoreVerticalRegular,
-  ArrowDown20Regular,
-  ChevronDown20Regular,
-} from "@fluentui/react-icons";
 import { ScholarshipReportData, ReportFilters, ReportTab } from "./types";
 import { mockScholarshipData } from "./constants";
 import ReportsTabs from "./components/ReportsTabs";
 import ReportsFilters from "./components/ReportsFilters";
 import EmptyState from "./components/EmptyState";
 import { useReportsTable } from "./hooks/useReportsTable";
+import PrintDetailsModal from "../process/components/PrintDetailsModal";
 
 const ReportsPage: React.FC = () => {
-  const [activeTab, setActiveTab] = React.useState<ReportTab>("scholarship-issued");
+  const [activeTab, setActiveTab] = React.useState<ReportTab>("categories-wise");
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(5);
+  // RPT-001: Filters state
   const [filters, setFilters] = React.useState<ReportFilters>({
     academicYear: undefined,
     appliedDate: null,
@@ -34,8 +26,15 @@ const ReportsPage: React.FC = () => {
   });
   const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set());
   const [hasAppliedFilters, setHasAppliedFilters] = React.useState(false);
-  const [exportMenuOpen, setExportMenuOpen] = React.useState(false);
-  const [moreMenuOpen, setMoreMenuOpen] = React.useState(false);
+
+  // Print Modal State
+  const [printModalOpen, setPrintModalOpen] = React.useState(false);
+  const [selectedReportForPrint, setSelectedReportForPrint] = React.useState<ScholarshipReportData | null>(null);
+
+  const handleViewPdf = React.useCallback((item: ScholarshipReportData) => {
+    setSelectedReportForPrint(item);
+    setPrintModalOpen(true);
+  }, []);
 
   // Get filtered data based on active tab and filters
   const filteredData = React.useMemo(() => {
@@ -82,6 +81,7 @@ const ReportsPage: React.FC = () => {
     },
     selectedRows,
     data: filteredData,
+    onViewPdf: handleViewPdf,
   });
 
   // Paginate data
@@ -94,30 +94,66 @@ const ReportsPage: React.FC = () => {
   const totalItems = filteredData.length;
   const totalPages = Math.ceil(totalItems / pageSize);
 
-  // Reset to page 1 when filters change
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [filters, activeTab]);
+  console.log("Rendering ReportsPage. Filters:", filters);
 
-  const handleApplyFilter = () => {
+  React.useEffect(() => {
+    console.log("ReportsPage MOUNTED");
+    return () => console.log("ReportsPage UNMOUNTED");
+  }, []);
+
+  // Handle tab change with explicit reset logic
+  const handleTabChange = React.useCallback((newTab: ReportTab) => {
+    console.log("Tab Change Triggered:", newTab);
+    if (newTab !== activeTab) {
+      setActiveTab(newTab);
+      // Reset logic temporarily disabled for debugging
+      /*
+      setFilters({
+        academicYear: undefined,
+        appliedDate: null,
+        gender: undefined,
+        status: undefined,
+        keywordSearch: "",
+        issuedBy: "",
+        issuedDate: null,
+        issuedType: undefined,
+        applicationNo: "",
+        studentId: "",
+        mobileNumber: "",
+      });
+      setHasAppliedFilters(false);
+      setSelectedRows(new Set());
+      setCurrentPage(1);
+      */
+    }
+  }, [activeTab]);
+
+  const handleApplyFilter = React.useCallback(() => {
     setHasAppliedFilters(true);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleResetFilter = () => {
+  const handleResetFilter = React.useCallback(() => {
+    console.log("Reset Filter Triggered");
     setFilters({
       academicYear: undefined,
       appliedDate: null,
       gender: undefined,
       status: undefined,
       keywordSearch: "",
+      issuedBy: "",
+      issuedDate: null,
+      issuedType: undefined,
+      applicationNo: "",
+      studentId: "",
+      mobileNumber: "",
     });
     setHasAppliedFilters(false);
     setSelectedRows(new Set());
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleExport = (format: "excel" | "pdf" | "csv") => {
+  const handleExport = React.useCallback((format: "excel" | "pdf" | "csv") => {
     // RPT-002: Include generation timestamp and generated-by user ID
     const exportData = {
       data: filteredData,
@@ -129,8 +165,8 @@ const ReportsPage: React.FC = () => {
       },
     };
 
-    console.log(`Exporting to ${format}`, exportData);
-    
+    console.log(`Exporting to ${format} `, exportData);
+
     // RPT-003: Support datasets up to 100,000 records
     if (filteredData.length > 100000) {
       console.warn("Dataset exceeds 100,000 records. Export may be slow.");
@@ -149,162 +185,104 @@ const ReportsPage: React.FC = () => {
       // Export as CSV (comma-separated values)
       console.log("Exporting as CSV for data analysis");
     }
-  };
+  }, [filteredData]);
+
+  // Handle individual filter updates
+  const handleFilterUpdate = React.useCallback((key: keyof ReportFilters, value: any) => {
+    console.log(`Parent updating filter: ${key} = ${value} `);
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  }, []);
 
   return (
     <div style={{
       width: "100%",
       height: "100%",
       backgroundColor: "#fafafa",
-      padding: "24px",
+      // padding: "24px",
       fontFamily: "'Inter', sans-serif",
       display: "flex",
-      gap: "24px",
+      gap: "0px",
+      overflow: "hidden",
     }}>
       {/* Main Content Area */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
         {/* Title Section */}
-        <div style={{ marginBottom: "24px" }}>
+        <div style={{ paddingTop: "8px", paddingBottom: "9px", paddingLeft: "24px", }}>
           <h1 style={{
-            fontSize: "32px",
-            lineHeight: "40px",
-            fontWeight: 700,
+            fontSize: "16px",
+            lineHeight: "22px",
+            fontWeight: 600,
             color: "#242424",
-            marginBottom: "8px",
+            marginTop: 0,
             fontFamily: "'Inter', sans-serif",
           }}>
-            Reports - Generate and Export Scholarship Performance Reports
+            Reports
           </h1>
+          <p style={{
+            fontSize: "12px",
+            lineHeight: "20px",
+            fontWeight: 400,
+            color: "#616161",
+            margin: 0,
+            fontFamily: "'Inter', sans-serif",
+          }}>
+            Generate and Export Scholarship Performance Reports
+          </p>
         </div>
 
         {/* Tabs Section */}
-        <div style={{ marginBottom: "24px" }}>
-          <ReportsTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        <div>
+          <ReportsTabs
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            onExport={handleExport}
+            showActions={hasAppliedFilters && filteredData.length > 0}
+          />
         </div>
 
         {/* Actions and Table Section */}
         {hasAppliedFilters && filteredData.length > 0 ? (
           <>
-            {/* Action Buttons */}
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              gap: "12px",
-              marginBottom: "16px",
-            }}>
-              <DropdownMenu open={exportMenuOpen} onOpenChange={setExportMenuOpen}>
-                <DropdownMenuTrigger>
-                  <Button
-                    appearance="primary"
-                    style={{
-                      backgroundColor: "#0f6cbd",
-                      color: "#ffffff",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
-                    <ArrowDown20Regular style={{ width: "16px", height: "16px" }} />
-                    Export
-                    <ChevronDown20Regular style={{ width: "16px", height: "16px" }} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem
-                    label="Excel (.xlsx)"
-                    onClick={() => {
-                      handleExport("excel");
-                      setExportMenuOpen(false);
-                    }}
-                  />
-                  <DropdownMenuItem
-                    label="PDF"
-                    onClick={() => {
-                      handleExport("pdf");
-                      setExportMenuOpen(false);
-                    }}
-                  />
-                  <DropdownMenuItem
-                    label="CSV"
-                    onClick={() => {
-                      handleExport("csv");
-                      setExportMenuOpen(false);
-                    }}
-                  />
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <DropdownMenu open={moreMenuOpen} onOpenChange={setMoreMenuOpen}>
-                <DropdownMenuTrigger>
-                  <Button
-                    appearance="subtle"
-                    onClick={() => setMoreMenuOpen(!moreMenuOpen)}
-                    aria-label="More options"
-                    style={{
-                      width: "36px",
-                      height: "36px",
-                      padding: 0,
-                    }}
-                  >
-                    <MoreVerticalRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem
-                    label="Refresh"
-                    onClick={() => {
-                      console.log("Refresh clicked");
-                      setMoreMenuOpen(false);
-                    }}
-                  />
-                  <DropdownMenuItem
-                    label="Settings"
-                    onClick={() => {
-                      console.log("Settings clicked");
-                      setMoreMenuOpen(false);
-                    }}
-                  />
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
             {/* Table Section */}
             <Card variant="elevated" style={{
               overflow: "hidden",
               border: "1px solid #e0e0e0",
+              borderRight: "none",
               backgroundColor: "#ffffff",
               borderRadius: "8px",
+              borderTopRightRadius: "0",
+              borderBottomRightRadius: "0",
               flex: 1,
               display: "flex",
               flexDirection: "column",
             }}>
-              <div style={{ overflowX: "auto", flex: 1 }}>
+              <div style={{ flex: 1, minHeight: 0, minWidth: 0, overflow: "hidden" }}>
                 <Table columns={columns} data={paginatedData} />
               </div>
 
               {/* Pagination */}
-              {totalPages > 1 && (
-                <div style={{
-                  padding: "16px",
-                  borderTop: "1px solid #e0e0e0",
-                  backgroundColor: "#ffffff",
-                }}>
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    pageSize={pageSize}
-                    totalItems={totalItems}
-                    onPageChange={setCurrentPage}
-                    onPageSizeChange={setPageSize}
-                    pageSizeOptions={[5, 10, 20, 50, 100]}
-                    showFirstLast={true}
-                    showPageSize={true}
-                    showPageNumbers={true}
-                    maxPageButtons={7}
-                  />
-                </div>
-              )}
+              <div style={{
+                padding: "16px",
+                borderTop: "1px solid #e0e0e0",
+                backgroundColor: "#ffffff",
+              }}>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  pageSize={pageSize}
+                  totalItems={totalItems}
+                  onPageChange={setCurrentPage}
+                  onPageSizeChange={setPageSize}
+                  pageSizeOptions={[5, 10, 20, 50, 100]}
+                  showFirstLast={true}
+                  showPageSize={true}
+                  showPageNumbers={true}
+                  maxPageButtons={7}
+                />
+              </div>
             </Card>
           </>
         ) : (
@@ -312,8 +290,11 @@ const ReportsPage: React.FC = () => {
           <Card variant="elevated" style={{
             overflow: "hidden",
             border: "1px solid #e0e0e0",
+            borderRight: "none",
             backgroundColor: "#ffffff",
             borderRadius: "8px",
+            borderTopRightRadius: "0",
+            borderBottomRightRadius: "0",
             flex: 1,
             display: "flex",
             alignItems: "center",
@@ -327,10 +308,23 @@ const ReportsPage: React.FC = () => {
       {/* Filters Sidebar */}
       <ReportsFilters
         filters={filters}
-        onFiltersChange={setFilters}
+        onFilterUpdate={handleFilterUpdate}
         onApplyFilter={handleApplyFilter}
         onResetFilter={handleResetFilter}
+        activeTab={activeTab}
       />
+
+      {/* Print Details Modal */}
+      {selectedReportForPrint && (
+        <PrintDetailsModal
+          open={printModalOpen}
+          onOpenChange={setPrintModalOpen}
+          data={{
+            ...selectedReportForPrint,
+            amount: selectedReportForPrint.issuedAmount
+          } as any}
+        />
+      )}
     </div>
   );
 };

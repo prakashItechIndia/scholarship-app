@@ -49,8 +49,8 @@ export interface TableProps {
 export const Table = React.forwardRef<HTMLDivElement, TableProps>(
   ({ className, columns, data, disableScroll = false }, ref) => {
     return (
-      <div ref={ref} className={cn("relative w-full ", className)} style={{ padding: 0, margin: 0 }}>
-        <FluentTable style={{ width: "100%", borderCollapse: "collapse", margin: 0, padding: 0, tableLayout: "auto" }}>
+      <div ref={ref} className={cn("relative w-full h-full overflow-auto", className)} style={{ padding: 0, margin: 0 }}>
+        <FluentTable style={{ minWidth: "100%", width: "max-content", borderCollapse: "collapse", margin: 0, padding: 0, tableLayout: "auto" }}>
           <TableHeader>
             <TableRow style={{ backgroundColor: "#FAFAFA" }}>
               {columns.map((col) => (
@@ -122,6 +122,7 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
                         lineHeight: "20px",
                         color: "#242424",
                         fontFamily: "'Inter', sans-serif",
+                        whiteSpace: "nowrap",
                         ...col.style,
                       }}
                       onClick={(e) => {
