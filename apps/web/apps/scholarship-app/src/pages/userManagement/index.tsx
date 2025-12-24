@@ -186,12 +186,12 @@ const UserManagementPage: React.FC = () => {
             placeholder="Search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            prefixIcon={<Search20Regular style={{ width: "18px", height: "18px", color: "#707070" }} />}
+            prefixIcon={<Search20Regular style={{ width: "18px", height: "15px", color: "#707070" }} />}
             style={{
               
               // paddingLeft: "10px",
               // marginBottom: "40px",
-              height:"42px",
+              height:"35px",
               borderRadius:"8px"
             }}
           />

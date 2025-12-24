@@ -3,6 +3,8 @@ import { Stack, Text, IStackStyles, IStackTokens, mergeStyles, FontWeights, Defa
 import { useRegistration } from '@/contexts/RegistrationContext';
 import loaderGif from '@shared/assets/icons/loader.gif';
 import { PencilIcon } from '@shared/components';
+import { scholarshipApplication } from '@/services/scholarship.service';
+import { useToast } from '@/components/ui/toast';
 
 // --- Styles ---
 const containerStyles: IStackStyles = {
@@ -125,6 +127,8 @@ const ReviewSubmit = () => {
     const { formData, prevStep, setStep } = useRegistration();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [applicationNumber, setApplicationNumber] = useState<string>('');
+    const { error: showError } = useToast();
 
     // Helper to render value or placeholder
     const displayValue = (val: string | number | Date | File[] | undefined | null): string => {
@@ -153,15 +157,102 @@ const ReviewSubmit = () => {
         return '-';
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        // Simulate API call delay
-        setTimeout(() => {
+        try {
+            // Get email from localStorage
+            const authData = localStorage.getItem('scholarship_auth');
+            const parsedAuth = authData ? (JSON.parse(authData) as { email?: string }) : null;
+            const email = parsedAuth?.email ?? null;
+            
+            if (!email) {
+                showError('Error', 'Please login to submit your application');
+                setIsSubmitting(false);
+                return;
+            }
+
+            // Prepare application data according to API requirements
+            // Map formData to the expected API format
+            const applicationPayload = {
+                // Identity Details
+                Applicant_Type: formData.applicantType || '',
+                Aadhaar_ID: formData.aadhaarId || '',
+                Pan_ID: formData.panId || '',
+                Scholarship_Year_Id: formData.scholarshipYearId || null,
+                
+                // Personal Details
+                Applicant_Name: formData.studentName || '',
+                Student_ID: formData.studentId || '',
+                Gender: formData.gender || '',
+                Community: formData.community || '',
+                Caste: formData.caste || '',
+                Date_Of_Birth: formData.dob 
+                    ? (typeof formData.dob === 'string' 
+                        ? formData.dob 
+                        : (formData.dob instanceof Date 
+                            ? formData.dob.toISOString().split('T')[0] 
+                            : (typeof formData.dob === 'number' 
+                                ? new Date(formData.dob).toISOString().split('T')[0] 
+                                : null)))
+                    : null,
+                Email: email,
+                Mobile_Number: formData.mobile || '',
+                Address_Line1: formData.addressLine1 || '',
+                Address_Line2: formData.addressLine2 || '',
+                City: formData.city || '',
+                District: formData.district || '',
+                State: formData.state || '',
+                Country: formData.country || '',
+                PinCode: formData.pincode || '',
+                
+                // Family Details
+                Father_Name: formData.fatherName || '',
+                Father_Occupation: formData.fatherOccupation || '',
+                Father_OfficeName: formData.fatherOfficeName || '',
+                Mother_Name: formData.motherName || '',
+                Mother_Occupation: formData.motherOccupation || '',
+                Mother_OfficeName: formData.motherOfficeName || '',
+                Father_AnnualIncome: formData.annualIncome || '',
+                
+                // Bank Details
+                Bank_Account_Number: formData.accountNumber || '',
+                Bank_Name: formData.bankName || '',
+                Bank_Branch: formData.bankBranch || '',
+                IFSC_Code: formData.ifscCode || '',
+                Scholarship_Issued_AccNo: formData.accountHolderName || '',
+                
+                // Educational Details (if available in formData)
+                Class_Studying: formData.classStudying || '',
+                Board_Of_Studying: formData.boardOfStudying || '',
+                Type_Of_Institution: formData.typeOfInstitution || '',
+                Cource_Of_Studying: formData.courseOfStudying || '',
+                Degree_Type: formData.degreeType || '',
+                Degree: formData.degree || '',
+                Institution_Name: formData.institutionName || '',
+                University: formData.university || '',
+                Current_Year: formData.currentYear || '',
+                Current_Semester: formData.currentSemester || '',
+                
+                // Documents will be handled separately via document upload API
+            };
+
+            // Submit application
+            const response = await scholarshipApplication.register(applicationPayload);
+            
+            // Extract application number from response
+            const responseData = (response as unknown) as { Application_Id?: string; applicationId?: string; [key: string]: unknown };
+            const appNumber = responseData?.Application_Id ?? responseData?.applicationId ?? 'AF2510001';
+            setApplicationNumber(appNumber);
+            
             setIsSubmitting(false);
             setIsSuccess(true);
-        }, 4500); // 4.5 seconds
+        } catch (error: unknown) {
+            setIsSubmitting(false);
+            const errorMessage = error instanceof Error ? error.message : 'Failed to submit application. Please try again.';
+            showError('Submission Failed', errorMessage);
+        }
     };
 
     const handleSuccessClose = () => {
@@ -214,7 +305,7 @@ const ReviewSubmit = () => {
 
                         <Text style={{ textAlign: 'center', color: '#4b5563', lineHeight: '1.5', marginBottom: 24, maxWidth: '90%' }}>
                             Your scholarship application is successfully received.
-                            Please note this Application Number <strong>AF2510001</strong> for further reference.
+                            Please note this Application Number <strong>{applicationNumber || 'AF2510001'}</strong> for further reference.
                             Track your status anytime by logging in.
                             <br />
                             Contact <strong>admission@aram.in</strong> or <strong>+91 12345 67890</strong>.

@@ -61,17 +61,18 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
                     minWidth: col.minWidth,
                     maxWidth: col.maxWidth,
                     width: col.width,
-                    paddingTop: "12px",
-                    paddingBottom: "12px",
+                    paddingTop: "8px",
+                    paddingBottom: "8px", 
                     paddingLeft: col.cellPaddingLeft !== undefined ? (typeof col.cellPaddingLeft === "number" ? `${col.cellPaddingLeft}px` : col.cellPaddingLeft) : "16px",
                     paddingRight: col.cellPaddingRight !== undefined ? (typeof col.cellPaddingRight === "number" ? `${col.cellPaddingRight}px` : col.cellPaddingRight) : "16px",
-                    fontSize: "13px",
+                    fontSize: "12px",
                     lineHeight: "20px",
                     fontWeight: 600,
                     color: "#424242",
                     fontFamily: "'Inter', sans-serif",
                     borderBottom: "1px solid #e0e0e0",
                     backgroundColor: "#FAFAFA",
+                  height: "36px",
                   }}
                 >
                   {col.onRenderHeader ? col.onRenderHeader() : col.name}
@@ -108,8 +109,8 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
                         minWidth: col.minWidth,
                         maxWidth: col.maxWidth,
                         width: col.width,
-                        paddingTop: "12px",
-                        paddingBottom: "12px",
+                        paddingTop: "8px",
+                        paddingBottom: "8px",
                         paddingLeft: col.cellPaddingLeft !== undefined ? (typeof col.cellPaddingLeft === "number" ? `${col.cellPaddingLeft}px` : col.cellPaddingLeft) : "16px",
                         paddingRight: col.cellPaddingRight !== undefined ? (typeof col.cellPaddingRight === "number" ? `${col.cellPaddingRight}px` : col.cellPaddingRight) : "16px",
                         fontSize: "13px",
@@ -117,6 +118,7 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
                         color: "#242424",
                         fontFamily: "'Inter', sans-serif",
                         ...col.style,
+                        fontWeight: 400,
                       }}
                       onClick={(e) => {
                         // Prevent cell click from triggering actions

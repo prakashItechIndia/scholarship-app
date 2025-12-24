@@ -25,12 +25,12 @@ export const RoleDetailsForm: React.FC<RoleDetailsFormProps> = ({
       display: "grid",
       gridTemplateColumns: "1fr 1fr 1fr",
       gap: "24px",
-      marginBottom: "32px",
+      marginBottom: "15px",
       marginLeft: "-24px",
       marginRight: "-24px",
       paddingLeft: "24px",
       paddingRight: "24px",
-      paddingBottom: "32px",
+      paddingBottom: "24px",
       borderBottom: "1px solid #e0e0e0",
     }}>
       <div>
@@ -39,7 +39,7 @@ export const RoleDetailsForm: React.FC<RoleDetailsFormProps> = ({
           lineHeight: "20px",
           fontWeight: 400,
           color: "#242424",
-          marginBottom: "8px",
+          marginBottom: "6px",
           display: "block",
         }}>
           Role <span style={{ color: "#dc2626" }}>*</span>
@@ -54,6 +54,7 @@ export const RoleDetailsForm: React.FC<RoleDetailsFormProps> = ({
             }
           }}
           errorMessage={errors.roleName}
+          style={{width: "100%", height: "32 px"}}
         />
       </div>
 
@@ -79,6 +80,7 @@ export const RoleDetailsForm: React.FC<RoleDetailsFormProps> = ({
             }
           }}
           errorMessage={errors.userType}
+          style={{width: "100%", height: "32px"}}
         />
       </div>
 

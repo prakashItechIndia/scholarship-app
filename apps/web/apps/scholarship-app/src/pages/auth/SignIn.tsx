@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { Stack, Text, MessageBar, MessageBarType } from '@fluentui/react';
+import { Stack, MessageBar, MessageBarType } from '@fluentui/react';
 import { secureTokenStorage } from '@shared/utils/secureTokenStorage';
 import { preserveQueryParams, handleAuthRedirect } from '../../utils/redirect';
 import { useAuth } from '../../contexts/AuthContext';
@@ -13,7 +13,6 @@ import { Form } from '@shared/components';
 import { useToast } from '@/components/ui/toast';
 import { SocialLoginButton } from '@/components/auth/SocialLoginButton';
 import { AuthLayoutWrapper } from '@/components/auth/AuthLayoutWrapper';
-import { ScholarshipFooter } from '@/components/auth/ScholarshipFooter';
 import { LogoHeader } from '@/components/auth/LogoHeader';
 import { EmailField } from '@/components/auth/EmailField';
 import { PasswordField } from '@/components/auth/PasswordField';
@@ -22,7 +21,6 @@ import { TermsOfServiceText } from '@/components/auth/TermsOfServiceText';
 import { DividerWithText } from '@/components/auth/DividerWithText';
 import { SubmitButton } from '@/components/auth/SubmitButton';
 import { getBaseUrl } from '@/utils/signInUtils';
-import { PersonIcon } from '@/components/ui/icons';
 
 const emailSchema = z.object({
   email: z
@@ -65,6 +63,7 @@ const SignInPage = () => {
   const { isAuthenticated, checkAuthStatus } = useAuth();
   const [step, setStep] = useState<'email' | 'password'>('email');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const redirectUrl = searchParams.get('redirect') ?? searchParams.get('returnUrl');
   const productCode = searchParams.get('product');
@@ -160,26 +159,114 @@ const SignInPage = () => {
   };
 
   const onEmailSubmit = async (values: EmailFormData) => {
-    // For now, always redirect to verification for new users
-    // TODO: Add API call to check if user exists, then decide between 'login' and 'check'
-    // Simulate loading for a few seconds before navigation
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    verifyEmail(values.email, 'check');
+    try {
+      setIsLoading(true);
+      
+      // Check user login status (email exists AND password set)
+      const { scholarshipApplication } = await import('../../services/scholarship.service');
+      const loginStatus = await scholarshipApplication.checkUserLoginStatus(values.email);
+      
+      if (loginStatus.canLogin) {
+        // Email exists AND password is set - enable password field for login
+        verifyEmail(values.email, 'login');
+      } else if (loginStatus.needsOnboarding) {
+        // Email exists but password not set - redirect to onboarding
+        localStorage.setItem('verification_email', values.email);
+        
+        // Send verification email automatically
+        try {
+          await scholarshipApplication.sendVerificationEmail(values.email);
+        } catch (err: unknown) {
+          // Log error but continue to verification page
+          console.error('Failed to send verification email:', err);
+        }
+        
+        void navigate('/email-verification');
+      } else {
+        // Email does not exist - send verification email and redirect to email verification/onboarding
+        localStorage.setItem('verification_email', values.email);
+        
+        // Send verification email automatically
+        try {
+          await scholarshipApplication.sendVerificationEmail(values.email);
+        } catch (err: unknown) {
+          // Log error but continue to verification page
+          console.error('Failed to send verification email:', err);
+        }
+        
+        void navigate('/email-verification');
+      }
+    } catch (err: unknown) {
+      // BRD Section 5.4.3: Error handling for email check
+      let errorMessage = 'Failed to verify email. Please try again.';
+      if (err instanceof Error) {
+        if (err.message.includes('not found') || err.message.includes('Email')) {
+          errorMessage = 'Email not registered. Please check or sign up.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      error('Verification Failed', errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onPasswordSubmit = async (values: SignInFormData) => {
-    localStorage.setItem('scholarship_auth', JSON.stringify({
-      email: values.email,
-      password: values.password,
-      cardcode: values.cardcode,
-      rememberMe: values.rememberMe,
-      timestamp: Date.now(),
-    }));
-
-    // Show loading for a few seconds before showing success and navigating
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    success('Sign In Successful', 'Redirecting to registration form...');
-    setTimeout(() => void navigate('/registration'), 300);
+    try {
+      setIsLoading(true);
+      
+      // Import scholarship auth service
+      const { scholarshipAuth } = await import('../../services/scholarship.service');
+      
+      // Call login API - validates credentials
+      const loginResponse = await scholarshipAuth.login(values.email, values.password);
+      
+      // Create session token (simple implementation - in production use JWT or secure session)
+      const responseData = (loginResponse as unknown) as { userId?: number; userName?: string; [key: string]: unknown };
+      const sessionToken = btoa(JSON.stringify({
+        email: values.email,
+        userId: responseData.userId ?? null,
+        userName: responseData.userName ?? values.email,
+        timestamp: Date.now(),
+        expiresAt: Date.now() + (20 * 60 * 1000), // 20 minutes session timeout per BRD
+      }));
+      
+      // Store session token and user data
+      if (values.rememberMe) {
+        localStorage.setItem('scholarship_session_token', sessionToken);
+      } else {
+        sessionStorage.setItem('scholarship_session_token', sessionToken);
+      }
+      
+      localStorage.setItem('scholarship_auth', JSON.stringify({
+        email: values.email,
+        cardcode: values.cardcode,
+        rememberMe: values.rememberMe,
+        timestamp: Date.now(),
+        user: loginResponse,
+      }));
+      
+      success('Sign In Successful', 'Redirecting to dashboard...');
+      setTimeout(() => void navigate('/user-dashboard'), 300);
+    } catch (err: unknown) {
+      // Handle specific error cases per BRD Section 5.4.3
+      let errorMessage = 'Invalid credentials. Please try again.';
+      if (err instanceof Error) {
+        if (err.message.includes('Invalid') || err.message.includes('password') || err.message.includes('credentials')) {
+          errorMessage = 'Incorrect password. Try again.'; // BRD: "Invalid password" -> "Incorrect password. Try again."
+        } else if (err.message.includes('not active') || err.message.includes('Account')) {
+          errorMessage = 'Account is not active. Please contact support.';
+        } else if (err.message.includes('not found') || err.message.includes('Email')) {
+          errorMessage = 'Email not registered. Please check or sign up.'; // BRD: "Invalid email" -> "Email not registered. Please check or sign up."
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      error('Sign In Failed', errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
 
@@ -212,13 +299,10 @@ const SignInPage = () => {
 
                 <Stack tokens={{ childrenGap: 8 }}>
                   <SubmitButton
-                  
                     type="submit"
-                    disabled={emailForm.formState.isSubmitting}
-                    isLoading={emailForm.formState.isSubmitting}
+                    disabled={emailForm.formState.isSubmitting || isLoading}
+                    isLoading={emailForm.formState.isSubmitting || isLoading}
                     loadingText="Loading..."
-                    // className='text-white'
-                    // className='!bg-[#2453C3]'
                   >
                     Continue
                   </SubmitButton>
@@ -249,94 +333,65 @@ const SignInPage = () => {
     <>
       <SEO
         title="Sign In - Leo Muthu Scholarship"
-        description="Log in to administer and monitor scholarship applications. An initiative of ARAM Foundation."
+        description="Apply online for the Leo Muthu Scholarship and secure your educational support. An initiative of ARAM Foundation."
         url="/user-login"
-        keywords="Leo Muthu Scholarship, LMS, ARAM Foundation, admin login"
+        keywords="Leo Muthu Scholarship, LMS, ARAM Foundation, scholarship application, education support"
         schema={organizationSchema}
       />
-      <Stack
-        horizontal
-        className="min-h-screen bg-[#0078D4]"
-      >
-        {/* Left Panel - Login Image */}
-        <Stack
-          className="hidden lg:flex w-[472px] relative overflow-hidden"
-        >
-          <Stack
-            className="w-full h-full relative rounded-[40px] border-4 border-white m-5"
-            style={{
-              background: 'linear-gradient(180deg, rgba(10, 224, 231, 0.15) 22.66%, rgba(0, 0, 0, 0) 43.38%)'
-            }}
-          >
-            <Stack horizontalAlign="center" verticalAlign="center" className="w-full h-full">
-              <Stack horizontalAlign="center" tokens={{ childrenGap: 16 }} className="text-white text-center p-8">
-                <PersonIcon className="w-32 h-32 mx-auto mb-4 opacity-50" />
-                <Text variant="large" className="font-semibold">
-                  Login Image
-                </Text>
+      <AuthLayoutWrapper footerVariant="email">
+        <LogoHeader variant="email" />
+
+        <WelcomeText variant="email" />
+
+        <Form {...passwordForm}>
+          <form onSubmit={(e) => void handlePasswordSubmit(onPasswordSubmit)(e)} noValidate>
+            <Stack tokens={{ childrenGap: 24 }}>
+              <EmailField control={passwordForm.control} name="email" variant="email" />
+              
+              <PasswordField
+                control={passwordForm.control}
+                name="password"
+                showPassword={showPassword}
+                onTogglePassword={() => setShowPassword(!showPassword)}
+                variant="email"
+              />
+
+              <Stack tokens={{ childrenGap: 8 }}>
+                <Link
+                  to={preserveQueryParams('/forgot-password', ['returnUrl', 'product', 'state'])}
+                  className="text-[#2453C3] text-xs font-sans leading-4 no-underline hover:underline"
+                >
+                  Forgot your password?
+                </Link>
+              </Stack>
+
+              <Stack tokens={{ childrenGap: 8 }}>
+                <SubmitButton
+                  type="submit"
+                  disabled={passwordForm.formState.isSubmitting || isLoading}
+                  isLoading={passwordForm.formState.isSubmitting || isLoading}
+                  loadingText="Loading..."
+                >
+                  Log In
+                </SubmitButton>
+
+                <TermsOfServiceText />
               </Stack>
             </Stack>
+          </form>
+        </Form>
+
+        {/* Social Login Section */}
+        <Stack tokens={{ childrenGap: 16 }}>
+          <DividerWithText />
+
+          <Stack horizontal tokens={{ childrenGap: 12 }}>
+            <SocialLoginButton provider="microsoft" />
+            <SocialLoginButton provider="google" />
+            <SocialLoginButton provider="apple" />
           </Stack>
         </Stack>
-
-        {/* Right Panel - Login Card */}
-        <Stack
-          grow
-          className="bg-white rounded-tl-[20px] rounded-bl-[20px] shadow-[0px_0px_0px_0px_rgba(0,0,0,0.01),2px_2px_6px_0px_rgba(0,0,0,0.01),7px_9px_11px_0px_rgba(0,0,0,0.01),16px_20px_15px_0px_rgba(0,0,0,0.01),28px_36px_18px_0px_rgba(0,0,0,0),44px_56px_20px_0px_rgba(0,0,0,0)]"
-        >
-          <Stack
-            grow
-            horizontalAlign="center"
-            className="p-8 sm:p-12 lg:p-16 xl:p-24"
-          >
-            <LogoHeader variant="password" />
-
-            <WelcomeText variant="password" />
-
-            <Stack className="w-full max-w-[340px] mt-12 mb-0">
-              <Form {...passwordForm}>
-                <form onSubmit={(e) => void handlePasswordSubmit(onPasswordSubmit)(e)} noValidate>
-                  <Stack tokens={{ childrenGap: 68 }}>
-                    <EmailField control={passwordForm.control} name="email" variant="password" placeholder="ie; hohndoe@mail.com" />
-                    <PasswordField
-                      control={passwordForm.control}
-                      name="password"
-                      showPassword={showPassword}
-                      onTogglePassword={() => setShowPassword(!showPassword)}
-                      variant="password"
-                      
-                    />
-
-                    <Stack className="mt-0">
-                      <Link
-                        to={preserveQueryParams('/forgot-password', ['returnUrl', 'product', 'state'])}
-                        className="text-[#2453C3] text-xs font-sans leading-4 no-underline hover:underline"
-                      >
-                        Forgot your password?
-                      </Link>
-                    </Stack>
-
-                    <Stack tokens={{ childrenGap: 8 }}>
-                      <SubmitButton
-                        type="submit"
-                        variant="password"
-                        disabled={passwordForm.formState.isSubmitting}
-                        isLoading={passwordForm.formState.isSubmitting}
-                        loadingText="Signing in…"
-                      >
-                        Log In
-                      </SubmitButton>
-                      <TermsOfServiceText variant="small" />
-                    </Stack>
-                  </Stack>
-                </form>
-              </Form>
-            </Stack>
-          </Stack>
-
-          <ScholarshipFooter variant="password" />
-        </Stack>
-      </Stack>
+      </AuthLayoutWrapper>
     </>
   );
 };

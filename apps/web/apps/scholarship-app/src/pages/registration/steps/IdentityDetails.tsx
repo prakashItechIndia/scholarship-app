@@ -5,6 +5,10 @@ import { StepLayout } from '../components/StepLayout';
 import { getStringValue } from '../utils/registrationHelpers';
 import { STACK_TOKENS } from '../utils/registrationConstants';
 import { DropdownField, TextInputField, FormRowContainer, FormRow, InputField, SelectField } from '../components';
+import { useRegistration } from '@/contexts/RegistrationContext';
+import { useEffect, useState } from 'react';
+import { scholarshipApplication } from '@/services/scholarship.service';
+import { useToast } from '@/components/ui/toast';
 
 // --- Validation Schema ---
 const identitySchema = z
@@ -40,6 +44,27 @@ const APPLICANT_OPTIONS: { value: string; label: string }[] = [
 ];
 
 const IdentityDetails = () => {
+    const { formData, updateFormData } = useRegistration();
+    const [scholarshipYearId, setScholarshipYearId] = useState<number | null>(null);
+    const { error: showError } = useToast();
+    
+    // Fetch scholarship year on mount
+    useEffect(() => {
+        const fetchScholarshipYear = async () => {
+            try {
+                const yearData = await scholarshipApplication.getScholarshipYear();
+                if (yearData && yearData.ScholarshipYear_Id) {
+                    setScholarshipYearId(yearData.ScholarshipYear_Id);
+                    updateFormData({ scholarshipYearId: yearData.ScholarshipYear_Id });
+                }
+            } catch (err) {
+                console.error('Error fetching scholarship year:', err);
+                showError('Error', 'Failed to load scholarship year. Please refresh the page.');
+            }
+        };
+        void fetchScholarshipYear();
+    }, [updateFormData, showError]);
+
     const { form, onSubmit } = useRegistrationForm({
         schema: identitySchema,
         stepNumber: 1,
@@ -48,6 +73,29 @@ const IdentityDetails = () => {
             aadhaarId: getStringValue(formData, 'aadhaarId'),
             panId: getStringValue(formData, 'panId'),
         }),
+        async onValidate(data) {
+            // Validate Aadhaar ID with API
+            if (data.aadhaarId && scholarshipYearId) {
+                try {
+                    await scholarshipApplication.checkAadhaarId(data.aadhaarId, scholarshipYearId);
+                } catch (err: unknown) {
+                    const errorMessage = err instanceof Error ? err.message : 'Aadhaar ID already exists';
+                    form.setError('aadhaarId', { type: 'manual', message: errorMessage });
+                    throw new Error(errorMessage);
+                }
+            }
+            
+            // Validate PAN ID with API if provided
+            if (data.panId && data.panId.trim() && scholarshipYearId) {
+                try {
+                    await scholarshipApplication.checkPanId(data.panId.toUpperCase(), scholarshipYearId);
+                } catch (err: unknown) {
+                    const errorMessage = err instanceof Error ? err.message : 'PAN ID already exists';
+                    form.setError('panId', { type: 'manual', message: errorMessage });
+                    throw new Error(errorMessage);
+                }
+            }
+        },
     });
 
     const { control, handleSubmit, formState: { errors } } = form;

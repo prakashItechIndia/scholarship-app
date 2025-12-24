@@ -95,7 +95,7 @@ export const DataTable = React.forwardRef<HTMLDivElement, DataTableProps>(
         className={cardClassName}
         style={cardStyles}
       >
-        <div style={{ overflowX: "auto", width: "100%", padding: 0, margin: 0, paddingLeft: 0, paddingRight: 0 }}>
+        <div style={{ overflowX: "auto", width: "100%", padding: 0, margin: 0, paddingLeft: 0, paddingRight: 0}}>
           <Table
             columns={columns}
             data={data}

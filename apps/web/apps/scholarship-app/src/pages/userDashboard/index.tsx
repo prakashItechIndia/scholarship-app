@@ -4,10 +4,12 @@ import {
   AddRegular,
 } from "@fluentui/react-icons";
 import { WelcomeBanner } from "../../components/common";
+import React, { useEffect, useState } from "react";
+import { scholarshipApplication } from "../../services/scholarship.service";
 
 interface ApplicationCardData {
   applicationNo: string;
-  status: "Registered" | "Completed" | "Pending" | "Rejected";
+  status: "Draft" | "Registered" | "Completed" | "In Progress" | "Rejected" | "Approved";
   studentName: string;
   studied: string;
   fatherName: string;
@@ -15,31 +17,81 @@ interface ApplicationCardData {
   scholarshipNumber?: string;
   mobileNo: string;
   preparedBy?: string;
+  applicationId?: string; // For API calls
+  rawData?: unknown; // Store raw API data for details view
 }
 
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
-  const isCompleted = status === "Completed";
-  const isRegistered = status === "Registered";
+  // BRD Section 7.3: Status colors
+  // Draft (Gray), Completed (Blue), In Progress (Yellow), Rejected (Red), Approved (Green)
+  const getStatusStyle = (status: string): React.CSSProperties => {
+    const baseStyle: React.CSSProperties = {
+      display: "inline-flex",
+      alignItems: "center",
+      padding: "4px 12px",
+      borderRadius: "10000px", // Pill shape
+      fontSize: "12px",
+      lineHeight: "16px",
+      fontWeight: 500,
+      fontFamily: "'Inter', sans-serif",
+    };
 
-  // Based on image: blue for Registered, green for Completed
-  const badgeStyle: React.CSSProperties = {
-    display: "inline-flex",
-    alignItems: "center",
-    padding: "4px 12px",
-    borderRadius: "10000px", // Pill shape
-    fontSize: "12px",
-    lineHeight: "16px",
-    fontWeight: 500,
-    fontFamily: "'Inter', sans-serif",
-    backgroundColor: isCompleted ? "#f1faf1" : isRegistered ? "#ebf3fc" : "#f5f5f5",
-    color: isCompleted ? "#0e700e" : isRegistered ? "#115ea3" : "#424242",
-    border: `1px solid ${isCompleted ? "#9fd89f" : isRegistered ? "#b4d6fa" : "#d1d1d1"}`,
+    switch (status) {
+      case "Draft":
+        return {
+          ...baseStyle,
+          backgroundColor: "#f5f5f5",
+          color: "#424242",
+          border: "1px solid #d1d1d1",
+        };
+      case "Completed":
+        return {
+          ...baseStyle,
+          backgroundColor: "#ebf3fc", // Blue
+          color: "#115ea3",
+          border: "1px solid #b4d6fa",
+        };
+      case "In Progress":
+        return {
+          ...baseStyle,
+          backgroundColor: "#fef3c7", // Yellow
+          color: "#92400e",
+          border: "1px solid #fde68a",
+        };
+      case "Rejected":
+        return {
+          ...baseStyle,
+          backgroundColor: "#fee2e2", // Red
+          color: "#991b1b",
+          border: "1px solid #fecaca",
+        };
+      case "Approved":
+        return {
+          ...baseStyle,
+          backgroundColor: "#f1faf1", // Green
+          color: "#0e700e",
+          border: "1px solid #9fd89f",
+        };
+      case "Registered":
+      default:
+        return {
+          ...baseStyle,
+          backgroundColor: "#ebf3fc", // Blue (same as Completed per BRD)
+          color: "#115ea3",
+          border: "1px solid #b4d6fa",
+        };
+    }
   };
 
-  return <span style={badgeStyle}>{status}</span>;
+  return <span style={getStatusStyle(status)}>{status}</span>;
 };
 
-const ApplicationCard: React.FC<{ data: ApplicationCardData }> = ({ data }) => {
+const ApplicationCard: React.FC<{ 
+  data: ApplicationCardData;
+  onViewDetails?: (data: ApplicationCardData) => void;
+  onContinueDraft?: (data: ApplicationCardData) => void;
+  onDownloadReceipt?: (data: ApplicationCardData) => void;
+}> = ({ data, onViewDetails, onContinueDraft, onDownloadReceipt }) => {
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
@@ -64,18 +116,32 @@ const ApplicationCard: React.FC<{ data: ApplicationCardData }> = ({ data }) => {
   };
 
   const handleReopen = () => {
-    console.log("Reopen application:", data.applicationNo);
+    // Continue Draft: For 'Registered' status applications, resume from where left off
+    if (data.status === "Registered" && onContinueDraft) {
+      onContinueDraft(data);
+    }
     setIsDropdownOpen(false);
   };
 
   const handlePrint = () => {
-    console.log("Print document:", data.applicationNo);
+    // Download Receipt: For submitted applications
+    if (onDownloadReceipt) {
+      onDownloadReceipt(data);
+    }
     setIsDropdownOpen(false);
+  };
+
+  const handleCardClick = () => {
+    // View Details: Click on any application card to see full application information
+    if (onViewDetails) {
+      onViewDetails(data);
+    }
   };
 
   return (
     <Card
       variant="outline"
+      onClick={handleCardClick}
       style={{
         padding: 0,
         borderRadius: "8px",
@@ -86,6 +152,14 @@ const ApplicationCard: React.FC<{ data: ApplicationCardData }> = ({ data }) => {
         height: "100%",
         overflow: "hidden",
         gap: 0,
+        cursor: "pointer",
+        transition: "box-shadow 0.2s ease",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = "none";
       }}
     >
       {/* Top Section - 50% height with background color */}
@@ -145,7 +219,11 @@ const ApplicationCard: React.FC<{ data: ApplicationCardData }> = ({ data }) => {
             <StatusBadge status={data.status} />
             <div ref={dropdownRef} style={{ position: "relative" }}>
               <button
-                onClick={handleToggleDropdown}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleDropdown();
+                }}
+                type="button"
                 style={{
                   width: "24px",
                   height: "24px",
@@ -182,63 +260,75 @@ const ApplicationCard: React.FC<{ data: ApplicationCardData }> = ({ data }) => {
                     padding: "4px",
                   }}
                 >
-                  <button
-                    onClick={handleReopen}
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      padding: "8px 12px",
-                      border: "none",
-                      backgroundColor: "transparent",
-                      cursor: "pointer",
-                      borderRadius: "4px",
-                      fontFamily: "'Inter', sans-serif",
-                      fontSize: "14px",
-                      lineHeight: "20px",
-                      color: "#242424",
-                      textAlign: "left",
-                      whiteSpace: "nowrap",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#f5f5f5";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                    }}
-                  >
-                    <ReopenIcon width={16} height={16} />
-                    <span style={{ whiteSpace: "nowrap" }}>Reopen application</span>
-                  </button>
-                  <button
-                    onClick={handlePrint}
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      padding: "8px 12px",
-                      border: "none",
-                      backgroundColor: "transparent",
-                      cursor: "pointer",
-                      borderRadius: "4px",
-                      fontFamily: "'Inter', sans-serif",
-                      fontSize: "14px",
-                      lineHeight: "20px",
-                      color: "#242424",
-                      textAlign: "left",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#f5f5f5";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                    }}
-                  >
-                    <PrintIcon width={16} height={16} />
-                    <span>Print Document</span>
-                  </button>
+                  {data.status === "Registered" && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleReopen();
+                      }}
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        padding: "8px 12px",
+                        border: "none",
+                        backgroundColor: "transparent",
+                        cursor: "pointer",
+                        borderRadius: "4px",
+                        fontFamily: "'Inter', sans-serif",
+                        fontSize: "14px",
+                        lineHeight: "20px",
+                        color: "#242424",
+                        textAlign: "left",
+                        whiteSpace: "nowrap",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#f5f5f5";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                    >
+                      <ReopenIcon width={16} height={16} />
+                      <span style={{ whiteSpace: "nowrap" }}>Continue Draft</span>
+                    </button>
+                  )}
+                  {(data.status === "Completed" || data.status === "Approved" || data.status === "In Progress") && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePrint();
+                      }}
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        padding: "8px 12px",
+                        border: "none",
+                        backgroundColor: "transparent",
+                        cursor: "pointer",
+                        borderRadius: "4px",
+                        fontFamily: "'Inter', sans-serif",
+                        fontSize: "14px",
+                        lineHeight: "20px",
+                        color: "#242424",
+                        textAlign: "left",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#f5f5f5";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                    >
+                      <PrintIcon width={16} height={16} />
+                      <span>Download Receipt</span>
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -339,56 +429,195 @@ const DetailRow: React.FC<{ label: string; value: string }> = ({
   );
 };
 
+// Summary Statistics Card Component - BRD Section 7.1.1
+const StatCard: React.FC<{ label: string; value: number; color?: string }> = ({ 
+  label, 
+  value, 
+  color = "#242424" 
+}) => {
+  return (
+    <div style={{
+      backgroundColor: "#ffffff",
+      border: "1px solid #e0e0e0",
+      borderRadius: "8px",
+      padding: "16px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "4px",
+    }}>
+      <span style={{
+        fontSize: "12px",
+        lineHeight: "18px",
+        fontWeight: 500,
+        color: "#707070",
+        fontFamily: "'Inter', sans-serif",
+      }}>
+        {label}
+      </span>
+      <span style={{
+        fontSize: "24px",
+        lineHeight: "32px",
+        fontWeight: 700,
+        color: color,
+        fontFamily: "'Inter', sans-serif",
+      }}>
+        {value}
+      </span>
+    </div>
+  );
+};
+
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
-  // Mock data - replace with actual data from API
-  const userName = "Saravanan";
-  const applications: ApplicationCardData[] = [
-    {
-      applicationNo: "AF2510001",
-      status: "Registered",
-      studentName: "Saravanan Kumar",
-      studied: "BE Computer Science",
-      fatherName: "Ramamurthy",
-      applied: "01/06/2025",
-      scholarshipNumber: "",
-      mobileNo: "91 9876543210",
-      preparedBy: "",
-    },
-    {
-      applicationNo: "AF25100025",
-      status: "Completed",
-      studentName: "Saravanan Kumar",
-      studied: "BE Computer Science",
-      fatherName: "Ramamurthy",
-      applied: "25/01/2025",
-      scholarshipNumber: "25LMSS1009",
-      mobileNo: "91 9876543210",
-      preparedBy: "Admin",
-    },
-    {
-      applicationNo: "AF2510001",
-      status: "Registered",
-      studentName: "Saravanan Kumar",
-      studied: "BE Computer Science",
-      fatherName: "Ramamurthy",
-      applied: "01/06/2025",
-      scholarshipNumber: "",
-      mobileNo: "91 9876543210",
-      preparedBy: "",
-    },
-    {
-      applicationNo: "AF25100025",
-      status: "Completed",
-      studentName: "Saravanan Kumar",
-      studied: "BE Computer Science",
-      fatherName: "Ramamurthy",
-      applied: "25/01/2025",
-      scholarshipNumber: "25LMSS1009",
-      mobileNo: "91 9876543210",
-      preparedBy: "Admin",
-    },
-  ];
+  const [applications, setApplications] = useState<ApplicationCardData[]>([]);
+  const [filteredApplications, setFilteredApplications] = useState<ApplicationCardData[]>([]);
+  const [userName, setUserName] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"date" | "status" | "applicationNo">("date");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterRef = React.useRef<HTMLDivElement>(null);
+
+  // Close filter dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    };
+
+    if (isFilterOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isFilterOpen]);
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Get email from localStorage or auth context
+        const authData = localStorage.getItem('scholarship_auth');
+        const email = authData ? JSON.parse(authData).email : null;
+        
+        if (!email) {
+          // Redirect to login if no email found
+          navigate('/user-login');
+          return;
+        }
+
+        // Fetch applications from API
+        const response = await scholarshipApplication.getApplications(email);
+        
+        // Transform API response to ApplicationCardData format
+        const transformedApplications: ApplicationCardData[] = Array.isArray(response) 
+          ? response.map((app: any) => ({
+              applicationNo: app.Application_Id || app.applicationId || '',
+              status: app.Status || 'Registered',
+              studentName: app.Applicant_Name || app.Student_Name || '',
+              studied: app.Cource_Of_Studying || app.Course || '',
+              fatherName: app.Father_Name || app.Guardian_Name || '',
+              applied: app.Data_Date 
+                ? new Date(app.Data_Date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                : new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+              scholarshipNumber: app.Scholarship_No || app.scholarshipNumber || '',
+              mobileNo: app.Mobile_Number || app.mobileNumber || '',
+              preparedBy: app.Prepared_By || app.preparedBy || '',
+            }))
+          : [];
+
+        setApplications(transformedApplications);
+        setFilteredApplications(transformedApplications);
+        
+        // Set user name from first application or use email
+        if (transformedApplications.length > 0 && transformedApplications[0].studentName) {
+          setUserName(transformedApplications[0].studentName.split(' ')[0]);
+        } else {
+          setUserName(email.split('@')[0]);
+        }
+      } catch (error: unknown) {
+        console.error('Error fetching applications:', error);
+        // On error, show empty state or redirect to login
+        setApplications([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void fetchApplications();
+  }, [navigate]);
+
+  // Calculate summary statistics
+  const summaryStats = React.useMemo(() => {
+    return {
+      total: applications.length,
+      approved: applications.filter(app => app.status === "Approved").length,
+      pending: applications.filter(app => app.status === "Completed" || app.status === "In Progress" || app.status === "Registered").length,
+      rejected: applications.filter(app => app.status === "Rejected").length,
+    };
+  }, [applications]);
+
+  // Filter and sort applications
+  React.useEffect(() => {
+    let filtered = [...applications];
+
+    // Filter by status
+    if (filterStatus !== "all") {
+      filtered = filtered.filter(app => app.status === filterStatus);
+    }
+
+    // Sort applications
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "date":
+          return new Date(b.applied).getTime() - new Date(a.applied).getTime();
+        case "status":
+          return a.status.localeCompare(b.status);
+        case "applicationNo":
+          return a.applicationNo.localeCompare(b.applicationNo);
+        default:
+          return 0;
+      }
+    });
+
+    setFilteredApplications(filtered);
+  }, [applications, filterStatus, sortBy]);
+
+  // Handlers for user actions
+  const handleViewDetails = (data: ApplicationCardData) => {
+    // Fetch full application details
+    void scholarshipApplication.getApplication(data.applicationNo)
+      .then((details) => {
+        // TODO: Open modal or navigate to details page with full application data
+        console.log("View details for:", data.applicationNo, details);
+        // For now, we can show an alert or navigate to a details page
+        // You can implement a modal similar to the process page
+      })
+      .catch((error) => {
+        console.error("Error fetching application details:", error);
+      });
+  };
+
+  const handleContinueDraft = (data: ApplicationCardData) => {
+    // Navigate to registration with application data to continue editing
+    navigate("/registration", { 
+      state: { 
+        applicationId: data.applicationNo,
+        continueDraft: true 
+      } 
+    });
+  };
+
+  const handleDownloadReceipt = (data: ApplicationCardData) => {
+    // TODO: Implement receipt download
+    // This would typically call an API endpoint to generate/download PDF
+    console.log("Download receipt for:", data.applicationNo);
+    // For now, we can show a message or implement PDF generation
+  };
 
   return (
     <div
@@ -401,6 +630,20 @@ const UserDashboard: React.FC = () => {
     >
       {/* Welcome Section */}
       <WelcomeBanner userName={userName} />
+
+      {/* Summary Statistics Section - BRD Section 7.1.1 */}
+      <div style={{ padding: "0 24px", marginBottom: "24px" }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "16px",
+        }}>
+          <StatCard label="Total Applications" value={summaryStats.total} />
+          <StatCard label="Approved" value={summaryStats.approved} color="#0e700e" />
+          <StatCard label="Pending" value={summaryStats.pending} color="#115ea3" />
+          <StatCard label="Rejected" value={summaryStats.rejected} color="#991b1b" />
+        </div>
+      </div>
 
       {/* Application Status Section */}
       <div style={{  }}>
@@ -456,37 +699,127 @@ const UserDashboard: React.FC = () => {
               <AddRegular style={{ width: "18px", height: "18px" }} />
               Create New Application
             </Button>
-            <Button
-              variant="ghost"
-              style={{
-                width: "36px",
-                height: "36px",
-                padding: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                border: "none",
-                backgroundColor: "transparent",
-                cursor: "pointer",
-                marginLeft: "0",
-              }}
-              onClick={() => console.log("More options")}
-              aria-label="More options"
-            >
-              <FilterIcon
-                width={32}
-                height={32}
-                style={{ marginLeft: "13px" }}
-              />
-            </Button>
+            <div ref={filterRef} style={{ position: "relative" }}>
+              <Button
+                variant="ghost"
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  padding: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  cursor: "pointer",
+                  marginLeft: "0",
+                }}
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                aria-label="Filter and Sort"
+              >
+                <FilterIcon
+                  width={32}
+                  height={32}
+                  style={{ marginLeft: "13px" }}
+                />
+              </Button>
+              
+              {/* Filter/Sort Dropdown - BRD Section 7.4 */}
+              {isFilterOpen && (
+                <div style={{
+                  position: "absolute",
+                  top: "100%",
+                  right: 0,
+                  marginTop: "8px",
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #e0e0e0",
+                  borderRadius: "8px",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+                  zIndex: 1000,
+                  minWidth: "250px",
+                  padding: "16px",
+                }}>
+                  <div style={{ marginBottom: "16px" }}>
+                    <label style={{
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      color: "#242424",
+                      marginBottom: "8px",
+                      display: "block",
+                    }}>Filter by Status</label>
+                    <select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        border: "1px solid #e0e0e0",
+                        borderRadius: "4px",
+                        fontSize: "14px",
+                      }}
+                    >
+                      <option value="all">All Status</option>
+                      <option value="Draft">Draft</option>
+                      <option value="Registered">Registered</option>
+                      <option value="Completed">Completed</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Approved">Approved</option>
+                      <option value="Rejected">Rejected</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      color: "#242424",
+                      marginBottom: "8px",
+                      display: "block",
+                    }}>Sort by</label>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as "date" | "status" | "applicationNo")}
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        border: "1px solid #e0e0e0",
+                        borderRadius: "4px",
+                        fontSize: "14px",
+                      }}
+                    >
+                      <option value="date">Date (Newest First)</option>
+                      <option value="status">Status</option>
+                      <option value="applicationNo">Application Number</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Application Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 rounded-[18px] px-6">
-          {applications.map((app) => (
-            <ApplicationCard key={app.applicationNo} data={app} />
-          ))}
+          {isLoading ? (
+            <div style={{ padding: '24px', textAlign: 'center', color: '#616161' }}>
+              Loading applications...
+            </div>
+          ) : filteredApplications.length === 0 ? (
+            <div style={{ padding: '24px', textAlign: 'center', color: '#616161' }}>
+              {applications.length === 0 
+                ? "No applications found. Create a new application to get started."
+                : "No applications match the selected filter."}
+            </div>
+          ) : (
+            filteredApplications.map((app) => (
+              <ApplicationCard 
+                key={app.applicationNo} 
+                data={app}
+                onViewDetails={handleViewDetails}
+                onContinueDraft={handleContinueDraft}
+                onDownloadReceipt={handleDownloadReceipt}
+              />
+            ))
+          )}
         </div>
       </div>
       <div className="h-10"></div>

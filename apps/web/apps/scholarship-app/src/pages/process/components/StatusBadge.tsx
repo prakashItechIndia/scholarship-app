@@ -16,7 +16,22 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
       textColor: "#0e700e",
       borderColor: "#9fd89f",
     },
+    Verified: { // Same as Completed
+      bgColor: "#f1faf1",
+      textColor: "#0e700e",
+      borderColor: "#9fd89f",
+    },
+    Approved: { // Same as Completed
+      bgColor: "#f1faf1",
+      textColor: "#0e700e",
+      borderColor: "#9fd89f",
+    },
     Review: {
+      bgColor: "#fff9f5",
+      textColor: "#bc4b09",
+      borderColor: "#fdcfb4",
+    },
+    Waiting: { // Same as Review
       bgColor: "#fff9f5",
       textColor: "#bc4b09",
       borderColor: "#fdcfb4",
@@ -25,6 +40,11 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
       bgColor: "#ebf3fc",
       textColor: "#115ea3",
       borderColor: "#b4d6fa",
+    },
+    "Documents Submitted": { // Blue text, light blue bg, blue border
+      bgColor: "#ebf3fc",
+      textColor: "#0F6CBD",
+      borderColor: "#0F6CBD",
     },
     Rejected: {
       bgColor: "#ffffff",

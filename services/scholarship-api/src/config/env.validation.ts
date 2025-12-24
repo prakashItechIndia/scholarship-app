@@ -119,7 +119,10 @@ export const envSchema = z.object({
     .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
     .optional()
     .default('info'),
-  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
+  JWT_SECRET: z
+    .string()
+    .min(32, 'JWT_SECRET must be at least 32 characters')
+    .optional(),
   JWT_EXPIRES_IN: z.string().default('1h'),
   SSO_ISSUER: urlOrEmpty.default(''),
   // SMTP Configuration (AWS SES)

@@ -46,23 +46,26 @@ async function bootstrap() {
   // Enhanced security headers with Helmet
   const nodeEnv = configService.get('NODE_ENV', { infer: true });
   const isProduction = nodeEnv === 'production';
+  const isDevelopment = nodeEnv === 'development';
 
   app.use(
     helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles for React
-          scriptSrc: ["'self'"],
-          imgSrc: ["'self'", 'data:', 'https:'],
-          connectSrc: ["'self'"],
-          fontSrc: ["'self'"],
-          objectSrc: ["'none'"],
-          mediaSrc: ["'self'"],
-          frameSrc: ["'none'"],
-          upgradeInsecureRequests: isProduction ? [] : null, // Only in production
-        },
-      },
+      contentSecurityPolicy: isDevelopment
+        ? false // Disable CSP in development to avoid blocking API calls
+        : {
+            directives: {
+              defaultSrc: ["'self'"],
+              styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles for React
+              scriptSrc: ["'self'"],
+              imgSrc: ["'self'", 'data:', 'https:'],
+              connectSrc: ["'self'"],
+              fontSrc: ["'self'"],
+              objectSrc: ["'none'"],
+              mediaSrc: ["'self'"],
+              frameSrc: ["'none'"],
+              upgradeInsecureRequests: isProduction ? [] : null, // Only in production
+            },
+          },
       hsts: {
         maxAge: 31536000, // 1 year
         includeSubDomains: true,
@@ -105,21 +108,28 @@ async function bootstrap() {
   const allowedOriginsEnv = configService.get('ALLOWED_ORIGINS', {
     infer: true,
   });
-  const allowedOrigins = (
-    allowedOriginsEnv?.split(',') || [
-      configService.get('SSO_APP_URL', { infer: true }) ?? '',
-      configService.get('EXPERIENCE_APP_URL', { infer: true }) ?? '',
-      configService.get('CUSTOMER_PORTAL_URL', { infer: true }) ?? '',
-      configService.get('IREPO_URL', { infer: true }) ?? '',
-      configService.get('INVOX_URL', { infer: true }) ?? '',
-      configService.get('ACCOUNTS_URL', { infer: true }) ?? '',
-    ]
-  ).filter((o) => !!o);
+
+  // In development, allow all origins for easier local development
+  // In production, use configured origins
+  const allowedOrigins = isDevelopment
+    ? true // Allow all origins in development
+    : (
+        allowedOriginsEnv?.split(',') || [
+          configService.get('SSO_APP_URL', { infer: true }) ?? '',
+          configService.get('EXPERIENCE_APP_URL', { infer: true }) ?? '',
+          configService.get('CUSTOMER_PORTAL_URL', { infer: true }) ?? '',
+          configService.get('IREPO_URL', { infer: true }) ?? '',
+          configService.get('INVOX_URL', { infer: true }) ?? '',
+          configService.get('ACCOUNTS_URL', { infer: true }) ?? '',
+        ]
+      ).filter((o) => !!o);
+
   app.enableCors({
     origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
   });
 
   const swaggerConfig = new DocumentBuilder()
