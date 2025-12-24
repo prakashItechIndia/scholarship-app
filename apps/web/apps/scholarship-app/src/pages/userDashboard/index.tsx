@@ -429,43 +429,6 @@ const DetailRow: React.FC<{ label: string; value: string }> = ({
   );
 };
 
-// Summary Statistics Card Component - BRD Section 7.1.1
-const StatCard: React.FC<{ label: string; value: number; color?: string }> = ({ 
-  label, 
-  value, 
-  color = "#242424" 
-}) => {
-  return (
-    <div style={{
-      backgroundColor: "#ffffff",
-      border: "1px solid #e0e0e0",
-      borderRadius: "8px",
-      padding: "16px",
-      display: "flex",
-      flexDirection: "column",
-      gap: "4px",
-    }}>
-      <span style={{
-        fontSize: "12px",
-        lineHeight: "18px",
-        fontWeight: 500,
-        color: "#707070",
-        fontFamily: "'Inter', sans-serif",
-      }}>
-        {label}
-      </span>
-      <span style={{
-        fontSize: "24px",
-        lineHeight: "32px",
-        fontWeight: 700,
-        color: color,
-        fontFamily: "'Inter', sans-serif",
-      }}>
-        {value}
-      </span>
-    </div>
-  );
-};
 
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -518,8 +481,8 @@ const UserDashboard: React.FC = () => {
           ? response.map((app: any) => ({
               applicationNo: app.Application_Id || app.applicationId || '',
               status: app.Status || 'Registered',
-              studentName: app.Applicant_Name || app.Student_Name || '',
-              studied: app.Cource_Of_Studying || app.Course || '',
+              studentName: app.Applicant_Name || app.Student_Name || app.fullName || '',
+              studied: app.Institution_Name || app.institutionName || '',
               fatherName: app.Father_Name || app.Guardian_Name || '',
               applied: app.Data_Date 
                 ? new Date(app.Data_Date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -551,15 +514,6 @@ const UserDashboard: React.FC = () => {
     void fetchApplications();
   }, [navigate]);
 
-  // Calculate summary statistics
-  const summaryStats = React.useMemo(() => {
-    return {
-      total: applications.length,
-      approved: applications.filter(app => app.status === "Approved").length,
-      pending: applications.filter(app => app.status === "Completed" || app.status === "In Progress" || app.status === "Registered").length,
-      rejected: applications.filter(app => app.status === "Rejected").length,
-    };
-  }, [applications]);
 
   // Filter and sort applications
   React.useEffect(() => {
@@ -630,20 +584,6 @@ const UserDashboard: React.FC = () => {
     >
       {/* Welcome Section */}
       <WelcomeBanner userName={userName} />
-
-      {/* Summary Statistics Section - BRD Section 7.1.1 */}
-      <div style={{ padding: "0 24px", marginBottom: "24px" }}>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          gap: "16px",
-        }}>
-          <StatCard label="Total Applications" value={summaryStats.total} />
-          <StatCard label="Approved" value={summaryStats.approved} color="#0e700e" />
-          <StatCard label="Pending" value={summaryStats.pending} color="#115ea3" />
-          <StatCard label="Rejected" value={summaryStats.rejected} color="#991b1b" />
-        </div>
-      </div>
 
       {/* Application Status Section */}
       <div style={{  }}>

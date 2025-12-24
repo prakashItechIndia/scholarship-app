@@ -639,4 +639,57 @@ export class DropdownOptionsService {
       },
     ]);
   }
+
+  /**
+   * Get degree options based on course and degree type
+   */
+  async getDegrees(
+    course: string,
+    degreeType: string,
+  ): Promise<DropdownOption[]> {
+    try {
+      const query = `
+        SELECT Degree
+        FROM t_Course_Type
+        WHERE Course = @course AND DegreeType = @degreeType
+        ORDER BY Degree
+      `;
+
+      const result = await this.db.query(query, {
+        course,
+        degreeType,
+      });
+
+      const degrees: DropdownOption[] = [{ value: '', label: '..Select..' }];
+
+      if (result.recordset && result.recordset.length > 0) {
+        result.recordset.forEach((row: unknown) => {
+          const rowRecord = row as Record<string, unknown>;
+          const degree = getCaseInsensitiveValue<string>(rowRecord, 'Degree');
+          if (degree) {
+            degrees.push({ value: degree, label: degree });
+          }
+        });
+      }
+
+      return degrees;
+    } catch (error) {
+      this.logger.error('Error fetching degrees', error);
+      // Return fallback options
+      return [
+        { value: '', label: '..Select..' },
+        { value: 'B.C.S', label: 'B.C.S' },
+        { value: 'B.Sc', label: 'B.Sc' },
+        { value: 'B.A', label: 'B.A' },
+        { value: 'B.Com', label: 'B.Com' },
+        { value: 'B.E', label: 'B.E' },
+        { value: 'B.Tech', label: 'B.Tech' },
+        { value: 'M.Sc', label: 'M.Sc' },
+        { value: 'M.A', label: 'M.A' },
+        { value: 'M.Com', label: 'M.Com' },
+        { value: 'M.E', label: 'M.E' },
+        { value: 'M.Tech', label: 'M.Tech' },
+      ];
+    }
+  }
 }

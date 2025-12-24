@@ -2245,6 +2245,50 @@ export const DropdownOptionsApiAxiosParamCreator = function (configuration?: Con
         },
         /**
          * 
+         * @summary Get degree options by course and degree type
+         * @param {string} course 
+         * @param {string} degreeType 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetDegrees: async (course: string, degreeType: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'course' is not null or undefined
+            assertParamExists('dropdownOptionsControllerGetDegrees', 'course', course)
+            // verify required parameter 'degreeType' is not null or undefined
+            assertParamExists('dropdownOptionsControllerGetDegrees', 'degreeType', degreeType)
+            const localVarPath = `/dropdown-options/degrees`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (course !== undefined) {
+                localVarQueryParameter['course'] = course;
+            }
+
+            if (degreeType !== undefined) {
+                localVarQueryParameter['degreeType'] = degreeType;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get districts by state ID
          * @param {string} [stateId] 
          * @param {*} [options] Override http request option.
@@ -2427,6 +2471,18 @@ export const DropdownOptionsApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get degree options by course and degree type
+         * @param {string} course 
+         * @param {string} degreeType 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dropdownOptionsControllerGetDegrees(course: string, degreeType: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dropdownOptionsControllerGetDegrees(course, degreeType, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get districts by state ID
          * @param {string} [stateId] 
          * @param {*} [options] Override http request option.
@@ -2531,6 +2587,17 @@ export const DropdownOptionsApiFactory = function (configuration?: Configuration
          */
         dropdownOptionsControllerGetCountries(options?: any): AxiosPromise<void> {
             return localVarFp.dropdownOptionsControllerGetCountries(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get degree options by course and degree type
+         * @param {string} course 
+         * @param {string} degreeType 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetDegrees(course: string, degreeType: string, options?: any): AxiosPromise<void> {
+            return localVarFp.dropdownOptionsControllerGetDegrees(course, degreeType, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2648,6 +2715,19 @@ export class DropdownOptionsApi extends BaseAPI {
      */
     public dropdownOptionsControllerGetCountries(options?: any) {
         return DropdownOptionsApiFp(this.configuration).dropdownOptionsControllerGetCountries(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get degree options by course and degree type
+     * @param {string} course 
+     * @param {string} degreeType 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DropdownOptionsApi
+     */
+    public dropdownOptionsControllerGetDegrees(course: string, degreeType: string, options?: any) {
+        return DropdownOptionsApiFp(this.configuration).dropdownOptionsControllerGetDegrees(course, degreeType, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -54,7 +54,7 @@ export const RegistrationProvider = ({ children }: { children: ReactNode }) => {
   }, [currentStep]);
 
   const nextStep = useCallback(() => {
-    setCurrentStep((prev) => Math.min(prev + 1, 6));
+    setCurrentStep((prev) => Math.min(prev + 1, 7));
   }, []);
 
   const prevStep = useCallback(async () => {
@@ -67,7 +67,7 @@ export const RegistrationProvider = ({ children }: { children: ReactNode }) => {
   }, [previousButtonConfig]);
 
   const setStep = useCallback((step: number) => {
-    setCurrentStep(Math.max(1, Math.min(step, 6)));
+    setCurrentStep(Math.max(1, Math.min(step, 7)));
   }, []);
 
   const markStepComplete = useCallback((step: number) => {

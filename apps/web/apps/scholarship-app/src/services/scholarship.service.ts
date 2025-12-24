@@ -432,5 +432,16 @@ export const dropdownOptions = {
     );
     return response.data;
   },
+
+  /**
+   * Get degree options by course and degree type
+   */
+  getDegrees: async (course: string, degreeType: string) => {
+    const response = await apiClient.get<{ value: string; label: string }[]>(
+      '/dropdown-options/degrees',
+      { params: { course, degreeType } },
+    );
+    return response.data;
+  },
 };
 

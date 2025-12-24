@@ -104,9 +104,9 @@ const IdentityDetails = () => {
                 // Fallback to default options
                 setApplicantOptions([
                     { value: '', label: '--Select Applicant Category--' },
-                    { value: 'Research', label: 'I am a Research Scholar seeking Scholarship' },
-                    { value: 'College', label: 'I am a College Student seeking Scholarship' },
                     { value: 'School', label: 'I am a School Student seeking Scholarship' },
+                    { value: 'College', label: 'I am a College Student seeking Scholarship' },
+                    { value: 'Research', label: 'I am a Research Scholar seeking Scholarship' },
                     { value: 'Medical', label: 'I am a Medical Student seeking Scholarship' },
                 ]);
             }
@@ -182,7 +182,7 @@ const IdentityDetails = () => {
                             name="applicantType"
                             control={control}
                         errors={errors}
-                        label="Applicant Category"
+                        label="What describes you better"
                         required
                         options={applicantOptions}
                                         placeholder="Select applicant category"

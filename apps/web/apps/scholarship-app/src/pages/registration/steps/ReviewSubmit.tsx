@@ -186,7 +186,7 @@ const ReviewSubmit = () => {
                 scholarshipFor: formData.bankScholarshipSeekingFor || '',
                 
                 // Personal Details
-                Applicant_Name: formData.studentName || '',
+                Applicant_Name: formData.fullName || formData.studentName || '',
                 Student_ID: formData.studentId || '',
                 Gender: formData.gender || '',
                 Community: formData.community || '',
@@ -245,6 +245,11 @@ const ReviewSubmit = () => {
                 University: formData.university || '',
                 Current_Year: formData.currentYear || '',
                 Current_Semester: formData.currentSemester || '',
+                
+                // Medical Details (if Medical applicant type)
+                ABHA_ID: formData.abhaId || '',
+                Medical_Reason: formData.medicalReason || '',
+                Last_Date_For_Amount: formData.lastDateForAmount || '',
                 
                 // Documents will be handled separately via document upload API
             };
@@ -317,6 +322,22 @@ const ReviewSubmit = () => {
                 } catch (photoError) {
                     console.error('Error uploading photo:', photoError);
                     // Don't fail the entire submission if photo upload fails
+                }
+            }
+
+            // Upload medical documents if available (for Medical applicant type)
+            const medicalDocuments = formData.medicalDocuments;
+            if (Array.isArray(medicalDocuments) && medicalDocuments.length > 0) {
+                try {
+                    const medicalDocumentTypes = medicalDocuments.map((_, index) => `MedicalDocument_${index + 1}`);
+                    await documentUpload.uploadMultipleDocuments(
+                        appNumber,
+                        medicalDocuments,
+                        medicalDocumentTypes,
+                    );
+                } catch (medicalDocError) {
+                    console.error('Error uploading medical documents:', medicalDocError);
+                    // Don't fail the entire submission if medical document upload fails
                 }
             }
             
