@@ -12,11 +12,13 @@ import {
     DocumentOnePageSparkleRegular,
     AlertBadgeRegular,
     ArrowExit24Regular,
+    KeyRegular,
 } from "@fluentui/react-icons";
 import { Button, TopNavProps, Popover, PopoverTrigger, PopoverContent, Modal } from "@shared/components";
 import * as React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { NavbarLogo } from "../common";
+import { ProfilePopover } from "../common/ProfilePopover";
 import { PageLayout, SideNavConfig } from "./PageLayout";
 
 interface ProcessLayoutProps {
@@ -24,15 +26,53 @@ interface ProcessLayoutProps {
   hideSidebar?: boolean;
 }
 
+interface ScholarshipUser {
+  userId?: number;
+  userName?: string;
+  userType?: string;
+  roleId?: number;
+  [key: string]: unknown;
+}
+
+interface ScholarshipAuthData {
+  email: string;
+  cardcode?: string;
+  rememberMe?: boolean;
+  timestamp?: number;
+  user?: ScholarshipUser;
+}
+
 export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSidebar = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [profilePopoverOpen, setProfilePopoverOpen] = React.useState(false);
+  const [settingsPopoverOpen, setSettingsPopoverOpen] = React.useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = React.useState(false);
+  const [userData, setUserData] = React.useState<ScholarshipAuthData | null>(null);
 
-  // Mock user data - replace with actual user data from context/API
-  const userName = "Aakash";
-  const userRole = "Administrator";
+  // Get user data from localStorage
+  React.useEffect(() => {
+    const loadUserData = () => {
+      try {
+        const authData = localStorage.getItem('scholarship_auth');
+        if (authData) {
+          const parsed = JSON.parse(authData) as ScholarshipAuthData;
+          setUserData(parsed);
+        }
+      } catch (error) {
+        console.error('Failed to load user data:', error);
+      }
+    };
+
+    loadUserData();
+    // Listen for storage changes (e.g., when user logs in from another tab)
+    window.addEventListener('storage', loadUserData);
+    return () => window.removeEventListener('storage', loadUserData);
+  }, []);
+
+  // Get user name and role from user data
+  const userName = userData?.user?.userName || userData?.email || 'User';
+  const userRole = userData?.user?.userType || 'User';
 
   const sideNavConfig: SideNavConfig = {
     // logo,
@@ -77,12 +117,34 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
         onClick: () => { void navigate("/help"); },
       },
       {
-        icon: <SettingsRegular className="w-5 h-5" />,
+        icon: (
+          <ProfilePopover
+            userName={userName}
+            userRole={userRole}
+            open={settingsPopoverOpen}
+            onOpenChange={setSettingsPopoverOpen}
+            onLogout={() => setLogoutModalOpen(true)}
+          >
+            <SettingsRegular className="w-5 h-5" />
+          </ProfilePopover>
+        ),
         label: "Settings",
         active: location.pathname === "/settings",
-        onClick: () => { void navigate("/settings"); },
+        onClick: () => { setSettingsPopoverOpen(true); },
       },
     ],
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    // Clear scholarship auth data
+    localStorage.removeItem('scholarship_auth');
+    localStorage.removeItem('scholarship_session_token');
+    sessionStorage.removeItem('scholarship_session_token');
+    sessionStorage.removeItem('scholarship_auth');
+    
+    // Redirect to sign in
+    void navigate('/user-login');
   };
 
   const topNavConfig: TopNavProps = {
@@ -102,163 +164,24 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
         </div>
         {/* Vertical separator */}
         <div className="h-6 w-px bg-gray-300"></div>
-        <Popover 
-          open={profilePopoverOpen} 
-          onOpenChange={(_, data) => {
-            const openState = (data as { open?: boolean })?.open ?? false;
-            setProfilePopoverOpen(openState);
-          }}
+        <ProfilePopover
+          userName={userName}
+          userRole={userRole}
+          open={profilePopoverOpen}
+          onOpenChange={setProfilePopoverOpen}
+          onLogout={() => setLogoutModalOpen(true)}
         >
-          <PopoverTrigger disableButtonEnhancement>
-            
-              <div className="w-9 h-9 rounded-full bg-[#C8D1FA] flex items-center justify-center">
-                <PersonRegular className="w-5 h-5 text-[#2C3C85]" />
-              </div>
-          </PopoverTrigger>
-          <PopoverContent 
-            className="w-[280px] p-0"
-            style={{
-              borderRadius: "8px",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-            }}
-          >
-            {/* User Info Section - Light gray background */}
-            <div 
-              className="p-4"
-              style={{
-                // backgroundColor: "#F5F5F5",
-                borderBottom: "1px solid #E0E0E0",
-                marginLeft: 0,
-                marginRight: 0,
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <div 
-                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{
-                    backgroundColor: "#E5E5E5",
-                  }}
-                >
-                  <PersonRegular className="w-6 h-6" style={{ color: "#707070" }} />
-                </div>
-                <div className="flex flex-col gap-0.5 min-w-0">
-                  <span 
-                    className="text-sm font-semibold text-gray-900 truncate" 
-                    style={{ 
-                      fontFamily: "'Inter', sans-serif", 
-                      lineHeight: "20px",
-                      fontSize: "14px",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {userName}
-                  </span>
-                  <span 
-                    className="text-xs font-normal text-gray-500 truncate" 
-                    style={{ 
-                      fontFamily: "'Inter', sans-serif", 
-                      lineHeight: "16px",
-                      fontSize: "12px",
-                      fontWeight: 400,
-                    }}
-                  >
-                    {userRole}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Menu Items */}
-            <div>
-              <button
-                onClick={() => {
-                  setProfilePopoverOpen(false);
-                  console.log("My Profile clicked");
-                  // Navigate to profile page
-                }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left focus:outline-none focus:bg-gray-50"
-                style={{
-                  fontFamily: "'Inter', sans-serif",
-                }}
-              >
-                <PersonRegular className="w-5 h-5 flex-shrink-0" style={{ color: "#424242" }} />
-                <span 
-                  className="text-sm font-normal text-gray-900" 
-                  style={{ 
-                    fontFamily: "'Inter', sans-serif", 
-                    lineHeight: "20px",
-                    fontSize: "14px",
-                    fontWeight: 400,
-                  }}
-                >
-                  My Profile
-                </span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setProfilePopoverOpen(false);
-                  console.log("Change Password clicked");
-                  // Navigate to change password page
-                }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left focus:outline-none focus:bg-gray-50"
-                style={{
-                  fontFamily: "'Inter', sans-serif",
-                  borderBottom: "1px solid #E0E0E0",
-                  marginLeft: 0,
-                  marginRight: 0,
-                }}
-              >
-                <LockClosedRegular className="w-5 h-5 flex-shrink-0" style={{ color: "#424242" }} />
-                <span 
-                  className="text-sm font-normal text-gray-900" 
-                  style={{ 
-                    fontFamily: "'Inter', sans-serif", 
-                    lineHeight: "20px",
-                    fontSize: "14px",
-                    fontWeight: 400,
-                  }}
-                >
-                  Change Password
-                </span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setProfilePopoverOpen(false);
-                  setLogoutModalOpen(true);
-                }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left focus:outline-none focus:bg-gray-50"
-                style={{
-                  fontFamily: "'Inter', sans-serif",
-                  paddingBottom: 0,
-                }}
-              >
-                <ArrowExit24Regular className="w-5 h-5 flex-shrink-0" style={{ color: "#B10E1C" }} />
-                <span 
-                  className="text-sm font-normal text-gray-900" 
-                  style={{ 
-                    fontFamily: "'Inter', sans-serif", 
-                    lineHeight: "20px",
-                    fontSize: "14px",
-                    fontWeight: 400,
-                  }}
-                >
-                  Logout
-                </span>
-              </button>
-            </div>
-          </PopoverContent>
-        </Popover>
+          <div className="w-9 h-9 rounded-full bg-[#C8D1FA] flex items-center justify-center cursor-pointer">
+            <PersonRegular className="w-5 h-5 text-[#2C3C85]" />
+          </div>
+        </ProfilePopover>
       </div>
     ),
   };
 
-  const handleLogout = () => {
+  const handleLogoutConfirm = () => {
     setLogoutModalOpen(false);
-    console.log("Logout confirmed");
-    // Add logout logic here (clear tokens, redirect, etc.)
-    // navigate("/signin");
+    handleLogout();
   };
 
   return (
@@ -324,7 +247,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           >
             <Button
               variant="default"
-              onClick={handleLogout}
+              onClick={handleLogoutConfirm}
               style={{
                 padding: "8px 16px",
                 fontSize: "14px",

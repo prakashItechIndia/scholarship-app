@@ -58,6 +58,1678 @@ export enum HealthResponseDtoEnvironmentEnum {
     Staging = 'staging'
 }
 
+/**
+ * 
+ * @export
+ * @interface InlineObject
+ */
+export interface InlineObject {
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject
+     */
+    username: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject
+     */
+    password: string;
+}
+/**
+ * 
+ * @export
+ * @interface InlineObject1
+ */
+export interface InlineObject1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject1
+     */
+    username: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject1
+     */
+    currentPassword: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject1
+     */
+    newPassword: string;
+}
+/**
+ * 
+ * @export
+ * @interface InlineObject2
+ */
+export interface InlineObject2 {
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject2
+     */
+    email: string;
+}
+/**
+ * 
+ * @export
+ * @interface InlineObject3
+ */
+export interface InlineObject3 {
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject3
+     */
+    email: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject3
+     */
+    password: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject3
+     */
+    token?: string;
+}
+
+/**
+ * AdminPanelApi - axios parameter creator
+ * @export
+ */
+export const AdminPanelApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Approve application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerApproveApplication: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin-panel/approve`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get applications for Approve module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [acyearId] 
+         * @param {number} [roleId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerGetApproveApplications: async (mainCategory?: string, key?: string, acyearId?: number, roleId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin-panel/approve`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (mainCategory !== undefined) {
+                localVarQueryParameter['mainCategory'] = mainCategory;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
+            }
+
+            if (acyearId !== undefined) {
+                localVarQueryParameter['acyearId'] = acyearId;
+            }
+
+            if (roleId !== undefined) {
+                localVarQueryParameter['roleId'] = roleId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get applications for Overview module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {string} [selectedStatusText] 
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerGetOverviewApplications: async (mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, acyearId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin-panel/overview`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (mainCategory !== undefined) {
+                localVarQueryParameter['mainCategory'] = mainCategory;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
+            }
+
+            if (selectedStatusText !== undefined) {
+                localVarQueryParameter['selectedStatusText'] = selectedStatusText;
+            }
+
+            if (fromDate !== undefined) {
+                localVarQueryParameter['fromDate'] = fromDate;
+            }
+
+            if (toDate !== undefined) {
+                localVarQueryParameter['toDate'] = toDate;
+            }
+
+            if (acyearId !== undefined) {
+                localVarQueryParameter['acyearId'] = acyearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get previous scholarship details by Aadhaar ID and PAN ID
+         * @param {string} aadhaarId 
+         * @param {string} panId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerGetPreviousScholarshipDetails: async (aadhaarId: string, panId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'aadhaarId' is not null or undefined
+            assertParamExists('adminPanelControllerGetPreviousScholarshipDetails', 'aadhaarId', aadhaarId)
+            // verify required parameter 'panId' is not null or undefined
+            assertParamExists('adminPanelControllerGetPreviousScholarshipDetails', 'panId', panId)
+            const localVarPath = `/admin-panel/previous-scholarship/{aadhaarId}/{panId}`
+                .replace(`{${"aadhaarId"}}`, encodeURIComponent(String(aadhaarId)))
+                .replace(`{${"panId"}}`, encodeURIComponent(String(panId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get applications for Process/Documents module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerGetProcessApplications: async (mainCategory?: string, key?: string, acyearId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin-panel/process`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (mainCategory !== undefined) {
+                localVarQueryParameter['mainCategory'] = mainCategory;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
+            }
+
+            if (acyearId !== undefined) {
+                localVarQueryParameter['acyearId'] = acyearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get applications for Suggest module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {string} [selectedStatusText] 
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerGetSuggestApplications: async (mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, acyearId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin-panel/suggest`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (mainCategory !== undefined) {
+                localVarQueryParameter['mainCategory'] = mainCategory;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
+            }
+
+            if (selectedStatusText !== undefined) {
+                localVarQueryParameter['selectedStatusText'] = selectedStatusText;
+            }
+
+            if (fromDate !== undefined) {
+                localVarQueryParameter['fromDate'] = fromDate;
+            }
+
+            if (toDate !== undefined) {
+                localVarQueryParameter['toDate'] = toDate;
+            }
+
+            if (acyearId !== undefined) {
+                localVarQueryParameter['acyearId'] = acyearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get applications for Verify module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerGetVerifyApplications: async (mainCategory?: string, key?: string, acyearId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin-panel/verify`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (mainCategory !== undefined) {
+                localVarQueryParameter['mainCategory'] = mainCategory;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
+            }
+
+            if (acyearId !== undefined) {
+                localVarQueryParameter['acyearId'] = acyearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Issue scholarship amount
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerIssueAmount: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin-panel/issue-amount`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Reject application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerRejectApplication: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin-panel/reject`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Suggest scholarship amount
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerSuggestAmount: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin-panel/suggest`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Verify document
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerVerifyDocument: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin-panel/verify`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * AdminPanelApi - functional programming interface
+ * @export
+ */
+export const AdminPanelApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AdminPanelApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Approve application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async adminPanelControllerApproveApplication(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.adminPanelControllerApproveApplication(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get applications for Approve module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [acyearId] 
+         * @param {number} [roleId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async adminPanelControllerGetApproveApplications(mainCategory?: string, key?: string, acyearId?: number, roleId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.adminPanelControllerGetApproveApplications(mainCategory, key, acyearId, roleId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get applications for Overview module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {string} [selectedStatusText] 
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async adminPanelControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, acyearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.adminPanelControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, acyearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get previous scholarship details by Aadhaar ID and PAN ID
+         * @param {string} aadhaarId 
+         * @param {string} panId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async adminPanelControllerGetPreviousScholarshipDetails(aadhaarId: string, panId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.adminPanelControllerGetPreviousScholarshipDetails(aadhaarId, panId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get applications for Process/Documents module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async adminPanelControllerGetProcessApplications(mainCategory?: string, key?: string, acyearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.adminPanelControllerGetProcessApplications(mainCategory, key, acyearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get applications for Suggest module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {string} [selectedStatusText] 
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async adminPanelControllerGetSuggestApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, acyearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.adminPanelControllerGetSuggestApplications(mainCategory, key, selectedStatusText, fromDate, toDate, acyearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get applications for Verify module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async adminPanelControllerGetVerifyApplications(mainCategory?: string, key?: string, acyearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.adminPanelControllerGetVerifyApplications(mainCategory, key, acyearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Issue scholarship amount
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async adminPanelControllerIssueAmount(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.adminPanelControllerIssueAmount(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Reject application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async adminPanelControllerRejectApplication(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.adminPanelControllerRejectApplication(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Suggest scholarship amount
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async adminPanelControllerSuggestAmount(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.adminPanelControllerSuggestAmount(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Verify document
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async adminPanelControllerVerifyDocument(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.adminPanelControllerVerifyDocument(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * AdminPanelApi - factory interface
+ * @export
+ */
+export const AdminPanelApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AdminPanelApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Approve application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerApproveApplication(options?: any): AxiosPromise<void> {
+            return localVarFp.adminPanelControllerApproveApplication(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get applications for Approve module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [acyearId] 
+         * @param {number} [roleId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerGetApproveApplications(mainCategory?: string, key?: string, acyearId?: number, roleId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.adminPanelControllerGetApproveApplications(mainCategory, key, acyearId, roleId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get applications for Overview module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {string} [selectedStatusText] 
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, acyearId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.adminPanelControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, acyearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get previous scholarship details by Aadhaar ID and PAN ID
+         * @param {string} aadhaarId 
+         * @param {string} panId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerGetPreviousScholarshipDetails(aadhaarId: string, panId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.adminPanelControllerGetPreviousScholarshipDetails(aadhaarId, panId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get applications for Process/Documents module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerGetProcessApplications(mainCategory?: string, key?: string, acyearId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.adminPanelControllerGetProcessApplications(mainCategory, key, acyearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get applications for Suggest module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {string} [selectedStatusText] 
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerGetSuggestApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, acyearId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.adminPanelControllerGetSuggestApplications(mainCategory, key, selectedStatusText, fromDate, toDate, acyearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get applications for Verify module
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerGetVerifyApplications(mainCategory?: string, key?: string, acyearId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.adminPanelControllerGetVerifyApplications(mainCategory, key, acyearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Issue scholarship amount
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerIssueAmount(options?: any): AxiosPromise<void> {
+            return localVarFp.adminPanelControllerIssueAmount(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Reject application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerRejectApplication(options?: any): AxiosPromise<void> {
+            return localVarFp.adminPanelControllerRejectApplication(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Suggest scholarship amount
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerSuggestAmount(options?: any): AxiosPromise<void> {
+            return localVarFp.adminPanelControllerSuggestAmount(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Verify document
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        adminPanelControllerVerifyDocument(options?: any): AxiosPromise<void> {
+            return localVarFp.adminPanelControllerVerifyDocument(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * AdminPanelApi - object-oriented interface
+ * @export
+ * @class AdminPanelApi
+ * @extends {BaseAPI}
+ */
+export class AdminPanelApi extends BaseAPI {
+    /**
+     * 
+     * @summary Approve application
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminPanelApi
+     */
+    public adminPanelControllerApproveApplication(options?: any) {
+        return AdminPanelApiFp(this.configuration).adminPanelControllerApproveApplication(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get applications for Approve module
+     * @param {string} [mainCategory] 
+     * @param {string} [key] 
+     * @param {number} [acyearId] 
+     * @param {number} [roleId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminPanelApi
+     */
+    public adminPanelControllerGetApproveApplications(mainCategory?: string, key?: string, acyearId?: number, roleId?: number, options?: any) {
+        return AdminPanelApiFp(this.configuration).adminPanelControllerGetApproveApplications(mainCategory, key, acyearId, roleId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get applications for Overview module
+     * @param {string} [mainCategory] 
+     * @param {string} [key] 
+     * @param {string} [selectedStatusText] 
+     * @param {string} [fromDate] 
+     * @param {string} [toDate] 
+     * @param {number} [acyearId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminPanelApi
+     */
+    public adminPanelControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, acyearId?: number, options?: any) {
+        return AdminPanelApiFp(this.configuration).adminPanelControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, acyearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get previous scholarship details by Aadhaar ID and PAN ID
+     * @param {string} aadhaarId 
+     * @param {string} panId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminPanelApi
+     */
+    public adminPanelControllerGetPreviousScholarshipDetails(aadhaarId: string, panId: string, options?: any) {
+        return AdminPanelApiFp(this.configuration).adminPanelControllerGetPreviousScholarshipDetails(aadhaarId, panId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get applications for Process/Documents module
+     * @param {string} [mainCategory] 
+     * @param {string} [key] 
+     * @param {number} [acyearId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminPanelApi
+     */
+    public adminPanelControllerGetProcessApplications(mainCategory?: string, key?: string, acyearId?: number, options?: any) {
+        return AdminPanelApiFp(this.configuration).adminPanelControllerGetProcessApplications(mainCategory, key, acyearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get applications for Suggest module
+     * @param {string} [mainCategory] 
+     * @param {string} [key] 
+     * @param {string} [selectedStatusText] 
+     * @param {string} [fromDate] 
+     * @param {string} [toDate] 
+     * @param {number} [acyearId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminPanelApi
+     */
+    public adminPanelControllerGetSuggestApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, acyearId?: number, options?: any) {
+        return AdminPanelApiFp(this.configuration).adminPanelControllerGetSuggestApplications(mainCategory, key, selectedStatusText, fromDate, toDate, acyearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get applications for Verify module
+     * @param {string} [mainCategory] 
+     * @param {string} [key] 
+     * @param {number} [acyearId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminPanelApi
+     */
+    public adminPanelControllerGetVerifyApplications(mainCategory?: string, key?: string, acyearId?: number, options?: any) {
+        return AdminPanelApiFp(this.configuration).adminPanelControllerGetVerifyApplications(mainCategory, key, acyearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Issue scholarship amount
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminPanelApi
+     */
+    public adminPanelControllerIssueAmount(options?: any) {
+        return AdminPanelApiFp(this.configuration).adminPanelControllerIssueAmount(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Reject application
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminPanelApi
+     */
+    public adminPanelControllerRejectApplication(options?: any) {
+        return AdminPanelApiFp(this.configuration).adminPanelControllerRejectApplication(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Suggest scholarship amount
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminPanelApi
+     */
+    public adminPanelControllerSuggestAmount(options?: any) {
+        return AdminPanelApiFp(this.configuration).adminPanelControllerSuggestAmount(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Verify document
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminPanelApi
+     */
+    public adminPanelControllerVerifyDocument(options?: any) {
+        return AdminPanelApiFp(this.configuration).adminPanelControllerVerifyDocument(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * DashboardApi - axios parameter creator
+ * @export
+ */
+export const DashboardApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Get application activity by month
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetApplicationActivityByMonth: async (academicYearId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dashboard/application-activity`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get application analytics
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetApplicationAnalytics: async (academicYearId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dashboard/application-analytics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get financial summary for dashboard
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetFinancialSummary: async (academicYearId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dashboard/financial-summary`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get recent applications
+         * @param {number} [limit] 
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetRecentApplications: async (limit?: number, academicYearId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dashboard/recent-applications`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get scholarship program distribution
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetScholarshipProgramDistribution: async (academicYearId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dashboard/program-distribution`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * DashboardApi - functional programming interface
+ * @export
+ */
+export const DashboardApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DashboardApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Get application activity by month
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardControllerGetApplicationActivityByMonth(academicYearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardControllerGetApplicationActivityByMonth(academicYearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get application analytics
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardControllerGetApplicationAnalytics(academicYearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardControllerGetApplicationAnalytics(academicYearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get financial summary for dashboard
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardControllerGetFinancialSummary(academicYearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardControllerGetFinancialSummary(academicYearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get recent applications
+         * @param {number} [limit] 
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardControllerGetRecentApplications(limit?: number, academicYearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardControllerGetRecentApplications(limit, academicYearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get scholarship program distribution
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardControllerGetScholarshipProgramDistribution(academicYearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardControllerGetScholarshipProgramDistribution(academicYearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * DashboardApi - factory interface
+ * @export
+ */
+export const DashboardApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DashboardApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Get application activity by month
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetApplicationActivityByMonth(academicYearId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.dashboardControllerGetApplicationActivityByMonth(academicYearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get application analytics
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetApplicationAnalytics(academicYearId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.dashboardControllerGetApplicationAnalytics(academicYearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get financial summary for dashboard
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetFinancialSummary(academicYearId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.dashboardControllerGetFinancialSummary(academicYearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get recent applications
+         * @param {number} [limit] 
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetRecentApplications(limit?: number, academicYearId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.dashboardControllerGetRecentApplications(limit, academicYearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get scholarship program distribution
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetScholarshipProgramDistribution(academicYearId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.dashboardControllerGetScholarshipProgramDistribution(academicYearId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * DashboardApi - object-oriented interface
+ * @export
+ * @class DashboardApi
+ * @extends {BaseAPI}
+ */
+export class DashboardApi extends BaseAPI {
+    /**
+     * 
+     * @summary Get application activity by month
+     * @param {number} [academicYearId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardControllerGetApplicationActivityByMonth(academicYearId?: number, options?: any) {
+        return DashboardApiFp(this.configuration).dashboardControllerGetApplicationActivityByMonth(academicYearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get application analytics
+     * @param {number} [academicYearId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardControllerGetApplicationAnalytics(academicYearId?: number, options?: any) {
+        return DashboardApiFp(this.configuration).dashboardControllerGetApplicationAnalytics(academicYearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get financial summary for dashboard
+     * @param {number} [academicYearId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardControllerGetFinancialSummary(academicYearId?: number, options?: any) {
+        return DashboardApiFp(this.configuration).dashboardControllerGetFinancialSummary(academicYearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get recent applications
+     * @param {number} [limit] 
+     * @param {number} [academicYearId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardControllerGetRecentApplications(limit?: number, academicYearId?: number, options?: any) {
+        return DashboardApiFp(this.configuration).dashboardControllerGetRecentApplications(limit, academicYearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get scholarship program distribution
+     * @param {number} [academicYearId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardControllerGetScholarshipProgramDistribution(academicYearId?: number, options?: any) {
+        return DashboardApiFp(this.configuration).dashboardControllerGetScholarshipProgramDistribution(academicYearId, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * DocumentUploadApi - axios parameter creator
+ * @export
+ */
+export const DocumentUploadApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Delete document
+         * @param {number} documentId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerDeleteDocument: async (documentId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'documentId' is not null or undefined
+            assertParamExists('documentUploadControllerDeleteDocument', 'documentId', documentId)
+            const localVarPath = `/document-upload/document/{documentId}`
+                .replace(`{${"documentId"}}`, encodeURIComponent(String(documentId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get documents for an application
+         * @param {string} applicationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerGetApplicationDocuments: async (applicationId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'applicationId' is not null or undefined
+            assertParamExists('documentUploadControllerGetApplicationDocuments', 'applicationId', applicationId)
+            const localVarPath = `/document-upload/documents/{applicationId}`
+                .replace(`{${"applicationId"}}`, encodeURIComponent(String(applicationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get applications for document upload
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerGetUploadApplications: async (mainCategory?: string, key?: string, acyearId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/document-upload/applications`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (mainCategory !== undefined) {
+                localVarQueryParameter['mainCategory'] = mainCategory;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
+            }
+
+            if (acyearId !== undefined) {
+                localVarQueryParameter['acyearId'] = acyearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Upload document
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerUploadDocument: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/document-upload/upload`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * DocumentUploadApi - functional programming interface
+ * @export
+ */
+export const DocumentUploadApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DocumentUploadApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Delete document
+         * @param {number} documentId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async documentUploadControllerDeleteDocument(documentId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerDeleteDocument(documentId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get documents for an application
+         * @param {string} applicationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async documentUploadControllerGetApplicationDocuments(applicationId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerGetApplicationDocuments(applicationId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get applications for document upload
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async documentUploadControllerGetUploadApplications(mainCategory?: string, key?: string, acyearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerGetUploadApplications(mainCategory, key, acyearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Upload document
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async documentUploadControllerUploadDocument(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerUploadDocument(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * DocumentUploadApi - factory interface
+ * @export
+ */
+export const DocumentUploadApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DocumentUploadApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Delete document
+         * @param {number} documentId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerDeleteDocument(documentId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.documentUploadControllerDeleteDocument(documentId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get documents for an application
+         * @param {string} applicationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerGetApplicationDocuments(applicationId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.documentUploadControllerGetApplicationDocuments(applicationId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get applications for document upload
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [acyearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerGetUploadApplications(mainCategory?: string, key?: string, acyearId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.documentUploadControllerGetUploadApplications(mainCategory, key, acyearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Upload document
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerUploadDocument(options?: any): AxiosPromise<void> {
+            return localVarFp.documentUploadControllerUploadDocument(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * DocumentUploadApi - object-oriented interface
+ * @export
+ * @class DocumentUploadApi
+ * @extends {BaseAPI}
+ */
+export class DocumentUploadApi extends BaseAPI {
+    /**
+     * 
+     * @summary Delete document
+     * @param {number} documentId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentUploadApi
+     */
+    public documentUploadControllerDeleteDocument(documentId: number, options?: any) {
+        return DocumentUploadApiFp(this.configuration).documentUploadControllerDeleteDocument(documentId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get documents for an application
+     * @param {string} applicationId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentUploadApi
+     */
+    public documentUploadControllerGetApplicationDocuments(applicationId: string, options?: any) {
+        return DocumentUploadApiFp(this.configuration).documentUploadControllerGetApplicationDocuments(applicationId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get applications for document upload
+     * @param {string} [mainCategory] 
+     * @param {string} [key] 
+     * @param {number} [acyearId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentUploadApi
+     */
+    public documentUploadControllerGetUploadApplications(mainCategory?: string, key?: string, acyearId?: number, options?: any) {
+        return DocumentUploadApiFp(this.configuration).documentUploadControllerGetUploadApplications(mainCategory, key, acyearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Upload document
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentUploadApi
+     */
+    public documentUploadControllerUploadDocument(options?: any) {
+        return DocumentUploadApiFp(this.configuration).documentUploadControllerUploadDocument(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
 
 /**
  * HealthApi - axios parameter creator
@@ -213,6 +1885,370 @@ export class HealthApi extends BaseAPI {
      */
     public appControllerGetRoot(options?: any) {
         return HealthApiFp(this.configuration).appControllerGetRoot(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * ReportsApi - axios parameter creator
+ * @export
+ */
+export const ReportsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Get all academic years
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportsControllerGetAcademicYears: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/reports/academic-years`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get approval form data
+         * @param {string} applicationId 
+         * @param {number} scholarshipId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportsControllerGetApprovalFormData: async (applicationId: string, scholarshipId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'applicationId' is not null or undefined
+            assertParamExists('reportsControllerGetApprovalFormData', 'applicationId', applicationId)
+            // verify required parameter 'scholarshipId' is not null or undefined
+            assertParamExists('reportsControllerGetApprovalFormData', 'scholarshipId', scholarshipId)
+            const localVarPath = `/reports/approval-form/{applicationId}/{scholarshipId}`
+                .replace(`{${"applicationId"}}`, encodeURIComponent(String(applicationId)))
+                .replace(`{${"scholarshipId"}}`, encodeURIComponent(String(scholarshipId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get categories wise report
+         * @param {number} [academicYear] 
+         * @param {string} [appliedDate] 
+         * @param {string} [gender] 
+         * @param {string} [status] 
+         * @param {string} [keyword] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportsControllerGetCategoriesWiseReport: async (academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/reports/categories`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (academicYear !== undefined) {
+                localVarQueryParameter['academicYear'] = academicYear;
+            }
+
+            if (appliedDate !== undefined) {
+                localVarQueryParameter['appliedDate'] = appliedDate;
+            }
+
+            if (gender !== undefined) {
+                localVarQueryParameter['gender'] = gender;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get scholarship issued report
+         * @param {number} [academicYear] 
+         * @param {string} [appliedDate] 
+         * @param {string} [gender] 
+         * @param {string} [keyword] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportsControllerGetScholarshipIssuedReport: async (academicYear?: number, appliedDate?: string, gender?: string, keyword?: string, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/reports/scholarship-issued`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (academicYear !== undefined) {
+                localVarQueryParameter['academicYear'] = academicYear;
+            }
+
+            if (appliedDate !== undefined) {
+                localVarQueryParameter['appliedDate'] = appliedDate;
+            }
+
+            if (gender !== undefined) {
+                localVarQueryParameter['gender'] = gender;
+            }
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * ReportsApi - functional programming interface
+ * @export
+ */
+export const ReportsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ReportsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Get all academic years
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async reportsControllerGetAcademicYears(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerGetAcademicYears(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get approval form data
+         * @param {string} applicationId 
+         * @param {number} scholarshipId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async reportsControllerGetApprovalFormData(applicationId: string, scholarshipId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerGetApprovalFormData(applicationId, scholarshipId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get categories wise report
+         * @param {number} [academicYear] 
+         * @param {string} [appliedDate] 
+         * @param {string} [gender] 
+         * @param {string} [status] 
+         * @param {string} [keyword] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async reportsControllerGetCategoriesWiseReport(academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerGetCategoriesWiseReport(academicYear, appliedDate, gender, status, keyword, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get scholarship issued report
+         * @param {number} [academicYear] 
+         * @param {string} [appliedDate] 
+         * @param {string} [gender] 
+         * @param {string} [keyword] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async reportsControllerGetScholarshipIssuedReport(academicYear?: number, appliedDate?: string, gender?: string, keyword?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerGetScholarshipIssuedReport(academicYear, appliedDate, gender, keyword, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * ReportsApi - factory interface
+ * @export
+ */
+export const ReportsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ReportsApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Get all academic years
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportsControllerGetAcademicYears(options?: any): AxiosPromise<void> {
+            return localVarFp.reportsControllerGetAcademicYears(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get approval form data
+         * @param {string} applicationId 
+         * @param {number} scholarshipId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportsControllerGetApprovalFormData(applicationId: string, scholarshipId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.reportsControllerGetApprovalFormData(applicationId, scholarshipId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get categories wise report
+         * @param {number} [academicYear] 
+         * @param {string} [appliedDate] 
+         * @param {string} [gender] 
+         * @param {string} [status] 
+         * @param {string} [keyword] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportsControllerGetCategoriesWiseReport(academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.reportsControllerGetCategoriesWiseReport(academicYear, appliedDate, gender, status, keyword, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get scholarship issued report
+         * @param {number} [academicYear] 
+         * @param {string} [appliedDate] 
+         * @param {string} [gender] 
+         * @param {string} [keyword] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportsControllerGetScholarshipIssuedReport(academicYear?: number, appliedDate?: string, gender?: string, keyword?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.reportsControllerGetScholarshipIssuedReport(academicYear, appliedDate, gender, keyword, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * ReportsApi - object-oriented interface
+ * @export
+ * @class ReportsApi
+ * @extends {BaseAPI}
+ */
+export class ReportsApi extends BaseAPI {
+    /**
+     * 
+     * @summary Get all academic years
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ReportsApi
+     */
+    public reportsControllerGetAcademicYears(options?: any) {
+        return ReportsApiFp(this.configuration).reportsControllerGetAcademicYears(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get approval form data
+     * @param {string} applicationId 
+     * @param {number} scholarshipId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ReportsApi
+     */
+    public reportsControllerGetApprovalFormData(applicationId: string, scholarshipId: number, options?: any) {
+        return ReportsApiFp(this.configuration).reportsControllerGetApprovalFormData(applicationId, scholarshipId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get categories wise report
+     * @param {number} [academicYear] 
+     * @param {string} [appliedDate] 
+     * @param {string} [gender] 
+     * @param {string} [status] 
+     * @param {string} [keyword] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ReportsApi
+     */
+    public reportsControllerGetCategoriesWiseReport(academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, options?: any) {
+        return ReportsApiFp(this.configuration).reportsControllerGetCategoriesWiseReport(academicYear, appliedDate, gender, status, keyword, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get scholarship issued report
+     * @param {number} [academicYear] 
+     * @param {string} [appliedDate] 
+     * @param {string} [gender] 
+     * @param {string} [keyword] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ReportsApi
+     */
+    public reportsControllerGetScholarshipIssuedReport(academicYear?: number, appliedDate?: string, gender?: string, keyword?: string, options?: any) {
+        return ReportsApiFp(this.configuration).reportsControllerGetScholarshipIssuedReport(academicYear, appliedDate, gender, keyword, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -431,50 +2467,1522 @@ export class SampleApi extends BaseAPI {
 
 
 /**
- * AuthenticationApi - placeholder class
- * TODO: Regenerate OpenAPI client to get full implementation
+ * ScholarshipApplicationApi - axios parameter creator
  * @export
- * @class AuthenticationApi
+ */
+export const ScholarshipApplicationApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Check if Aadhaar ID already exists
+         * @param {string} aadhaarId 
+         * @param {number} scholarshipYearId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerCheckAadhaarId: async (aadhaarId: string, scholarshipYearId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'aadhaarId' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerCheckAadhaarId', 'aadhaarId', aadhaarId)
+            // verify required parameter 'scholarshipYearId' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerCheckAadhaarId', 'scholarshipYearId', scholarshipYearId)
+            const localVarPath = `/scholarship-application/check-aadhaar/{aadhaarId}/{scholarshipYearId}`
+                .replace(`{${"aadhaarId"}}`, encodeURIComponent(String(aadhaarId)))
+                .replace(`{${"scholarshipYearId"}}`, encodeURIComponent(String(scholarshipYearId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Check if email exists in the system
+         * @param {string} email 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerCheckEmailExists: async (email: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'email' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerCheckEmailExists', 'email', email)
+            const localVarPath = `/scholarship-application/check-email/{email}`
+                .replace(`{${"email"}}`, encodeURIComponent(String(email)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Check if PAN ID already exists
+         * @param {string} panId 
+         * @param {number} scholarshipYearId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerCheckPanId: async (panId: string, scholarshipYearId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'panId' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerCheckPanId', 'panId', panId)
+            // verify required parameter 'scholarshipYearId' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerCheckPanId', 'scholarshipYearId', scholarshipYearId)
+            const localVarPath = `/scholarship-application/check-pan/{panId}/{scholarshipYearId}`
+                .replace(`{${"panId"}}`, encodeURIComponent(String(panId)))
+                .replace(`{${"scholarshipYearId"}}`, encodeURIComponent(String(scholarshipYearId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Check user login status (email exists and password set)
+         * @param {string} email 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerCheckUserLoginStatus: async (email: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'email' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerCheckUserLoginStatus', 'email', email)
+            const localVarPath = `/scholarship-application/check-login-status/{email}`
+                .replace(`{${"email"}}`, encodeURIComponent(String(email)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get application by application ID
+         * @param {string} applicationId 
+         * @param {string} [processType] 
+         * @param {number} [scholarshipId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerGetApplication: async (applicationId: string, processType?: string, scholarshipId?: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'applicationId' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerGetApplication', 'applicationId', applicationId)
+            const localVarPath = `/scholarship-application/application/{applicationId}`
+                .replace(`{${"applicationId"}}`, encodeURIComponent(String(applicationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (processType !== undefined) {
+                localVarQueryParameter['processType'] = processType;
+            }
+
+            if (scholarshipId !== undefined) {
+                localVarQueryParameter['scholarshipId'] = scholarshipId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get applications by email
+         * @param {string} email 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerGetApplications: async (email: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'email' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerGetApplications', 'email', email)
+            const localVarPath = `/scholarship-application/applications`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (email !== undefined) {
+                localVarQueryParameter['email'] = email;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get active scholarship year settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerGetScholarshipYear: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/scholarship-application/scholarship-year`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Register new scholarship application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerRegister: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/scholarship-application/register`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Send verification email for new user onboarding
+         * @param {InlineObject2} inlineObject2 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerSendVerificationEmail: async (inlineObject2: InlineObject2, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'inlineObject2' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerSendVerificationEmail', 'inlineObject2', inlineObject2)
+            const localVarPath = `/scholarship-application/send-verification-email`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject2, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Set password for new user (onboarding completion)
+         * @param {InlineObject3} inlineObject3 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerSetNewPassword: async (inlineObject3: InlineObject3, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'inlineObject3' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerSetNewPassword', 'inlineObject3', inlineObject3)
+            const localVarPath = `/scholarship-application/set-password`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject3, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Update application
+         * @param {string} applicationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerUpdateApplication: async (applicationId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'applicationId' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerUpdateApplication', 'applicationId', applicationId)
+            const localVarPath = `/scholarship-application/application/{applicationId}`
+                .replace(`{${"applicationId"}}`, encodeURIComponent(String(applicationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Verify email verification token
+         * @param {string} token 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerVerifyEmailToken: async (token: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'token' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerVerifyEmailToken', 'token', token)
+            const localVarPath = `/scholarship-application/verify-email-token/{token}`
+                .replace(`{${"token"}}`, encodeURIComponent(String(token)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * ScholarshipApplicationApi - functional programming interface
+ * @export
+ */
+export const ScholarshipApplicationApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ScholarshipApplicationApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Check if Aadhaar ID already exists
+         * @param {string} aadhaarId 
+         * @param {number} scholarshipYearId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipApplicationControllerCheckAadhaarId(aadhaarId: string, scholarshipYearId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerCheckAadhaarId(aadhaarId, scholarshipYearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Check if email exists in the system
+         * @param {string} email 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipApplicationControllerCheckEmailExists(email: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerCheckEmailExists(email, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Check if PAN ID already exists
+         * @param {string} panId 
+         * @param {number} scholarshipYearId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipApplicationControllerCheckPanId(panId: string, scholarshipYearId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerCheckPanId(panId, scholarshipYearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Check user login status (email exists and password set)
+         * @param {string} email 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipApplicationControllerCheckUserLoginStatus(email: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerCheckUserLoginStatus(email, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get application by application ID
+         * @param {string} applicationId 
+         * @param {string} [processType] 
+         * @param {number} [scholarshipId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipApplicationControllerGetApplication(applicationId: string, processType?: string, scholarshipId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerGetApplication(applicationId, processType, scholarshipId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get applications by email
+         * @param {string} email 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipApplicationControllerGetApplications(email: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerGetApplications(email, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get active scholarship year settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipApplicationControllerGetScholarshipYear(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerGetScholarshipYear(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Register new scholarship application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipApplicationControllerRegister(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerRegister(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Send verification email for new user onboarding
+         * @param {InlineObject2} inlineObject2 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipApplicationControllerSendVerificationEmail(inlineObject2: InlineObject2, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerSendVerificationEmail(inlineObject2, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Set password for new user (onboarding completion)
+         * @param {InlineObject3} inlineObject3 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipApplicationControllerSetNewPassword(inlineObject3: InlineObject3, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerSetNewPassword(inlineObject3, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Update application
+         * @param {string} applicationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipApplicationControllerUpdateApplication(applicationId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerUpdateApplication(applicationId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Verify email verification token
+         * @param {string} token 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipApplicationControllerVerifyEmailToken(token: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerVerifyEmailToken(token, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * ScholarshipApplicationApi - factory interface
+ * @export
+ */
+export const ScholarshipApplicationApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ScholarshipApplicationApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Check if Aadhaar ID already exists
+         * @param {string} aadhaarId 
+         * @param {number} scholarshipYearId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerCheckAadhaarId(aadhaarId: string, scholarshipYearId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerCheckAadhaarId(aadhaarId, scholarshipYearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Check if email exists in the system
+         * @param {string} email 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerCheckEmailExists(email: string, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerCheckEmailExists(email, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Check if PAN ID already exists
+         * @param {string} panId 
+         * @param {number} scholarshipYearId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerCheckPanId(panId: string, scholarshipYearId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerCheckPanId(panId, scholarshipYearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Check user login status (email exists and password set)
+         * @param {string} email 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerCheckUserLoginStatus(email: string, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerCheckUserLoginStatus(email, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get application by application ID
+         * @param {string} applicationId 
+         * @param {string} [processType] 
+         * @param {number} [scholarshipId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerGetApplication(applicationId: string, processType?: string, scholarshipId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerGetApplication(applicationId, processType, scholarshipId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get applications by email
+         * @param {string} email 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerGetApplications(email: string, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerGetApplications(email, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get active scholarship year settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerGetScholarshipYear(options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerGetScholarshipYear(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Register new scholarship application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerRegister(options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerRegister(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Send verification email for new user onboarding
+         * @param {InlineObject2} inlineObject2 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerSendVerificationEmail(inlineObject2: InlineObject2, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerSendVerificationEmail(inlineObject2, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Set password for new user (onboarding completion)
+         * @param {InlineObject3} inlineObject3 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerSetNewPassword(inlineObject3: InlineObject3, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerSetNewPassword(inlineObject3, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update application
+         * @param {string} applicationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerUpdateApplication(applicationId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerUpdateApplication(applicationId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Verify email verification token
+         * @param {string} token 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipApplicationControllerVerifyEmailToken(token: string, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerVerifyEmailToken(token, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * ScholarshipApplicationApi - object-oriented interface
+ * @export
+ * @class ScholarshipApplicationApi
  * @extends {BaseAPI}
  */
-export class AuthenticationApi extends BaseAPI {
-    // Placeholder class - regenerate OpenAPI client for full implementation
+export class ScholarshipApplicationApi extends BaseAPI {
+    /**
+     * 
+     * @summary Check if Aadhaar ID already exists
+     * @param {string} aadhaarId 
+     * @param {number} scholarshipYearId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipApplicationApi
+     */
+    public scholarshipApplicationControllerCheckAadhaarId(aadhaarId: string, scholarshipYearId: number, options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerCheckAadhaarId(aadhaarId, scholarshipYearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Check if email exists in the system
+     * @param {string} email 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipApplicationApi
+     */
+    public scholarshipApplicationControllerCheckEmailExists(email: string, options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerCheckEmailExists(email, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Check if PAN ID already exists
+     * @param {string} panId 
+     * @param {number} scholarshipYearId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipApplicationApi
+     */
+    public scholarshipApplicationControllerCheckPanId(panId: string, scholarshipYearId: number, options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerCheckPanId(panId, scholarshipYearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Check user login status (email exists and password set)
+     * @param {string} email 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipApplicationApi
+     */
+    public scholarshipApplicationControllerCheckUserLoginStatus(email: string, options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerCheckUserLoginStatus(email, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get application by application ID
+     * @param {string} applicationId 
+     * @param {string} [processType] 
+     * @param {number} [scholarshipId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipApplicationApi
+     */
+    public scholarshipApplicationControllerGetApplication(applicationId: string, processType?: string, scholarshipId?: number, options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerGetApplication(applicationId, processType, scholarshipId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get applications by email
+     * @param {string} email 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipApplicationApi
+     */
+    public scholarshipApplicationControllerGetApplications(email: string, options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerGetApplications(email, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get active scholarship year settings
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipApplicationApi
+     */
+    public scholarshipApplicationControllerGetScholarshipYear(options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerGetScholarshipYear(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Register new scholarship application
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipApplicationApi
+     */
+    public scholarshipApplicationControllerRegister(options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerRegister(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Send verification email for new user onboarding
+     * @param {InlineObject2} inlineObject2 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipApplicationApi
+     */
+    public scholarshipApplicationControllerSendVerificationEmail(inlineObject2: InlineObject2, options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerSendVerificationEmail(inlineObject2, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Set password for new user (onboarding completion)
+     * @param {InlineObject3} inlineObject3 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipApplicationApi
+     */
+    public scholarshipApplicationControllerSetNewPassword(inlineObject3: InlineObject3, options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerSetNewPassword(inlineObject3, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update application
+     * @param {string} applicationId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipApplicationApi
+     */
+    public scholarshipApplicationControllerUpdateApplication(applicationId: string, options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerUpdateApplication(applicationId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Verify email verification token
+     * @param {string} token 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipApplicationApi
+     */
+    public scholarshipApplicationControllerVerifyEmailToken(token: string, options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerVerifyEmailToken(token, options).then((request) => request(this.axios, this.basePath));
+    }
 }
 
 
 /**
- * MFAApi - placeholder class
- * TODO: Regenerate OpenAPI client to get full implementation
+ * ScholarshipAuthenticationApi - axios parameter creator
  * @export
- * @class MFAApi
+ */
+export const ScholarshipAuthenticationApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Change password for admin user
+         * @param {InlineObject1} inlineObject1 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipAuthControllerChangePassword: async (inlineObject1: InlineObject1, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'inlineObject1' is not null or undefined
+            assertParamExists('scholarshipAuthControllerChangePassword', 'inlineObject1', inlineObject1)
+            const localVarPath = `/scholarship-auth/change-password`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject1, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Admin login for scholarship portal
+         * @param {InlineObject} inlineObject 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipAuthControllerLogin: async (inlineObject: InlineObject, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'inlineObject' is not null or undefined
+            assertParamExists('scholarshipAuthControllerLogin', 'inlineObject', inlineObject)
+            const localVarPath = `/scholarship-auth/login`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * ScholarshipAuthenticationApi - functional programming interface
+ * @export
+ */
+export const ScholarshipAuthenticationApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ScholarshipAuthenticationApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Change password for admin user
+         * @param {InlineObject1} inlineObject1 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipAuthControllerChangePassword(inlineObject1: InlineObject1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipAuthControllerChangePassword(inlineObject1, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Admin login for scholarship portal
+         * @param {InlineObject} inlineObject 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipAuthControllerLogin(inlineObject: InlineObject, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipAuthControllerLogin(inlineObject, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * ScholarshipAuthenticationApi - factory interface
+ * @export
+ */
+export const ScholarshipAuthenticationApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ScholarshipAuthenticationApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Change password for admin user
+         * @param {InlineObject1} inlineObject1 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipAuthControllerChangePassword(inlineObject1: InlineObject1, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipAuthControllerChangePassword(inlineObject1, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Admin login for scholarship portal
+         * @param {InlineObject} inlineObject 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipAuthControllerLogin(inlineObject: InlineObject, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipAuthControllerLogin(inlineObject, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * ScholarshipAuthenticationApi - object-oriented interface
+ * @export
+ * @class ScholarshipAuthenticationApi
  * @extends {BaseAPI}
  */
-export class MFAApi extends BaseAPI {
-    // Placeholder class - regenerate OpenAPI client for full implementation
+export class ScholarshipAuthenticationApi extends BaseAPI {
+    /**
+     * 
+     * @summary Change password for admin user
+     * @param {InlineObject1} inlineObject1 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipAuthenticationApi
+     */
+    public scholarshipAuthControllerChangePassword(inlineObject1: InlineObject1, options?: any) {
+        return ScholarshipAuthenticationApiFp(this.configuration).scholarshipAuthControllerChangePassword(inlineObject1, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Admin login for scholarship portal
+     * @param {InlineObject} inlineObject 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipAuthenticationApi
+     */
+    public scholarshipAuthControllerLogin(inlineObject: InlineObject, options?: any) {
+        return ScholarshipAuthenticationApiFp(this.configuration).scholarshipAuthControllerLogin(inlineObject, options).then((request) => request(this.axios, this.basePath));
+    }
 }
 
 
 /**
- * JWKSApi - placeholder class
- * TODO: Regenerate OpenAPI client to get full implementation
+ * UserManagementApi - axios parameter creator
  * @export
- * @class JWKSApi
- * @extends {BaseAPI}
  */
-export class JWKSApi extends BaseAPI {
-    // Placeholder class - regenerate OpenAPI client for full implementation
-}
+export const UserManagementApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Check if user ID exists
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerCheckUserId: async (userId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('userManagementControllerCheckUserId', 'userId', userId)
+            const localVarPath = `/user-management/check-user/{userId}`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
 
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Create new user
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerCreateUser: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/user-management/user`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Delete user
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerDeleteUser: async (userId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('userManagementControllerDeleteUser', 'userId', userId)
+            const localVarPath = `/user-management/user/{userId}`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get all users
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerGetAllUsers: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/user-management/users`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get user by ID
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerGetUserById: async (userId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('userManagementControllerGetUserById', 'userId', userId)
+            const localVarPath = `/user-management/user/{userId}`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get all user types/roles
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerGetUserTypes: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/user-management/user-types`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Update user
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerUpdateUser: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/user-management/user`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
 
 /**
- * AdminRedirectURIsApi - placeholder class
- * TODO: Regenerate OpenAPI client to get full implementation
+ * UserManagementApi - functional programming interface
  * @export
- * @class AdminRedirectURIsApi
+ */
+export const UserManagementApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = UserManagementApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Check if user ID exists
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userManagementControllerCheckUserId(userId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userManagementControllerCheckUserId(userId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Create new user
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userManagementControllerCreateUser(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userManagementControllerCreateUser(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Delete user
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userManagementControllerDeleteUser(userId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userManagementControllerDeleteUser(userId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get all users
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userManagementControllerGetAllUsers(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userManagementControllerGetAllUsers(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get user by ID
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userManagementControllerGetUserById(userId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userManagementControllerGetUserById(userId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get all user types/roles
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userManagementControllerGetUserTypes(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userManagementControllerGetUserTypes(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Update user
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userManagementControllerUpdateUser(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userManagementControllerUpdateUser(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * UserManagementApi - factory interface
+ * @export
+ */
+export const UserManagementApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = UserManagementApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Check if user ID exists
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerCheckUserId(userId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.userManagementControllerCheckUserId(userId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Create new user
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerCreateUser(options?: any): AxiosPromise<void> {
+            return localVarFp.userManagementControllerCreateUser(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Delete user
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerDeleteUser(userId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.userManagementControllerDeleteUser(userId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all users
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerGetAllUsers(options?: any): AxiosPromise<void> {
+            return localVarFp.userManagementControllerGetAllUsers(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get user by ID
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerGetUserById(userId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.userManagementControllerGetUserById(userId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all user types/roles
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerGetUserTypes(options?: any): AxiosPromise<void> {
+            return localVarFp.userManagementControllerGetUserTypes(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update user
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerUpdateUser(options?: any): AxiosPromise<void> {
+            return localVarFp.userManagementControllerUpdateUser(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * UserManagementApi - object-oriented interface
+ * @export
+ * @class UserManagementApi
  * @extends {BaseAPI}
  */
-export class AdminRedirectURIsApi extends BaseAPI {
-    // Placeholder class - regenerate OpenAPI client for full implementation
+export class UserManagementApi extends BaseAPI {
+    /**
+     * 
+     * @summary Check if user ID exists
+     * @param {string} userId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserManagementApi
+     */
+    public userManagementControllerCheckUserId(userId: string, options?: any) {
+        return UserManagementApiFp(this.configuration).userManagementControllerCheckUserId(userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Create new user
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserManagementApi
+     */
+    public userManagementControllerCreateUser(options?: any) {
+        return UserManagementApiFp(this.configuration).userManagementControllerCreateUser(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Delete user
+     * @param {string} userId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserManagementApi
+     */
+    public userManagementControllerDeleteUser(userId: string, options?: any) {
+        return UserManagementApiFp(this.configuration).userManagementControllerDeleteUser(userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get all users
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserManagementApi
+     */
+    public userManagementControllerGetAllUsers(options?: any) {
+        return UserManagementApiFp(this.configuration).userManagementControllerGetAllUsers(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get user by ID
+     * @param {string} userId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserManagementApi
+     */
+    public userManagementControllerGetUserById(userId: string, options?: any) {
+        return UserManagementApiFp(this.configuration).userManagementControllerGetUserById(userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get all user types/roles
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserManagementApi
+     */
+    public userManagementControllerGetUserTypes(options?: any) {
+        return UserManagementApiFp(this.configuration).userManagementControllerGetUserTypes(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update user
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserManagementApi
+     */
+    public userManagementControllerUpdateUser(options?: any) {
+        return UserManagementApiFp(this.configuration).userManagementControllerUpdateUser(options).then((request) => request(this.axios, this.basePath));
+    }
 }
 
 

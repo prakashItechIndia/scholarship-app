@@ -16,6 +16,7 @@ const MfaVerifyPage = lazy(() => import('../pages/auth/MfaVerify'));
 const RegistrationPage = lazy(() => import('../pages/registration/RegistrationForm'));
 const VerificationPage = lazy(() => import('../pages/auth/Verification'));
 const SetPasswordPage = lazy(() => import('../pages/auth/SetPassword'));
+const EmailVerificationPage = lazy(() => import('../pages/auth/EmailVerification'));
 const ProcessPage = lazy(() => import('../pages/process'));
 const LandingPage = lazy(() => import('../pages/Landing'));
 
@@ -149,6 +150,16 @@ export const Router = () => {
             <Suspense fallback={<LoadingScreen message="Loading..." />}>
               <ErrorBoundary>
                 <SetPasswordPage />
+              </ErrorBoundary>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/email-verification"
+          element={
+            <Suspense fallback={<LoadingScreen message="Loading..." />}>
+              <ErrorBoundary>
+                <EmailVerificationPage />
               </ErrorBoundary>
             </Suspense>
           }

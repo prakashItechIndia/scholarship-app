@@ -15,7 +15,7 @@
     "test:scholarship-api": "pnpm --filter @icaptur-api/scholarship-api test",
     "test": "pnpm --filter \"./apps/**\" --filter \"./services/**\" --filter \"./packages/**\" test",
     "test:e2e": "pnpm --filter \"./tests/**\" test",
-    "generate-api:all": "pnpm --filter @shared generate-api:all",
+    "generate-api:all": "pnpm --filter @web/shared generate-api:all",
     "clean": "pnpm --filter \"./apps/**\" --filter \"./services/**\" --filter \"./packages/**\" clean && find . -name 'node_modules' -type d -prune -exec rm -rf '{}' + 2>/dev/null || true",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\""
@@ -43,5 +43,6 @@
   },
   "dependencies": {
     "scheduler": "^0.23.2"
-  }
+  },
+  "packageManager": "pnpm@10.26.2+sha512.0e308ff2005fc7410366f154f625f6631ab2b16b1d2e70238444dd6ae9d630a8482d92a451144debc492416896ed16f7b114a86ec68b8404b2443869e68ffda6"
 }

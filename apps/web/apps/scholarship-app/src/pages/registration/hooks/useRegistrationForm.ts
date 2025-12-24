@@ -9,6 +9,7 @@ interface UseRegistrationFormOptions<T extends z.ZodTypeAny> {
     schema: T;
     stepNumber: number;
     defaultValues: (formData: RegistrationFormData) => z.infer<T>;
+    onValidate?: (data: z.infer<T>, form: UseFormReturn<z.infer<T>>) => Promise<void>;
 }
 
 interface UseRegistrationFormReturn<T extends z.ZodTypeAny> {
@@ -27,6 +28,7 @@ export const useRegistrationForm = <T extends z.ZodTypeAny>({
     schema,
     stepNumber,
     defaultValues,
+    onValidate,
 }: UseRegistrationFormOptions<T>): UseRegistrationFormReturn<T> => {
     const { formData, updateFormData, nextStep, markStepComplete, setIsLoading } = useRegistration();
 
@@ -45,8 +47,11 @@ export const useRegistrationForm = <T extends z.ZodTypeAny>({
     const onSubmit = async (data: z.infer<T>) => {
         setIsLoading(true);
         try {
-            // Simulate API call delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Run custom validation if provided
+            if (onValidate) {
+                await onValidate(data, form);
+            }
+            
             // Convert Date objects to ISO strings for storage
             const serializedData = Object.entries(data).reduce((acc, [key, value]) => {
                 acc[key] = value instanceof Date ? value.toISOString() : value;
@@ -55,6 +60,9 @@ export const useRegistrationForm = <T extends z.ZodTypeAny>({
             updateFormData(serializedData);
             markStepComplete(stepNumber);
             nextStep();
+        } catch (error) {
+            // Error handling is done in onValidate, just rethrow
+            throw error;
         } finally {
             setIsLoading(false);
         }

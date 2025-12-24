@@ -79,7 +79,7 @@ export const useUserTable = ({
               icon={<PersonDeleteRegular style={{ width: "16px", height: "16px" }} />}
               label="Delete User Profile"
               onClick={() => handleDelete(item)}
-              className="hover:text-red-700"
+              // className="hover:text-red-700"
             />
           </DropdownMenuContent>
         </DropdownMenu>
@@ -93,8 +93,9 @@ export const useUserTable = ({
           fontSize: "12px",
           lineHeight: "16px",
           fontWeight: 500,
-          color: status === "Active" ? "#16a34a" : "#dc2626",
-          backgroundColor: status === "Active" ? "#dcfce7" : "#fee2e2",
+          color: status === "Active" ? "#0E700E" : "#616161",
+          backgroundColor: status === "Active" ? "#9FD89F" : "#F0F0F0",
+          opacity: status === "Active" ? 0.8 : 0.9,
           padding: "4px 30px",
           borderRadius: "12px",
           fontFamily: "'Inter', sans-serif",
