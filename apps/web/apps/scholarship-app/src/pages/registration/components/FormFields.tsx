@@ -231,3 +231,35 @@ export const IfscCodeField = ({ name, control, errors, label, required, placehol
     );
 };
 
+/**
+ * TextArea Field Component
+ */
+interface TextAreaFieldProps extends BaseFormFieldProps {
+    rows?: number;
+}
+
+export const TextAreaField = ({ name, control, errors, label, required, placeholder, rows = 4 }: TextAreaFieldProps) => {
+    return (
+        <Controller
+            name={name}
+            control={control}
+            render={({ field }) => (
+                <FormField label={label} required={required} error={errors[name]?.message as string}>
+                    <TextField
+                        {...field}
+                        multiline
+                        rows={rows}
+                        placeholder={placeholder}
+                        errorMessage={errors[name]?.message as string}
+                        styles={{
+                            fieldGroup: {
+                                minHeight: `${rows * 24}px`,
+                            },
+                        }}
+                    />
+                </FormField>
+            )}
+        />
+    );
+};
+

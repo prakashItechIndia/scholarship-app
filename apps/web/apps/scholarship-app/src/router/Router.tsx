@@ -18,7 +18,6 @@ const VerificationPage = lazy(() => import('../pages/auth/Verification'));
 const SetPasswordPage = lazy(() => import('../pages/auth/SetPassword'));
 const EmailVerificationPage = lazy(() => import('../pages/auth/EmailVerification'));
 const ProcessPage = lazy(() => import('../pages/process'));
-const LandingPage = lazy(() => import('../pages/Landing'));
 
 const UserDashboardPage = lazy(() => import('../pages/userDashboard'));
 const AdminDashboardPage = lazy(() => import('../pages/adminDashboard/AdminDashboard'));
@@ -49,16 +48,6 @@ export const Router = () => {
             <Suspense fallback={<LoadingScreen message="Loading..." />}>
               <ErrorBoundary>
                 <AdminSignInPage />
-              </ErrorBoundary>
-            </Suspense>
-          }
-        />
-        <Route
-          path="/landing"
-          element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <LandingPage />
               </ErrorBoundary>
             </Suspense>
           }

@@ -104,11 +104,41 @@ interface RegistrationData {
   guardianAnnualIncome?: string;
   guardianOfficeName?: string;
   motherAnnualIncome?: string;
+  // Medical fields
+  abhaId?: string;
+  medicalReason?: string;
+  medicalDocuments?: File[];
+  lastDateForAmount?: string;
 }
 
 @Injectable()
 export class ScholarshipApplicationService {
   private readonly logger = new Logger(ScholarshipApplicationService.name);
+
+  /**
+   * Get or find Student role ID from T_ROLES table
+   * Returns the Role_Id for Student role, or null if not found
+   */
+  private async getStudentRoleId(): Promise<number | null> {
+    try {
+      const query = `
+        SELECT Id
+        FROM T_ROLES
+        WHERE Role_Name = 'Student' AND Is_Active = 1
+      `;
+      const result = await this.db.query<{ Id: number }>(query);
+      if (result.recordset && result.recordset.length > 0) {
+        const roleId = result.recordset[0].Id;
+        this.logger.log(`Found Student role ID: ${roleId}`);
+        return roleId;
+      }
+      this.logger.warn('Student role not found in T_ROLES table');
+      return null;
+    } catch (error) {
+      this.logger.error('Error fetching Student role ID', error);
+      return null;
+    }
+  }
 
   constructor(
     private readonly db: DatabaseService,
@@ -229,7 +259,7 @@ export class ScholarshipApplicationService {
         applicationId: getValue<string | undefined>('applicationId', 'Application_Id', 'applicationId') as string | undefined,
         applicantType: getValue<string | undefined>('applicantType', 'Applicant_Type', 'applicantType') as string | undefined,
         studentId: getValue<string | undefined>('studentId', 'Student_ID', 'studentId') as string | undefined,
-        applicantName: getValue<string>('applicantName', 'Applicant_Name', 'applicantName', '') as string,
+        applicantName: getValue<string>('applicantName', 'Applicant_Name', 'fullName', '') as string,
         fatherName: getValue<string>('fatherName', 'Father_Name', 'fatherName', '') as string,
         fatherOccupation: getValue<string | undefined>('fatherOccupation', 'Father_Occupation', 'fatherOccupation') as string | undefined,
         fatherOccupationOther: getValue<string | undefined>('fatherOccupationOther', 'Father_Occupation_Other', 'fatherOccupationOther') as string | undefined,
@@ -283,6 +313,10 @@ export class ScholarshipApplicationService {
         guardianAnnualIncome: getValue<string | undefined>('guardianAnnualIncome', 'GuardianAnnulIncome', 'guardianAnnualIncome') as string | undefined,
         guardianOfficeName: getValue<string | undefined>('guardianOfficeName', 'Guardian_OfficeName', 'guardianOfficeName') as string | undefined,
         motherAnnualIncome: getValue<string | undefined>('motherAnnualIncome', 'Mother_AnnualIncome', 'motherAnnualIncome') as string | undefined,
+        // Medical fields
+        abhaId: getValue<string | undefined>('abhaId', 'ABHA_ID', 'abhaId') as string | undefined,
+        medicalReason: getValue<string | undefined>('medicalReason', 'Medical_Reason', 'medicalReason') as string | undefined,
+        lastDateForAmount: getValue<string | undefined>('lastDateForAmount', 'Last_Date_For_Amount', 'lastDateForAmount') as string | undefined,
       };
 
       // If schYearId is provided but schYear is missing, fetch it from database
@@ -393,6 +427,35 @@ export class ScholarshipApplicationService {
         User_ID: '',
       });
 
+      // Update Tbl_UserMaster with personal details for Student users (first-time registration completion)
+      // This updates User_Name from Applicant_Name for Student role users
+      try {
+        const studentRoleId = await this.getStudentRoleId();
+        if (studentRoleId) {
+          const updateUserQuery = `
+            UPDATE Tbl_UserMaster
+            SET 
+              User_Name = @applicantName,
+              Modified_Date = GETDATE(),
+              Modified_By = @email
+            WHERE User_ID = @email
+            AND Role_Id = @studentRoleId
+            AND (User_Name IS NULL OR User_Name = '' OR User_Name = User_ID)
+          `;
+          await this.db.query(updateUserQuery, {
+            applicantName: normalizedData.applicantName.toUpperCase(),
+            email: normalizedData.email,
+            studentRoleId,
+          });
+          this.logger.log(`Updated User_Name in Tbl_UserMaster for Student user: ${normalizedData.email}`);
+        } else {
+          this.logger.warn('Student role not found, skipping User_Name update');
+        }
+      } catch (updateError) {
+        // Log error but don't fail registration if user update fails
+        this.logger.warn('Failed to update Tbl_UserMaster with personal details', updateError);
+      }
+
       return {
         applicationId,
         message: 'Registration saved successfully',
@@ -444,16 +507,33 @@ export class ScholarshipApplicationService {
           P.Status,
           P.Scholarship_No,
           P.Scholarship_Approved_Amount,
-          P.Scholarship_Suggest_Amount
+          P.Scholarship_Suggest_Amount,
+          P.Data_Date,
+          UP.User_Name as Prepared_By
         FROM t_Registration R
         LEFT JOIN t_Registration_Process P ON P.Application_Id = R.Application_Id
+        LEFT JOIN TBL_USERMASTER UP ON P.Prepared_By = UP.Id
         WHERE R.Email = @email
         ORDER BY R.Application_Id DESC
       `;
 
       const result = await this.db.query(query, { email });
 
-      return result.recordset || [];
+      // Map results with case-insensitive field access
+      const mappedResults = (result.recordset || []).map((row: Record<string, unknown>) => {
+        const rowRecord = row as Record<string, unknown>;
+        return {
+          ...row,
+          Applicant_Name: getCaseInsensitiveValue<string>(rowRecord, 'Applicant_Name') || '',
+          Institution_Name: getCaseInsensitiveValue<string>(rowRecord, 'Institution_Name') || '',
+          Data_Date: getCaseInsensitiveValue<Date | string>(rowRecord, 'Data_Date'),
+          Prepared_By: getCaseInsensitiveValue<string>(rowRecord, 'Prepared_By') || '',
+          Scholarship_No: getCaseInsensitiveValue<string>(rowRecord, 'Scholarship_No') || '',
+          Status: getCaseInsensitiveValue<string>(rowRecord, 'Status') || 'Registered',
+        };
+      });
+
+      return mappedResults;
     } catch (error) {
       this.logger.error('Error fetching applications', error);
       throw new BadRequestException('Failed to fetch applications');
@@ -510,8 +590,10 @@ export class ScholarshipApplicationService {
       const emailExists = (regResult.recordset?.[0]?.count || 0) > 0;
 
       // Check if user has password set in Tbl_UserMaster
+      // Check for both admin users and Student users (identified by Role_Id)
       // IsActive and IsDeleted are bit type (1/0)
-      const userQuery = `
+      const studentRoleId = await this.getStudentRoleId();
+      let userQuery = `
         SELECT COUNT(*) as count
         FROM Tbl_UserMaster
         WHERE User_ID = @email
@@ -520,9 +602,16 @@ export class ScholarshipApplicationService {
         AND IsActive = 1
         AND (IsDeleted = 0 OR IsDeleted IS NULL)
       `;
-      const userResult = await this.db.query<{ count: number }>(userQuery, {
-        email,
-      });
+      
+      // If Student role exists, check for Student role OR users without role (admin users)
+      // If Student role doesn't exist, check all users (backward compatibility)
+      const params: { email: string; studentRoleId?: number } = { email };
+      if (studentRoleId !== null) {
+        userQuery += ` AND (Role_Id = @studentRoleId OR Role_Id IS NULL OR Role_Id = 0)`;
+        params.studentRoleId = studentRoleId;
+      }
+      
+      const userResult = await this.db.query<{ count: number }>(userQuery, params);
       const hasPassword = (userResult.recordset?.[0]?.count || 0) > 0;
 
       // If user has password set, they can login (regardless of registration status)
@@ -871,34 +960,69 @@ export class ScholarshipApplicationService {
         });
         this.logger.log(`Password updated and user activated for: ${email}`);
       } else {
-        // Create new user (even if not in t_Registration yet - they can register later)
+        // Create new user with Student role for user flow
         // Based on actual schema: IsActive, IsDeleted, Password_change are bit type (1/0)
-        // User_Type column doesn't exist in the schema
         // Set IsActive = 1 to ensure user can login immediately
-        const insertQuery = `
-          INSERT INTO Tbl_UserMaster (
-            User_ID,
-            Password,
-            Password_change,
-            IsActive,
-            IsDeleted,
-            Created_Date,
-            Created_By
-          ) VALUES (
-            @email,
-            @password,
-            1,
-            1,
-            0,
-            GETDATE(),
-            @email
-          )
-        `;
-        await this.db.query(insertQuery, {
+        // Role_Id identifies users from applicant (user flow) application
+        const studentRoleId = await this.getStudentRoleId();
+        
+        if (studentRoleId === null) {
+          this.logger.warn('Student role not found in T_ROLES. Creating user without role assignment.');
+        }
+        
+        const insertQuery = studentRoleId !== null
+          ? `
+            INSERT INTO Tbl_UserMaster (
+              User_ID,
+              Password,
+              Password_change,
+              IsActive,
+              IsDeleted,
+              Role_Id,
+              Created_Date,
+              Created_By
+            ) VALUES (
+              @email,
+              @password,
+              1,
+              1,
+              0,
+              @studentRoleId,
+              GETDATE(),
+              @email
+            )
+          `
+          : `
+            INSERT INTO Tbl_UserMaster (
+              User_ID,
+              Password,
+              Password_change,
+              IsActive,
+              IsDeleted,
+              Created_Date,
+              Created_By
+            ) VALUES (
+              @email,
+              @password,
+              1,
+              1,
+              0,
+              GETDATE(),
+              @email
+            )
+          `;
+        
+        const insertParams: { email: string; password: string; studentRoleId?: number } = {
           email,
           password: encryptedPassword,
-        });
-        this.logger.log(`New user created and activated for: ${email}`);
+        };
+        
+        if (studentRoleId !== null) {
+          insertParams.studentRoleId = studentRoleId;
+        }
+        
+        await this.db.query(insertQuery, insertParams);
+        this.logger.log(`New Student user created and activated for: ${email}${studentRoleId !== null ? ` with Role_Id: ${studentRoleId}` : ' (without role assignment)'}`);
       }
 
       // Verify the user was created/updated correctly and ensure IsActive is set

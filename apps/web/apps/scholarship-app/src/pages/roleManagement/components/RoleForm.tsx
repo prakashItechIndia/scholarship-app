@@ -8,8 +8,10 @@ import {
   DataTable,
 } from "@shared/components";
 import { Role, RoleFormData, RolePermission } from "../types";
-import { mockRoles, defaultPermissions } from "../constants";
+import { defaultPermissions } from "../constants";
 import { RoleDetailsForm } from "./RoleDetailsForm";
+import { roleManagement } from "../../../services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
 
 // ProfileAvatar component - SVG as React component
 const ProfileAvatar = ({ width = 80, height = 80, className = '' }: { width?: number; height?: number; className?: string }) => {
@@ -30,7 +32,9 @@ const ProfileAvatar = ({ width = 80, height = 80, className = '' }: { width?: nu
 const RoleForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
+  const { success, error: showError } = useToast();
   const isEditMode = !!id;
+  const [loading, setLoading] = React.useState(false);
   
   const [formData, setFormData] = React.useState<RoleFormData>({
     roleName: "",
@@ -52,21 +56,27 @@ const RoleForm: React.FC = () => {
 
   // Load role data if editing
   React.useEffect(() => {
-    if (isEditMode && id) {
-      const role = mockRoles.find((r) => r.id === id);
-      if (role) {
-        setFormData({
-          roleName: role.roleName,
-          userType: role.userType || "",
-          status: role.status,
-          permissions: role.permissions || [...defaultPermissions],
-        });
-        if (role.profilePhoto) {
-          setProfilePhotoPreview(role.profilePhoto);
+    const loadRole = async () => {
+      if (isEditMode && id) {
+        try {
+          setLoading(true);
+          const roleId = parseInt(id, 10);
+          const roleData = await roleManagement.getRoleById(roleId);
+          setFormData({
+            roleName: roleData.roleName || "",
+            userType: roleData.userType || "",
+            status: roleData.isActive === 1 ? "Active" : "Inactive",
+            permissions: [...defaultPermissions], // Permissions not stored in DB yet
+          });
+        } catch (err) {
+          showError('Failed to Load Role', err instanceof Error ? err.message : 'Failed to fetch role data');
+        } finally {
+          setLoading(false);
         }
       }
-    }
-  }, [id, isEditMode]);
+    };
+    void loadRole();
+  }, [id, isEditMode, showError]);
 
   const handleInputChange = (field: keyof RoleFormData, value: any) => {
     setFormData((prev) => ({
@@ -157,7 +167,7 @@ const RoleForm: React.FC = () => {
   };
 
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const newErrors: typeof errors = {};
 
     // Basic validation
@@ -171,17 +181,23 @@ const RoleForm: React.FC = () => {
 
     // ROL-001: Role name shall be unique across the system
     if (formData.roleName.trim()) {
-      // Get all existing roles from sessionStorage or use mockRoles
-      const existingRolesJson = sessionStorage.getItem("allRoles");
-      const allRoles: Role[] = existingRolesJson ? JSON.parse(existingRolesJson) : mockRoles;
-      
-      const existingRole = allRoles.find(
-        (role) => 
-          role.roleName.toLowerCase() === formData.roleName.trim().toLowerCase() &&
-          (!isEditMode || role.id !== id)
-      );
-      if (existingRole) {
-        newErrors.roleName = "Role name must be unique. This role name already exists.";
+      try {
+        const checkResult = await roleManagement.checkRoleName(formData.roleName.trim());
+        if (checkResult.exists) {
+          // If editing, check if it's the same role
+          if (isEditMode && id) {
+            const roleId = parseInt(id, 10);
+            const currentRole = await roleManagement.getRoleById(roleId);
+            if (currentRole.roleName.toLowerCase() !== formData.roleName.trim().toLowerCase()) {
+              newErrors.roleName = "Role name must be unique. This role name already exists.";
+            }
+          } else {
+            newErrors.roleName = "Role name must be unique. This role name already exists.";
+          }
+        }
+      } catch (err) {
+        // If check fails, continue (might be network error)
+        console.warn('Failed to check role name uniqueness', err);
       }
     }
 
@@ -200,28 +216,34 @@ const RoleForm: React.FC = () => {
       return;
     }
 
-    // In a real app, this would make an API call
-    console.log("Saving role:", formData);
-    
-    // Store in sessionStorage to persist across navigation
-    // In a real app, this would be handled by API and state management
-    const savedRole = {
-      id: isEditMode ? id : `role-${Date.now()}`,
-      roleName: formData.roleName.trim(),
-      roleType: formData.userType.toLowerCase(),
-      description: "",
-      status: formData.status,
-      userType: formData.userType,
-      profilePhoto: profilePhotoPreview || undefined,
-      permissions: formData.permissions,
-    };
-    
-    // Store in sessionStorage temporarily
-    sessionStorage.setItem("lastSavedRole", JSON.stringify(savedRole));
-    sessionStorage.setItem("roleAction", isEditMode ? "edit" : "add");
-    
-    // Navigate back to list
-    navigate("/role-management");
+    try {
+      setLoading(true);
+      const roleData = {
+        roleName: formData.roleName.trim(),
+        userType: formData.userType,
+        isActive: formData.status === "Active" ? 1 : 0,
+      };
+
+      if (isEditMode && id) {
+        const roleId = parseInt(id, 10);
+        await roleManagement.updateRole(roleId, roleData);
+        success('Success', 'Role updated successfully');
+      } else {
+        await roleManagement.createRole(roleData);
+        success('Success', 'Role created successfully');
+      }
+      
+      // Store action for list page refresh
+      sessionStorage.setItem("roleAction", isEditMode ? "edit" : "add");
+      
+      // Navigate back to list
+      navigate("/role-management");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to save role';
+      showError('Save Failed', errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -739,13 +761,14 @@ const RoleForm: React.FC = () => {
           <Button
             appearance="primary"
             onClick={handleSave}
+            disabled={loading}
             style={{
               backgroundColor: "#2453C3",
               color: "#ffffff",
               minWidth: "100px",
             }}
           >
-            Save
+            {loading ? "Saving..." : (isEditMode ? "Update" : "Save")}
           </Button>
         </div>
       </Card>

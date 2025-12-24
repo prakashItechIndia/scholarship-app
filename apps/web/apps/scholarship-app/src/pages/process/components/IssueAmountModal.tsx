@@ -13,27 +13,39 @@ import {
     ChevronDownRegular
 } from "@fluentui/react-icons";
 import { ApplicationData } from "../types";
+import { processManagement } from "../../../services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
 
 interface IssueAmountModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     data?: ApplicationData | null;
+    onIssueSuccess?: () => void;
 }
 
 const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
     open,
     onOpenChange,
     data,
+    onIssueSuccess,
 }) => {
+    const { success, error: showError } = useToast();
     const [comment, setComment] = React.useState("");
     const [paymentMode, setPaymentMode] = React.useState("");
+    const [ddChequeNo, setDdChequeNo] = React.useState("");
+    const [ddChequeInFavor, setDdChequeInFavor] = React.useState("");
+    const [ddChequeDate, setDdChequeDate] = React.useState("");
     const [isSubmitted, setIsSubmitted] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
 
     // Clean up state when modal closes/opens
     React.useEffect(() => {
         if (open) {
             setComment("");
             setPaymentMode("");
+            setDdChequeNo("");
+            setDdChequeInFavor("");
+            setDdChequeDate("");
             setIsSubmitted(false);
         }
     }, [open]);
@@ -50,13 +62,43 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
         { label: "Approved Amount", value: "25000" }, // Mocked
     ];
 
-    const handleSubmit = () => {
-        console.log("Submitting Issue Amount:", {
-            applicationNo: data?.applicationNo,
-            paymentMode,
-            comment,
-        });
-        setIsSubmitted(true);
+    const handleSubmit = async () => {
+        if (!data?.applicationNo || !paymentMode) {
+            showError('Validation Error', 'Please select payment mode');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            // Get current user ID from localStorage
+            const authData = localStorage.getItem('scholarship_auth');
+            const userId = authData ? JSON.parse(authData).userId : undefined;
+
+            await processManagement.issueAmount({
+                applicationId: data.applicationNo,
+                paymentMode,
+                comments: comment,
+                ddChequeNo: paymentMode === 'DD' || paymentMode === 'Cheque' ? ddChequeNo : '',
+                ddChequeInFavor: paymentMode === 'DD' || paymentMode === 'Cheque' ? ddChequeInFavor : '',
+                ddChequeDate: paymentMode === 'DD' || paymentMode === 'Cheque' ? ddChequeDate : '',
+                issuedBy: userId,
+            });
+
+            setIsSubmitted(true);
+            success('Success', 'Amount issued successfully');
+
+            // Refresh data and close modal after success
+            if (onIssueSuccess) {
+                onIssueSuccess();
+            }
+            setTimeout(() => {
+                onOpenChange(false);
+            }, 1500);
+        } catch (err) {
+            showError('Failed to Issue Amount', err instanceof Error ? err.message : 'Failed to issue amount');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const renderRow = (label: string, value: string, isLast: boolean) => (
@@ -204,7 +246,7 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
-                                {["Cheque", "NEFT", "Cash"].map((option) => (
+                                {["Demand Draft (DD)", "NEFT/RTGS Transfer", "Cheque", "UPI Transfer"].map((option) => (
                                     <DropdownMenuItem
                                         key={option}
                                         onClick={() => setPaymentMode(option)}
@@ -257,9 +299,10 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
                         <Button
                             appearance="primary"
                             onClick={handleSubmit}
+                            disabled={loading || !paymentMode}
                             style={{ backgroundColor: "#0F6CBD", color: "white", minWidth: "80px" }}
                         >
-                            Submit
+                            {loading ? "Submitting..." : "Submit"}
                         </Button>
                     </div>
 

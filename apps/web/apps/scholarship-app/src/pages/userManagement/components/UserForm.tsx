@@ -26,12 +26,16 @@ const ProfileAvatar = ({ width = 80, height = 80, className = '' }: { width?: nu
   );
 };
 import { User, UserFormData, userRoleOptions } from "../types";
-import { mockUsers } from "../constants";
+import { userManagement } from "../../../services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
 
 const UserForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
+  const { success, error: showError } = useToast();
   const isEditMode = !!id;
+  const [loading, setLoading] = React.useState(false);
+  const [userRoles, setUserRoles] = React.useState<{ value: string; label: string }[]>([]);
   
   const [formData, setFormData] = React.useState<UserFormData>({
     name: "",
@@ -51,24 +55,46 @@ const UserForm: React.FC = () => {
     phoneNumber?: string;
   }>({});
 
+  // Load user roles from API
+  React.useEffect(() => {
+    const loadUserRoles = async () => {
+      try {
+        const roles = await userManagement.getUserTypes();
+        const mappedRoles = roles.map((role: { Id: number; Role_Name: string }) => ({
+          value: String(role.Id),
+          label: role.Role_Name,
+        }));
+        setUserRoles(mappedRoles);
+      } catch (err) {
+        showError('Failed to Load Roles', err instanceof Error ? err.message : 'Failed to fetch user roles');
+      }
+    };
+    void loadUserRoles();
+  }, [showError]);
+
   // Load user data if editing
   React.useEffect(() => {
-    if (isEditMode && id) {
-      const user = mockUsers.find((u) => u.id === id);
-      if (user) {
-        setFormData({
-          name: user.name,
-          userRole: user.userRole,
-          emailId: user.emailId,
-          phoneNumber: user.mobileNumber,
-          status: user.status,
-        });
-        if (user.profilePhoto) {
-          setProfilePhotoPreview(user.profilePhoto);
+    const loadUser = async () => {
+      if (isEditMode && id) {
+        try {
+          setLoading(true);
+          const userData = await userManagement.getUserById(id);
+          setFormData({
+            name: userData.User_Name || "",
+            userRole: String(userData.Role_Id || ""),
+            emailId: userData.EMail_Id || "",
+            phoneNumber: userData.Mobile_Number || "",
+            status: userData.IsActive === 1 ? "Active" : "Inactive",
+          });
+        } catch (err) {
+          showError('Failed to Load User', err instanceof Error ? err.message : 'Failed to fetch user data');
+        } finally {
+          setLoading(false);
         }
       }
-    }
-  }, [id, isEditMode]);
+    };
+    void loadUser();
+  }, [id, isEditMode, showError]);
 
   const handleInputChange = (field: keyof UserFormData, value: any) => {
     setFormData((prev) => ({
@@ -124,7 +150,7 @@ const UserForm: React.FC = () => {
     return phoneRegex.test(phone.replace(/\s/g, ""));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const newErrors: typeof errors = {};
 
     // Validate required fields
@@ -142,17 +168,20 @@ const UserForm: React.FC = () => {
     } else if (!validateEmail(formData.emailId)) {
       newErrors.emailId = "Please enter a valid email address";
     } else {
-      // Check for unique email
-      const existingUsersJson = sessionStorage.getItem("allUsers");
-      const allUsers: User[] = existingUsersJson ? JSON.parse(existingUsersJson) : mockUsers;
-      
-      const existingUser = allUsers.find(
-        (user) => 
-          user.emailId.toLowerCase() === formData.emailId.trim().toLowerCase() &&
-          (!isEditMode || user.id !== id)
-      );
-      if (existingUser) {
-        newErrors.emailId = "Email address must be unique. This email is already registered.";
+      // Check for unique email via API
+      try {
+        const checkResult = await userManagement.checkUserId(formData.emailId.trim());
+        if (checkResult.exists) {
+          // If editing, check if it's the same user
+          if (isEditMode && id && id === formData.emailId.trim()) {
+            // Same user, allow
+          } else {
+            newErrors.emailId = "Email address must be unique. This email is already registered.";
+          }
+        }
+      } catch (err) {
+        // If check fails, continue (might be network error)
+        console.warn('Failed to check email uniqueness', err);
       }
     }
 
@@ -170,45 +199,40 @@ const UserForm: React.FC = () => {
       return;
     }
 
-    // USR-002: New user accounts shall receive temporary password via email
-    // This would be handled by the backend API
-    if (!isEditMode) {
-      console.log("New user will receive temporary password via email");
-    }
+    try {
+      setLoading(true);
+      // Generate temporary password for new users (backend will handle email)
+      const tempPassword = isEditMode ? "TempPassword123!" : `Temp${Date.now()}`;
+      
+      const userData = {
+        userType: parseInt(formData.userRole, 10),
+        name: formData.name.trim(),
+        userName: formData.emailId.trim(), // Email is used as username
+        password: tempPassword, // Backend will encrypt
+        mobileNumber: formData.phoneNumber.trim(),
+        email: formData.emailId.trim().toLowerCase(),
+        isActive: formData.status === "Active" ? 1 : 0,
+      };
 
-    // USR-003: User role assignment determines all permission levels
-    // Map role to user type based on role hierarchy
-    const getUserType = (role: string): "Administrator" | "Manager" | "Standard User" => {
-      if (role === "CEO" || role === "Super Admin" || role === "Document Super Admin") {
-        return "Administrator";
-      } else if (role === "Scholarship Admin") {
-        return "Manager";
+      if (isEditMode && id) {
+        await userManagement.updateUser(userData);
+        success('Success', 'User updated successfully');
       } else {
-        return "Standard User";
+        await userManagement.createUser(userData);
+        success('Success', 'User created successfully. Temporary password sent via email.');
       }
-    };
-
-    // In a real app, this would make an API call
-    console.log("Saving user:", formData);
-    
-    // Store in sessionStorage to persist across navigation
-    const savedUser: User = {
-      id: isEditMode ? id! : `user-${Date.now()}`,
-      name: formData.name.trim(),
-      userRole: formData.userRole,
-      userType: getUserType(formData.userRole),
-      mobileNumber: formData.phoneNumber.trim(),
-      emailId: formData.emailId.trim().toLowerCase(),
-      status: formData.status,
-      profilePhoto: profilePhotoPreview || undefined,
-    };
-    
-    // Store in sessionStorage temporarily
-    sessionStorage.setItem("lastSavedUser", JSON.stringify(savedUser));
-    sessionStorage.setItem("userAction", isEditMode ? "edit" : "add");
-    
-    // Navigate back to list
-    navigate("/user-management");
+      
+      // Store action for list page refresh
+      sessionStorage.setItem("userAction", isEditMode ? "edit" : "add");
+      
+      // Navigate back to list
+      navigate("/user-management");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to save user';
+      showError('Save Failed', errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -427,7 +451,7 @@ const UserForm: React.FC = () => {
             </Label>
             <Select
               placeholder="Select"
-              options={userRoleOptions}
+              options={userRoles.length > 0 ? userRoles : userRoleOptions}
               selectedKey={formData.userRole}
               onValueChange={(value) => handleInputChange("userRole", value)}
               errorMessage={errors.userRole}
@@ -575,13 +599,14 @@ const UserForm: React.FC = () => {
           <Button
             appearance="primary"
             onClick={handleSave}
+            disabled={loading}
             style={{
               backgroundColor: "#0f6cbd",
               color: "#ffffff",
               minWidth: "100px",
             }}
           >
-            Save
+            {loading ? "Saving..." : (isEditMode ? "Update" : "Save")}
           </Button>
         </div>
       </Card>

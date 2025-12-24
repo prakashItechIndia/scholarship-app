@@ -1,0 +1,3665 @@
+[
+    {
+      "table_name": "T_ADMISSIONYEAR",
+      "column_name": "AdmissionYear_Id",
+      "data_type": "bigint",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ADMISSIONYEAR",
+      "column_name": "AdmissionYear_Code",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ADMISSIONYEAR",
+      "column_name": "AdmissionYear_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ADMISSIONYEAR",
+      "column_name": "Admission_MailId",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ADMISSIONYEAR",
+      "column_name": "Admission_ReplyTo_MailId",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ADMISSIONYEAR",
+      "column_name": "Admission_CC_MailId",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ADMISSIONYEAR",
+      "column_name": "Admission_BCC_MailId",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ADMISSIONYEAR",
+      "column_name": "Admission_Mail_Subject",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ADMISSIONYEAR",
+      "column_name": "Status",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ADMISSIONYEAR",
+      "column_name": "Delete_Flag",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ADMISSIONYEAR",
+      "column_name": "Created_By",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ADMISSIONYEAR",
+      "column_name": "Created_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ADMISSIONYEAR",
+      "column_name": "Modified_By",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ADMISSIONYEAR",
+      "column_name": "Modified_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_BASIC_SETTING",
+      "column_name": "Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_BASIC_SETTING",
+      "column_name": "Aram_MailId",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_BASIC_SETTING",
+      "column_name": "Aram_ReplyTo_MailId",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_BASIC_SETTING",
+      "column_name": "Aram_CC_MailId",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_BASIC_SETTING",
+      "column_name": "Aram_BCC_MailId",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_BASIC_SETTING",
+      "column_name": "Aram_Mail_Subject",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_BASIC_SETTING",
+      "column_name": "Service_StartDate",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_BASIC_SETTING",
+      "column_name": "Service_EndDate",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_BASIC_SETTING",
+      "column_name": "Status",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_BASIC_SETTING",
+      "column_name": "Aram_Mail_Body_1",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_CFG_ERRORLOG",
+      "column_name": "Error_ID",
+      "data_type": "bigint",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_CFG_ERRORLOG",
+      "column_name": "ProjectName",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_CFG_ERRORLOG",
+      "column_name": "FormName",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_CFG_ERRORLOG",
+      "column_name": "CustomerID",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_CFG_ERRORLOG",
+      "column_name": "ProcessName",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_CFG_ERRORLOG",
+      "column_name": "Severity",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_CFG_ERRORLOG",
+      "column_name": "ErrorDetails",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_CFG_ERRORLOG",
+      "column_name": "UserName",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_CFG_ERRORLOG",
+      "column_name": "RecordStatus",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_CFG_ERRORLOG",
+      "column_name": "Data_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_CFG_ERRORLOG",
+      "column_name": "IsDelete",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Country",
+      "column_name": "Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Country",
+      "column_name": "Country_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Country",
+      "column_name": "Country_Code",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Country",
+      "column_name": "Is_Active",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Country",
+      "column_name": "Created_By",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Country",
+      "column_name": "Created_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Country",
+      "column_name": "Is_Deleted",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Country",
+      "column_name": "Modified_By",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Country",
+      "column_name": "Modified_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Course_Type",
+      "column_name": "Course",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Course_Type",
+      "column_name": "DegreeType",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Course_Type",
+      "column_name": "Degree",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_DocType",
+      "column_name": "ID",
+      "data_type": "bigint",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_DocType",
+      "column_name": "Doc_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_DONOR_CATEGORIES",
+      "column_name": "Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_DONOR_CATEGORIES",
+      "column_name": "Account_Number",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_DONOR_CATEGORIES",
+      "column_name": "Donor_Types",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_DONOR_CATEGORIES",
+      "column_name": "Donation_Code",
+      "data_type": "nchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_DONOR_CATEGORIES",
+      "column_name": "Is_Active",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_DONOR_CATEGORIES",
+      "column_name": "Is_Deleted",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_DONOR_CATEGORIES",
+      "column_name": "Created_By",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_DONOR_CATEGORIES",
+      "column_name": "Created_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Receipt_Number",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Donation_Types",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Account_Number",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Name_Of_Donor",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Address",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "State_Id",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "State_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Country_Id",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Country_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "City",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Pincode",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Telephone_Number",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Mobile_Number",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Email_Id",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Payment_Mode",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Amount",
+      "data_type": "decimal",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Amount_In_Words",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "DD_OR_Cheque_Number",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "DD_OR_Cheque_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "DD_OR_Cheque_BankName",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "DD_OR_Cheque_Branch",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "PANcard_Number",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Location",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Receipt_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Is_Active",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Created_by",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Created_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Type",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Transaction_Reference_PGI_Number",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Bank_Reference_Number",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Transaction_Amount",
+      "data_type": "decimal",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Bank_Id",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Bank_Merchant_Id",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Transaction_Type",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Auth_Status",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Transaction_Date",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EChallan",
+      "column_name": "Auth_Status_Message",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EmailVerification",
+      "column_name": "Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EmailVerification",
+      "column_name": "Email",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EmailVerification",
+      "column_name": "VerificationToken",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EmailVerification",
+      "column_name": "ExpiresAt",
+      "data_type": "datetime",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EmailVerification",
+      "column_name": "CreatedAt",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_EmailVerification",
+      "column_name": "UsedAt",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_ApplicantDocuments",
+      "column_name": "Registration_ID",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_ApplicantDocuments",
+      "column_name": "Application_Id",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_ApplicantDocuments",
+      "column_name": "DocumentType",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_ApplicantDocuments",
+      "column_name": "DocumentPath",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_ApplicantDocuments",
+      "column_name": "Is_Verified",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_ApplicantDocuments",
+      "column_name": "Is_Valid",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Registration_Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Sch_Year",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Scholarship_For",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Application_Id",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Applicant_Type",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Student_ID",
+      "data_type": "nchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "ApplicationID_SAI_EAdmission",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Applicant_Name",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Guardian_Name",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Father_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Father_Occupation",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Father_Occupation_Other",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Father_OfficeName",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Father_AnnualIncome",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Mother_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Mother_Occupation",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Mother_Occupation_Other",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Mother_OfficeName",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Mother_AnnualIncome",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Parent_AnnualIncome",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Address_Line1",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Address_Line2",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "City",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "PinCode",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "State",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "District",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Country",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Mobile_Number",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Email",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Date_Of_Birth",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Gender",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Community",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Caste",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Class_Studying",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Board_Of_Studying",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Type_Of_Institution",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Cource_Of_Studying",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Degree_Type",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Degree",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Other_Degree",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Ph_D",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Specialization",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Institution_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Department_Studying",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "University",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Current_Year",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Current_Semester",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "PCM",
+      "data_type": "varchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Aadhaar_ID",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Pan_ID",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Bank_Account_Number",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Bank_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Bank_Branch",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "IFSC_Code",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Scholarship_Status",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Scholarship_No",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Payment_Mode",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Payment_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "NetBanking_RefNo",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "DDCheque_No",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "DDCheque_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Scholarship_Issued_Date",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Scholarship_Issued_BankName",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Scholarship_Issued_BankBranch",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "User_ID",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Data_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Scholarship_Year_Id",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Photo",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Status",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "IsUpload_Status",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "IsVerify",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Scholar_Reject",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Remark_Reject",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Request_Amount",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Scholarship_Suggest_Amount",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Scholarship_Approved_Amount",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Scholarship_Issued_Amount",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Scholarship_Issued_AccNo",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Merit_Amount",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "DDCheque_In_Favor",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "DDCheque_Path",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Verifed_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Update_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Suggesred_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Approved_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Donated_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "UpdatedBy",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Prepared_By",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Verified_By",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Suggested_By",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Trustee",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "DDCheque_In_Favor_Type",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "DDCheque_Path_ForCrystal",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "DDCheque_IssuedBy",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "DDCheque_Institution_ID",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "DDCheque_Other_Institution",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "AppliedOtherScholarship",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Guardian_Occupation",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Guardian_Occupation_Other",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Guardian_AnnualIncome",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Guardian_OfficeName",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Father_Designation",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Mother_Designation",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_Registration",
+      "column_name": "Guardian_Designation",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_esch_ScholarshipYear",
+      "column_name": "Scholarship_Year",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Registration_Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Scholarship_Year_Id",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Sch_Year",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Scholarship_For",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Application_Id",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Applicant_Type",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Student_ID",
+      "data_type": "nchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "ApplicationID_SAI_EAdmission",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Applicant_Name",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Gender",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Date_Of_Birth",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Mobile_Number",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Email",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Father_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Father_Occupation",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Father_Occupation_Other",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Father_OfficeName",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Father_Designation",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Father_AnnualIncome",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Mother_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Mother_Occupation",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Mother_Occupation_Other",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Mother_OfficeName",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Mother_Designation",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Mother_AnnualIncome",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Guardian_Name",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Guardian_Occupation",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Guardian_Occupation_Other",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Guardian_OfficeName",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Guardian_Designation",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Guardian_AnnualIncome",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Address_Line1",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Address_Line2",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "City",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "PinCode",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "State",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "District",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Country",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Community",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Caste",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Photo",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Class_Studying",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Board_Of_Studying",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Type_Of_Institution",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Cource_Of_Studying",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Degree_Type",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Degree",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Other_Degree",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Ph_D",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Specialization",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Institution_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Department_Studying",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "University",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Current_Year",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Current_Semester",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "PCM",
+      "data_type": "varchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Aadhaar_ID",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Pan_ID",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Bank_Account_Number",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Bank_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Bank_Branch",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "IFSC_Code",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "AppliedOtherScholarship",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "User_ID",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration",
+      "column_name": "Data_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Process_Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Application_Id",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Scholarship_Id",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Scholarship_Status",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Scholarship_No",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Request_Amount",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Payment_Mode",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Payment_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "NetBanking_RefNo",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "DDCheque_No",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "DDCheque_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Scholarship_Issued_Date",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Scholarship_Issued_BankName",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Scholarship_Issued_BankBranch",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Scholarship_Suggest_Amount",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Scholarship_Approved_Amount",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Scholarship_Issued_Amount",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Scholarship_Issued_AccNo",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Merit_Amount",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "DDCheque_In_Favor_Type",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "DDCheque_In_Favor",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "DDCheque_Path",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "DDCheque_Path_ForCrystal",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "DDCheque_IssuedBy",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "DDCheque_Institution_ID",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "DDCheque_Other_Institution",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Scholar_Reject",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Remark_Reject",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Prepared_By",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Verified_By",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Suggested_By",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Trustee",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Verifed_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Update_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Suggesred_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Approved_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Donated_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "IsUpload_Status",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "IsVerify",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Status",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "User_ID",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "t_Registration_Process",
+      "column_name": "Data_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ROLES",
+      "column_name": "Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ROLES",
+      "column_name": "Role_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ROLES",
+      "column_name": "Is_Active",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ROLES",
+      "column_name": "Is_Deleted",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ROLES_PRIVILEGE",
+      "column_name": "Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ROLES_PRIVILEGE",
+      "column_name": "Roles_Id",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ROLES_PRIVILEGE",
+      "column_name": "Screens_Id",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_ROLES_PRIVILEGE",
+      "column_name": "Is_Active",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_CFG",
+      "column_name": "Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_CFG",
+      "column_name": "Issued_By",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_CFG",
+      "column_name": "Is_Deleted",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "ScholarshipYear_Id",
+      "data_type": "bigint",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "ScholarshipYear_Prefix",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "ScholarshipYear_Code",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "ScholarshipYear_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "Scholarship_MailId",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "Scholarship_ReplyTo_MailId",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "Scholarship_CC_MailId",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "Scholarship_BCC_MailId",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "Scholarship_Mail_Subject",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "Status",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "Delete_Flag",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "Created_By",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "Created_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "Modified_By",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_Scholarship_Year",
+      "column_name": "Modified_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_SCREENS",
+      "column_name": "Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_SCREENS",
+      "column_name": "Screen_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_SCREENS",
+      "column_name": "URL",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_SCREENS",
+      "column_name": "Is_Active",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_SCREENS",
+      "column_name": "Is_Deleted",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_State",
+      "column_name": "Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_State",
+      "column_name": "Country_Id",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_State",
+      "column_name": "State_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_State",
+      "column_name": "Is_Active",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_State",
+      "column_name": "Created_By",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_State",
+      "column_name": "Created_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_State",
+      "column_name": "Is_Deleted",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_State",
+      "column_name": "Modified_By",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_State",
+      "column_name": "Modified_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER",
+      "column_name": "Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER",
+      "column_name": "Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER",
+      "column_name": "User_Type",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER",
+      "column_name": "User_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER",
+      "column_name": "Password",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER",
+      "column_name": "Mobile_Number",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER",
+      "column_name": "Location",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER",
+      "column_name": "E_Mail",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER",
+      "column_name": "Is_Active",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER",
+      "column_name": "Created_By",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER",
+      "column_name": "Created_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER",
+      "column_name": "Is_Deleted",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER",
+      "column_name": "Modified_By",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER",
+      "column_name": "Modified_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_User_Activites",
+      "column_name": "Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_User_Activites",
+      "column_name": "EChallan_Id",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_User_Activites",
+      "column_name": "Type",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_User_Activites",
+      "column_name": "Done_By",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_User_Activites",
+      "column_name": "CurrentDate",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_User_Activites",
+      "column_name": "CurrentTime",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER_ROLES_ASSIGN",
+      "column_name": "Id",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER_ROLES_ASSIGN",
+      "column_name": "Roles_Id",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER_ROLES_ASSIGN",
+      "column_name": "User_Id",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "T_USER_ROLES_ASSIGN",
+      "column_name": "Is_Active",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_HISTORY",
+      "column_name": "ID",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": "TBL_HISTORY",
+      "parent_column": "ID"
+    },
+    {
+      "table_name": "TBL_HISTORY",
+      "column_name": "Application_Id",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_HISTORY",
+      "column_name": "Process",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_HISTORY",
+      "column_name": "Action",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_HISTORY",
+      "column_name": "Data_Date",
+      "data_type": "datetime",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_HISTORY",
+      "column_name": "User_Id",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_STATE_LIST",
+      "column_name": "COUNTRY_ID",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_STATE_LIST",
+      "column_name": "STATE_ID",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_STATE_LIST",
+      "column_name": "STATE_NAME",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "ID",
+      "data_type": "int",
+      "is_nullable": false,
+      "key_type": "PK",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "User_ID",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "Password",
+      "data_type": "nvarchar",
+      "is_nullable": false,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "Password_Change",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "Department",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "IsActive",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "IsDeleted",
+      "data_type": "bit",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "Created_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "Created_By",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "Modified_Date",
+      "data_type": "datetime",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "Modified_By",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "Role_Id",
+      "data_type": "int",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "User_Name",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "Mobile_Number",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    },
+    {
+      "table_name": "TBL_USERMASTER",
+      "column_name": "EMail_Id",
+      "data_type": "nvarchar",
+      "is_nullable": true,
+      "key_type": "",
+      "parent_table": null,
+      "parent_column": null
+    }
+  ]

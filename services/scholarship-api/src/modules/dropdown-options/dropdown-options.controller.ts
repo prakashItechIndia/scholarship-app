@@ -126,5 +126,19 @@ export class DropdownOptionsController {
   async getApplicantCategories() {
     return this.dropdownService.getApplicantCategories();
   }
+
+  @Get('degrees')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get degree options by course and degree type' })
+  @ApiResponse({
+    status: 200,
+    description: 'Degree options retrieved successfully',
+  })
+  async getDegrees(
+    @Query('course') course: string,
+    @Query('degreeType') degreeType: string,
+  ) {
+    return this.dropdownService.getDegrees(course, degreeType);
+  }
 }
 
