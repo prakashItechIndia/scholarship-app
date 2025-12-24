@@ -12,12 +12,14 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 import { AppModule } from './app.module';
 import type { EnvVars } from './config/env.validation';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
 
   const configService = app.get(ConfigService<EnvVars, true>);
 
@@ -163,6 +165,25 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix(globalPrefix);
+
+  // Serve static files from uploads directory
+  const uploadBasePath =
+    process.env.UPLOAD_BASE_PATH || join(process.cwd(), 'uploads');
+  
+  // Serve files from uploads directory at /uploads path
+  app.useStaticAssets(uploadBasePath, {
+    prefix: '/uploads',
+    setHeaders: (res, path) => {
+      // Set appropriate headers for different file types
+      if (path.endsWith('.pdf')) {
+        res.setHeader('Content-Type', 'application/pdf');
+      } else if (path.match(/\.(jpg|jpeg|png|gif)$/i)) {
+        res.setHeader('Content-Type', `image/${path.split('.').pop()?.toLowerCase()}`);
+      }
+      // Enable CORS for uploaded files
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    },
+  });
 
   // Register global input sanitization interceptor for XSS protection
   // Lazy load to avoid top-level require() causing watch mode restarts
