@@ -8,8 +8,16 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  UseInterceptors,
+  UploadedFile,
+  UploadedFiles,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
+  BadRequestException,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { DocumentUploadService } from './document-upload.service';
 
 @ApiTags('Document Upload')
@@ -41,7 +49,178 @@ export class DocumentUploadController {
 
   @Post('upload')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Upload document' })
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Upload document with file' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+        applicationId: {
+          type: 'string',
+        },
+        documentType: {
+          type: 'string',
+        },
+        uploadedBy: {
+          type: 'number',
+        },
+      },
+      required: ['file', 'applicationId', 'documentType'],
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Document uploaded successfully',
+  })
+  async uploadDocumentFile(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10MB
+          new FileTypeValidator({
+            fileType: /(jpg|jpeg|png|pdf|doc|docx)$/,
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Body('applicationId') applicationId: string,
+    @Body('documentType') documentType: string,
+    @Body('uploadedBy') uploadedBy?: number,
+  ) {
+    return this.documentService.uploadDocumentFile(
+      applicationId,
+      documentType,
+      file,
+      uploadedBy ? Number(uploadedBy) : undefined,
+    );
+  }
+
+  @Post('upload-multiple')
+  @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(FilesInterceptor('files', 10))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Upload multiple documents' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+        applicationId: {
+          type: 'string',
+        },
+        documentTypes: {
+          type: 'string',
+          description: 'Comma-separated list of document types',
+        },
+        uploadedBy: {
+          type: 'number',
+        },
+      },
+      required: ['files', 'applicationId', 'documentTypes'],
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Documents uploaded successfully',
+  })
+  async uploadMultipleDocuments(
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 20 * 1024 * 1024 }), // 20MB per file
+          new FileTypeValidator({
+            fileType: /(jpg|jpeg|png|pdf|doc|docx)$/,
+          }),
+        ],
+        fileIsRequired: true,
+      }),
+    )
+    files: Express.Multer.File[],
+    @Body('applicationId') applicationId: string,
+    @Body('documentTypes') documentTypes: string,
+    @Body('uploadedBy') uploadedBy?: number,
+  ) {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('At least one file is required');
+    }
+    if (!applicationId) {
+      throw new BadRequestException('Application ID is required');
+    }
+    if (!documentTypes) {
+      throw new BadRequestException('Document types are required');
+    }
+    
+    const types = documentTypes.split(',').map((t) => t.trim());
+    
+    if (files.length !== types.length) {
+      throw new BadRequestException(
+        `Number of files (${files.length}) must match number of document types (${types.length})`,
+      );
+    }
+    
+    return this.documentService.uploadMultipleDocuments(
+      applicationId,
+      files,
+      types,
+      uploadedBy ? Number(uploadedBy) : undefined,
+    );
+  }
+
+  @Post('upload-photo')
+  @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(FileInterceptor('photo'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Upload student photo' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        photo: {
+          type: 'string',
+          format: 'binary',
+        },
+        applicationId: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Photo uploaded successfully',
+  })
+  async uploadPhoto(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
+          new FileTypeValidator({
+            fileType: /(jpg|jpeg|png)$/,
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Body('applicationId') applicationId: string,
+  ) {
+    return this.documentService.uploadPhoto(applicationId, file);
+  }
+
+  @Post('upload-legacy')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Upload document (legacy - accepts path directly)' })
   @ApiResponse({
     status: 201,
     description: 'Document uploaded successfully',

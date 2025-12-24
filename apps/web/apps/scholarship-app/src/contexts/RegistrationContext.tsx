@@ -9,7 +9,7 @@ import {
 } from 'react';
 
 // Define a more specific type for form data
-export type RegistrationFormData = Record<string, string | number | Date | File[] | undefined | null>;
+export type RegistrationFormData = Record<string, string | number | Date | File | File[] | undefined | null>;
 
 export interface PreviousButtonConfig {
   onPrevious?: () => void | Promise<void>;

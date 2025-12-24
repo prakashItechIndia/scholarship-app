@@ -3,7 +3,7 @@ import { Stack, Text, IStackStyles, IStackTokens, mergeStyles, FontWeights, Defa
 import { useRegistration } from '@/contexts/RegistrationContext';
 import loaderGif from '@shared/assets/icons/loader.gif';
 import { PencilIcon } from '@shared/components';
-import { scholarshipApplication } from '@/services/scholarship.service';
+import { scholarshipApplication, documentUpload } from '@/services/scholarship.service';
 import { useToast } from '@/components/ui/toast';
 
 // --- Styles ---
@@ -181,6 +181,9 @@ const ReviewSubmit = () => {
                 Aadhaar_ID: formData.aadhaarId || '',
                 Pan_ID: formData.panId || '',
                 Scholarship_Year_Id: formData.scholarshipYearId || null,
+                schYearId: formData.scholarshipYearId || null,
+                schYear: '', // Will be fetched by backend if missing
+                scholarshipFor: formData.bankScholarshipSeekingFor || '',
                 
                 // Personal Details
                 Applicant_Name: formData.studentName || '',
@@ -188,6 +191,7 @@ const ReviewSubmit = () => {
                 Gender: formData.gender || '',
                 Community: formData.community || '',
                 Caste: formData.caste || '',
+                AppliedOtherScholarship: formData.scholarshipApplied || '',
                 Date_Of_Birth: formData.dob 
                     ? (typeof formData.dob === 'string' 
                         ? formData.dob 
@@ -217,11 +221,18 @@ const ReviewSubmit = () => {
                 Father_AnnualIncome: formData.annualIncome || '',
                 
                 // Bank Details
-                Bank_Account_Number: formData.accountNumber || '',
+                Bank_Account_Number: formData.bankAccountNumber || '',
                 Bank_Name: formData.bankName || '',
                 Bank_Branch: formData.bankBranch || '',
-                IFSC_Code: formData.ifscCode || '',
-                Scholarship_Issued_AccNo: formData.accountHolderName || '',
+                IFSC_Code: formData.bankIfscCode || '',
+                RequestAmount: formData.bankRequestAmount 
+                    ? (typeof formData.bankRequestAmount === 'string' 
+                        ? parseFloat(formData.bankRequestAmount) 
+                        : (typeof formData.bankRequestAmount === 'number' 
+                            ? formData.bankRequestAmount 
+                            : 0))
+                    : 0,
+                Scholarship_Issued_AccNo: formData.bankAccountName || '',
                 
                 // Educational Details (if available in formData)
                 Class_Studying: formData.classStudying || '',
@@ -245,6 +256,69 @@ const ReviewSubmit = () => {
             const responseData = (response as unknown) as { Application_Id?: string; applicationId?: string; [key: string]: unknown };
             const appNumber = responseData?.Application_Id ?? responseData?.applicationId ?? 'AF2510001';
             setApplicationNumber(appNumber);
+            
+            // Upload documents if available
+            const documents = formData.documents;
+            if (Array.isArray(documents) && documents.length > 0) {
+                try {
+                    // Map file names to document types
+                    // Try to infer document type from filename or use generic names
+                    const documentTypes = documents.map((file, index) => {
+                        const fileName = file.name.toLowerCase();
+                        // Try to match common document types from filename
+                        if (fileName.includes('birth') || fileName.includes('birthcertificate')) {
+                            return 'BirthCertificate';
+                        } else if (fileName.includes('aadhaar') || fileName.includes('aadhar') || fileName.includes('uid')) {
+                            return 'AadharID';
+                        } else if (fileName.includes('pan') || fileName.includes('pancard')) {
+                            return 'PanCard';
+                        } else if (fileName.includes('student') && fileName.includes('id')) {
+                            return 'StudentIDCard';
+                        } else if (fileName.includes('ration')) {
+                            return 'RationCard';
+                        } else if (fileName.includes('voter')) {
+                            return 'VoterID';
+                        } else if (fileName.includes('driving') || fileName.includes('license')) {
+                            return 'DrivingLicense';
+                        } else if (fileName.includes('bank') || fileName.includes('passbook')) {
+                            return 'BankPassBook';
+                        } else if (fileName.includes('bonafide') && fileName.includes('student')) {
+                            return 'BonafideStudent';
+                        } else if (fileName.includes('bonafide') && fileName.includes('parent')) {
+                            return 'BonafideParent';
+                        } else if (fileName.includes('academic') || fileName.includes('performance')) {
+                            return 'AcademicPerformance';
+                        } else if (fileName.includes('letter')) {
+                            return 'Letter';
+                        } else {
+                            // Use generic document type with index
+                            return `Document_${index + 1}`;
+                        }
+                    });
+
+                    // Upload all documents
+                    await documentUpload.uploadMultipleDocuments(
+                        appNumber,
+                        documents,
+                        documentTypes,
+                    );
+                } catch (docError) {
+                    console.error('Error uploading documents:', docError);
+                    // Don't fail the entire submission if document upload fails
+                    // Just log the error
+                }
+            }
+
+            // Upload photo if available
+            const photo = formData.photo;
+            if (photo instanceof File) {
+                try {
+                    await documentUpload.uploadPhoto(appNumber, photo);
+                } catch (photoError) {
+                    console.error('Error uploading photo:', photoError);
+                    // Don't fail the entire submission if photo upload fails
+                }
+            }
             
             setIsSubmitting(false);
             setIsSuccess(true);
