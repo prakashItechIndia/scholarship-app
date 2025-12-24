@@ -14,6 +14,7 @@ const ProcessTabs: React.FC<ProcessTabsProps> = ({ activeTab, onTabChange }) => 
         display: "flex",
         gap: "24px",
         borderBottom: "none",
+        padding: "12px"
       }}>
         {tabLabels.map((tab) => {
           const isActive = activeTab === tab.value;
@@ -32,7 +33,7 @@ const ProcessTabs: React.FC<ProcessTabsProps> = ({ activeTab, onTabChange }) => 
                 border: "none",
                 borderBottom: `2px solid ${isActive ? "#0f6cbd" : "transparent"}`,
                 cursor: "pointer",
-                marginBottom: "-1px", // Pull border down to overlap container border
+                marginBottom: "12px", // Pull border down to overlap container border
                 transition: "all 0.2s",
                 outline: "none",
               }}

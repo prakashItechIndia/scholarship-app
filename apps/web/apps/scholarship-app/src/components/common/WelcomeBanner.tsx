@@ -13,14 +13,6 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
   className,
   style,
 }) => {
-  // Get current date in format: "Monday, January 15, 2025"
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-
   return (
     <div
       className={className}
@@ -54,7 +46,7 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
           paddingLeft: "25px",
         }}
       >
-        {greeting} {currentDate}
+        {greeting}
       </p>
     </div>
   );

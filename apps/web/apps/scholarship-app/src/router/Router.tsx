@@ -5,7 +5,6 @@ import { AuthenticatedRedirect } from '../components/auth/AuthenticatedRedirect'
 import { ErrorBoundary } from '../components/common/ErrorBoundary';
 import { LoadingScreen } from '../components/layout/LoadingScreen';
 import { ProcessLayout } from '../components/layout/ProcessLayout';
-// import LandingPage from '@/pages/Landing.tsx';
 
 // Lazy load pages with code splitting
 const SignInPage = lazy(() => import('../pages/auth/SignIn.tsx'));

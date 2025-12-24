@@ -128,15 +128,16 @@ const RoleManagementPage: React.FC = () => {
       boxSizing: "border-box",
     }}>
       {/* Title and Action Buttons */}
-      <div style={{ padding: "24px 24px 16px 24px" }}>
+      <div style={{ padding: "16px 24px 0px 24px" }}>
         <PageActionButtons
           title={
-            <div style={{ lineHeight: "1.2" }}>
+            <div style={{  }}>
               <div style={{
                 fontSize: "16px",
                 fontWeight: 600,
                 color: "#242424",
-                fontFamily: "'Inter', sans-serif",
+                // fontFamily: "'Inter', sans-serif",
+                lineHeight: "22px",
               }}>
                 Role and Permissions
               </div>
@@ -146,6 +147,7 @@ const RoleManagementPage: React.FC = () => {
                 color: "#242424",
                 fontFamily: "'Inter', sans-serif",
                 marginTop: "2px",
+                lineHeight: "22px",
               }}>
                 Maintain Roles, Rights, and User Information
               </div>

@@ -101,18 +101,26 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
             open={open}
             onOpenChange={onOpenChange}
             size="md"
-            title={isSubmitted ? "Success" : "LEO MUTHO - Scholarship Approve Panel"}
             headerContent={
                 !isSubmitted ? (
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                        <span style={{ fontSize: "16px", fontWeight: 600, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", gap: "20px" }}>
+                        <span style={{
+                            fontSize: "16px",
+                            fontWeight: 600,
+                            color: "#242424",
+                            fontFamily: "'Inter', sans-serif",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            flex: 1
+                        }}>
                             LEO MUTHU - Scholarship Approve Panel ( 2024-2025 )
                         </span>
                         <Button
                             appearance="subtle"
                             icon={<Dismiss24Regular />}
                             onClick={() => onOpenChange(false)}
-                            style={{ padding: 0, minWidth: "32px" }}
+                            style={{ padding: 0, minWidth: "32px", flexShrink: 0 }}
                             aria-label="Close"
                         />
                     </div>

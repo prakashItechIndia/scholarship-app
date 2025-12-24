@@ -1,7 +1,14 @@
 import * as React from "react";
 import { Button, Dropdown, Option, Text } from "@fluentui/react-components";
-import { ChevronLeft20Regular, ChevronRight20Regular } from "@fluentui/react-icons";
+import {
+  ChevronDownRegular,
+  ChevronLeft20Regular,
+  ChevronRight20Regular,
+  ChevronDoubleLeft20Regular,
+  ChevronDoubleRight20Regular
+} from "@fluentui/react-icons";
 import { cn } from "../lib/utils";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown";
 
 export interface PaginationProps {
   currentPage: number;
@@ -82,29 +89,33 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
     return (
       <div
         ref={ref}
-        className={cn("flex flex-row items-center justify-between gap-4 w-full px-4 py-2", className)}
+        className={cn("flex flex-row items-center justify-between gap-4", className)}
+        style={{ width: "100%", height: "2.5rem", paddingLeft: "1rem", paddingRight: "1rem", position: "relative" }}
       >
-        <div className="flex-1 text-left">
-          <Text className="whitespace-nowrap">{startItem}-{endItem} of {totalItems} items</Text>
+        {/* Left: Item count */}
+        <div style={{ position: "absolute", left: "1rem" }}>
+          <Text className="whitespace-nowrap" style={{ fontSize: "0.875rem", color: "#616161" }}>
+            {startItem}-{endItem} of {totalItems} items
+          </Text>
         </div>
 
-        <div className="flex items-center gap-[3px] justify-center">
+        {/* Center: Pagination controls */}
+        <div className="flex items-center gap-[3px]" style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
           {showPageNumbers && (
             <div className="flex items-center gap-[3px]">
               {showFirstLast && (
                 <Button
                   appearance="subtle"
-                  style={{ minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0, backgroundColor: "#fff" }}
+                  style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
+                  icon={<ChevronDoubleLeft20Regular />}
                   onClick={() => onPageChange(1)}
                   disabled={currentPage === 1}
                   aria-label="First page"
-                >
-                  &laquo;
-                </Button>
+                />
               )}
               <Button
                 appearance="subtle"
-                style={{ minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0, backgroundColor: "white" }}
+                style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
                 icon={<ChevronLeft20Regular />}
                 onClick={() => onPageChange(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
@@ -120,7 +131,7 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
                         key={page}
                         appearance="subtle"
                         style={{
-                          minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0,
+                          minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0,
                           backgroundColor: currentPage === page ? "#f5f5f5" : "white",
                           fontWeight: currentPage === page ? "bold" : "normal"
                         }}
@@ -138,7 +149,7 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
                     key={page}
                     appearance="subtle"
                     style={{
-                      minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0,
+                      minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0,
                       backgroundColor: currentPage === page ? "#f5f5f5" : "white",
                       fontWeight: currentPage === page ? "bold" : "normal"
                     }}
@@ -153,7 +164,7 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
 
               <Button
                 appearance="subtle"
-                style={{ minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0, backgroundColor: "white" }}
+                style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
                 icon={<ChevronRight20Regular />}
                 onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
@@ -162,37 +173,67 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
               {showFirstLast && (
                 <Button
                   appearance="subtle"
-                  style={{ minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0, backgroundColor: "white" }}
+                  style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
+                  icon={<ChevronDoubleRight20Regular />}
                   onClick={() => onPageChange(totalPages)}
                   disabled={currentPage === totalPages}
                   aria-label="Last page"
-                >
-                  &raquo;
-                </Button>
+                />
               )}
             </div>
           )}
         </div>
 
-        <div className="flex-1 flex justify-end gap-2 items-center">
+        {/* Right: Items per page */}
+
+        <div
+          className="flex gap-2 items-center"
+          style={{ position: "absolute", right: "1rem" }}
+        >
           {showPageSize && onPageSizeChange && (
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <Dropdown
-                value={String(pageSize)}
-                onOptionSelect={handlePageSizeChange}
-                style={{ minWidth: 60 }}
-              >
-                {pageSizeOptions.map((size) => (
-                  <Option key={size} text={String(size)} value={String(size)}>
-                    {size}
-                  </Option>
-                ))}
-              </Dropdown>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <div
+                    style={{
+                      minWidth: "6px",
+                      padding: "4px 8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      cursor: "pointer",
+                      backgroundColor: "transparent",
+                      border: "none",
+                    }}
+                  >
+                    {pageSize}
+                    <ChevronDownRegular style={{ marginLeft: "4px" }} />
+                  </div>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent>
+                  {pageSizeOptions.map((size) => (
+                    <DropdownMenuItem
+                      key={size}
+                      onClick={() => onPageSizeChange(size)}
+                      style={{
+                        fontWeight: size === pageSize ? "bold" : "normal",
+                        color: size === pageSize ? "#242424" : "#616161",
+                      }}
+                    >
+                      {size}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <Text style={{ whiteSpace: "nowrap" }}>Items per page</Text>
             </div>
           )}
         </div>
-      </div>
+
+
+      </div >
     );
   }
 );

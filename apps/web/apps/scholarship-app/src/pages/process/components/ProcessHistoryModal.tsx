@@ -87,12 +87,7 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
             open={open}
             onOpenChange={onOpenChange}
             size="xl" // Adjusted size to accommodate table
-            title={
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
-                    <span style={{ fontSize: "18px", fontWeight: 600 }}>History Against Application Number : {applicationNo}</span>
 
-                </div>
-            }
             // Custom header to include actions
             headerContent={
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", gap: "60px" }}>
