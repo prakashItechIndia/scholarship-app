@@ -14,6 +14,7 @@ import {
   MoreVerticalRegular,
   ChevronDownRegular,
   SearchRegular,
+  FilterRegular,
 } from "@fluentui/react-icons";
 import PDFViewerModal from "../../components/PDFViewerModal";
 import ViewDocumentsDrawer from "../../components/ViewDocumentsDrawer";
@@ -22,7 +23,6 @@ import { ApplicationData } from "./types";
 import { tabDataMap, tabTotalItemsMap } from "./constants";
 import { useProcessTable } from "./hooks/useProcessTable";
 import ProcessTabs from "./components/ProcessTabs";
-import ProcessFilters from "./components/ProcessFilters";
 import DocumentUploadPanel from "./components/DocumentUploadPanel";
 import ProcessHistoryModal from "./components/ProcessHistoryModal";
 import ScholarshipHistoryModal from "./components/ScholarshipHistoryModal";
@@ -68,7 +68,6 @@ const ProcessPage: React.FC = () => {
   const [viewModalOpen, setViewModalOpen] = React.useState(false);
   const [editModalOpen, setEditModalOpen] = React.useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
-  const [filterPopoverOpen, setFilterPopoverOpen] = React.useState(false);
   const [pdfViewerOpen, setPdfViewerOpen] = React.useState(false);
   const [viewDocumentsDrawerOpen, setViewDocumentsDrawerOpen] = React.useState(false);
   const [selectedPdfUrl, setSelectedPdfUrl] = React.useState<string | undefined>();
@@ -355,6 +354,7 @@ const ProcessPage: React.FC = () => {
             alignItems: "center",
             gap: "12px",
             marginBottom: "12px",
+            paddingRight: "24px",
             flexShrink: 0,
           }}>
             <div>
@@ -374,11 +374,43 @@ const ProcessPage: React.FC = () => {
               </Button>
 
             </div>
-            <ProcessFilters
-              open={filterPopoverOpen}
-              onOpenChange={setFilterPopoverOpen}
 
-            />
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button
+                  appearance="outline"
+                  aria-label="Filter"
+                  style={{
+                    width: "32px",
+                    minWidth: "32px",
+                    maxWidth: "32px",
+                    height: "32px",
+                    padding: 0,
+                    borderColor: "#d1d5db",
+                    backgroundColor: "#fff",
+                  }}
+                >
+                  <FilterRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => console.log("Application No clicked")}>
+                  Application No
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => console.log("Aadhaar ID clicked")}>
+                  Aadhaar ID
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => console.log("Mobile No clicked")}>
+                  Mobile No
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => console.log("Name clicked")}>
+                  Name
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => console.log("Student ID clicked")}>
+                  Student ID
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <Button
               appearance="outline"
