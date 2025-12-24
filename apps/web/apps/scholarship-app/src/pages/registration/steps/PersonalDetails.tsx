@@ -1,11 +1,16 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { z } from 'zod';
-import { Stack, IChoiceGroupOption, Text } from '@fluentui/react';
+import { Stack, IChoiceGroupOption, Text, MessageBar, MessageBarType } from '@fluentui/react';
 import { useRegistrationForm } from '../hooks/useRegistrationForm';
+import { useRegistration } from '@/contexts/RegistrationContext';
+import { dropdownOptions } from '@/services/scholarship.service';
 import { StepLayout } from '../components/StepLayout';
 import { getStringValue, getDateValue } from '../utils/registrationHelpers';
 import { STACK_TOKENS, SECTION_HEADER_CLASS } from '../utils/registrationConstants';
 import { InputField, SelectField, DatePickerField, ChoiceGroupField, FormRowContainer, FormRow } from '../components';
+import { Input } from '@shared/components';
+import { Controller } from 'react-hook-form';
+import { FormField } from '../components/FormField';
 // ProfileAvatar component - SVG as React component
 export const ProfileAvatar = ({ width = 80, height = 80, className = '' }: { width?: number; height?: number; className?: string }) => {
   return (
@@ -70,19 +75,7 @@ const GENDER_OPTIONS: IChoiceGroupOption[] = [
     { key: 'other', text: 'Other' },
 ];
 
-const COMMUNITY_OPTIONS = [
-    { value: 'oc', label: 'OC' },
-    { value: 'bc', label: 'BC' },
-    { value: 'mbc', label: 'MBC' },
-    { value: 'sc', label: 'SC' },
-    { value: 'st', label: 'ST' },
-];
-
-// Mock options (usually fetched from API)
-const CASTE_OPTIONS = [{ value: 'caste1', label: 'Caste 1' }, { value: 'caste2', label: 'Caste 2' }];
-const DISTRICT_OPTIONS = [{ value: 'chennai', label: 'Chennai' }, { value: 'kancheepuram', label: 'Kancheepuram' }];
-const STATE_OPTIONS = [{ value: 'tn', label: 'Tamil Nadu' }, { value: 'ka', label: 'Karnataka' }];
-const COUNTRY_OPTIONS = [{ value: 'in', label: 'India' }];
+// Options will be loaded from API
 
 
 
@@ -113,8 +106,179 @@ const PersonalDetails = () => {
         },
     });
 
-    const { control, handleSubmit, formState: { errors } } = form;
+    const { control, handleSubmit, formState: { errors }, watch, setValue } = form;
+    const { formData, updateFormData } = useRegistration();
     const [isHovered, setIsHovered] = useState(false);
+    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+    const [photoError, setPhotoError] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    
+    // Get email from localStorage (pre-populated from registration)
+    const [userEmail, setUserEmail] = useState<string>('');
+
+    // Dropdown options state
+    const [communityOptions, setCommunityOptions] = useState<{ value: string; label: string }[]>([]);
+    const [districtOptions, setDistrictOptions] = useState<{ value: string; label: string }[]>([]);
+    const [stateOptions, setStateOptions] = useState<{ value: string; label: string }[]>([]);
+    const [countryOptions, setCountryOptions] = useState<{ value: string; label: string }[]>([]);
+
+    // Watch for changes to trigger dependent dropdowns
+    const selectedCountry = watch('country');
+    const selectedState = watch('state');
+
+    // Load email from localStorage on mount
+    useEffect(() => {
+        const authData = localStorage.getItem('scholarship_auth');
+        if (authData) {
+            try {
+                const parsedAuth = JSON.parse(authData) as { email?: string };
+                const email = parsedAuth?.email ?? '';
+                if (email) {
+                    setUserEmail(email);
+                    setValue('email', email);
+                    updateFormData({ email });
+                }
+            } catch (error) {
+                console.error('Error parsing auth data:', error);
+            }
+        }
+    }, [setValue, updateFormData]);
+
+    // Load dropdown options on mount
+    useEffect(() => {
+        const loadOptions = async () => {
+            try {
+                const [countries, communities] = await Promise.all([
+                    dropdownOptions.getCountries(),
+                    dropdownOptions.getCommunities(),
+                ]);
+                setCountryOptions(countries);
+                setCommunityOptions(communities);
+            } catch (error) {
+                console.error('Error loading dropdown options:', error);
+            }
+        };
+        void loadOptions();
+    }, []);
+
+    // Load states when country changes
+    useEffect(() => {
+        const loadStates = async () => {
+            if (selectedCountry) {
+                try {
+                    const states = await dropdownOptions.getStates(selectedCountry);
+                    setStateOptions(states);
+                    // Reset state and district when country changes
+                    updateFormData({ state: '', district: '' });
+                } catch (error) {
+                    console.error('Error loading states:', error);
+                }
+            } else {
+                setStateOptions([]);
+            }
+        };
+        void loadStates();
+    }, [selectedCountry, updateFormData]);
+
+    // Load districts when state changes
+    useEffect(() => {
+        const loadDistricts = async () => {
+            if (selectedState) {
+                try {
+                    const districts = await dropdownOptions.getDistricts(selectedState);
+                    setDistrictOptions(districts);
+                    // Reset district when state changes
+                    updateFormData({ district: '' });
+                } catch (error) {
+                    console.error('Error loading districts:', error);
+                }
+            } else {
+                setDistrictOptions([]);
+            }
+        };
+        void loadDistricts();
+    }, [selectedState, updateFormData]);
+
+    // Load existing photo if available
+    useEffect(() => {
+        const existingPhoto = formData.photo;
+        if (existingPhoto instanceof File) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPhotoPreview(reader.result as string);
+            };
+            reader.readAsDataURL(existingPhoto);
+        } else {
+            setPhotoPreview(null);
+        }
+    }, [formData.photo]);
+
+    const handlePhotoClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        // Validate file type
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (!validTypes.includes(file.type)) {
+            setPhotoError('Invalid file type. Please upload PNG, JPG or JPEG image.');
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+            return;
+        }
+
+        // Validate file size (5MB)
+        const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+        if (file.size > MAX_SIZE) {
+            setPhotoError('File size exceeds 5MB limit. Please upload a smaller image.');
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+            return;
+        }
+
+        // Validate minimum dimensions (200x200 pixels)
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        img.onload = () => {
+            URL.revokeObjectURL(objectUrl);
+            const MIN_WIDTH = 200;
+            const MIN_HEIGHT = 200;
+            
+            if (img.width < MIN_WIDTH || img.height < MIN_HEIGHT) {
+                setPhotoError(`Image dimensions must be at least ${MIN_WIDTH}x${MIN_HEIGHT} pixels. Current size: ${img.width}x${img.height} pixels.`);
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
+                return;
+            }
+
+            // Clear previous errors
+            setPhotoError(null);
+
+            // Create preview
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPhotoPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+
+            // Store file in formData
+            updateFormData({ photo: file });
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(objectUrl);
+            setPhotoError('Failed to load image. Please try again.');
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        };
+        img.src = objectUrl;
+    };
 
     return (
         <StepLayout
@@ -125,31 +289,53 @@ const PersonalDetails = () => {
                 <Stack tokens={STACK_TOKENS}>
 
                         {/* Profile Photo */}
+                        <Stack tokens={{ childrenGap: 8 }}>
                         <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 16 }}>
                             <div
+                                    onClick={handlePhotoClick}
                                 onMouseEnter={() => setIsHovered(true)}
                                 onMouseLeave={() => setIsHovered(false)}
                                 className="w-20 h-20 rounded-full cursor-pointer overflow-hidden relative bg-[#242424] opacity-50 flex items-center justify-center"
-                            >
-                                {!isHovered && (
+                                    style={{
+                                        backgroundImage: photoPreview ? `url(${photoPreview})` : undefined,
+                                        backgroundSize: 'cover',
+                                        backgroundPosition: 'center',
+                                    }}
+                                >
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        className="hidden"
+                                        accept="image/jpeg,image/jpg,image/png"
+                                        onChange={handlePhotoChange}
+                                    />
+                                    {!photoPreview && !isHovered && (
                                     <ProfileAvatar 
                                         width={80} 
                                         height={80} 
                                         className="w-full h-full"
                                     />
                                 )}
-                                {isHovered && (
-                                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full transition-opacity duration-300">
+                                    {(isHovered || photoPreview) && (
+                                        <div className={`absolute inset-0 flex items-center justify-center rounded-full transition-opacity duration-300 ${
+                                            photoPreview ? 'bg-black bg-opacity-40 hover:bg-opacity-60' : 'bg-black bg-opacity-50'
+                                        }`}>
                                         <Text variant="small" className="text-white font-semibold text-center px-2" style={{ fontSize: '10px', lineHeight: '12px' }}>
-                                            Click to Add Photo
+                                                {photoPreview ? 'Change Photo' : 'Click to Add Photo'}
                                         </Text>
                                     </div>
                                 )}
                             </div>
                             <Stack>
                                 <Text variant="medium" className="font-semibold text-gray-700 dark:text-gray-300">Profile Photo</Text>
-                                <Text variant="small" className="text-gray-500 dark:text-gray-400">Supported formats: PNG, JPG and JPEG (up to 5MB)</Text>
+                                    <Text variant="small" className="text-gray-500 dark:text-gray-400">Supported formats: PNG, JPG and JPEG (up to 5MB, minimum 200x200 pixels)</Text>
+                                </Stack>
                             </Stack>
+                            {photoError && (
+                                <MessageBar messageBarType={MessageBarType.error} onDismiss={() => setPhotoError(null)}>
+                                    {photoError}
+                                </MessageBar>
+                            )}
                         </Stack>
 
                         {/* Row 1: Scholarship & Gender */}
@@ -183,20 +369,19 @@ const PersonalDetails = () => {
                             errors={errors}
                             label="Community"
                             required
-                            options={COMMUNITY_OPTIONS}
+                            options={communityOptions}
                             placeholder="Select your community"
                         />
 
                         {/* Row 2: Caste & DOB */}
                         <FormRowContainer>
                             <FormRow>
-                                <SelectField
+                                <InputField
                                     name="caste"
                                     control={control}
                                     errors={errors}
                                     label="Caste"
-                                    options={CASTE_OPTIONS}
-                                    placeholder="Select your caste"
+                                    placeholder="Enter your caste (Optional)"
                                 />
                             </FormRow>
                             <FormRow>
@@ -214,13 +399,21 @@ const PersonalDetails = () => {
                         {/* Row 3: Email & Mobile */}
                         <FormRowContainer>
                             <FormRow>
-                                <InputField
+                                <Controller
                                     name="email"
                                     control={control}
-                                    errors={errors}
-                                    label="Email"
-                                    required
-                                    placeholder="Enter email ID"
+                                    render={({ field }) => (
+                                        <FormField label="Email" required error={errors.email?.message as string}>
+                                            <Input
+                                                {...field}
+                                                value={userEmail ?? field.value ?? ''}
+                                                placeholder="Email (auto-filled)"
+                                                errorMessage={errors.email?.message as string}
+                                                disabled
+                                                readOnly
+                                            />
+                                        </FormField>
+                                    )}
                                 />
                             </FormRow>
                             <FormRow>
@@ -279,7 +472,7 @@ const PersonalDetails = () => {
                                     errors={errors}
                                     label="District"
                                     required
-                                    options={DISTRICT_OPTIONS}
+                                    options={districtOptions}
                                     placeholder="Select"
                                 />
                             </FormRow>
@@ -295,7 +488,7 @@ const PersonalDetails = () => {
                                     errors={errors}
                                     label="State"
                                     required
-                                    options={STATE_OPTIONS}
+                                    options={stateOptions}
                                     placeholder="Select"
                                 />
                             </FormRow>
@@ -319,7 +512,7 @@ const PersonalDetails = () => {
                                 errors={errors}
                                 label="Country"
                                 required
-                                options={COUNTRY_OPTIONS}
+                                options={countryOptions}
                                 placeholder="Select"
                             />
                         </div>

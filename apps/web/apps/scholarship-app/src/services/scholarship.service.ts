@@ -118,10 +118,11 @@ export const scholarshipApplication = {
    * Register new scholarship application
    */
   register: async (applicationData: Record<string, unknown>) => {
-    const response =
-      await scholarshipApis.application.scholarshipApplicationControllerRegister(
-        applicationData,
-      );
+    const response = await apiClient.post<{
+      applicationId?: string;
+      Application_Id?: string;
+      message?: string;
+    }>('/scholarship-application/register', applicationData);
     return response.data;
   },
 
@@ -220,6 +221,214 @@ export const scholarshipApplication = {
     const response = await apiClient.post<{ success: boolean; message: string }>(
       '/scholarship-application/set-password',
       { email, password, token },
+    );
+    return response.data;
+  },
+};
+
+/**
+ * Document Upload Service
+ */
+export const documentUpload = {
+  /**
+   * Upload a single document
+   */
+  uploadDocument: async (
+    applicationId: string,
+    documentType: string,
+    file: File,
+    uploadedBy?: number,
+  ) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('applicationId', applicationId);
+    formData.append('documentType', documentType);
+    if (uploadedBy !== undefined) {
+      formData.append('uploadedBy', uploadedBy.toString());
+    }
+
+    const response = await apiClient.post<{
+      message: string;
+      documentPath: string;
+    }>('/document-upload/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  /**
+   * Upload multiple documents
+   */
+  uploadMultipleDocuments: async (
+    applicationId: string,
+    files: File[],
+    documentTypes: string[],
+    uploadedBy?: number,
+  ) => {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+    formData.append('applicationId', applicationId);
+    formData.append('documentTypes', documentTypes.join(','));
+    if (uploadedBy !== undefined) {
+      formData.append('uploadedBy', uploadedBy.toString());
+    }
+
+    const response = await apiClient.post<{
+      message: string;
+      results: Array<{ message: string; documentPath: string }>;
+    }>('/document-upload/upload-multiple', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  /**
+   * Upload student photo
+   */
+  uploadPhoto: async (applicationId: string, file: File) => {
+    const formData = new FormData();
+    formData.append('photo', file);
+    formData.append('applicationId', applicationId);
+
+    const response = await apiClient.post<{
+      message: string;
+      photoPath: string;
+    }>('/document-upload/upload-photo', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  /**
+   * Get documents for an application
+   */
+  getDocuments: async (applicationId: string) => {
+    const response = await apiClient.get<
+      {
+        Document_Id: number;
+        Application_Id: string;
+        Document_Type: string;
+        Document_Path: string;
+        Uploaded_Date: string;
+        Uploaded_By?: number;
+      }[]
+    >(`/document-upload/documents/${applicationId}`);
+    return response.data;
+  },
+};
+
+/**
+ * Dropdown Options Service
+ */
+export const dropdownOptions = {
+  /**
+   * Get all countries
+   */
+  getCountries: async () => {
+    const response = await apiClient.get<
+      Array<{ value: string; label: string }>
+    >('/dropdown-options/countries');
+    return response.data;
+  },
+
+  /**
+   * Get states by country ID
+   */
+  getStates: async (countryId?: string) => {
+    const response = await apiClient.get<Array<{ value: string; label: string }>>(
+      '/dropdown-options/states',
+      { params: countryId ? { countryId } : {} },
+    );
+    return response.data;
+  },
+
+  /**
+   * Get districts by state ID
+   */
+  getDistricts: async (stateId?: string) => {
+    const response = await apiClient.get<Array<{ value: string; label: string }>>(
+      '/dropdown-options/districts',
+      { params: stateId ? { stateId } : {} },
+    );
+    return response.data;
+  },
+
+  /**
+   * Get all communities
+   */
+  getCommunities: async () => {
+    const response = await apiClient.get<Array<{ value: string; label: string }>>(
+      '/dropdown-options/communities',
+    );
+    return response.data;
+  },
+
+  /**
+   * Get castes by community
+   */
+  getCastes: async (community?: string) => {
+    const response = await apiClient.get<Array<{ value: string; label: string }>>(
+      '/dropdown-options/castes',
+      { params: community ? { community } : {} },
+    );
+    return response.data;
+  },
+
+  /**
+   * Get all occupations
+   */
+  getOccupations: async () => {
+    const response = await apiClient.get<Array<{ value: string; label: string }>>(
+      '/dropdown-options/occupations',
+    );
+    return response.data;
+  },
+
+  /**
+   * Get annual income ranges
+   */
+  getAnnualIncomeRanges: async () => {
+    const response = await apiClient.get<Array<{ value: string; label: string }>>(
+      '/dropdown-options/annual-income-ranges',
+    );
+    return response.data;
+  },
+
+  /**
+   * Get all bank names
+   */
+  getBankNames: async () => {
+    const response = await apiClient.get<Array<{ value: string; label: string }>>(
+      '/dropdown-options/bank-names',
+    );
+    return response.data;
+  },
+
+  /**
+   * Get bank branches by bank ID
+   */
+  getBankBranches: async (bankId?: string) => {
+    const response = await apiClient.get<{ value: string; label: string }[]>(
+      '/dropdown-options/bank-branches',
+      { params: bankId ? { bankId } : {} },
+    );
+    return response.data;
+  },
+
+  /**
+   * Get applicant categories
+   */
+  getApplicantCategories: async () => {
+    const response = await apiClient.get<{ value: string; label: string }[]>(
+      '/dropdown-options/applicant-categories',
     );
     return response.data;
   },

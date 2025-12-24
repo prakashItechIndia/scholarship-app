@@ -1536,12 +1536,12 @@ export const DocumentUploadApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * 
-         * @summary Upload document
+         * @summary Upload document (legacy - accepts path directly)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         documentUploadControllerUploadDocument: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/document-upload/upload`;
+            const localVarPath = `/document-upload/upload-legacy`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1558,6 +1558,172 @@ export const DocumentUploadApiAxiosParamCreator = function (configuration?: Conf
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Upload document with file
+         * @param {any} file 
+         * @param {string} applicationId 
+         * @param {string} documentType 
+         * @param {number} [uploadedBy] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerUploadDocumentFile: async (file: any, applicationId: string, documentType: string, uploadedBy?: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'file' is not null or undefined
+            assertParamExists('documentUploadControllerUploadDocumentFile', 'file', file)
+            // verify required parameter 'applicationId' is not null or undefined
+            assertParamExists('documentUploadControllerUploadDocumentFile', 'applicationId', applicationId)
+            // verify required parameter 'documentType' is not null or undefined
+            assertParamExists('documentUploadControllerUploadDocumentFile', 'documentType', documentType)
+            const localVarPath = `/document-upload/upload`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+
+            if (file !== undefined) { 
+                localVarFormParams.append('file', file as any);
+            }
+    
+            if (applicationId !== undefined) { 
+                localVarFormParams.append('applicationId', applicationId as any);
+            }
+    
+            if (documentType !== undefined) { 
+                localVarFormParams.append('documentType', documentType as any);
+            }
+    
+            if (uploadedBy !== undefined) { 
+                localVarFormParams.append('uploadedBy', uploadedBy as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Upload multiple documents
+         * @param {Array<any>} files 
+         * @param {string} applicationId 
+         * @param {string} documentTypes Comma-separated list of document types
+         * @param {number} [uploadedBy] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerUploadMultipleDocuments: async (files: Array<any>, applicationId: string, documentTypes: string, uploadedBy?: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'files' is not null or undefined
+            assertParamExists('documentUploadControllerUploadMultipleDocuments', 'files', files)
+            // verify required parameter 'applicationId' is not null or undefined
+            assertParamExists('documentUploadControllerUploadMultipleDocuments', 'applicationId', applicationId)
+            // verify required parameter 'documentTypes' is not null or undefined
+            assertParamExists('documentUploadControllerUploadMultipleDocuments', 'documentTypes', documentTypes)
+            const localVarPath = `/document-upload/upload-multiple`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+            if (files) {
+                files.forEach((element) => {
+                    localVarFormParams.append('files', element as any);
+                })
+            }
+
+    
+            if (applicationId !== undefined) { 
+                localVarFormParams.append('applicationId', applicationId as any);
+            }
+    
+            if (documentTypes !== undefined) { 
+                localVarFormParams.append('documentTypes', documentTypes as any);
+            }
+    
+            if (uploadedBy !== undefined) { 
+                localVarFormParams.append('uploadedBy', uploadedBy as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Upload student photo
+         * @param {any} [photo] 
+         * @param {string} [applicationId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerUploadPhoto: async (photo?: any, applicationId?: string, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/document-upload/upload-photo`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+
+            if (photo !== undefined) { 
+                localVarFormParams.append('photo', photo as any);
+            }
+    
+            if (applicationId !== undefined) { 
+                localVarFormParams.append('applicationId', applicationId as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1611,12 +1777,52 @@ export const DocumentUploadApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Upload document
+         * @summary Upload document (legacy - accepts path directly)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         async documentUploadControllerUploadDocument(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerUploadDocument(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Upload document with file
+         * @param {any} file 
+         * @param {string} applicationId 
+         * @param {string} documentType 
+         * @param {number} [uploadedBy] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async documentUploadControllerUploadDocumentFile(file: any, applicationId: string, documentType: string, uploadedBy?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerUploadDocumentFile(file, applicationId, documentType, uploadedBy, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Upload multiple documents
+         * @param {Array<any>} files 
+         * @param {string} applicationId 
+         * @param {string} documentTypes Comma-separated list of document types
+         * @param {number} [uploadedBy] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async documentUploadControllerUploadMultipleDocuments(files: Array<any>, applicationId: string, documentTypes: string, uploadedBy?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerUploadMultipleDocuments(files, applicationId, documentTypes, uploadedBy, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Upload student photo
+         * @param {any} [photo] 
+         * @param {string} [applicationId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async documentUploadControllerUploadPhoto(photo?: any, applicationId?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerUploadPhoto(photo, applicationId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -1663,12 +1869,49 @@ export const DocumentUploadApiFactory = function (configuration?: Configuration,
         },
         /**
          * 
-         * @summary Upload document
+         * @summary Upload document (legacy - accepts path directly)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         documentUploadControllerUploadDocument(options?: any): AxiosPromise<void> {
             return localVarFp.documentUploadControllerUploadDocument(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Upload document with file
+         * @param {any} file 
+         * @param {string} applicationId 
+         * @param {string} documentType 
+         * @param {number} [uploadedBy] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerUploadDocumentFile(file: any, applicationId: string, documentType: string, uploadedBy?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.documentUploadControllerUploadDocumentFile(file, applicationId, documentType, uploadedBy, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Upload multiple documents
+         * @param {Array<any>} files 
+         * @param {string} applicationId 
+         * @param {string} documentTypes Comma-separated list of document types
+         * @param {number} [uploadedBy] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerUploadMultipleDocuments(files: Array<any>, applicationId: string, documentTypes: string, uploadedBy?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.documentUploadControllerUploadMultipleDocuments(files, applicationId, documentTypes, uploadedBy, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Upload student photo
+         * @param {any} [photo] 
+         * @param {string} [applicationId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerUploadPhoto(photo?: any, applicationId?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.documentUploadControllerUploadPhoto(photo, applicationId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1720,13 +1963,726 @@ export class DocumentUploadApi extends BaseAPI {
 
     /**
      * 
-     * @summary Upload document
+     * @summary Upload document (legacy - accepts path directly)
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentUploadApi
      */
     public documentUploadControllerUploadDocument(options?: any) {
         return DocumentUploadApiFp(this.configuration).documentUploadControllerUploadDocument(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Upload document with file
+     * @param {any} file 
+     * @param {string} applicationId 
+     * @param {string} documentType 
+     * @param {number} [uploadedBy] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentUploadApi
+     */
+    public documentUploadControllerUploadDocumentFile(file: any, applicationId: string, documentType: string, uploadedBy?: number, options?: any) {
+        return DocumentUploadApiFp(this.configuration).documentUploadControllerUploadDocumentFile(file, applicationId, documentType, uploadedBy, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Upload multiple documents
+     * @param {Array<any>} files 
+     * @param {string} applicationId 
+     * @param {string} documentTypes Comma-separated list of document types
+     * @param {number} [uploadedBy] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentUploadApi
+     */
+    public documentUploadControllerUploadMultipleDocuments(files: Array<any>, applicationId: string, documentTypes: string, uploadedBy?: number, options?: any) {
+        return DocumentUploadApiFp(this.configuration).documentUploadControllerUploadMultipleDocuments(files, applicationId, documentTypes, uploadedBy, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Upload student photo
+     * @param {any} [photo] 
+     * @param {string} [applicationId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentUploadApi
+     */
+    public documentUploadControllerUploadPhoto(photo?: any, applicationId?: string, options?: any) {
+        return DocumentUploadApiFp(this.configuration).documentUploadControllerUploadPhoto(photo, applicationId, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * DropdownOptionsApi - axios parameter creator
+ * @export
+ */
+export const DropdownOptionsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Get annual income ranges
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetAnnualIncomeRanges: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dropdown-options/annual-income-ranges`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get applicant categories
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetApplicantCategories: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dropdown-options/applicant-categories`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get bank branches by bank ID
+         * @param {string} [bankId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetBankBranches: async (bankId?: string, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dropdown-options/bank-branches`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (bankId !== undefined) {
+                localVarQueryParameter['bankId'] = bankId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get all bank names
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetBankNames: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dropdown-options/bank-names`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get castes by community
+         * @param {string} [community] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetCastes: async (community?: string, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dropdown-options/castes`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (community !== undefined) {
+                localVarQueryParameter['community'] = community;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get all communities
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetCommunities: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dropdown-options/communities`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get all countries
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetCountries: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dropdown-options/countries`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get districts by state ID
+         * @param {string} [stateId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetDistricts: async (stateId?: string, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dropdown-options/districts`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (stateId !== undefined) {
+                localVarQueryParameter['stateId'] = stateId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get all occupations
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetOccupations: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dropdown-options/occupations`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get states by country ID
+         * @param {string} [countryId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetStates: async (countryId?: string, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dropdown-options/states`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (countryId !== undefined) {
+                localVarQueryParameter['countryId'] = countryId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * DropdownOptionsApi - functional programming interface
+ * @export
+ */
+export const DropdownOptionsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DropdownOptionsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Get annual income ranges
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dropdownOptionsControllerGetAnnualIncomeRanges(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dropdownOptionsControllerGetAnnualIncomeRanges(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get applicant categories
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dropdownOptionsControllerGetApplicantCategories(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dropdownOptionsControllerGetApplicantCategories(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get bank branches by bank ID
+         * @param {string} [bankId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dropdownOptionsControllerGetBankBranches(bankId?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dropdownOptionsControllerGetBankBranches(bankId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get all bank names
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dropdownOptionsControllerGetBankNames(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dropdownOptionsControllerGetBankNames(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get castes by community
+         * @param {string} [community] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dropdownOptionsControllerGetCastes(community?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dropdownOptionsControllerGetCastes(community, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get all communities
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dropdownOptionsControllerGetCommunities(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dropdownOptionsControllerGetCommunities(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get all countries
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dropdownOptionsControllerGetCountries(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dropdownOptionsControllerGetCountries(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get districts by state ID
+         * @param {string} [stateId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dropdownOptionsControllerGetDistricts(stateId?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dropdownOptionsControllerGetDistricts(stateId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get all occupations
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dropdownOptionsControllerGetOccupations(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dropdownOptionsControllerGetOccupations(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get states by country ID
+         * @param {string} [countryId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dropdownOptionsControllerGetStates(countryId?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dropdownOptionsControllerGetStates(countryId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * DropdownOptionsApi - factory interface
+ * @export
+ */
+export const DropdownOptionsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DropdownOptionsApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Get annual income ranges
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetAnnualIncomeRanges(options?: any): AxiosPromise<void> {
+            return localVarFp.dropdownOptionsControllerGetAnnualIncomeRanges(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get applicant categories
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetApplicantCategories(options?: any): AxiosPromise<void> {
+            return localVarFp.dropdownOptionsControllerGetApplicantCategories(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get bank branches by bank ID
+         * @param {string} [bankId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetBankBranches(bankId?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.dropdownOptionsControllerGetBankBranches(bankId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all bank names
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetBankNames(options?: any): AxiosPromise<void> {
+            return localVarFp.dropdownOptionsControllerGetBankNames(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get castes by community
+         * @param {string} [community] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetCastes(community?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.dropdownOptionsControllerGetCastes(community, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all communities
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetCommunities(options?: any): AxiosPromise<void> {
+            return localVarFp.dropdownOptionsControllerGetCommunities(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all countries
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetCountries(options?: any): AxiosPromise<void> {
+            return localVarFp.dropdownOptionsControllerGetCountries(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get districts by state ID
+         * @param {string} [stateId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetDistricts(stateId?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.dropdownOptionsControllerGetDistricts(stateId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all occupations
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetOccupations(options?: any): AxiosPromise<void> {
+            return localVarFp.dropdownOptionsControllerGetOccupations(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get states by country ID
+         * @param {string} [countryId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dropdownOptionsControllerGetStates(countryId?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.dropdownOptionsControllerGetStates(countryId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * DropdownOptionsApi - object-oriented interface
+ * @export
+ * @class DropdownOptionsApi
+ * @extends {BaseAPI}
+ */
+export class DropdownOptionsApi extends BaseAPI {
+    /**
+     * 
+     * @summary Get annual income ranges
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DropdownOptionsApi
+     */
+    public dropdownOptionsControllerGetAnnualIncomeRanges(options?: any) {
+        return DropdownOptionsApiFp(this.configuration).dropdownOptionsControllerGetAnnualIncomeRanges(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get applicant categories
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DropdownOptionsApi
+     */
+    public dropdownOptionsControllerGetApplicantCategories(options?: any) {
+        return DropdownOptionsApiFp(this.configuration).dropdownOptionsControllerGetApplicantCategories(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get bank branches by bank ID
+     * @param {string} [bankId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DropdownOptionsApi
+     */
+    public dropdownOptionsControllerGetBankBranches(bankId?: string, options?: any) {
+        return DropdownOptionsApiFp(this.configuration).dropdownOptionsControllerGetBankBranches(bankId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get all bank names
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DropdownOptionsApi
+     */
+    public dropdownOptionsControllerGetBankNames(options?: any) {
+        return DropdownOptionsApiFp(this.configuration).dropdownOptionsControllerGetBankNames(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get castes by community
+     * @param {string} [community] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DropdownOptionsApi
+     */
+    public dropdownOptionsControllerGetCastes(community?: string, options?: any) {
+        return DropdownOptionsApiFp(this.configuration).dropdownOptionsControllerGetCastes(community, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get all communities
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DropdownOptionsApi
+     */
+    public dropdownOptionsControllerGetCommunities(options?: any) {
+        return DropdownOptionsApiFp(this.configuration).dropdownOptionsControllerGetCommunities(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get all countries
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DropdownOptionsApi
+     */
+    public dropdownOptionsControllerGetCountries(options?: any) {
+        return DropdownOptionsApiFp(this.configuration).dropdownOptionsControllerGetCountries(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get districts by state ID
+     * @param {string} [stateId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DropdownOptionsApi
+     */
+    public dropdownOptionsControllerGetDistricts(stateId?: string, options?: any) {
+        return DropdownOptionsApiFp(this.configuration).dropdownOptionsControllerGetDistricts(stateId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get all occupations
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DropdownOptionsApi
+     */
+    public dropdownOptionsControllerGetOccupations(options?: any) {
+        return DropdownOptionsApiFp(this.configuration).dropdownOptionsControllerGetOccupations(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get states by country ID
+     * @param {string} [countryId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DropdownOptionsApi
+     */
+    public dropdownOptionsControllerGetStates(countryId?: string, options?: any) {
+        return DropdownOptionsApiFp(this.configuration).dropdownOptionsControllerGetStates(countryId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

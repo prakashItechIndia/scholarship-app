@@ -20,6 +20,7 @@ export * from "./divider";
 export * from "./modal";
 export * from "./drawer";
 export * from "./pdf-icon";
+export * from "./image-icon";
 export * from "./close-icon";
 export * from "./upload-icon";
 export * from "./pencil-icon";
