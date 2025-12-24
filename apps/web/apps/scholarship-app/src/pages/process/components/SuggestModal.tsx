@@ -2,6 +2,8 @@ import * as React from "react";
 import { Modal, Button } from "@shared/components";
 import { Dismiss24Regular, CheckmarkCircle24Regular } from "@fluentui/react-icons";
 import { ApplicationData } from "../types";
+import { processManagement } from "../../../services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
 
 interface SuggestModalProps {
     open: boolean;
@@ -16,9 +18,11 @@ const SuggestModal: React.FC<SuggestModalProps> = ({
     data,
     onSuggestSuccess,
 }) => {
+    const { success, error: showError } = useToast();
     const [suggestedAmount, setSuggestedAmount] = React.useState("");
     const [comment, setComment] = React.useState("");
     const [isSubmitted, setIsSubmitted] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
     const [modalTitle, setModalTitle] = React.useState("LEO MUTHU - Scholarship Suggestion Panel ( 2024-2025 )");
 
     // Clean up state when modal closes/opens
@@ -40,21 +44,40 @@ const SuggestModal: React.FC<SuggestModalProps> = ({
         { label: "Request Amount", value: "50000" }, // Mocked
     ];
 
-    const handleSubmit = () => {
-        console.log("Suggesting Amount:", {
-            applicationNo: data?.applicationNo,
-            suggestedAmount,
-            comment,
-        });
-        setIsSubmitted(true);
-        setModalTitle("Success");
+    const handleSubmit = async () => {
+        if (!data?.applicationNo || !suggestedAmount) {
+            showError('Validation Error', 'Please enter suggested amount');
+            return;
+        }
 
-        // Call the success callback to open PDF
-        if (onSuggestSuccess && data?.applicationNo) {
-            // Delay slightly to show success message first
-            setTimeout(() => {
-                onSuggestSuccess(data.applicationNo);
-            }, 1500);
+        try {
+            setLoading(true);
+            // Get current user ID from localStorage
+            const authData = localStorage.getItem('scholarship_auth');
+            const userId = authData ? JSON.parse(authData).userId : undefined;
+
+            await processManagement.suggestAmount({
+                applicationId: data.applicationNo,
+                suggestedAmount: parseFloat(suggestedAmount),
+                remarks: comment,
+                suggestedBy: userId,
+            });
+
+            setIsSubmitted(true);
+            setModalTitle("Success");
+            success('Success', 'Amount suggested successfully');
+
+            // Call the success callback to refresh data
+            if (onSuggestSuccess && data.applicationNo) {
+                setTimeout(() => {
+                    onSuggestSuccess(data.applicationNo);
+                    onOpenChange(false);
+                }, 1500);
+            }
+        } catch (err) {
+            showError('Failed to Suggest Amount', err instanceof Error ? err.message : 'Failed to suggest amount');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -259,6 +282,7 @@ const SuggestModal: React.FC<SuggestModalProps> = ({
                         <Button
                             appearance="primary"
                             onClick={handleSubmit}
+                            disabled={loading || !suggestedAmount}
                             style={{ backgroundColor: "#0F6CBD", color: "white", minWidth: "100px" }}
                         >
                             Suggest

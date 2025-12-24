@@ -17,47 +17,100 @@ import {
   Search20Regular,
 } from "@fluentui/react-icons";
 import { User } from "./types";
-import { mockUsers } from "./constants";
 import { useUserTable } from "./hooks/useUserTable";
+import { userManagement } from "../../services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
 
 const UserManagementPage: React.FC = () => {
   const navigate = useNavigate();
+  const { success, error: showError } = useToast();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
-  const [users, setUsers] = React.useState<User[]>(mockUsers);
+  const [users, setUsers] = React.useState<User[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  // Sync users to sessionStorage for validation in form
+  // Fetch users from API
   React.useEffect(() => {
-    sessionStorage.setItem("allUsers", JSON.stringify(users));
-  }, [users]);
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const data = await userManagement.getAllUsers();
+        // Map API response to User interface
+        const mappedUsers: User[] = data.map((user: {
+          ID: number;
+          User_ID: string;
+          User_Name: string;
+          Role_Name: string;
+          Role_Id: number;
+          Mobile_Number: string;
+          EMail_Id: string;
+          ActiveStatus: string;
+        }) => ({
+          id: user.User_ID,
+          name: user.User_Name || user.User_ID,
+          userRole: user.Role_Name || '',
+          userType: 'Standard User', // Can be derived from role if needed
+          mobileNumber: user.Mobile_Number || '',
+          emailId: user.EMail_Id || user.User_ID,
+          status: user.ActiveStatus === 'Active' ? 'Active' : 'Inactive',
+        }));
+        setUsers(mappedUsers);
+        // Sync users to sessionStorage for validation in form
+        sessionStorage.setItem("allUsers", JSON.stringify(mappedUsers));
+      } catch (err) {
+        showError('Failed to Load Users', err instanceof Error ? err.message : 'Failed to fetch users');
+      } finally {
+        setLoading(false);
+      }
+    };
+    void fetchUsers();
+  }, [showError]);
 
-  // Check for saved user from form page
+  // Refresh users after form save (check sessionStorage)
   React.useEffect(() => {
-    const lastSavedUser = sessionStorage.getItem("lastSavedUser");
     const userAction = sessionStorage.getItem("userAction");
     
-    if (lastSavedUser && userAction) {
-      const savedUser = JSON.parse(lastSavedUser) as User;
-      
-      if (userAction === "add") {
-        // Add new user
-        setUsers((prev) => [...prev, savedUser]);
-      } else if (userAction === "edit") {
-        // Update existing user
-        setUsers((prev) =>
-          prev.map((user) => (user.id === savedUser.id ? savedUser : user))
-        );
-      }
+    if (userAction) {
+      // Reload users from API instead of using sessionStorage
+      const fetchUsers = async () => {
+        try {
+          const data = await userManagement.getAllUsers();
+          const mappedUsers: User[] = data.map((user: {
+            ID: number;
+            User_ID: string;
+            User_Name: string;
+            Role_Name: string;
+            Role_Id: number;
+            Mobile_Number: string;
+            EMail_Id: string;
+            ActiveStatus: string;
+          }) => ({
+            id: user.User_ID,
+            name: user.User_Name || user.User_ID,
+            userRole: user.Role_Name || '',
+            userType: 'Standard User',
+            mobileNumber: user.Mobile_Number || '',
+            emailId: user.EMail_Id || user.User_ID,
+            status: user.ActiveStatus === 'Active' ? 'Active' : 'Inactive',
+          }));
+          setUsers(mappedUsers);
+          sessionStorage.setItem("allUsers", JSON.stringify(mappedUsers));
+          success('Success', userAction === 'add' ? 'User created successfully' : 'User updated successfully');
+        } catch (err) {
+          showError('Failed to Refresh', err instanceof Error ? err.message : 'Failed to refresh users');
+        }
+      };
+      void fetchUsers();
       
       // Clear sessionStorage
       sessionStorage.removeItem("lastSavedUser");
       sessionStorage.removeItem("userAction");
     }
-  }, []);
+  }, [success, showError]);
 
   // Filter users based on search query
   const filteredUsers = React.useMemo(() => {
@@ -116,21 +169,26 @@ const UserManagementPage: React.FC = () => {
     void navigate("/user-management/add");
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (selectedUser) {
-      // USR-004: Deactivated users shall be retained in system for audit purposes
-      // Instead of deleting, set status to Inactive
-      setUsers((prev) =>
-        prev.map((user) =>
-          user.id === selectedUser.id ? { ...user, status: "Inactive" as const } : user
-        )
-      );
-      setDeleteModalOpen(false);
-      setSelectedUser(null);
-      
-      // Reset to page 1 if current page becomes empty
-      if (paginatedData.length === 1 && currentPage > 1) {
-        setCurrentPage(currentPage - 1);
+      try {
+        // USR-004: Deactivated users shall be retained in system for audit purposes
+        // Delete user via API (sets IsDeleted = 1)
+        await userManagement.deleteUser(selectedUser.id);
+        
+        // Remove user from list
+        setUsers((prev) => prev.filter((user) => user.id !== selectedUser.id));
+        setDeleteModalOpen(false);
+        setSelectedUser(null);
+        success('Success', 'User deleted successfully');
+        
+        // Reset to page 1 if current page becomes empty
+        if (paginatedData.length === 1 && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to delete user';
+        showError('Delete Failed', errorMessage);
       }
     }
   };

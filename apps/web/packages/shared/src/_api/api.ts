@@ -2926,6 +2926,908 @@ export class HealthApi extends BaseAPI {
 
 
 /**
+ * ProcessManagementApi - axios parameter creator
+ * @export
+ */
+export const ProcessManagementApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Approve or reject application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerApproveApplication: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/process-management/approve`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get applications for Approve tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetApproveApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/process-management/applications/approve`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (mainCategory !== undefined) {
+                localVarQueryParameter['mainCategory'] = mainCategory;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
+            }
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get applications for Documents tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetDocumentsApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/process-management/applications/documents`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (mainCategory !== undefined) {
+                localVarQueryParameter['mainCategory'] = mainCategory;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
+            }
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get applications for Issue Amount tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetIssueAmountApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/process-management/applications/issue-amount`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (mainCategory !== undefined) {
+                localVarQueryParameter['mainCategory'] = mainCategory;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
+            }
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get applications for Overview tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {string} [selectedStatusText] 
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetOverviewApplications: async (mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/process-management/applications/overview`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (mainCategory !== undefined) {
+                localVarQueryParameter['mainCategory'] = mainCategory;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
+            }
+
+            if (selectedStatusText !== undefined) {
+                localVarQueryParameter['selectedStatusText'] = selectedStatusText;
+            }
+
+            if (fromDate !== undefined) {
+                localVarQueryParameter['fromDate'] = fromDate;
+            }
+
+            if (toDate !== undefined) {
+                localVarQueryParameter['toDate'] = toDate;
+            }
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get applications for Suggest tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetSuggestApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/process-management/applications/suggest`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (mainCategory !== undefined) {
+                localVarQueryParameter['mainCategory'] = mainCategory;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
+            }
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get applications for Verify tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetVerifyApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/process-management/applications/verify`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (mainCategory !== undefined) {
+                localVarQueryParameter['mainCategory'] = mainCategory;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
+            }
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Issue amount for approved application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerIssueAmount: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/process-management/issue-amount`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Suggest amount for application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerSuggestAmount: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/process-management/suggest`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Verify application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerVerifyApplication: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/process-management/verify`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * ProcessManagementApi - functional programming interface
+ * @export
+ */
+export const ProcessManagementApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ProcessManagementApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Approve or reject application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processManagementControllerApproveApplication(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerApproveApplication(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get applications for Approve tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processManagementControllerGetApproveApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetApproveApplications(mainCategory, key, academicYearId, page, pageSize, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get applications for Documents tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processManagementControllerGetDocumentsApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetDocumentsApplications(mainCategory, key, academicYearId, page, pageSize, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get applications for Issue Amount tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processManagementControllerGetIssueAmountApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetIssueAmountApplications(mainCategory, key, academicYearId, page, pageSize, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get applications for Overview tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {string} [selectedStatusText] 
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processManagementControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, academicYearId, page, pageSize, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get applications for Suggest tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processManagementControllerGetSuggestApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetSuggestApplications(mainCategory, key, academicYearId, page, pageSize, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get applications for Verify tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processManagementControllerGetVerifyApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetVerifyApplications(mainCategory, key, academicYearId, page, pageSize, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Issue amount for approved application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processManagementControllerIssueAmount(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerIssueAmount(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Suggest amount for application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processManagementControllerSuggestAmount(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerSuggestAmount(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Verify application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processManagementControllerVerifyApplication(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerVerifyApplication(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * ProcessManagementApi - factory interface
+ * @export
+ */
+export const ProcessManagementApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ProcessManagementApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Approve or reject application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerApproveApplication(options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerApproveApplication(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get applications for Approve tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetApproveApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetApproveApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get applications for Documents tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetDocumentsApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetDocumentsApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get applications for Issue Amount tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetIssueAmountApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetIssueAmountApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get applications for Overview tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {string} [selectedStatusText] 
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, academicYearId, page, pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get applications for Suggest tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetSuggestApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetSuggestApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get applications for Verify tab
+         * @param {string} [mainCategory] 
+         * @param {string} [key] 
+         * @param {number} [academicYearId] 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetVerifyApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetVerifyApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Issue amount for approved application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerIssueAmount(options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerIssueAmount(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Suggest amount for application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerSuggestAmount(options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerSuggestAmount(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Verify application
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerVerifyApplication(options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerVerifyApplication(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * ProcessManagementApi - object-oriented interface
+ * @export
+ * @class ProcessManagementApi
+ * @extends {BaseAPI}
+ */
+export class ProcessManagementApi extends BaseAPI {
+    /**
+     * 
+     * @summary Approve or reject application
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProcessManagementApi
+     */
+    public processManagementControllerApproveApplication(options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerApproveApplication(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get applications for Approve tab
+     * @param {string} [mainCategory] 
+     * @param {string} [key] 
+     * @param {number} [academicYearId] 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProcessManagementApi
+     */
+    public processManagementControllerGetApproveApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetApproveApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get applications for Documents tab
+     * @param {string} [mainCategory] 
+     * @param {string} [key] 
+     * @param {number} [academicYearId] 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProcessManagementApi
+     */
+    public processManagementControllerGetDocumentsApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetDocumentsApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get applications for Issue Amount tab
+     * @param {string} [mainCategory] 
+     * @param {string} [key] 
+     * @param {number} [academicYearId] 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProcessManagementApi
+     */
+    public processManagementControllerGetIssueAmountApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetIssueAmountApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get applications for Overview tab
+     * @param {string} [mainCategory] 
+     * @param {string} [key] 
+     * @param {string} [selectedStatusText] 
+     * @param {string} [fromDate] 
+     * @param {string} [toDate] 
+     * @param {number} [academicYearId] 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProcessManagementApi
+     */
+    public processManagementControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, academicYearId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get applications for Suggest tab
+     * @param {string} [mainCategory] 
+     * @param {string} [key] 
+     * @param {number} [academicYearId] 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProcessManagementApi
+     */
+    public processManagementControllerGetSuggestApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetSuggestApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get applications for Verify tab
+     * @param {string} [mainCategory] 
+     * @param {string} [key] 
+     * @param {number} [academicYearId] 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProcessManagementApi
+     */
+    public processManagementControllerGetVerifyApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetVerifyApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Issue amount for approved application
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProcessManagementApi
+     */
+    public processManagementControllerIssueAmount(options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerIssueAmount(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Suggest amount for application
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProcessManagementApi
+     */
+    public processManagementControllerSuggestAmount(options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerSuggestAmount(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Verify application
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProcessManagementApi
+     */
+    public processManagementControllerVerifyApplication(options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerVerifyApplication(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
  * ReportsApi - axios parameter creator
  * @export
  */
@@ -3285,6 +4187,499 @@ export class ReportsApi extends BaseAPI {
      */
     public reportsControllerGetScholarshipIssuedReport(academicYear?: number, appliedDate?: string, gender?: string, keyword?: string, options?: any) {
         return ReportsApiFp(this.configuration).reportsControllerGetScholarshipIssuedReport(academicYear, appliedDate, gender, keyword, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * RoleManagementApi - axios parameter creator
+ * @export
+ */
+export const RoleManagementApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Check if role has assigned users
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerCheckRoleHasUsers: async (roleId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'roleId' is not null or undefined
+            assertParamExists('roleManagementControllerCheckRoleHasUsers', 'roleId', roleId)
+            const localVarPath = `/role-management/check-role-users/{roleId}`
+                .replace(`{${"roleId"}}`, encodeURIComponent(String(roleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Check if role name exists
+         * @param {string} roleName 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerCheckRoleName: async (roleName: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'roleName' is not null or undefined
+            assertParamExists('roleManagementControllerCheckRoleName', 'roleName', roleName)
+            const localVarPath = `/role-management/check-role-name/{roleName}`
+                .replace(`{${"roleName"}}`, encodeURIComponent(String(roleName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Create new role
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerCreateRole: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/role-management/role`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Delete role
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerDeleteRole: async (roleId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'roleId' is not null or undefined
+            assertParamExists('roleManagementControllerDeleteRole', 'roleId', roleId)
+            const localVarPath = `/role-management/role/{roleId}`
+                .replace(`{${"roleId"}}`, encodeURIComponent(String(roleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get all roles
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerGetAllRoles: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/role-management/roles`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get role by ID
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerGetRoleById: async (roleId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'roleId' is not null or undefined
+            assertParamExists('roleManagementControllerGetRoleById', 'roleId', roleId)
+            const localVarPath = `/role-management/role/{roleId}`
+                .replace(`{${"roleId"}}`, encodeURIComponent(String(roleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Update role
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerUpdateRole: async (roleId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'roleId' is not null or undefined
+            assertParamExists('roleManagementControllerUpdateRole', 'roleId', roleId)
+            const localVarPath = `/role-management/role/{roleId}`
+                .replace(`{${"roleId"}}`, encodeURIComponent(String(roleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * RoleManagementApi - functional programming interface
+ * @export
+ */
+export const RoleManagementApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = RoleManagementApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Check if role has assigned users
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerCheckRoleHasUsers(roleId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerCheckRoleHasUsers(roleId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Check if role name exists
+         * @param {string} roleName 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerCheckRoleName(roleName: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerCheckRoleName(roleName, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Create new role
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerCreateRole(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerCreateRole(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Delete role
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerDeleteRole(roleId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerDeleteRole(roleId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get all roles
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerGetAllRoles(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerGetAllRoles(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get role by ID
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerGetRoleById(roleId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerGetRoleById(roleId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Update role
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerUpdateRole(roleId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerUpdateRole(roleId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * RoleManagementApi - factory interface
+ * @export
+ */
+export const RoleManagementApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = RoleManagementApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Check if role has assigned users
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerCheckRoleHasUsers(roleId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerCheckRoleHasUsers(roleId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Check if role name exists
+         * @param {string} roleName 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerCheckRoleName(roleName: string, options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerCheckRoleName(roleName, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Create new role
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerCreateRole(options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerCreateRole(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Delete role
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerDeleteRole(roleId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerDeleteRole(roleId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all roles
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerGetAllRoles(options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerGetAllRoles(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get role by ID
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerGetRoleById(roleId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerGetRoleById(roleId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update role
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerUpdateRole(roleId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerUpdateRole(roleId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * RoleManagementApi - object-oriented interface
+ * @export
+ * @class RoleManagementApi
+ * @extends {BaseAPI}
+ */
+export class RoleManagementApi extends BaseAPI {
+    /**
+     * 
+     * @summary Check if role has assigned users
+     * @param {number} roleId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerCheckRoleHasUsers(roleId: number, options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerCheckRoleHasUsers(roleId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Check if role name exists
+     * @param {string} roleName 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerCheckRoleName(roleName: string, options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerCheckRoleName(roleName, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Create new role
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerCreateRole(options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerCreateRole(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Delete role
+     * @param {number} roleId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerDeleteRole(roleId: number, options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerDeleteRole(roleId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get all roles
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerGetAllRoles(options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerGetAllRoles(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get role by ID
+     * @param {number} roleId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerGetRoleById(roleId: number, options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerGetRoleById(roleId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update role
+     * @param {number} roleId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerUpdateRole(roleId: number, options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerUpdateRole(roleId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

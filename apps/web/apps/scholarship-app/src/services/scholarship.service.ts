@@ -445,3 +445,322 @@ export const dropdownOptions = {
   },
 };
 
+/**
+ * Role Management Service
+ */
+export const roleManagement = {
+  /**
+   * Get all roles
+   */
+  getAllRoles: async () => {
+    const response = await apiClient.get('/role-management/roles');
+    return response.data;
+  },
+
+  /**
+   * Get role by ID
+   */
+  getRoleById: async (roleId: number) => {
+    const response = await apiClient.get(`/role-management/role/${roleId}`);
+    return response.data;
+  },
+
+  /**
+   * Check if role name exists
+   */
+  checkRoleName: async (roleName: string) => {
+    const response = await apiClient.get(`/role-management/check-role-name/${encodeURIComponent(roleName)}`);
+    return response.data;
+  },
+
+  /**
+   * Check if role has assigned users
+   */
+  checkRoleHasUsers: async (roleId: number) => {
+    const response = await apiClient.get(`/role-management/check-role-users/${roleId}`);
+    return response.data;
+  },
+
+  /**
+   * Create new role
+   */
+  createRole: async (roleData: {
+    roleName: string;
+    userType: string;
+    isActive: number;
+  }) => {
+    const response = await apiClient.post('/role-management/role', roleData);
+    return response.data;
+  },
+
+  /**
+   * Update role
+   */
+  updateRole: async (roleId: number, roleData: {
+    roleName: string;
+    userType: string;
+    isActive: number;
+  }) => {
+    const response = await apiClient.put(`/role-management/role/${roleId}`, roleData);
+    return response.data;
+  },
+
+  /**
+   * Delete role
+   */
+  deleteRole: async (roleId: number) => {
+    const response = await apiClient.delete(`/role-management/role/${roleId}`);
+    return response.data;
+  },
+};
+
+/**
+ * User Management Service
+ */
+export const userManagement = {
+  /**
+   * Get all users
+   */
+  getAllUsers: async () => {
+    const response = await apiClient.get('/user-management/users');
+    return response.data;
+  },
+
+  /**
+   * Get user types/roles
+   */
+  getUserTypes: async () => {
+    const response = await apiClient.get('/user-management/user-types');
+    return response.data;
+  },
+
+  /**
+   * Check if user ID exists
+   */
+  checkUserId: async (userId: string) => {
+    const response = await apiClient.get(`/user-management/check-user/${encodeURIComponent(userId)}`);
+    return response.data;
+  },
+
+  /**
+   * Get user by ID
+   */
+  getUserById: async (userId: string) => {
+    const response = await apiClient.get(`/user-management/user/${encodeURIComponent(userId)}`);
+    return response.data;
+  },
+
+  /**
+   * Create new user
+   */
+  createUser: async (userData: {
+    userType: number;
+    name: string;
+    userName: string;
+    password: string;
+    mobileNumber: string;
+    email: string;
+    isActive: number;
+  }) => {
+    const response = await apiClient.post('/user-management/user', userData);
+    return response.data;
+  },
+
+  /**
+   * Update user
+   */
+  updateUser: async (userData: {
+    userType: number;
+    name: string;
+    userName: string;
+    password: string;
+    mobileNumber: string;
+    email: string;
+    isActive: number;
+  }) => {
+    const response = await apiClient.put('/user-management/user', userData);
+    return response.data;
+  },
+
+  /**
+   * Delete user
+   */
+  deleteUser: async (userId: string) => {
+    const response = await apiClient.delete(`/user-management/user/${encodeURIComponent(userId)}`);
+    return response.data;
+  },
+};
+
+/**
+ * Process Management Service
+ */
+export const processManagement = {
+  /**
+   * Get applications for Overview tab
+   */
+  getOverviewApplications: async (params: {
+    mainCategory?: string;
+    key?: string;
+    selectedStatusText?: string;
+    fromDate?: string;
+    toDate?: string;
+    academicYearId?: number;
+    page?: number;
+    pageSize?: number;
+  }) => {
+    const response = await apiClient.get('/process-management/applications/overview', {
+      params,
+    });
+    return response.data;
+  },
+
+  /**
+   * Get applications for Documents tab
+   */
+  getDocumentsApplications: async (params: {
+    mainCategory?: string;
+    key?: string;
+    academicYearId?: number;
+    page?: number;
+    pageSize?: number;
+  }) => {
+    const response = await apiClient.get('/process-management/applications/documents', {
+      params,
+    });
+    return response.data;
+  },
+
+  /**
+   * Get applications for Verify tab
+   */
+  getVerifyApplications: async (params: {
+    mainCategory?: string;
+    key?: string;
+    academicYearId?: number;
+    page?: number;
+    pageSize?: number;
+  }) => {
+    const response = await apiClient.get('/process-management/applications/verify', {
+      params,
+    });
+    return response.data;
+  },
+
+  /**
+   * Get applications for Suggest tab
+   */
+  getSuggestApplications: async (params: {
+    mainCategory?: string;
+    key?: string;
+    academicYearId?: number;
+    page?: number;
+    pageSize?: number;
+  }) => {
+    const response = await apiClient.get('/process-management/applications/suggest', {
+      params,
+    });
+    return response.data;
+  },
+
+  /**
+   * Get applications for Approve tab
+   */
+  getApproveApplications: async (params: {
+    mainCategory?: string;
+    key?: string;
+    academicYearId?: number;
+    page?: number;
+    pageSize?: number;
+  }) => {
+    const response = await apiClient.get('/process-management/applications/approve', {
+      params,
+    });
+    return response.data;
+  },
+
+  /**
+   * Get applications for Issue Amount tab
+   */
+  getIssueAmountApplications: async (params: {
+    mainCategory?: string;
+    key?: string;
+    academicYearId?: number;
+    page?: number;
+    pageSize?: number;
+  }) => {
+    const response = await apiClient.get('/process-management/applications/issue-amount', {
+      params,
+    });
+    return response.data;
+  },
+
+  /**
+   * Verify application
+   */
+  verifyApplication: async (data: {
+    applicationId: string;
+    status: 'Verified' | 'Recheck' | 'Reject';
+    remarks?: string;
+    verifiedBy?: number;
+  }) => {
+    const response = await apiClient.post('/process-management/verify', data);
+    return response.data;
+  },
+
+  /**
+   * Suggest amount
+   */
+  suggestAmount: async (data: {
+    applicationId: string;
+    suggestedAmount: number;
+    remarks?: string;
+    suggestedBy?: number;
+  }) => {
+    const response = await apiClient.post('/process-management/suggest', data);
+    return response.data;
+  },
+
+  /**
+   * Approve application
+   */
+  approveApplication: async (data: {
+    applicationId: string;
+    approvedAmount: number;
+    status: 'Approved' | 'Rejected';
+    remarks?: string;
+    approvedBy?: number;
+  }) => {
+    const response = await apiClient.post('/process-management/approve', data);
+    return response.data;
+  },
+
+  /**
+   * Issue amount
+   */
+  issueAmount: async (data: {
+    applicationId: string;
+    paymentMode: string;
+    comments?: string;
+    ddChequeNo?: string;
+    ddChequeInFavor?: string;
+    ddChequeDate?: string;
+    issuedBy?: number;
+  }) => {
+    const response = await apiClient.post('/process-management/issue-amount', data);
+    return response.data;
+  },
+};
+
+/**
+ * Reports Service
+ */
+export const reports = {
+  /**
+   * Get academic years
+   */
+  getAcademicYears: async () => {
+    const response = await apiClient.get('/reports/academic-years');
+    return response.data;
+  },
+};
+

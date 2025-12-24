@@ -1,0 +1,337 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="SiteMaster.master.cs" Inherits="Sairam_RegularUG.SiteMaster" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-69167534-16', 'auto');
+        ga('send', 'pageview');
+
+</script>
+
+    <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+
+    <script type="text/javascript">
+        try {
+            var pageTracker = _gat._getTracker("UA-10803136-9");
+            pageTracker._setDomainName(".sairamgroup.in");
+            pageTracker._trackPageview();
+        } catch (err) { }
+    </script>
+
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <link type="text/css" href="CSS/PagBtn.css" rel="Stylesheet" />
+    <title>Sai Aram Foundation</title>
+
+    <script language="JavaScript">
+        var message = new Array();
+        // Set your messages you want typed into the title bar below.
+        // To add more messages, just add more elements to the array.
+        message[0] = "Sai Ram Group of Institutions";
+        message[1] = "Sri Sairam Engineering College";
+        message[2] = "Sri Sairam institute of Technology";
+        message[3] = "Sri Sairam College of Engineering";
+        message[4] = "Sri Sai Ram Medical College";
+
+        // Set the number of repetitions (how many times a given message is typed out
+        // before moving onto the next message).
+        var reps = 1;
+        var speed = 150; // Set the overall typing speed (larger number = slower action).
+        var hold = 15 // set the length of time to display the whole phrase before retyping (larger number = longer)
+
+        // DO NOT EDIT BELOW THIS LINE.
+        var p = message.length;
+        var q = 0;
+        var r = 0;
+        var C = 0;
+        var mC = 0;
+        var s = 0;
+        var sT = null;
+
+        if (reps < 1) {
+            reps = 1;
+        }
+        function setMessage() {
+            typing = message[mC];
+            q = typing.length;
+            r = q + hold;
+            typeMessage();
+        }
+        function typeMessage() {
+            if (s > r) {
+                s = 0;
+            }
+            if (s > q) {
+                document.title = '| ' + typing + '_|';
+            }
+            else {
+                document.title = '| ' + typing.substr(0, s) + '_|';
+            }
+            if (C < (r * reps)) {
+                sT = setTimeout("typeMessage()", speed);
+                C++;
+                s++;
+            }
+            else {
+                C = 0;
+                s = 0;
+                mC++;
+                if (mC > p - 1) { mC = 0; }
+                sT = null;
+                setMessage();
+            }
+        }
+        setMessage();
+
+    </script>
+
+    <script language="JavaScript" type="text/JavaScript">
+        <!--
+        function MM_reloadPage(init) {  //reloads the window if Nav4 resized
+            if (init == true) with (navigator) {
+                if ((appName == "Netscape") && (parseInt(appVersion) == 4)) {
+                    document.MM_pgW = innerWidth; document.MM_pgH = innerHeight; onresize = MM_reloadPage;
+                } 
+            }
+            else if (innerWidth != document.MM_pgW || innerHeight != document.MM_pgH) location.reload();
+        }
+        MM_reloadPage(true);
+        //-->
+    </script>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <link rel="stylesheet" type="text/css" href="CSS/SaiGroup.css" />
+    <!-- Save for Web Styles (Sairam1_V1_Sliced.psd) -->
+
+    <script type="text/javascript" src="JS/jquery1.js"></script>
+
+    <asp:ContentPlaceHolder ID="cphHeadSection" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <!-- Save for Web Slices (Sairam1_V1_Sliced.psd) -->
+    <div id="Header">
+        <div id="LogoArea">
+            <div id="Search">
+                <div style="margin-top: 45px;" align="center">
+                    <form action="search.html" id="cse-search-box">
+                    <div>
+                        <input type="hidden" name="cx" value="013132051917571692441:y9dqlwsqmwm" />
+                        <input type="hidden" name="cof" value="FORID:10" />
+                        <input type="hidden" name="ie" value="UTF-8" />
+                        <input type="text" style="border: 1px #7e9db9 solid;" name="q" size="25" />
+                        <input name="sa" type="image" value="Search" src="images/SubmitBtn.jpg" title="Search"
+                            style="vertical-align: middle; margin-bottom: 4px;" align="middle" />
+                    </div>
+                    </form>
+
+                    <script type="text/javascript" src="http://www.google.com/cse/brand?form=cse-search-box&lang=en"></script>
+
+                </div>
+            </div>
+            <!-- End of id="Search" -->
+            <div id="Logo">
+                <a href="http://admission.sairamgroup.in/" title="Sai Ram Group of Institutions" style="margin-left: 90px;
+                    border: 0px; display: block; width: 250px; min-height: 15px; border: 0px; height: 75px;">
+                </a>
+            </div>
+            <!-- End of id="Logo" -->
+            <div id="HeaderLinks">
+                <div style="margin-top: 45px;" align="center">
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td width="4%" align="center" valign="baseline">
+                                <img src="images/BulletT.jpg" width="7" height="7" />
+                            </td>
+                            <td width="19%" align="left" valign="baseline" class="TopLink">
+                                <a href="index.html" title="Go to Home page">home</a>
+                            </td>
+                            <td width="5%" align="center" valign="baseline">
+                                <img src="images/BulletT.jpg" width="7" height="7" />
+                            </td>
+                            <td width="21%" align="left" valign="baseline" class="TopLink">
+                                <a href="Media.html" title="Sai Ram in Media">Media</a>
+                            </td>
+                            <td width="5%" align="center" valign="baseline">
+                                <img src="images/BulletT.jpg" width="7" height="7" />
+                            </td>
+                            <td width="20%" align="left" valign="baseline" class="TopLink">
+                                <a href="#" title="Enquiry">enquiry</a>
+                            </td>
+                            <td width="4%" align="center" valign="baseline">
+                                <img src="images/BulletT.jpg" width="7" height="7" />
+                            </td>
+                            <td width="22%" align="left" valign="baseline" class="TopLink">
+                                <a href="#" title="Sitemap">sitemap</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <!-- End of id="Logo" -->
+        </div>
+        <!-- End of id="LogoArea" -->
+    </div>
+    <!-- End of id="Header" -->
+    <div class="Clr">
+    </div>
+    <div id="Wrapper">
+        <div id="LftContent">
+            <div id="LftMenuArea">
+                <table width="100%" border="0" cellspacing="0" cellpadding="2">
+                    <tr>
+                        <td width="28">
+                            &nbsp;
+                        </td>
+                        <td width="155">
+                            &nbsp;
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;
+                        </td>
+                        <td class="Menu">
+                            <a href="index.html" title="Home">Home</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;
+                        </td>
+                        <td class="Menu">
+                            <a  href="http://www.sairamgroup.in/About.html" title="About Us">About Us</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;
+                        </td>
+                        <td class="Menu">
+                            <a href="Groups.html" title="Group of Institutions">Institutions</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;
+                        </td>
+                        <td class="Menu">
+                            <a href="http://www.sairamgroup.in/Admission.html" title="Admission">Admission</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;
+                        </td>
+                        <td class="Menu">
+                            <a href="#" title="Gallery">Gallery</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;
+                        </td>
+                        <td class="Menu">
+                            <a  href="http://www.sairamgroup.in/Companies.html" title="Companies">Companies</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;
+                        </td>
+                        <td class="Menu">
+                            <a  href="http://www.sairamgroup.in/Contact.html" title="Contact Us">Contact Us</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!-- End of id="LftMenuArea" -->
+            <div align="center">
+                <span class="RedHead"><u>Notice Board</u></span><br />
+                <a href="http://www.sairam.edu.in/SAI_Bday2011.html" target="_blank">
+                    <img src="images/SAI_Bday.gif" width="155" height="195" border="0" /></a><br />
+            </div>
+            <hr size="1" width="80%" color="#999999" />
+            <br />
+            <div style="padding-left: 5px; padding-right: 5px;" align="center">
+                <a href="http://www.sairam.edu.in/Registration2011.html" target="_blank">
+                    <img src="images/Admission11.jpg" alt="Admission 2011-2012" width="172" height="81"
+                        border="0" /></a></div>
+            <div class="Clr">
+            </div>
+            <br />
+            <!-- End of id="QuickLinks" -->
+        </div>
+        <!-- End of id="LftContent" -->
+        <div id="RgtContent">
+            <div align="center" id="BannerAreaIN">
+                <img src="images/Banner.jpg" width="790" height="200" /></div>
+            <!-- End of id="BannerAreaIN" -->
+            <div class="Clr">
+            </div>
+            <div class="Brud" id="Brudcurms">
+                <a href="http://www.sairamgroup.in/index.html">Home</a> &raquo; About Sai Ram Group</div>
+            <!-- End of id="Brudcurms" -->
+            <div class="Clr">
+            </div>
+            <div class="Tittle" id="Tittle">
+                &nbsp;About Sai Ram Group</div>
+            <!-- End of id="Tittle" -->
+            <div class="Clr">
+            </div>
+            <div id="BodyContentIN">
+                <asp:ContentPlaceHolder ID="cphBodyContent" runat="server">
+                </asp:ContentPlaceHolder>
+            </div>
+            <!-- End of id="BodyContent" -->
+        </div>
+        <!-- End of id="RgtContent" -->
+    </div>
+    <!-- End of id="Wrapper" -->
+    <div class="Clr">
+    </div>
+    <div id="FooterArea">
+        <div id="Footer">
+            <div id="LftBtm">
+            </div>
+            <div id="BtmCurve">
+            </div>
+            <div id="RgtBtm">
+            </div>
+            <div class="Clr">
+            </div>
+            <div id="BtmLink">
+                <div class="Btm" style="float: left; margin-top: 15px; width: 30%;">
+                    &copy; 2011 Sai Ram Group. All Rights Reserved.</div>
+                <div class="Btm" style="float: left; margin-top: 14px; width: 50%;">
+                    <a href="index.html" title="Home">Home</a> | <a  href="http://www.sairamgroup.in/About.html" title="About us">About
+                        us</a> | <a href="Groups.html" title="Institutions">Institutions</a> | <a href="http://www.sairamgroup.in/Admission.html"
+                            title="Admission">Admission</a> | <a href="#">Gallery</a> | <a  href="http://www.sairamgroup.in/Companies.html"
+                                title="Companies">Companies</a> | <a  href="http://www.sairamgroup.in/Contact.html" title="Contact Us">Contact
+                                    Us</a></div>
+                <div align="right" style="float: left; margin-top: 5px; width: 20%;">
+                    <a href="http://www.itech-india.com" target="_blank">
+                        <img src="images/iTechLogo.jpg" title="iTech India Private Limited" alt="iTech India Private Limited"
+                            width="77" height="35" border="0" /></a></div>
+            </div>
+            <!-- End of id="BtmLink" -->
+        </div>
+        <!-- End of id="Footer" -->
+    </div>
+    <!-- End of id="FooterArea" -->
+    <!-- End Save for Web Slices -->
+    </form>
+</body>
+</html>

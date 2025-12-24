@@ -1,0 +1,62 @@
+/* CSS Document */
+
+/* 
+    Theme Name: Sri Sai Ram Engineering College.
+	Website Url: http://wwww.sairamgroup.in
+	Description: iTech India Pvt Ltd website design - April 2011.
+	Version: 2.0
+	Author: MuthamilSelvan S (MSM38), iTech India Pvt Ltd.
+	Author URL: http://www.iTech-India.com/
+	*/
+
+@charset "utf-8";
+ 
+
+/********* tab news NAVIGATION *************************************************************/
+.input,select,textarea{border:#ddd 1px solid;font-size:12px;padding:10px; font-family:Arial;} li{list-style:none;}
+*{border:0;margin:0; }
+#navigation{
+   
+	/*   left: 30px;*/
+  margin-top:0px;
+  padding-top:0px;
+	margin-left:20px;
+	 
+}
+
+#navigation li{
+    float: left;
+	margin-right:5px;
+    width: 96px;
+	height: 55px;
+    
+}
+
+
+#navigation li:hover{
+    cursor: pointer;  
+}
+
+#navigation li.about1      {   position: relative; background:url(../images/NewsMenu.jpg) 0 0 no-repeat; z-index: 1;  }
+#navigation li.about1.tabActive {   position: relative; background:url(../images/NewsMenu.jpg) 0 -63px no-repeat; z-index:999!important; }
+
+#navigation li.about2       {  position: relative; background:url(../images/NewsMenu.jpg) -101px 0 no-repeat; z-index: 1;  }
+#navigation li.about2.tabActive {  position: relative; background:url(../images/NewsMenu.jpg) -101px -63px no-repeat; z-index:999!important;  }
+
+#navigation li.about3     { position: relative; background:url(../images/NewsMenu.jpg) -204px 0 no-repeat; z-index: 1;  }
+#navigation li.about3.tabActive {   position: relative; background:url(../images/NewsMenu.jpg) -204px -63px no-repeat; z-index:999!important; }
+/*
+#navigation li.about4       { position: relative; background:url(../images/NewsMenu.jpg) -381px -60px no-repeat; z-index: 1;  }
+#navigation li.about4.tabActive { position: relative; background:url(../images/NewsMenu.jpg) -381px top; z-index:9999!important; }
+
+#navigation li.about5     { position: relative; background:url(../images/NewsMenu.jpg) -508px -60px no-repeat; z-index: 1;  }
+#navigation li.about5.tabActive { position: relative; background:url(../images/NewsMenu.jpg) -508px top; z-index:9999!important; }*/
+
+
+
+#navigation li.firstNav{
+    margin-left: 0px;
+}
+ 
+
+/*********tab news END NAVIGATION *************************************************************/
