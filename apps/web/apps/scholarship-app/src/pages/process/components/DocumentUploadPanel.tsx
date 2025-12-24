@@ -250,7 +250,7 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                                             <Button
                                                 appearance="outline"
                                                 icon={<ArrowUploadRegular />}
-                                                style={{ color: "#424242", borderColor: "#d1d1d1" }}
+                                                style={{ color: "#242424", borderColor: "#d1d1d1" }}
                                                 onClick={() => handleUploadClick(doc.id)}
                                             >
                                                 Upload
