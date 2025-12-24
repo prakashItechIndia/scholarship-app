@@ -6,6 +6,7 @@ import { RegistrationProvider, useRegistration } from '@/contexts/RegistrationCo
 import IdentityDetails from './steps/IdentityDetails';
 import PersonalDetails from './steps/PersonalDetails';
 import FamilyDetails from './steps/FamilyDetails';
+import EducationMedicalDetails from './steps/EducationMedicalDetails';
 import BankDetails from './steps/BankDetails';
 import DocumentsUpload from './steps/DocumentsUpload';
 // import ReviewSubmit from './steps/ReviewSubmit';
@@ -24,9 +25,10 @@ const STEPS: Step[] = [
   { id: 1, title: 'Identity Details', key: 'identity' },
   { id: 2, title: 'Personal Details', key: 'personal' },
   { id: 3, title: 'Family details', key: 'family' },
-  { id: 4, title: 'Bank details of Applicant', key: 'bank' },
-  { id: 5, title: 'Documents Upload', key: 'documents' },
-  { id: 6, title: 'Review & Submit', key: 'review' },
+  { id: 4, title: 'Education / Medical Details', key: 'education-medical' },
+  { id: 5, title: 'Bank details of Applicant', key: 'bank' },
+  { id: 6, title: 'Documents Upload', key: 'documents' },
+  { id: 7, title: 'Review & Submit', key: 'review' },
 ];
 
 // --- Styles ---
@@ -150,8 +152,8 @@ const RegistrationContent = () => {
   // Direct destructuring - TypeScript should infer types from the hook's return type
   const { currentStep, completedSteps, prevStep, isLoading, formData, previousButtonConfig } = useRegistration();
   
-  // Check if documents step has minimum 3 files (step 5 is DocumentsUpload)
-  const isDocumentsStepValid = currentStep === 5 
+  // Check if documents step has minimum 3 files (step 6 is DocumentsUpload)
+  const isDocumentsStepValid = currentStep === 6 
     ? (formData?.documents && Array.isArray(formData.documents) && formData.documents.length >= 3)
     : true;
 
@@ -212,9 +214,10 @@ const RegistrationContent = () => {
       case 1: return <IdentityDetails />;
       case 2: return <PersonalDetails />;
       case 3: return <FamilyDetails />;
-      case 4: return <BankDetails />;
-      case 5: return <DocumentsUpload />;
-      case 6: return <ReviewSubmit />;
+      case 4: return <EducationMedicalDetails />;
+      case 5: return <BankDetails />;
+      case 6: return <DocumentsUpload />;
+      case 7: return <ReviewSubmit />;
       default: return <IdentityDetails />;
     }
   };
@@ -377,7 +380,7 @@ const RegistrationContent = () => {
                       <span>Loading...</span>
                     </Stack>
                   ) : (
-                    currentStep === 6 ? 'Submit' : 'Next'
+                    currentStep === 7 ? 'Submit' : 'Next'
                   )}
                 </Button>
               </Stack>

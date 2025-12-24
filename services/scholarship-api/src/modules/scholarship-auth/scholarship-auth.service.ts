@@ -194,6 +194,7 @@ export class ScholarshipAuthService {
 
   /**
    * Login - validates user and returns session info
+   * For admin login - only allows admin users (not Student role users)
    */
   async login(loginDto: LoginDto) {
     // Encrypt password as ASP.NET does
@@ -204,6 +205,33 @@ export class ScholarshipAuthService {
       loginDto.username,
       encryptedPassword,
     );
+
+    // Check if user is a Student role user - reject admin login for Student users
+    // Student users should use the user login flow, not admin login
+    try {
+      const studentRoleQuery = `
+        SELECT Id
+        FROM T_ROLES
+        WHERE Role_Name = 'Student' AND Is_Active = 1
+      `;
+      const studentRoleResult = await this.db.query<{ Id: number }>(studentRoleQuery);
+      
+      if (studentRoleResult.recordset && studentRoleResult.recordset.length > 0) {
+        const studentRoleId = studentRoleResult.recordset[0].Id;
+        
+        // If user has Student role, reject admin login
+        if (user.roleId === studentRoleId) {
+          throw new UnauthorizedException('Student users cannot access admin portal. Please use the user login.');
+        }
+      }
+    } catch (error) {
+      // If error is UnauthorizedException, re-throw it
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      // If Student role doesn't exist or query fails, continue (backward compatibility)
+      this.logger.warn('Could not verify Student role, allowing login to proceed', error);
+    }
 
     // Return user info (without password)
     return {

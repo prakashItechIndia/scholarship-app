@@ -1,7 +1,14 @@
 import * as React from "react";
 import { Button, Dropdown, Option, Text } from "@fluentui/react-components";
-import { ChevronLeft20Regular, ChevronRight20Regular } from "@fluentui/react-icons";
+import {
+  ChevronDownRegular,
+  ChevronLeft20Regular,
+  ChevronRight20Regular,
+  ChevronDoubleLeft20Regular,
+  ChevronDoubleRight20Regular
+} from "@fluentui/react-icons";
 import { cn } from "../lib/utils";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown";
 
 export interface PaginationProps {
   currentPage: number;
@@ -99,13 +106,12 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
               {showFirstLast && (
                 <Button
                   appearance="subtle"
-                  style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "#fff" }}
+                  style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
+                  icon={<ChevronDoubleLeft20Regular />}
                   onClick={() => onPageChange(1)}
                   disabled={currentPage === 1}
                   aria-label="First page"
-                >
-                  &laquo;
-                </Button>
+                />
               )}
               <Button
                 appearance="subtle"
@@ -168,37 +174,66 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
                 <Button
                   appearance="subtle"
                   style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
+                  icon={<ChevronDoubleRight20Regular />}
                   onClick={() => onPageChange(totalPages)}
                   disabled={currentPage === totalPages}
                   aria-label="Last page"
-                >
-                  &raquo;
-                </Button>
+                />
               )}
             </div>
           )}
         </div>
 
         {/* Right: Items per page */}
-        <div className="flex gap-2 items-center" style={{ position: "absolute", right: "1rem" }}>
+
+        <div
+          className="flex gap-2 items-center"
+          style={{ position: "absolute", right: "1rem" }}
+        >
           {showPageSize && onPageSizeChange && (
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <div
+                    style={{
+                      minWidth: "6px",
+                      padding: "4px 8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      cursor: "pointer",
+                      backgroundColor: "transparent",
+                      border: "none",
+                    }}
+                  >
+                    {pageSize}
+                    <ChevronDownRegular style={{ marginLeft: "4px" }} />
+                  </div>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent>
+                  {pageSizeOptions.map((size) => (
+                    <DropdownMenuItem
+                      key={size}
+                      onClick={() => onPageSizeChange(size)}
+                      style={{
+                        fontWeight: size === pageSize ? "bold" : "normal",
+                        color: size === pageSize ? "#242424" : "#616161",
+                      }}
+                    >
+                      {size}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <Text style={{ whiteSpace: "nowrap" }}>Items per page</Text>
-              <Dropdown
-                value={String(pageSize)}
-                onOptionSelect={handlePageSizeChange}
-                style={{ minWidth: 60 }}
-              >
-                {pageSizeOptions.map((size) => (
-                  <Option key={size} text={String(size)} value={String(size)}>
-                    {size}
-                  </Option>
-                ))}
-              </Dropdown>
             </div>
           )}
         </div>
-      </div>
+
+
+      </div >
     );
   }
 );

@@ -217,7 +217,7 @@ const SignInPage = () => {
       setIsLoading(true);
       
       // Import scholarship auth service
-      const { scholarshipAuth } = await import('../../services/scholarship.service');
+      const { scholarshipAuth, scholarshipApplication } = await import('../../services/scholarship.service');
       
       // Call login API - validates credentials
       const loginResponse = await scholarshipAuth.login(values.email, values.password);
@@ -247,8 +247,20 @@ const SignInPage = () => {
         user: loginResponse,
       }));
       
-      success('Sign In Successful', 'Redirecting to dashboard...');
-      setTimeout(() => void navigate('/user-dashboard'), 300);
+      // Check if user has completed registration (has record in t_Registration)
+      // New users (who just set password) should be redirected to registration form
+      // Existing users (who have completed registration) should be redirected to dashboard
+      const hasCompletedRegistration = await scholarshipApplication.checkEmailExists(values.email);
+      
+      if (hasCompletedRegistration) {
+        // Existing user - has completed registration, redirect to dashboard
+        success('Sign In Successful', 'Redirecting to dashboard...');
+        setTimeout(() => void navigate('/user-dashboard'), 300);
+      } else {
+        // New user - just set password, hasn't completed registration, redirect to registration form
+        success('Sign In Successful', 'Please complete your registration...');
+        setTimeout(() => void navigate('/registration'), 300);
+      }
     } catch (err: unknown) {
       // Handle specific error cases per BRD Section 5.4.3
       let errorMessage = 'Invalid credentials. Please try again.';

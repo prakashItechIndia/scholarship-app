@@ -13,6 +13,8 @@ import { ScholarshipAuthModule } from './modules/scholarship-auth/scholarship-au
 import { AdminPanelModule } from './modules/admin-panel/admin-panel.module';
 import { ScholarshipApplicationModule } from './modules/scholarship-application/scholarship-application.module';
 import { UserManagementModule } from './modules/user-management/user-management.module';
+import { RoleManagementModule } from './modules/role-management/role-management.module';
+import { ProcessManagementModule } from './modules/process-management/process-management.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { DocumentUploadModule } from './modules/document-upload/document-upload.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
@@ -38,6 +40,8 @@ import { DropdownOptionsModule } from './modules/dropdown-options/dropdown-optio
     AdminPanelModule,
     ScholarshipApplicationModule,
     UserManagementModule,
+    RoleManagementModule,
+    ProcessManagementModule,
     ReportsModule,
     DocumentUploadModule,
     DashboardModule,

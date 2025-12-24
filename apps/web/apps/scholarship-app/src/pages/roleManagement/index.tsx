@@ -7,47 +7,95 @@ import {
   PageActionButtons,
 } from "@shared/components";
 import { Role } from "./types";
-import { mockRoles } from "./constants";
 import { useRoleTable } from "./hooks/useRoleTable";
+import { roleManagement } from "../../services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
 
 const RoleManagementPage: React.FC = () => {
   const navigate = useNavigate();
+  const { success, error: showError } = useToast();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
-  const [roles, setRoles] = React.useState<Role[]>(mockRoles);
+  const [roles, setRoles] = React.useState<Role[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [selectedRole, setSelectedRole] = React.useState<Role | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set());
   const [deleteError, setDeleteError] = React.useState<string | null>(null);
 
-  // Sync roles to sessionStorage for validation in form
+  // Fetch roles from API
   React.useEffect(() => {
-    sessionStorage.setItem("allRoles", JSON.stringify(roles));
-  }, [roles]);
+    const fetchRoles = async () => {
+      try {
+        setLoading(true);
+        const data = await roleManagement.getAllRoles();
+        // Map API response to Role interface
+        const mappedRoles: Role[] = data.map((role: {
+          id: string | number;
+          roleName: string;
+          userType: string;
+          status: string;
+          isActive: number;
+        }) => ({
+          id: String(role.id),
+          roleName: role.roleName,
+          userType: role.userType,
+          status: role.status,
+          roleType: role.userType.toLowerCase().replace(' ', ''),
+          description: '',
+          permissions: [],
+        }));
+        setRoles(mappedRoles);
+        // Sync roles to sessionStorage for validation in form
+        sessionStorage.setItem("allRoles", JSON.stringify(mappedRoles));
+      } catch (err) {
+        showError('Failed to Load Roles', err instanceof Error ? err.message : 'Failed to fetch roles');
+      } finally {
+        setLoading(false);
+      }
+    };
+    void fetchRoles();
+  }, [showError]);
 
-  // Check for saved role from form page
+  // Refresh roles after form save (check sessionStorage)
   React.useEffect(() => {
     const lastSavedRole = sessionStorage.getItem("lastSavedRole");
     const roleAction = sessionStorage.getItem("roleAction");
     
     if (lastSavedRole && roleAction) {
-      const savedRole = JSON.parse(lastSavedRole) as Role;
-      
-      if (roleAction === "add") {
-        // Add new role
-        setRoles((prev) => [...prev, savedRole]);
-      } else if (roleAction === "edit") {
-        // Update existing role
-        setRoles((prev) =>
-          prev.map((role) => (role.id === savedRole.id ? savedRole : role))
-        );
-      }
+      // Reload roles from API instead of using sessionStorage
+      const fetchRoles = async () => {
+        try {
+          const data = await roleManagement.getAllRoles();
+          const mappedRoles: Role[] = data.map((role: {
+            id: string | number;
+            roleName: string;
+            userType: string;
+            status: string;
+            isActive: number;
+          }) => ({
+            id: String(role.id),
+            roleName: role.roleName,
+            userType: role.userType,
+            status: role.status,
+            roleType: role.userType.toLowerCase().replace(' ', ''),
+            description: '',
+            permissions: [],
+          }));
+          setRoles(mappedRoles);
+          sessionStorage.setItem("allRoles", JSON.stringify(mappedRoles));
+          success('Success', roleAction === 'add' ? 'Role created successfully' : 'Role updated successfully');
+        } catch (err) {
+          showError('Failed to Refresh', err instanceof Error ? err.message : 'Failed to refresh roles');
+        }
+      };
+      void fetchRoles();
       
       // Clear sessionStorage
       sessionStorage.removeItem("lastSavedRole");
       sessionStorage.removeItem("roleAction");
     }
-  }, []);
+  }, [success, showError]);
 
   // Paginate data
   const paginatedData = React.useMemo(() => {
@@ -94,26 +142,37 @@ const RoleManagementPage: React.FC = () => {
     void navigate("/role-management/add");
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (selectedRole) {
-      // ROL-004: Check if role has assigned users (prevent deletion)
-      // In a real app, this would check from API
-      const hasAssignedUsers = false; // Mock: would check from API
-      
-      if (hasAssignedUsers) {
-        setDeleteError("Cannot delete role. Users are currently assigned to this role.");
-        return;
-      }
+      try {
+        setDeleteError(null);
+        const roleId = parseInt(selectedRole.id, 10);
+        
+        // ROL-004: Check if role has assigned users (prevent deletion)
+        const checkResult = await roleManagement.checkRoleHasUsers(roleId);
+        if (checkResult.hasUsers) {
+          setDeleteError("Cannot delete role. Users are currently assigned to this role.");
+          return;
+        }
 
-      // Remove role from list
-      setRoles(roles.filter((role) => role.id !== selectedRole.id));
-      setDeleteModalOpen(false);
-      setSelectedRole(null);
-      setDeleteError(null);
-      
-      // Reset to page 1 if current page becomes empty
-      if (paginatedData.length === 1 && currentPage > 1) {
-        setCurrentPage(currentPage - 1);
+        // Delete role via API
+        await roleManagement.deleteRole(roleId);
+        
+        // Remove role from list
+        setRoles(roles.filter((role) => role.id !== selectedRole.id));
+        setDeleteModalOpen(false);
+        setSelectedRole(null);
+        setDeleteError(null);
+        success('Success', 'Role deleted successfully');
+        
+        // Reset to page 1 if current page becomes empty
+        if (paginatedData.length === 1 && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to delete role';
+        setDeleteError(errorMessage);
+        showError('Delete Failed', errorMessage);
       }
     }
   };
@@ -128,15 +187,16 @@ const RoleManagementPage: React.FC = () => {
       boxSizing: "border-box",
     }}>
       {/* Title and Action Buttons */}
-      <div style={{ padding: "24px 24px 16px 24px" }}>
+      <div style={{ padding: "16px 24px 0px 24px" }}>
         <PageActionButtons
           title={
-            <div style={{ lineHeight: "1.2" }}>
+            <div style={{  }}>
               <div style={{
                 fontSize: "16px",
                 fontWeight: 600,
                 color: "#242424",
-                fontFamily: "'Inter', sans-serif",
+                // fontFamily: "'Inter', sans-serif",
+                lineHeight: "22px",
               }}>
                 Role and Permissions
               </div>
@@ -146,6 +206,7 @@ const RoleManagementPage: React.FC = () => {
                 color: "#242424",
                 fontFamily: "'Inter', sans-serif",
                 marginTop: "2px",
+                lineHeight: "22px",
               }}>
                 Maintain Roles, Rights, and User Information
               </div>

@@ -40,6 +40,7 @@ const AdminSignInPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { isAuthenticated, checkAuthStatus } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const redirectUrl = searchParams.get('redirect') ?? searchParams.get('returnUrl');
   const productCode = searchParams.get('product');
@@ -50,7 +51,7 @@ const AdminSignInPage = () => {
   });
 
   const { handleSubmit } = loginForm;
-  const { success } = useToast();
+  const { success, error } = useToast();
 
   const baseUrl = getBaseUrl();
   const organizationSchema = generateOrganizationSchema({
@@ -111,16 +112,65 @@ const AdminSignInPage = () => {
 
 
   const onLoginSubmit = async (values: LoginFormData) => {
-    localStorage.setItem('scholarship_auth', JSON.stringify({
-      username: values.username,
-      password: values.password,
-      timestamp: Date.now(),
-    }));
-
-    // Show loading for a few seconds before showing success and navigating
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    success('Successfully Logged In', 'You have been successfully logged in. Redirecting...');
-    setTimeout(() => void navigate('/landing'), 300);
+    try {
+      setIsLoading(true);
+      
+      // Import scholarship auth service
+      const { scholarshipAuth } = await import('../../services/scholarship.service');
+      
+      // Call login API - validates credentials using ValidateUser stored procedure
+      // This only works for admin users (not Student role users)
+      const loginResponse = await scholarshipAuth.login(values.username, values.password);
+      
+      // Create session token for admin users
+      const responseData = (loginResponse as unknown) as { userId?: number; userName?: string; roleId?: number; [key: string]: unknown };
+      const sessionToken = btoa(JSON.stringify({
+        username: values.username,
+        userId: responseData.userId ?? null,
+        userName: responseData.userName ?? values.username,
+        roleId: responseData.roleId ?? null,
+        timestamp: Date.now(),
+        expiresAt: Date.now() + (30 * 60 * 1000), // 30 minutes session timeout per BRD
+        isAdmin: true, // Mark as admin user
+      }));
+      
+      // Store session token and user data
+      sessionStorage.setItem('scholarship_admin_session_token', sessionToken);
+      
+      localStorage.setItem('scholarship_auth', JSON.stringify({
+        username: values.username,
+        timestamp: Date.now(),
+        user: loginResponse,
+        isAdmin: true, // Mark as admin user
+      }));
+      
+      // Redirect to admin dashboard after successful login
+      // Role_Id 1 or 7 → AdminPanelApprove (approve page) - can be handled within dashboard
+      // Other roles → AdminPanelHome (home/dashboard)
+      const roleId = responseData.roleId ?? 0;
+      if (roleId === 1 || roleId === 7) {
+        success('Successfully Logged In', 'Redirecting to approval panel...');
+        setTimeout(() => void navigate('/admin-dashboard'), 300);
+      } else {
+        success('Successfully Logged In', 'Redirecting to dashboard...');
+        setTimeout(() => void navigate('/admin-dashboard'), 300);
+      }
+    } catch (err: unknown) {
+      // Handle specific error cases per BRD Section 5.4.3
+      let errorMessage = 'Invalid credentials. Please try again.';
+      if (err instanceof Error) {
+        if (err.message.includes('Invalid') || err.message.includes('password') || err.message.includes('credentials')) {
+          errorMessage = 'Incorrect username or password. Try again.';
+        } else if (err.message.includes('not active') || err.message.includes('Account')) {
+          errorMessage = 'Account is not active. Please contact support.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      error('Login Failed', errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
 
@@ -184,8 +234,8 @@ const AdminSignInPage = () => {
               <Stack tokens={{ childrenGap: 8 }}>
                 <SubmitButton
                   type="submit"
-                  disabled={loginForm.formState.isSubmitting}
-                  isLoading={loginForm.formState.isSubmitting}
+                  disabled={loginForm.formState.isSubmitting || isLoading}
+                  isLoading={loginForm.formState.isSubmitting || isLoading}
                   loadingText="Loading..."
                   variant="password"
                   className="h-11"

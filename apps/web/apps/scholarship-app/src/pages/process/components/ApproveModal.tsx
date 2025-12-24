@@ -2,12 +2,14 @@ import * as React from "react";
 import { Modal, Button } from "@shared/components";
 import { Dismiss24Regular, CheckmarkCircle24Regular } from "@fluentui/react-icons";
 import { ApplicationData } from "../types";
+import { processManagement } from "../../../services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
 
 interface ApproveModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     data?: ApplicationData | null;
-    onApproveSuccess?: (applicationNo: string) => void;
+    onApproveSuccess?: () => void;
 }
 
 const ApproveModal: React.FC<ApproveModalProps> = ({
@@ -16,9 +18,11 @@ const ApproveModal: React.FC<ApproveModalProps> = ({
     data,
     onApproveSuccess,
 }) => {
+    const { success, error: showError } = useToast();
     const [approvedAmount, setApprovedAmount] = React.useState("");
     const [comment, setComment] = React.useState("");
     const [isSubmitted, setIsSubmitted] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
     const [modalTitle, setModalTitle] = React.useState("LEO MUTHU - Scholarship Approve Panel ( 2024-2025 )");
 
     // Clean up state when modal closes/opens
@@ -41,30 +45,76 @@ const ApproveModal: React.FC<ApproveModalProps> = ({
         { label: "Suggested Amount", value: "25000" }, // Mocked
     ];
 
-    const handleSubmit = () => {
-        console.log("Approving Application:", {
-            applicationNo: data?.applicationNo,
-            approvedAmount,
-            comment,
-        });
-        setIsSubmitted(true);
-        setModalTitle("Success");
+    const handleSubmit = async () => {
+        if (!data?.applicationNo || !approvedAmount) {
+            showError('Validation Error', 'Please enter approved amount');
+            return;
+        }
 
-        // Call the success callback to open PDF
-        if (onApproveSuccess && data?.applicationNo) {
-            // Delay slightly to show success message first
-            setTimeout(() => {
-                onApproveSuccess(data.applicationNo);
-            }, 1500);
+        try {
+            setLoading(true);
+            // Get current user ID from localStorage
+            const authData = localStorage.getItem('scholarship_auth');
+            const userId = authData ? JSON.parse(authData).userId : undefined;
+
+            await processManagement.approveApplication({
+                applicationId: data.applicationNo,
+                approvedAmount: parseFloat(approvedAmount),
+                status: 'Approved',
+                remarks: comment,
+                approvedBy: userId,
+            });
+
+            setIsSubmitted(true);
+            setModalTitle("Success");
+            success('Success', 'Application approved successfully');
+
+            // Call the success callback to refresh data
+            if (onApproveSuccess) {
+                setTimeout(() => {
+                    onApproveSuccess(data.applicationNo);
+                    onOpenChange(false);
+                }, 1500);
+            }
+        } catch (err) {
+            showError('Failed to Approve', err instanceof Error ? err.message : 'Failed to approve application');
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleReject = () => {
-        console.log("Rejecting Application:", {
-            applicationNo: data?.applicationNo,
-            comment,
-        });
-        onOpenChange(false);
+    const handleReject = async () => {
+        if (!data?.applicationNo) {
+            showError('Validation Error', 'Application data is missing');
+            return;
+        }
+
+        if (!comment.trim()) {
+            showError('Validation Error', 'Remarks are required for rejection');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            // Get current user ID from localStorage
+            const authData = localStorage.getItem('scholarship_auth');
+            const userId = authData ? JSON.parse(authData).userId : undefined;
+
+            await processManagement.approveApplication({
+                applicationId: data.applicationNo,
+                approvedAmount: 0,
+                status: 'Rejected',
+                remarks: comment,
+                approvedBy: userId,
+            });
+
+            success('Success', 'Application rejected successfully');
+            onOpenChange(false);
+        } catch (err) {
+            showError('Failed to Reject', err instanceof Error ? err.message : 'Failed to reject application');
+        } finally {
+            setLoading(false);
+        }
     }
 
     const renderRow = (label: string, value: string, isLast: boolean) => (
@@ -260,6 +310,7 @@ const ApproveModal: React.FC<ApproveModalProps> = ({
                         <Button
                             appearance="primary"
                             onClick={handleSubmit}
+                            disabled={loading || !approvedAmount}
                             style={{ backgroundColor: "#0F6CBD", color: "white", minWidth: "100px" }}
                         >
                             Approve

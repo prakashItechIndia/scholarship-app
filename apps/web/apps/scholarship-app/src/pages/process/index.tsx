@@ -14,15 +14,14 @@ import {
   MoreVerticalRegular,
   ChevronDownRegular,
   SearchRegular,
+  FilterRegular,
 } from "@fluentui/react-icons";
 import PDFViewerModal from "../../components/PDFViewerModal";
 import ViewDocumentsDrawer from "../../components/ViewDocumentsDrawer";
 import ApplicationDetailsView from "../../components/ApplicationDetailsView";
 import { ApplicationData } from "./types";
-import { tabDataMap, tabTotalItemsMap } from "./constants";
 import { useProcessTable } from "./hooks/useProcessTable";
 import ProcessTabs from "./components/ProcessTabs";
-import ProcessFilters from "./components/ProcessFilters";
 import DocumentUploadPanel from "./components/DocumentUploadPanel";
 import ProcessHistoryModal from "./components/ProcessHistoryModal";
 import ScholarshipHistoryModal from "./components/ScholarshipHistoryModal";
@@ -31,6 +30,8 @@ import ApproveModal from "./components/ApproveModal";
 import IssueAmountModal from "./components/IssueAmountModal";
 import SuggestModal from "./components/SuggestModal";
 import VerifyModal from "./components/VerifyModal";
+import { processManagement, reports } from "../../services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
 
 const tabHeaderInfo: Record<string, { title: string; subtitle: string }> = {
   overview: {
@@ -60,15 +61,18 @@ const tabHeaderInfo: Record<string, { title: string; subtitle: string }> = {
 };
 
 const ProcessPage: React.FC = () => {
+  const { success, error: showError } = useToast();
   const [activeTab, setActiveTab] = React.useState("overview");
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(5);
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const [applications, setApplications] = React.useState<ApplicationData[]>([]);
+  const [totalItems, setTotalItems] = React.useState(0);
   const [selectedApplication, setSelectedApplication] = React.useState<ApplicationData | null>(null);
   const [viewModalOpen, setViewModalOpen] = React.useState(false);
   const [editModalOpen, setEditModalOpen] = React.useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
-  const [filterPopoverOpen, setFilterPopoverOpen] = React.useState(false);
   const [pdfViewerOpen, setPdfViewerOpen] = React.useState(false);
   const [viewDocumentsDrawerOpen, setViewDocumentsDrawerOpen] = React.useState(false);
   const [selectedPdfUrl, setSelectedPdfUrl] = React.useState<string | undefined>();
@@ -101,16 +105,177 @@ const ProcessPage: React.FC = () => {
   const [selectedVerifyApplication, setSelectedVerifyApplication] = React.useState<ApplicationData | null>(null);
 
   const [selectedDocument, setSelectedDocument] = React.useState<ApplicationData | null>(null);
-  const [academicYear, setAcademicYear] = React.useState("Academic year");
+  const [academicYear, setAcademicYear] = React.useState("All Years");
+  const [academicYearId, setAcademicYearId] = React.useState<number | undefined>();
+  const [academicYears, setAcademicYears] = React.useState<{ ScholarshipYear_Id?: string | number; ScholarshipYear_Code?: string; [key: string]: unknown }[]>([]);
+  const [loadingAcademicYears, setLoadingAcademicYears] = React.useState(false);
 
-  // Get current tab's total items
-  const totalItems = tabTotalItemsMap[activeTab] || 0;
-  const totalPages = Math.ceil(totalItems / pageSize);
+  // Helper function to map API response to ApplicationData
+  const mapApiResponseToApplicationData = (apiData: Record<string, unknown>): ApplicationData => {
+    return {
+      applicationNo: String(apiData.Application_Id || ''),
+      studentName: String(apiData.Applicant_Name || ''),
+      classStudying: String(apiData.Class_Studying || ''),
+      institutionName: String(apiData.Institution_Name || ''),
+      fatherAnnualIncome: String(apiData.Father_AnnualIncome || ''),
+      mobileNumber: String(apiData.Mobile_Number || ''),
+      fatherOccupation: String(apiData.Father_Occupation || ''),
+      scholarshipNumber: String(apiData.Scholarship_No || '-'),
+      status: String(apiData.Status || ''),
+      scholarship: String(apiData.Scholarship_Id || ''),
+      preparedBy: String(apiData.Prepared_By || '-'),
+      verifiedBy: String(apiData.Verified_By || '-'),
+      suggestedBy: String(apiData.Suggested_By || '-'),
+      processActionLabel: getProcessActionLabel(String(apiData.Status || ''), activeTab),
+      ...apiData,
+    };
+  };
 
-  // Reset to page 1 when tab changes
+  // Helper function to get process action label based on status and tab
+  const getProcessActionLabel = (status: string, tab: string): string => {
+    if (tab === 'overview') {
+      if (status === 'Registered') return 'View';
+      if (status === 'Waiting') return 'Approve';
+      if (status === 'Approved') return 'Issue Amount';
+      if (status === 'Completed') return 'View';
+    }
+    if (tab === 'documents') return 'Upload';
+    if (tab === 'verify') return 'Verify';
+    if (tab === 'suggest') return 'Suggest';
+    if (tab === 'approve') return 'Approve';
+    if (tab === 'issue-amount') return 'Issue Amount';
+    return 'View';
+  };
+
+  // Fetch applications based on active tab
+  React.useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        setLoading(true);
+        const params: Record<string, unknown> = {
+          page: currentPage,
+          pageSize: pageSize,
+        };
+
+        // Add search filters if provided
+        if (searchQuery) {
+          params.mainCategory = 'Name';
+          params.key = searchQuery;
+        }
+
+        // Add academic year filter if selected (matching old app: intAcyearId != 0)
+        if (academicYearId && academicYearId > 0) {
+          params.academicYearId = academicYearId;
+        }
+
+        let response: { data: unknown[]; total: number; page: number; pageSize: number } | unknown[] = [];
+
+        switch (activeTab) {
+          case 'overview':
+            response = await processManagement.getOverviewApplications({
+              mainCategory: params.mainCategory as string | undefined,
+              key: params.key as string | undefined,
+              academicYearId: params.academicYearId as number | undefined,
+              page: params.page as number,
+              pageSize: params.pageSize as number,
+              selectedStatusText: undefined,
+              fromDate: undefined,
+              toDate: undefined,
+            });
+            break;
+          case 'documents':
+            response = await processManagement.getDocumentsApplications({
+              mainCategory: params.mainCategory as string | undefined,
+              key: params.key as string | undefined,
+              academicYearId: params.academicYearId as number | undefined,
+              page: params.page as number,
+              pageSize: params.pageSize as number,
+            });
+            break;
+          case 'verify':
+            response = await processManagement.getVerifyApplications({
+              mainCategory: params.mainCategory as string | undefined,
+              key: params.key as string | undefined,
+              academicYearId: params.academicYearId as number | undefined,
+              page: params.page as number,
+              pageSize: params.pageSize as number,
+            });
+            break;
+          case 'suggest':
+            response = await processManagement.getSuggestApplications({
+              mainCategory: params.mainCategory as string | undefined,
+              key: params.key as string | undefined,
+              academicYearId: params.academicYearId as number | undefined,
+              page: params.page as number,
+              pageSize: params.pageSize as number,
+            });
+            break;
+          case 'approve':
+            response = await processManagement.getApproveApplications({
+              mainCategory: params.mainCategory as string | undefined,
+              key: params.key as string | undefined,
+              academicYearId: params.academicYearId as number | undefined,
+              page: params.page as number,
+              pageSize: params.pageSize as number,
+            });
+            break;
+          case 'issue-amount':
+            response = await processManagement.getIssueAmountApplications({
+              mainCategory: params.mainCategory as string | undefined,
+              key: params.key as string | undefined,
+              academicYearId: params.academicYearId as number | undefined,
+              page: params.page as number,
+              pageSize: params.pageSize as number,
+            });
+            break;
+          default:
+            response = { data: [], total: 0, page: 1, pageSize: 5 };
+        }
+
+        // Handle both old format (array) and new format (object with data, total, page, pageSize)
+        if (Array.isArray(response)) {
+          const mappedData = (response as Record<string, unknown>[]).map(mapApiResponseToApplicationData);
+          setApplications(mappedData);
+          setTotalItems(mappedData.length);
+        } else {
+          const apiResponse = response as { data: unknown[]; total: number; page: number; pageSize: number };
+          const mappedData = (apiResponse.data as Record<string, unknown>[]).map(mapApiResponseToApplicationData);
+          setApplications(mappedData);
+          setTotalItems(apiResponse.total || 0);
+        }
+      } catch (err) {
+        showError('Failed to Load Applications', err instanceof Error ? err.message : 'Failed to fetch applications');
+        setApplications([]);
+        setTotalItems(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void fetchApplications();
+  }, [activeTab, searchQuery, academicYearId, currentPage, pageSize, showError]);
+
+  // Fetch academic years on component mount
+  React.useEffect(() => {
+    const fetchAcademicYears = async () => {
+      try {
+        setLoadingAcademicYears(true);
+        const years = await reports.getAcademicYears();
+        setAcademicYears(Array.isArray(years) ? years : []);
+      } catch (err) {
+        showError('Failed to Load Academic Years', err instanceof Error ? err.message : 'Failed to fetch academic years');
+        setAcademicYears([]);
+      } finally {
+        setLoadingAcademicYears(false);
+      }
+    };
+    void fetchAcademicYears();
+  }, [showError]);
+
+  // Reset to page 1 when tab changes, search query changes, or academic year changes
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [activeTab]);
+  }, [activeTab, searchQuery, academicYearId]);
 
   // Handle view action
   const handleView = React.useCallback((item: ApplicationData) => {
@@ -193,6 +358,111 @@ const ProcessPage: React.FC = () => {
     }
   }, []);
 
+  // Refresh applications after modal actions
+  const refreshApplications = React.useCallback(() => {
+    const fetchApplications = async () => {
+      try {
+        setLoading(true);
+        const params: Record<string, unknown> = {
+          page: currentPage,
+          pageSize: pageSize,
+        };
+
+        // Add search filters if provided
+        if (searchQuery) {
+          params.mainCategory = 'Name';
+          params.key = searchQuery;
+        }
+
+        // Add academic year filter if selected (matching old app: intAcyearId != 0)
+        if (academicYearId && academicYearId > 0) {
+          params.academicYearId = academicYearId;
+        }
+
+        let response: { data: unknown[]; total: number; page: number; pageSize: number } | unknown[] = [];
+
+        switch (activeTab) {
+          case 'overview':
+            response = await processManagement.getOverviewApplications({
+              mainCategory: params.mainCategory as string | undefined,
+              key: params.key as string | undefined,
+              academicYearId: params.academicYearId as number | undefined,
+              page: params.page as number,
+              pageSize: params.pageSize as number,
+              selectedStatusText: undefined,
+              fromDate: undefined,
+              toDate: undefined,
+            });
+            break;
+          case 'documents':
+            response = await processManagement.getDocumentsApplications({
+              mainCategory: params.mainCategory as string | undefined,
+              key: params.key as string | undefined,
+              academicYearId: params.academicYearId as number | undefined,
+              page: params.page as number,
+              pageSize: params.pageSize as number,
+            });
+            break;
+          case 'verify':
+            response = await processManagement.getVerifyApplications({
+              mainCategory: params.mainCategory as string | undefined,
+              key: params.key as string | undefined,
+              academicYearId: params.academicYearId as number | undefined,
+              page: params.page as number,
+              pageSize: params.pageSize as number,
+            });
+            break;
+          case 'suggest':
+            response = await processManagement.getSuggestApplications({
+              mainCategory: params.mainCategory as string | undefined,
+              key: params.key as string | undefined,
+              academicYearId: params.academicYearId as number | undefined,
+              page: params.page as number,
+              pageSize: params.pageSize as number,
+            });
+            break;
+          case 'approve':
+            response = await processManagement.getApproveApplications({
+              mainCategory: params.mainCategory as string | undefined,
+              key: params.key as string | undefined,
+              academicYearId: params.academicYearId as number | undefined,
+              page: params.page as number,
+              pageSize: params.pageSize as number,
+            });
+            break;
+          case 'issue-amount':
+            response = await processManagement.getIssueAmountApplications({
+              mainCategory: params.mainCategory as string | undefined,
+              key: params.key as string | undefined,
+              academicYearId: params.academicYearId as number | undefined,
+              page: params.page as number,
+              pageSize: params.pageSize as number,
+            });
+            break;
+          default:
+            response = { data: [], total: 0, page: 1, pageSize: 5 };
+        }
+
+        // Handle both old format (array) and new format (object with data, total, page, pageSize)
+        if (Array.isArray(response)) {
+          const mappedData = (response as Record<string, unknown>[]).map(mapApiResponseToApplicationData);
+          setApplications(mappedData);
+          setTotalItems(mappedData.length);
+        } else {
+          const apiResponse = response as { data: unknown[]; total: number; page: number; pageSize: number };
+          const mappedData = (apiResponse.data as Record<string, unknown>[]).map(mapApiResponseToApplicationData);
+          setApplications(mappedData);
+          setTotalItems(apiResponse.total || 0);
+        }
+      } catch (err) {
+        showError('Failed to Refresh', err instanceof Error ? err.message : 'Failed to refresh applications');
+      } finally {
+        setLoading(false);
+      }
+    };
+    void fetchApplications();
+  }, [activeTab, searchQuery, academicYearId, currentPage, pageSize, showError]);
+
   // Handle viewing a specific document from the drawer - opens in new tab
   const handleViewSpecificDocument = React.useCallback((doc: { url: string; name: string }) => {
     // Open PDF in new tab
@@ -224,28 +494,9 @@ const ProcessPage: React.FC = () => {
     handleProcess,
   });
 
-  // Get current tab's data
-  const currentTabData = React.useMemo(() => {
-    return tabDataMap[activeTab] ?? [];
-  }, [activeTab]);
-
-  // Filter data based on search query and active tab
-  const filteredData = React.useMemo(() => {
-    if (!searchQuery) return currentTabData;
-    const query = searchQuery.toLowerCase();
-    return currentTabData.filter((item) => {
-      return Object.values(item).some((value) =>
-        String(value).toLowerCase().includes(query)
-      );
-    });
-  }, [searchQuery, currentTabData]);
-
-  // Paginate data
-  const paginatedData = React.useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    return filteredData.slice(startIndex, endIndex);
-  }, [filteredData, currentPage, pageSize]);
+  // Data is already paginated from the server
+  const paginatedData = applications;
+  const totalPages = Math.ceil(totalItems / pageSize);
 
   return (
     <div style={{
@@ -309,18 +560,55 @@ const ProcessPage: React.FC = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              {["2020", "2021", "2022", "2023", "2024", "2025", "2026"].map((year) => (
-                <DropdownMenuItem
-                  key={year}
-                  onClick={() => setAcademicYear(year)}
-                  style={{
-                    fontWeight: year === academicYear ? "bold" : "normal",
-                    color: year === academicYear ? "#242424" : "#616161", // optional color change for better visibility
-                  }}
+              <DropdownMenuItem
+                onClick={() => {
+                  setAcademicYear("All Years");
+                  setAcademicYearId(undefined);
+                }}
+                style={{
+                  fontWeight: academicYear === "All Years" ? "bold" : "normal",
+                  color: academicYear === "All Years" ? "#242424" : "#616161",
+                  backgroundColor: "transparent",
+                }}
+                className="!text-[#242424]"
+              >
+                All Years
+              </DropdownMenuItem>
+              {loadingAcademicYears ? (
+                <DropdownMenuItem 
+                  style={{ color: "#616161", backgroundColor: "transparent" }}
+                  className="!text-[#616161]"
                 >
-                  {year}
+                  Loading...
                 </DropdownMenuItem>
-              ))}
+              ) : (
+                academicYears.map((yearData) => {
+                  // API returns: { ScholarshipYear_Id: "16", ScholarshipYear_Code: "2025" }
+                  const yearIdRaw = yearData.ScholarshipYear_Id;
+                  const yearId = yearIdRaw ? (typeof yearIdRaw === 'string' ? parseInt(yearIdRaw, 10) : yearIdRaw) : undefined;
+                  const yearLabel = yearData.ScholarshipYear_Code || (yearId ? String(yearId) : '');
+                  const isSelected = academicYearId === yearId;
+                  const keyValue = yearId ?? yearLabel;
+                  
+                  return (
+                    <DropdownMenuItem
+                      key={String(keyValue)}
+                      onClick={() => {
+                        setAcademicYear(yearLabel);
+                        setAcademicYearId(yearId ?? undefined);
+                      }}
+                      style={{
+                        fontWeight: isSelected ? "bold" : "normal",
+                        color: isSelected ? "#242424" : "#616161",
+                        backgroundColor: "transparent",
+                      }}
+                      className={isSelected ? "!text-[#242424]" : "!text-[#616161]"}
+                    >
+                      {yearLabel}
+                    </DropdownMenuItem>
+                  );
+                })
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -355,6 +643,7 @@ const ProcessPage: React.FC = () => {
             alignItems: "center",
             gap: "12px",
             marginBottom: "12px",
+            paddingRight: "24px",
             flexShrink: 0,
           }}>
             <div>
@@ -374,11 +663,43 @@ const ProcessPage: React.FC = () => {
               </Button>
 
             </div>
-            <ProcessFilters
-              open={filterPopoverOpen}
-              onOpenChange={setFilterPopoverOpen}
 
-            />
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button
+                  appearance="outline"
+                  aria-label="Filter"
+                  style={{
+                    width: "32px",
+                    minWidth: "32px",
+                    maxWidth: "32px",
+                    height: "32px",
+                    padding: 0,
+                    borderColor: "#d1d5db",
+                    backgroundColor: "#fff",
+                  }}
+                >
+                  <FilterRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => console.log("Application No clicked")}>
+                  Application No
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => console.log("Aadhaar ID clicked")}>
+                  Aadhaar ID
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => console.log("Mobile No clicked")}>
+                  Mobile No
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => console.log("Name clicked")}>
+                  Name
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => console.log("Student ID clicked")}>
+                  Student ID
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <Button
               appearance="outline"
@@ -738,6 +1059,7 @@ const ProcessPage: React.FC = () => {
         open={issueAmountModalOpen}
         onOpenChange={setIssueAmountModalOpen}
         data={selectedIssueAmountApplication}
+        onIssueSuccess={refreshApplications}
       />
       <PrintDetailsModal
         open={printDetailsModalOpen}

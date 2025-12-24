@@ -2,12 +2,15 @@ import * as React from "react";
 import { Button } from "@shared/components";
 import { Dismiss24Regular, ArrowDownload24Regular } from "@fluentui/react-icons";
 import { ApplicationData } from "../types";
+import { processManagement } from "../../../services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
 
 interface VerifyModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     data?: ApplicationData | null;
     onPreviousScholarshipHistory?: () => void;
+    onVerifySuccess?: () => void;
 }
 
 const VerifyModal: React.FC<VerifyModalProps> = ({
@@ -15,7 +18,11 @@ const VerifyModal: React.FC<VerifyModalProps> = ({
     onOpenChange,
     data,
     onPreviousScholarshipHistory,
+    onVerifySuccess,
 }) => {
+    const { success, error: showError } = useToast();
+    const [remarks, setRemarks] = React.useState("");
+    const [loading, setLoading] = React.useState(false);
     const [formData, setFormData] = React.useState({
         name: "AGATHIYAN J",
         aadhaar: "**** **** 3901",
@@ -651,6 +658,29 @@ const VerifyModal: React.FC<VerifyModalProps> = ({
                         </div>
                     </div>
 
+                    {/* Remarks Section - Required for Recheck and Reject */}
+                    <div style={{ marginTop: "20px" }}>
+                        <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+                            Remarks <span style={{ color: "#dc2626" }}>*</span> (Required for Recheck/Reject)
+                        </label>
+                        <textarea
+                            placeholder="Enter remarks here"
+                            style={{
+                                width: "100%",
+                                minHeight: "80px",
+                                padding: "12px",
+                                borderRadius: "4px",
+                                border: "1px solid #d1d1d1",
+                                fontSize: "14px",
+                                fontFamily: "'Inter', sans-serif",
+                                resize: "vertical",
+                                outline: "none"
+                            }}
+                            value={remarks}
+                            onChange={(e) => setRemarks(e.target.value)}
+                        />
+                    </div>
+
                     {/* Footer Buttons */}
                     <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px", paddingTop: "16px", borderTop: "1px solid #e0e0e0" }}>
                         <Button
@@ -668,16 +698,110 @@ const VerifyModal: React.FC<VerifyModalProps> = ({
                         >
                             Previous Scholarship History
                         </Button>
-                        <Button
-                            appearance="primary"
-                            onClick={() => {
-                                console.log("Update clicked", formData);
-                                onOpenChange(false);
-                            }}
-                            style={{ backgroundColor: "#0F6CBD", color: "white", minWidth: "100px" }}
-                        >
-                            Update
-                        </Button>
+                        <div style={{ display: "flex", gap: "12px" }}>
+                            <Button
+                                appearance="outline"
+                                onClick={async () => {
+                                    if (!data?.applicationNo) return;
+                                    if (!remarks.trim()) {
+                                        showError('Validation Error', 'Remarks are required for Recheck');
+                                        return;
+                                    }
+                                    try {
+                                        setLoading(true);
+                                        const authData = localStorage.getItem('scholarship_auth');
+                                        const userId = authData ? JSON.parse(authData).userId : undefined;
+                                        await processManagement.verifyApplication({
+                                            applicationId: data.applicationNo,
+                                            status: 'Recheck',
+                                            remarks,
+                                            verifiedBy: userId,
+                                        });
+                                        success('Success', 'Application marked for recheck');
+                                        if (onVerifySuccess) onVerifySuccess();
+                                        onOpenChange(false);
+                                    } catch (err) {
+                                        showError('Failed to Recheck', err instanceof Error ? err.message : 'Failed to mark for recheck');
+                                    } finally {
+                                        setLoading(false);
+                                    }
+                                }}
+                                disabled={loading}
+                                style={{ 
+                                    backgroundColor: "#FEF3C7", 
+                                    color: "#92400E", 
+                                    borderColor: "#FCD34D",
+                                    minWidth: "100px" 
+                                }}
+                            >
+                                {loading ? "Processing..." : "Recheck"}
+                            </Button>
+                            <Button
+                                appearance="outline"
+                                onClick={async () => {
+                                    if (!data?.applicationNo) return;
+                                    if (!remarks.trim()) {
+                                        showError('Validation Error', 'Remarks are required for Rejection');
+                                        return;
+                                    }
+                                    try {
+                                        setLoading(true);
+                                        const authData = localStorage.getItem('scholarship_auth');
+                                        const userId = authData ? JSON.parse(authData).userId : undefined;
+                                        await processManagement.verifyApplication({
+                                            applicationId: data.applicationNo,
+                                            status: 'Reject',
+                                            remarks,
+                                            verifiedBy: userId,
+                                        });
+                                        success('Success', 'Application rejected');
+                                        if (onVerifySuccess) onVerifySuccess();
+                                        onOpenChange(false);
+                                    } catch (err) {
+                                        showError('Failed to Reject', err instanceof Error ? err.message : 'Failed to reject application');
+                                    } finally {
+                                        setLoading(false);
+                                    }
+                                }}
+                                disabled={loading}
+                                style={{ 
+                                    backgroundColor: "#FEE2E2", 
+                                    color: "#991B1B", 
+                                    borderColor: "#FCA5A5",
+                                    minWidth: "100px" 
+                                }}
+                            >
+                                {loading ? "Processing..." : "Reject"}
+                            </Button>
+                            <Button
+                                appearance="primary"
+                                onClick={async () => {
+                                    if (!data?.applicationNo) return;
+                                    try {
+                                        setLoading(true);
+                                        const authData = localStorage.getItem('scholarship_auth');
+                                        const userId = authData ? JSON.parse(authData).userId : undefined;
+                                        await processManagement.verifyApplication({
+                                            applicationId: data.applicationNo,
+                                            status: 'Verified',
+                                            remarks: remarks || '',
+                                            verifiedBy: userId,
+                                        });
+                                        success('Success', 'Application verified successfully');
+                                        if (onVerifySuccess) onVerifySuccess();
+                                        onOpenChange(false);
+                                    } catch (err) {
+                                        showError('Failed to Verify', err instanceof Error ? err.message : 'Failed to verify application');
+                                    } finally {
+                                        setLoading(false);
+                                    }
+                                }}
+                                disabled={loading}
+                                style={{ backgroundColor: "#10B981", color: "white", minWidth: "100px" }}
+                            >
+                                {loading ? "Processing..." : "Verify"}
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>
