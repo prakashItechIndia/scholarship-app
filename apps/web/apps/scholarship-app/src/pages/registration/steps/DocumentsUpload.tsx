@@ -1,18 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import {
     Stack,
     Text,
-    FontWeights,
     mergeStyles,
-    IStackStyles,
     MessageBar,
     MessageBarType,
 } from '@fluentui/react';
 import { useRegistration } from '@/contexts/RegistrationContext';
 import { useThemeTokens } from '@/hooks/useThemeTokens';
 // import { usePreviousButton } from '../hooks/usePreviousButton'; // Uncomment to use dynamic previous button
-import { PdfIcon, CloseIcon, UploadIcon } from '@shared/components';
+import { PdfIcon, ImageIcon, CloseIcon, UploadIcon } from '@shared/components';
 
 // --- Constants ---
 const REQUIRED_DOCUMENTS = [
@@ -50,15 +47,54 @@ function truncateFileName(fileName: string, maxLength = 10): string {
     return `${nameWithoutExt.substring(0, maxLength)}...${extension}`;
 }
 
-// --- Styles ---
-const containerStyles: IStackStyles = {
-    root: {
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-    },
-};
+/**
+ * Get file type from filename
+ * Returns 'pdf' for PDF files, 'image' for image files
+ */
+function getFileType(fileName: string): 'pdf' | 'image' {
+    const extension = fileName.toLowerCase().split('.').pop();
+    if (extension === 'pdf') {
+        return 'pdf';
+    }
+    if (['jpg', 'jpeg', 'png'].includes(extension ?? '')) {
+        return 'image';
+    }
+    return 'pdf'; // Default fallback
+}
+
+/**
+ * Infer document type from filename
+ * Maps common document name patterns to document types
+ */
+function inferDocumentType(fileName: string): string {
+    const lowerName = fileName.toLowerCase();
+    
+    // Map filename patterns to document types
+    const patterns: Record<string, string> = {
+        'birth': 'Birth Certificate',
+        'student': 'Student ID Card',
+        'ration': 'Ration Card',
+        'voter': 'Voter ID',
+        'driving': 'Driving License',
+        'license': 'Driving License',
+        'bank': 'Bank Pass Book',
+        'passbook': 'Bank Pass Book',
+        'aadhaar': 'AADHAAR ID',
+        'aadhar': 'AADHAAR ID',
+        'pan': 'PAN Card',
+        'bonafide': 'Bonafide (Student)',
+        'parent': 'Bonafide (Parent)',
+    };
+    
+    for (const [key, docType] of Object.entries(patterns)) {
+        if (lowerName.includes(key)) {
+            return docType;
+        }
+    }
+    
+    // Default: return a generic type based on file extension
+    return getFileType(fileName) === 'pdf' ? 'Document' : 'Image';
+}
 
 const DocumentsUpload = () => {
     const { formData, updateFormData, nextStep, markStepComplete, setIsLoading } = useRegistration();
@@ -96,22 +132,6 @@ const DocumentsUpload = () => {
     const [uploadedFiles, setUploadedFiles] = useState<File[]>(getDocumentsFromFormData());
     const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const { handleSubmit } = useForm();
-
-    // Styles using theme tokens
-const titleStyles = mergeStyles({
-        fontSize: parseInt(tokens.fontSizeBase600),
-    fontWeight: FontWeights.semibold,
-        color: tokens.colorNeutralForeground1,
-    marginBottom: 4,
-});
-
-const subtitleStyles = mergeStyles({
-        fontSize: parseInt(tokens.fontSizeBase300),
-        color: tokens.colorNeutralForeground4,
-    marginBottom: 32,
-});
 
 const uploadAreaStyles = mergeStyles({
         border: `2px dashed ${tokens.colorNeutralStroke2}`,
@@ -193,12 +213,32 @@ const fileItemStyles = mergeStyles({
         const files = event.target.files;
         if (files && files.length > 0) {
             const newFiles = Array.from(files);
-            const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+            const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB in bytes
             
             // Validate file sizes
             const oversizedFiles = newFiles.filter(file => file.size > MAX_FILE_SIZE);
             if (oversizedFiles.length > 0) {
-                setError(`The following file(s) exceed the 2MB limit: ${oversizedFiles.map(f => f.name).join(', ')}`);
+                setError(`The following file(s) exceed the 20MB limit: ${oversizedFiles.map(f => f.name).join(', ')}`);
+                // Reset input
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
+                return;
+            }
+            
+            // Check for duplicate document types
+            const existingDocTypes = uploadedFiles.map(file => inferDocumentType(file.name));
+            const duplicateFiles: string[] = [];
+            
+            newFiles.forEach(file => {
+                const docType = inferDocumentType(file.name);
+                if (existingDocTypes.includes(docType)) {
+                    duplicateFiles.push(`${file.name} (${docType})`);
+                }
+            });
+            
+            if (duplicateFiles.length > 0) {
+                setError(`Duplicate document types detected. The following files have the same document type as already uploaded files: ${duplicateFiles.join(', ')}`);
                 // Reset input
                 if (fileInputRef.current) {
                     fileInputRef.current.value = '';
@@ -241,10 +281,19 @@ const fileItemStyles = mergeStyles({
         }
         
         // Validate all files are within size limit (double-check)
-        const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+        const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
         const oversizedFiles = uploadedFiles.filter(file => file.size > MAX_FILE_SIZE);
         if (oversizedFiles.length > 0) {
-            setError(`The following file(s) exceed the 2MB limit: ${oversizedFiles.map(f => f.name).join(', ')}`);
+            setError(`The following file(s) exceed the 20MB limit: ${oversizedFiles.map(f => f.name).join(', ')}`);
+            return;
+        }
+        
+        // Validate no duplicate document types
+        const docTypes = uploadedFiles.map(file => inferDocumentType(file.name));
+        const duplicateTypes = docTypes.filter((type, index) => docTypes.indexOf(type) !== index);
+        if (duplicateTypes.length > 0) {
+            const uniqueDuplicates = [...new Set(duplicateTypes)];
+            setError(`Duplicate document types detected: ${uniqueDuplicates.join(', ')}. Please remove duplicates before submitting.`);
             return;
         }
 
@@ -272,7 +321,10 @@ const fileItemStyles = mergeStyles({
                     </MessageBar>
                 )}
 
-                <form id="current-step-form" className="w-full flex-1 flex flex-col" style={{ minHeight: 0 }} onSubmit={handleSubmit(onFormSubmit)}>
+                <form id="current-step-form" className="w-full flex-1 flex flex-col" style={{ minHeight: 0 }} onSubmit={(e) => {
+                    e.preventDefault();
+                    void onFormSubmit();
+                }}>
                     {/* Main Layout: Grid - 70% upload area, 30% documents required initially */}
                     <style>{`
                         @media (min-width: 768px) {
@@ -303,7 +355,7 @@ const fileItemStyles = mergeStyles({
                                     Click to select files
                                 </Text>
                                 <Text className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                    Supported formats: JPG, PNG and PDF (max 2MB per file, minimum 3 files required)
+                                    Supported formats: JPG, JPEG, PNG and PDF (max 20MB per file, minimum 3 files required)
                                 </Text>
                             </div>
                         </div>
@@ -313,11 +365,17 @@ const fileItemStyles = mergeStyles({
                             <div className="flex flex-col h-full" style={{ minHeight: 0 }}>
                                 <div className="overflow-y-auto pr-0 md:pr-2 h-full" style={{ maxHeight: '100%' }}>
                                     <div className="grid grid-cols-1 gap-3">
-                                        {uploadedFiles.map((file, idx) => (
+                                        {uploadedFiles.map((file, idx) => {
+                                            const fileType = getFileType(file.name);
+                                            return (
                                             <div key={idx} className={`${fileItemStyles} bg-[#F5F5F5] dark:bg-gray-800 border-gray-200 dark:border-gray-700 border h-[56px]`}>
                                                 <Stack horizontal verticalAlign="center" tokens={{ childrenGap: 12 }} style={{ width: '100%' }}>
                                                     <div className="shrink-0">
+                                                        {fileType === 'pdf' ? (
                                                         <PdfIcon width={28} height={28} />
+                                                        ) : (
+                                                            <ImageIcon width={28} height={28} />
+                                                        )}
                                                     </div>
                                                     <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                                                         <Text
@@ -350,7 +408,8 @@ const fileItemStyles = mergeStyles({
                                                     </div>
                                                 </Stack>
                                             </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </div>

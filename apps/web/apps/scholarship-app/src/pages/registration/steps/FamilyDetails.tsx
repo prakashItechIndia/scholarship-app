@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { useRegistrationForm } from '../hooks/useRegistrationForm';
+import { dropdownOptions } from '@/services/scholarship.service';
 import { StepLayout } from '../components/StepLayout';
 import { getStringValue } from '../utils/registrationHelpers';
 import { InputField, SelectField } from '../components';
@@ -33,25 +35,7 @@ const familySchema = z.object({
 });
 
 
-// --- Constants ---
-const OCCUPATION_OPTIONS = [
-    { value: 'government', label: 'Government Service' },
-    { value: 'private', label: 'Private Sector' },
-    { value: 'business', label: 'Business / Self Employed' },
-    { value: 'agriculture', label: 'Agriculture' },
-    { value: 'professional', label: 'Professional (Doctor, Lawyer, etc.)' },
-    { value: 'retired', label: 'Retired' },
-    { value: 'homemaker', label: 'Homemaker' },
-    { value: 'others', label: 'Others' },
-];
-
-const INCOME_OPTIONS = [
-    { value: 'upto_1L', label: 'Up to 1 Lakh' },
-    { value: '1L_2.5L', label: '1 Lakh - 2.5 Lakhs' },
-    { value: '2.5L_5L', label: '2.5 Lakhs - 5 Lakhs' },
-    { value: '5L_8L', label: '5 Lakhs - 8 Lakhs' },
-    { value: 'above_8L', label: 'Above 8 Lakhs' },
-];
+// Options will be loaded from API
 
 
 
@@ -81,6 +65,29 @@ const FamilyDetails = () => {
     });
 
     const { control, handleSubmit, formState: { errors } } = form;
+    const [occupationOptions, setOccupationOptions] = useState<Array<{ value: string; label: string }>>([]);
+    const [incomeOptions, setIncomeOptions] = useState<Array<{ value: string; label: string }>>([]);
+    const [isLoadingOptions, setIsLoadingOptions] = useState(true);
+
+    // Load dropdown options on mount
+    useEffect(() => {
+        const loadOptions = async () => {
+            try {
+                setIsLoadingOptions(true);
+                const [occupations, incomeRanges] = await Promise.all([
+                    dropdownOptions.getOccupations(),
+                    dropdownOptions.getAnnualIncomeRanges(),
+                ]);
+                setOccupationOptions(occupations);
+                setIncomeOptions(incomeRanges);
+            } catch (error) {
+                console.error('Error loading dropdown options:', error);
+            } finally {
+                setIsLoadingOptions(false);
+            }
+        };
+        void loadOptions();
+    }, []);
 
     return (
         <StepLayout
@@ -135,7 +142,7 @@ const FamilyDetails = () => {
                             errors={errors}
                             label="Occupation"
                             required
-                            options={OCCUPATION_OPTIONS}
+                            options={occupationOptions}
                             placeholder="Select"
                         />
                     </div>
@@ -164,7 +171,7 @@ const FamilyDetails = () => {
                             errors={errors}
                             label="Annual Income"
                             required
-                            options={INCOME_OPTIONS}
+                            options={incomeOptions}
                             placeholder="Select"
                         />
                     </div>
@@ -190,7 +197,7 @@ const FamilyDetails = () => {
                             errors={errors}
                             label="Occupation"
                             required
-                            options={OCCUPATION_OPTIONS}
+                            options={occupationOptions}
                             placeholder="Select"
                         />
                     </div>
@@ -219,7 +226,7 @@ const FamilyDetails = () => {
                             errors={errors}
                             label="Annual Income"
                             required
-                            options={INCOME_OPTIONS}
+                            options={incomeOptions}
                             placeholder="Select"
                         />
                     </div>
@@ -243,7 +250,7 @@ const FamilyDetails = () => {
                             control={control}
                             errors={errors}
                             label="Occupation"
-                            options={OCCUPATION_OPTIONS}
+                            options={occupationOptions}
                             placeholder="Select"
                         />
                     </div>
@@ -271,7 +278,7 @@ const FamilyDetails = () => {
                             control={control}
                             errors={errors}
                             label="Annual Income"
-                            options={INCOME_OPTIONS}
+                            options={incomeOptions}
                             placeholder="Select"
                         />
                     </div>

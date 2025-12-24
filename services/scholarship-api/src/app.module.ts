@@ -16,6 +16,7 @@ import { UserManagementModule } from './modules/user-management/user-management.
 import { ReportsModule } from './modules/reports/reports.module';
 import { DocumentUploadModule } from './modules/document-upload/document-upload.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { DropdownOptionsModule } from './modules/dropdown-options/dropdown-options.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     ReportsModule,
     DocumentUploadModule,
     DashboardModule,
+    DropdownOptionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
