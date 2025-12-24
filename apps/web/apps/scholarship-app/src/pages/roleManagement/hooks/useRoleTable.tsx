@@ -63,7 +63,7 @@ export const useRoleTable = ({
 
     // Action column renderer
     const renderActions = (item: Role) => (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Button
@@ -89,8 +89,8 @@ export const useRoleTable = ({
               icon={<PersonDeleteRegular style={{ width: "16px", height: "16px" }} />}
               label="Delete Role"
               onClick={() => handleDeleteRole(item, handleDelete)}
-              style={{ color: "#c50f1f" }}
-              className="hover:text-red-700"
+              // style={{ color: "#c50f1f" }}
+              // className="hover:text-red-700"
             />
           </DropdownMenuContent>
         </DropdownMenu>
@@ -98,23 +98,24 @@ export const useRoleTable = ({
     );
 
     // Status badge renderer
-    const renderStatus = (status: string) => (
-      <span
+    const renderStatus = (status: string) => {
+      debugger
+      return  <div
         style={{
-          fontSize: "12px",
+          fontSize: "10px",
           lineHeight: "16px",
-          fontWeight: 500,
-          color: status === "Active" ? "#16a34a" : "#6b7280",
-          backgroundColor: status === "Active" ? "#dcfce7" : "#f3f4f6",
-          padding: "4px 12px",
+          fontWeight: "semi-bold",
+          color: status?.toLowerCase() === "active" ? "#0E700E !important" : "#616161",
+          backgroundColor: status?.toLowerCase() === "active" ? "#9FD89F" : "#F0F0F0",
+          padding: "4px 30px",
           borderRadius: "12px",
-          fontFamily: "'Inter', sans-serif",
           display: "inline-block",
+          border: status?.toLowerCase() === "active" ? "1px solid #0E700E" : "1px solid #E0E0E0",
         }}
       >
         {status}
-      </span>
-    );
+      </div>
+    }
 
     // Common text renderer
     const renderText = (value: string | undefined) => (
@@ -124,7 +125,7 @@ export const useRoleTable = ({
         color: "#242424",
         fontFamily: "'Inter', sans-serif",
       }}>
-        {value || "-"}
+        {value || "-"}  
       </span>
     );
 
@@ -133,8 +134,11 @@ export const useRoleTable = ({
         key: "checkbox",
         name: "",
         fieldName: "checkbox",
-        minWidth: 48,
-        maxWidth: 48,
+        width: 200,
+        minWidth: 200,
+        maxWidth: 200,
+        cellPaddingLeft: 40,
+        cellPaddingRight: 8,
         isSortable: false,
         onRender: (item?: Role) => (
           <input
@@ -188,7 +192,11 @@ export const useRoleTable = ({
         key: "roleName",
         name: "User Role",
         fieldName: "roleName",
-        minWidth: 200,
+        width: 300,
+        minWidth: 300,
+        maxWidth: 300,
+        cellPaddingLeft: 8,
+        cellPaddingRight: 8,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("User Role"),
         onRender: (item: Role) => renderText(item.roleName),
@@ -197,7 +205,11 @@ export const useRoleTable = ({
         key: "roleType",
         name: "User Type",
         fieldName: "roleType",
-        minWidth: 150,
+        width: 250,
+        minWidth: 250,
+        maxWidth: 250,
+        cellPaddingLeft: 8,
+        cellPaddingRight: 8,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("User Type"),
         onRender: (item: Role) => renderText(item.roleType),
@@ -214,7 +226,11 @@ export const useRoleTable = ({
         key: "status",
         name: "Status",
         fieldName: "status",
-        minWidth: 120,
+        width: 200,
+        minWidth: 200,
+        maxWidth: 200,
+        cellPaddingLeft: 8,
+        cellPaddingRight: 8,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Status"),
         onRender: (item: Role) => renderStatus(item.status),
@@ -223,10 +239,24 @@ export const useRoleTable = ({
         key: "actions",
         name: "",
         fieldName: "actions",
+        width: 80,
         minWidth: 80,
         maxWidth: 80,
+        cellPaddingLeft: 8,
+        cellPaddingRight: 8,
         isSortable: false,
         onRender: renderActions,
+      },
+      {
+        key: "spacer",
+        name: "",
+        fieldName: "spacer",
+        width: "auto",
+        minWidth: 100,
+        cellPaddingLeft: 0,
+        cellPaddingRight: 0,
+        isSortable: false,
+        onRender: () => <span></span>,
       },
     ];
   }, [handleEdit, handleDelete, selectedRows, onRowSelect, onSelectAll, data]);

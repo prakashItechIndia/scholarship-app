@@ -145,7 +145,7 @@ const UserManagementPage: React.FC = () => {
       boxSizing: "border-box",
     }}>
       {/* Title and Action Buttons */}
-      <div style={{ padding: "24px 24px 16px 24px" }}>
+      <div style={{ padding: "24px 24px 0px 24px" }}>
         <PageActionButtons
           title={
             <div style={{ lineHeight: "1.2" }}>
@@ -162,7 +162,7 @@ const UserManagementPage: React.FC = () => {
                 fontWeight: 400,
                 color: "#242424",
                 fontFamily: "'Inter', sans-serif",
-                marginTop: "2px",
+                marginTop: "4px",
               }}>
                 Maintain Roles, Rights, and User Information
               </div>
@@ -179,18 +179,20 @@ const UserManagementPage: React.FC = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: "12px",
+        // gap: "20px",
       }}>
-        <div style={{ width: "250px", }}>
+        <div style={{ border:"#D1D1D1",height:"32px",width:"216px",marginBottom:"4px" }}>
           <Input
             placeholder="Search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            prefixIcon={<Search20Regular style={{ width: "20px", height: "20px", color: "#707070" }} />}
+            prefixIcon={<Search20Regular style={{ width: "18px", height: "15px", color: "#707070" }} />}
             style={{
               
-              paddingLeft: "10px",
-              marginBottom: "2px",
+              // paddingLeft: "10px",
+              // marginBottom: "40px",
+              height:"35px",
+              borderRadius:"8px"
             }}
           />
         </div>

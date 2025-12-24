@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button } from "./button";
-import { AddRegular } from "@fluentui/react-icons";
+import { Add24Filled, Add24Regular, AddFilled } from "@fluentui/react-icons";
 import { MoreIcon } from "./more-icon";
 
 export interface PageActionButtonsProps {
@@ -40,7 +40,7 @@ export const PageActionButtons = React.forwardRef<
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: "16px",
+        marginBottom: "12px",
         width: "100%",
       }}
     >
@@ -78,18 +78,21 @@ export const PageActionButtons = React.forwardRef<
             // appearance="primary"
             onClick={onPrimaryAction}
             style={{
-              backgroundColor: "#0f6cbd",
+              backgroundColor: "#2453C3",
               color: "#ffffff",
               display: "flex",
               alignItems: "center",
               gap: "8px",
               borderRadius: "7px",
               // padding:"3px",
-              width: "120px",
-              height: "40px",
+              width: "102px",
+              height: "32px",
+              border:"none",
+              fontSize:"12px",
+              fontWeight:600  
             }}
           >
-            <AddRegular style={{ width: "16px", height: "16px" }} />
+            <Add24Regular style={{ width: "11px", height: "11px",fontSize:"12px",fontWeight:600}} />
             {primaryButtonLabel}
           </Button>
         )}
@@ -100,14 +103,15 @@ export const PageActionButtons = React.forwardRef<
             aria-label="More options"
             style={{
               width: "36px",
-              height: "36px",
+              height: "32px",
               padding: 0,
-              border: "1px solid #e0e0e0",
-              minHeight: "35px",
+              border: "1px solid #D1D1D1",
+              minHeight: "10px",
               minWidth: "35px",
+              // border:"none"
             }}
           >
-            <MoreIcon width={20} height={20} />
+            <MoreIcon width={20} height={20} style={{width:"16px",height:"16px",fontSize:"12px",fontWeight:600}} />
           </Button>
         )}
         {children}
