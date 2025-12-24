@@ -61,14 +61,7 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
                     minWidth: col.minWidth,
                     maxWidth: col.maxWidth,
                     width: col.width,
-<<<<<<< HEAD
-                    paddingTop: "8px",
-                    paddingBottom: "8px", 
-=======
                     height: "2.5rem",
-                    // paddingTop: "8px",
-                    // paddingBottom: "8px",
->>>>>>> ee8e7b2bdf4061895416617858d37438fe5171ed
                     paddingLeft: col.cellPaddingLeft !== undefined ? (typeof col.cellPaddingLeft === "number" ? `${col.cellPaddingLeft}px` : col.cellPaddingLeft) : "16px",
                     paddingRight: col.cellPaddingRight !== undefined ? (typeof col.cellPaddingRight === "number" ? `${col.cellPaddingRight}px` : col.cellPaddingRight) : "16px",
                     fontSize: "12px",
@@ -78,13 +71,9 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
                     fontFamily: "'Inter', sans-serif",
                     borderBottom: "1px solid #e0e0e0",
                     backgroundColor: "#FAFAFA",
-<<<<<<< HEAD
-                  height: "36px",
-=======
                     overflow: "auto",
                     minHeight: 0,
                     whiteSpace: "nowrap",
->>>>>>> ee8e7b2bdf4061895416617858d37438fe5171ed
                   }}
                 >
                   {col.onRenderHeader ? col.onRenderHeader() : col.name}

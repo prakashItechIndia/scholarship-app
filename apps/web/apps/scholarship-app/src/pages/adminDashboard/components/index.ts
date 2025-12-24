@@ -1,5 +1,6 @@
 export { StatCard } from "./StatCard";
-export { FinancialSummaryCard } from "./FinancialSummaryCard";
+// export { FinancialSummaryCard } from "./FinancialSummaryCard";
+export { UnifiedCard } from "./UnifiedCard";
 export { ApplicationActivityChart } from "./ApplicationActivityChart";
 export { ApplicationStatusChart } from "./ApplicationStatusChart";
 export { RecentActivityWidget } from "./RecentActivityWidget";
