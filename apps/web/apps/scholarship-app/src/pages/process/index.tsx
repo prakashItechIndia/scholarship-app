@@ -265,6 +265,7 @@ const ProcessPage: React.FC = () => {
           marginBottom: "24px",
           display: "flex",
           alignItems: "flex-start",
+          marginTop: "1rem",
           justifyContent: "space-between"
         }}>
           <div>
@@ -273,7 +274,9 @@ const ProcessPage: React.FC = () => {
               lineHeight: "1.25rem",
               fontWeight: 600,
               color: "#242424",
+
               marginBottom: "0.5rem",
+
               fontFamily: "'Inter', sans-serif",
             }}>
               {tabHeaderInfo[activeTab]?.title || "Overview"}
@@ -393,19 +396,24 @@ const ProcessPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Table Section */}
-      <div style={{
-        overflow: "auto", // Enable scrolling on parent container
-        backgroundColor: "#ffffff",
-        display: "flex", // Changed to flex to support marginTop: auto for footer
-        flexDirection: "column",
-        border: "none",
-        boxShadow: "none",
-        borderRadius: "0px",
-        flex: 1, // Fill remaining height of the page
-        minHeight: 0, // Enable scrolling within flex child
-      }} className="custom-scrollbar">
-        {/* Add custom style for webkit browsers via style tag if needed, or rely on scrollbar-color property */}
+      {/* Table Section - Scrollable */}
+      <div
+        id="table-scroll-container"
+        style={{
+          flex: 1,
+          overflow: "auto",
+          backgroundColor: "#ffffff",
+          minHeight: 0,
+        }}
+        className="custom-scrollbar"
+        onScroll={(e) => {
+          // Sync horizontal scroll with footer scrollbar
+          const footerScroll = document.getElementById('footer-scroll-sync');
+          if (footerScroll) {
+            footerScroll.scrollLeft = e.currentTarget.scrollLeft;
+          }
+        }}
+      >
         <style>
           {`
             .custom-scrollbar::-webkit-scrollbar {
@@ -422,40 +430,92 @@ const ProcessPage: React.FC = () => {
             .custom-scrollbar::-webkit-scrollbar-thumb:hover {
               background-color: #a8a8a8;
             }
+            .footer-scrollbar::-webkit-scrollbar {
+              height: 8px;
+            }
+            .footer-scrollbar::-webkit-scrollbar-track {
+              background: #f5f5f5;
+            }
+            .footer-scrollbar::-webkit-scrollbar-thumb {
+              background-color: #d1d1d1;
+              border-radius: 4px;
+            }
+            .footer-scrollbar::-webkit-scrollbar-thumb:hover {
+              background-color: #a8a8a8;
+            }
           `}
         </style>
 
-        {/* Table no longer handles its own scrolling. It sits inside the scrolling parent. */}
-        <Table
-          columns={columns}
-          data={paginatedData}
-          disableScroll={true}
-        />
+        <div style={{ minWidth: "fit-content" }}>
+          <Table
+            columns={columns}
+            data={paginatedData}
+            disableScroll={true}
+          />
+        </div>
       </div>
 
-      {/* Pagination Fixed Footer */}
+      {/* Static Footer with Pagination and Horizontal Scrollbar */}
       <div style={{
-        padding: "12px 24px",
+        flexShrink: 0,
         backgroundColor: "#ffffff",
         borderTop: "1px solid #e0e0e0",
-        flexShrink: 0,
-        width: "100%",
-        zIndex: 10,
       }}>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          pageSize={pageSize}
-          totalItems={totalItems}
-          onPageChange={setCurrentPage}
-          onPageSizeChange={setPageSize}
-          pageSizeOptions={[5, 10, 20, 50, 100]}
-          showFirstLast={true}
-          showPageSize={true}
-          showPageNumbers={true}
-          maxPageButtons={7}
-          className="w-full !flex-row"
-        />
+        {/* Pagination */}
+        <div style={{
+          padding: "12px 24px",
+          backgroundColor: "#ffffff",
+        }}>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+            pageSizeOptions={[5, 10, 20, 50, 100]}
+            showFirstLast={true}
+            showPageSize={true}
+            showPageNumbers={true}
+            maxPageButtons={7}
+            className="w-full !flex-row"
+          />
+        </div>
+
+        {/* Horizontal Scrollbar Sync */}
+        <div
+          id="footer-scroll-sync"
+          style={{
+            overflowX: "auto",
+            overflowY: "hidden",
+            height: "12px",
+          }}
+          className="footer-scrollbar"
+          onScroll={(e) => {
+            // Sync scroll with table container
+            const tableContainer = document.getElementById('table-scroll-container');
+            if (tableContainer) {
+              tableContainer.scrollLeft = e.currentTarget.scrollLeft;
+            }
+          }}
+        >
+          <div style={{
+            height: "1px",
+            width: "fit-content",
+            minWidth: "100%",
+          }}
+            ref={(el) => {
+              // Match the width of the table content
+              if (el) {
+                const tableContainer = document.getElementById('table-scroll-container');
+                if (tableContainer && tableContainer.firstChild) {
+                  const tableWidth = (tableContainer.firstChild as HTMLElement).scrollWidth;
+                  el.style.width = `${tableWidth}px`;
+                }
+              }
+            }}
+          />
+        </div>
       </div>
 
       {/* View Modal with Application Details */}

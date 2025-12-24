@@ -79,22 +79,153 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
       [onPageSizeChange]
     );
 
+    //   return (
+    //     <div
+    //       ref={ref}
+    //       className={cn("flex flex-row items-center justify-between gap-4 w-full px-4", className)}
+    //       style={{ width: "75.4375rem", height: "2.5rem", paddingLeft: "1rem", paddingRight: "1rem", position: "relative" }}
+    //     >
+    //       {/* Left: Item count */}
+    //       <div style={{ position: "absolute", left: "1rem", backgroundColor: "red" }}>
+    //         <Text className="whitespace-nowrap" style={{ fontSize: "0.875rem", color: "#616161" }}>
+    //           {startItem}-{endItem} of {totalItems} items
+    //         </Text>
+    //       </div>
+
+    //       {/* Center: Pagination controls */}
+    //       <div className="flex items-center gap-[3px]" style={{ position: "absolute", left: "70%", transform: "translateX(-50%)" }}>
+    //         {showPageNumbers && (
+    //           <div className="flex items-center gap-[3px]">
+    //             {showFirstLast && (
+    //               <Button
+    //                 appearance="subtle"
+    //                 style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "#fff" }}
+    //                 onClick={() => onPageChange(1)}
+    //                 disabled={currentPage === 1}
+    //                 aria-label="First page"
+    //               >
+    //                 &laquo;
+    //               </Button>
+    //             )}
+    //             <Button
+    //               appearance="subtle"
+    //               style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
+    //               icon={<ChevronLeft20Regular />}
+    //               onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+    //               disabled={currentPage === 1}
+    //               aria-label="Previous page"
+    //             />
+
+    //             {pageNumbers.map((page, index) => {
+    //               if (index > 0 && pageNumbers[index - 1] !== page - 1) {
+    //                 return (
+    //                   <React.Fragment key={`ellipsis-${page}`}>
+    //                     <Text style={{ padding: "0 4px", color: "#707070" }}>...</Text>
+    //                     <Button
+    //                       key={page}
+    //                       appearance="subtle"
+    //                       style={{
+    //                         minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0,
+    //                         backgroundColor: currentPage === page ? "#f5f5f5" : "white",
+    //                         fontWeight: currentPage === page ? "bold" : "normal"
+    //                       }}
+    //                       onClick={() => onPageChange(page)}
+    //                       aria-label={`Go to page ${page}`}
+    //                       aria-current={currentPage === page ? "page" : undefined}
+    //                     >
+    //                       {page}
+    //                     </Button>
+    //                   </React.Fragment>
+    //                 );
+    //               }
+    //               return (
+    //                 <Button
+    //                   key={page}
+    //                   appearance="subtle"
+    //                   style={{
+    //                     minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0,
+    //                     backgroundColor: currentPage === page ? "#f5f5f5" : "white",
+    //                     fontWeight: currentPage === page ? "bold" : "normal"
+    //                   }}
+    //                   onClick={() => onPageChange(page)}
+    //                   aria-label={`Go to page ${page}`}
+    //                   aria-current={currentPage === page ? "page" : undefined}
+    //                 >
+    //                   {page}
+    //                 </Button>
+    //               );
+    //             })}
+
+    //             <Button
+    //               appearance="subtle"
+    //               style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
+    //               icon={<ChevronRight20Regular />}
+    //               onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+    //               disabled={currentPage === totalPages}
+    //               aria-label="Next page"
+    //             />
+    //             {showFirstLast && (
+    //               <Button
+    //                 appearance="subtle"
+    //                 style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
+    //                 onClick={() => onPageChange(totalPages)}
+    //                 disabled={currentPage === totalPages}
+    //                 aria-label="Last page"
+    //               >
+    //                 &raquo;
+    //               </Button>
+    //             )}
+    //           </div>
+    //         )}
+    //       </div>
+
+    //       {/* Right: Items per page */}
+    //       <div className="flex gap-2 items-center justify-end" style={{ position: "absolute", right: "1rem" }}>
+    //         {showPageSize && onPageSizeChange && (
+    //           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+    //             <Text style={{ whiteSpace: "nowrap" }}>Items per page</Text>
+    //             <Dropdown
+    //               value={String(pageSize)}
+    //               onOptionSelect={handlePageSizeChange}
+    //               style={{ minWidth: 60 }}
+    //             >
+    //               {pageSizeOptions.map((size) => (
+    //                 <Option key={size} text={String(size)} value={String(size)}>
+    //                   {size}
+    //                 </Option>
+    //               ))}
+    //             </Dropdown>
+    //           </div>
+    //         )}
+    //       </div>
+    //     </div>
+    //   );
+    // }
     return (
       <div
         ref={ref}
-        className={cn("flex flex-row items-center justify-between gap-4 w-full px-4 py-2", className)}
+        className={cn(
+          "flex flex-row items-center gap-4",
+          "w-full px-4", // let it be responsive; or keep your fixed width if needed
+          className
+        )}
+        style={{ height: "2.5rem", position: "relative" }}
       >
-        <div className="flex-1 text-left">
-          <Text className="whitespace-nowrap">{startItem}-{endItem} of {totalItems} items</Text>
+        {/* Left: Item count */}
+        <div className="flex-1 flex items-center">
+          <Text className="whitespace-nowrap" style={{ fontSize: "0.875rem", color: "#616161" }}>
+            {startItem}-{endItem} of {totalItems} items
+          </Text>
         </div>
 
-        <div className="flex items-center gap-[3px] justify-center">
+        {/* Center: Pagination controls */}
+        <div className="flex-1 flex items-center justify-center">
           {showPageNumbers && (
             <div className="flex items-center gap-[3px]">
               {showFirstLast && (
                 <Button
                   appearance="subtle"
-                  style={{ minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0, backgroundColor: "#fff" }}
+                  style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "#fff" }}
                   onClick={() => onPageChange(1)}
                   disabled={currentPage === 1}
                   aria-label="First page"
@@ -102,9 +233,10 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
                   &laquo;
                 </Button>
               )}
+
               <Button
                 appearance="subtle"
-                style={{ minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0, backgroundColor: "white" }}
+                style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
                 icon={<ChevronLeft20Regular />}
                 onClick={() => onPageChange(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
@@ -120,9 +252,12 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
                         key={page}
                         appearance="subtle"
                         style={{
-                          minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0,
+                          minWidth: "1.75rem",
+                          maxWidth: "1.75rem",
+                          height: "1.75rem",
+                          padding: 0,
                           backgroundColor: currentPage === page ? "#f5f5f5" : "white",
-                          fontWeight: currentPage === page ? "bold" : "normal"
+                          fontWeight: currentPage === page ? "bold" : "normal",
                         }}
                         onClick={() => onPageChange(page)}
                         aria-label={`Go to page ${page}`}
@@ -133,14 +268,18 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
                     </React.Fragment>
                   );
                 }
+
                 return (
                   <Button
                     key={page}
                     appearance="subtle"
                     style={{
-                      minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0,
+                      minWidth: "1.75rem",
+                      maxWidth: "1.75rem",
+                      height: "1.75rem",
+                      padding: 0,
                       backgroundColor: currentPage === page ? "#f5f5f5" : "white",
-                      fontWeight: currentPage === page ? "bold" : "normal"
+                      fontWeight: currentPage === page ? "bold" : "normal",
                     }}
                     onClick={() => onPageChange(page)}
                     aria-label={`Go to page ${page}`}
@@ -153,16 +292,17 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
 
               <Button
                 appearance="subtle"
-                style={{ minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0, backgroundColor: "white" }}
+                style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
                 icon={<ChevronRight20Regular />}
                 onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
                 aria-label="Next page"
               />
+
               {showFirstLast && (
                 <Button
                   appearance="subtle"
-                  style={{ minWidth: "32px", maxWidth: "32px", height: "32px", padding: 0, backgroundColor: "white" }}
+                  style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
                   onClick={() => onPageChange(totalPages)}
                   disabled={currentPage === totalPages}
                   aria-label="Last page"
@@ -174,9 +314,11 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
           )}
         </div>
 
-        <div className="flex-1 flex justify-end gap-2 items-center">
+        {/* Right: Items per page */}
+        <div className="flex-1 flex items-center justify-end">
           {showPageSize && onPageSizeChange && (
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div className="flex items-center gap-2">
+              <Text style={{ whiteSpace: "nowrap" }}>Items per page</Text>
               <Dropdown
                 value={String(pageSize)}
                 onOptionSelect={handlePageSizeChange}
@@ -188,7 +330,6 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
                   </Option>
                 ))}
               </Dropdown>
-              <Text style={{ whiteSpace: "nowrap" }}>Items per page</Text>
             </div>
           )}
         </div>
