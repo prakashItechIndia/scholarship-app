@@ -53,9 +53,13 @@ interface RegistrationData {
   applicantName: string;
   fatherName: string;
   fatherOccupation?: string;
+  fatherOccupationOther?: string;
+  fatherDesignation?: string;
   fatherOfficeName?: string;
   motherName: string;
   motherOccupation?: string;
+  motherOccupationOther?: string;
+  motherDesignation?: string;
   motherOfficeName?: string;
   addressLine1?: string;
   addressLine2?: string;
@@ -94,6 +98,12 @@ interface RegistrationData {
   photo?: string;
   appliedOtherScholarship?: string;
   guardianName?: string;
+  guardianOccupation?: string;
+  guardianOccupationOther?: string;
+  guardianDesignation?: string;
+  guardianAnnualIncome?: string;
+  guardianOfficeName?: string;
+  motherAnnualIncome?: string;
 }
 
 @Injectable()
@@ -187,66 +197,192 @@ export class ScholarshipApplicationService {
   /**
    * Save scholarship registration - matches USP_SAVESCHOLERSHIP stored procedure
    */
-  async saveRegistration(data: RegistrationData) {
+  async saveRegistration(data: RegistrationData | Record<string, unknown>) {
     try {
+      // Validate data exists
+      if (!data || typeof data !== 'object') {
+        throw new BadRequestException('Invalid registration data provided');
+      }
+
+      // Helper function to safely get value from data
+      const getValue = <T>(
+        camelKey: keyof RegistrationData,
+        dbKey: string,
+        altKey?: string,
+        defaultValue: T | '' = '',
+      ): T | '' => {
+        const record = data as Record<string, unknown>;
+        return (
+          ((data as RegistrationData)[camelKey] as T | undefined) ??
+          (record[dbKey] as T | undefined) ??
+          (altKey ? (record[altKey] as T | undefined) : undefined) ??
+          defaultValue
+        );
+      };
+
+      // Handle both camelCase (RegistrationData) and database column name formats
+      // Map incoming data to expected format
+      const normalizedData: RegistrationData = {
+        schYearId: (getValue<number>('schYearId', 'Scholarship_Year_Id', 'scholarshipYearId', 0) as number) || 0,
+        schYear: getValue<string>('schYear', 'Sch_Year', 'schYear', '') as string,
+        scholarshipFor: getValue<string>('scholarshipFor', 'Scholarship_For', 'scholarshipFor', '') as string,
+        applicationId: getValue<string | undefined>('applicationId', 'Application_Id', 'applicationId') as string | undefined,
+        applicantType: getValue<string | undefined>('applicantType', 'Applicant_Type', 'applicantType') as string | undefined,
+        studentId: getValue<string | undefined>('studentId', 'Student_ID', 'studentId') as string | undefined,
+        applicantName: getValue<string>('applicantName', 'Applicant_Name', 'applicantName', '') as string,
+        fatherName: getValue<string>('fatherName', 'Father_Name', 'fatherName', '') as string,
+        fatherOccupation: getValue<string | undefined>('fatherOccupation', 'Father_Occupation', 'fatherOccupation') as string | undefined,
+        fatherOccupationOther: getValue<string | undefined>('fatherOccupationOther', 'Father_Occupation_Other', 'fatherOccupationOther') as string | undefined,
+        fatherDesignation: getValue<string | undefined>('fatherDesignation', 'Father_Designation', 'fatherDesignation') as string | undefined,
+        fatherOfficeName: getValue<string | undefined>('fatherOfficeName', 'Father_OfficeName', 'fatherOfficeName') as string | undefined,
+        motherName: getValue<string>('motherName', 'Mother_Name', 'motherName', '') as string,
+        motherOccupation: getValue<string | undefined>('motherOccupation', 'Mother_Occupation', 'motherOccupation') as string | undefined,
+        motherOccupationOther: getValue<string | undefined>('motherOccupationOther', 'Mother_Occupation_Other', 'motherOccupationOther') as string | undefined,
+        motherDesignation: getValue<string | undefined>('motherDesignation', 'Mother_Designation', 'motherDesignation') as string | undefined,
+        motherOfficeName: getValue<string | undefined>('motherOfficeName', 'Mother_OfficeName', 'motherOfficeName') as string | undefined,
+        addressLine1: getValue<string | undefined>('addressLine1', 'Address_Line1', 'addressLine1') as string | undefined,
+        addressLine2: getValue<string | undefined>('addressLine2', 'Address_Line2', 'addressLine2') as string | undefined,
+        city: getValue<string | undefined>('city', 'City', 'city') as string | undefined,
+        pinCode: getValue<string | undefined>('pinCode', 'PinCode', 'pincode') as string | undefined,
+        state: getValue<string | undefined>('state', 'State', 'state') as string | undefined,
+        district: getValue<string | undefined>('district', 'District', 'district') as string | undefined,
+        country: getValue<string | undefined>('country', 'Country', 'country') as string | undefined,
+        aadhaarId: getValue<string>('aadhaarId', 'Aadhaar_ID', 'aadhaarId', '') as string,
+        panId: getValue<string | undefined>('panId', 'Pan_ID', 'panId') as string | undefined,
+        mobileNumber: getValue<string>('mobileNumber', 'Mobile_Number', 'mobile', '') as string,
+        email: getValue<string>('email', 'Email', 'email', '') as string,
+        dateOfBirth: getValue<string>('dateOfBirth', 'Date_Of_Birth', 'dateOfBirth', '') as string,
+        gender: getValue<string>('gender', 'Gender', 'gender', '') as string,
+        community: getValue<string | undefined>('community', 'Community', 'community') as string | undefined,
+        caste: getValue<string | undefined>('caste', 'Caste', 'caste') as string | undefined,
+        classStudying: getValue<string | undefined>('classStudying', 'Class_Studying', 'classStudying') as string | undefined,
+        boardOfStudying: getValue<string | undefined>('boardOfStudying', 'Board_Of_Studying', 'boardOfStudying') as string | undefined,
+        typeOfInstitution: getValue<string | undefined>('typeOfInstitution', 'Type_Of_Institution', 'typeOfInstitution') as string | undefined,
+        courceOfStudying: getValue<string | undefined>('courceOfStudying', 'Cource_Of_Studying', 'courseOfStudying') as string | undefined,
+        degreeType: getValue<string | undefined>('degreeType', 'Degree_Type', 'degreeType') as string | undefined,
+        degree: getValue<string | undefined>('degree', 'Degree', 'degree') as string | undefined,
+        otherDegree: getValue<string | undefined>('otherDegree', 'Other_Degree', 'otherDegree') as string | undefined,
+        phD: getValue<string | undefined>('phD', 'Ph_D', 'phD') as string | undefined,
+        specialization: getValue<string | undefined>('specialization', 'Specialization', 'specialization') as string | undefined,
+        institutionName: getValue<string | undefined>('institutionName', 'Institution_Name', 'institutionName') as string | undefined,
+        university: getValue<string | undefined>('university', 'University', 'university') as string | undefined,
+        currentYear: getValue<string | undefined>('currentYear', 'Current_Year', 'currentYear') as string | undefined,
+        currentSemester: getValue<string | undefined>('currentSemester', 'Current_Semester', 'currentSemester') as string | undefined,
+        fatherAnnualIncome: getValue<string | undefined>('fatherAnnualIncome', 'Father_AnnualIncome', 'annualIncome') as string | undefined,
+        bankAccountNumber: getValue<string | undefined>('bankAccountNumber', 'Bank_Account_Number', 'accountNumber') as string | undefined,
+        bankName: getValue<string | undefined>('bankName', 'Bank_Name', 'bankName') as string | undefined,
+        bankBranch: getValue<string | undefined>('bankBranch', 'Bank_Branch', 'bankBranch') as string | undefined,
+        ifscCode: getValue<string | undefined>('ifscCode', 'IFSC_Code', 'ifscCode') as string | undefined,
+        requestAmount: getValue<number | undefined>('requestAmount', 'RequestAmount', 'requestAmount') as number | undefined,
+        photo: getValue<string | undefined>('photo', 'Photo', 'photo') as string | undefined,
+        appliedOtherScholarship: getValue<string | undefined>('appliedOtherScholarship', 'AppliedOtherScholarship', 'appliedOtherScholarship') as string | undefined,
+        guardianName: getValue<string | undefined>('guardianName', 'Guardian_Name', 'guardianName') as string | undefined,
+        guardianOccupation: getValue<string | undefined>('guardianOccupation', 'Guardian_Occupation', 'guardianOccupation') as string | undefined,
+        guardianOccupationOther: getValue<string | undefined>('guardianOccupationOther', 'Guardian_Occupation_Other', 'guardianOccupationOther') as string | undefined,
+        guardianDesignation: getValue<string | undefined>('guardianDesignation', 'Guardian_Designation', 'guardianDesignation') as string | undefined,
+        guardianAnnualIncome: getValue<string | undefined>('guardianAnnualIncome', 'GuardianAnnulIncome', 'guardianAnnualIncome') as string | undefined,
+        guardianOfficeName: getValue<string | undefined>('guardianOfficeName', 'Guardian_OfficeName', 'guardianOfficeName') as string | undefined,
+        motherAnnualIncome: getValue<string | undefined>('motherAnnualIncome', 'Mother_AnnualIncome', 'motherAnnualIncome') as string | undefined,
+      };
+
+      // If schYearId is provided but schYear is missing, fetch it from database
+      if (normalizedData.schYearId && !normalizedData.schYear) {
+        try {
+          const yearData = await this.getActiveScholarshipYear();
+          if (Array.isArray(yearData) && yearData.length > 0) {
+            const yearRecord = yearData[0] as Record<string, unknown>;
+            normalizedData.schYear =
+              (getCaseInsensitiveValue<string>(
+                yearRecord,
+                'ScholarshipYear_Code',
+              ) ??
+                getCaseInsensitiveValue<string>(
+                  yearRecord,
+                  'ScholarshipYear_Name',
+                )) ??
+              '';
+          }
+        } catch (error) {
+          this.logger.warn(
+            'Failed to fetch scholarship year, using provided data',
+            error,
+          );
+        }
+      }
+
+      // Validate required fields
+      if (!normalizedData.schYearId || !normalizedData.schYear) {
+        throw new BadRequestException('Scholarship year information is required');
+      }
+
       // Generate application ID if not provided
-      let applicationId = data.applicationId;
+      let applicationId = normalizedData.applicationId;
       if (!applicationId) {
-        applicationId = await this.generateApplicationId(data.schYear);
+        applicationId = await this.generateApplicationId(normalizedData.schYear);
       }
 
       // Call stored procedure
       await this.db.execute('USP_SAVESCHOLERSHIP', {
-        Sch_YearId: data.schYearId,
-        Sch_Year: data.schYear,
-        Scholarship_For: data.scholarshipFor,
+        Sch_YearId: normalizedData.schYearId,
+        Sch_Year: normalizedData.schYear,
+        Scholarship_For: normalizedData.scholarshipFor || '',
         Application_Id: applicationId,
-        Applicant_Type: data.applicantType || '',
-        Student_ID: data.studentId || '',
-        Applicant_Name: data.applicantName.toUpperCase(),
-        Father_Name: data.fatherName.toUpperCase(),
-        Father_Occupation: data.fatherOccupation || '',
-        Father_OfficeName: data.fatherOfficeName || '',
-        Mother_Name: data.motherName.toUpperCase(),
-        Mother_Occupation: data.motherOccupation || '',
-        Mother_OfficeName: data.motherOfficeName || '',
-        Address_Line1: data.addressLine1 || '',
-        Address_Line2: data.addressLine2 || '',
-        City: data.city || '',
-        PinCode: data.pinCode || '',
-        State: data.state || '',
-        District: data.district || '',
-        Country: data.country || '',
-        Aadhaar_ID: data.aadhaarId,
-        Pan_ID: data.panId || '',
-        Mobile_Number: data.mobileNumber,
-        Email: data.email,
-        Date_Of_Birth: data.dateOfBirth,
-        Gender: data.gender,
-        Community: data.community || '',
-        Caste: data.caste || '',
-        Class_Studying: data.classStudying || '',
-        Board_Of_Studying: data.boardOfStudying || '',
-        Type_Of_Institution: data.typeOfInstitution || '',
-        Cource_Of_Studying: data.courceOfStudying || '',
-        Degree_Type: data.degreeType || '',
-        Degree: data.degree || '',
-        Other_Degree: data.otherDegree || '',
-        Ph_D: data.phD || '',
-        Specialization: data.specialization || '',
-        Institution_Name: data.institutionName || '',
-        University: data.university || '',
-        Current_Year: data.currentYear || '',
-        Current_Semester: data.currentSemester || '',
-        Father_AnnualIncome: data.fatherAnnualIncome || '',
-        Bank_Account_Number: data.bankAccountNumber || '',
-        Bank_Name: data.bankName || '',
-        Bank_Branch: data.bankBranch || '',
-        IFSC_Code: data.ifscCode || '',
-        RequestAmount: data.requestAmount || 0,
-        Photo: data.photo || '',
-        AppliedOtherScholarship: data.appliedOtherScholarship || '',
-        Guardian_Name: data.guardianName || '',
+        Applicant_Type: normalizedData.applicantType || '',
+        Student_ID: normalizedData.studentId || '',
+        Applicant_Name: normalizedData.applicantName.toUpperCase(),
+        Father_Name: normalizedData.fatherName.toUpperCase(),
+        Father_Occupation: normalizedData.fatherOccupation || '',
+        Father_Occupation_Other: normalizedData.fatherOccupationOther || '',
+        Father_Designation: normalizedData.fatherDesignation || '',
+        Father_OfficeName: normalizedData.fatherOfficeName || '',
+        Mother_Name: normalizedData.motherName.toUpperCase(),
+        Mother_Occupation: normalizedData.motherOccupation || '',
+        Mother_Occupation_Other: normalizedData.motherOccupationOther || '',
+        Mother_Designation: normalizedData.motherDesignation || '',
+        Mother_OfficeName: normalizedData.motherOfficeName || '',
+        Address_Line1: normalizedData.addressLine1 || '',
+        Address_Line2: normalizedData.addressLine2 || '',
+        City: normalizedData.city || '',
+        PinCode: normalizedData.pinCode || '',
+        State: normalizedData.state || '',
+        District: normalizedData.district || '',
+        Country: normalizedData.country || '',
+        Aadhaar_ID: normalizedData.aadhaarId,
+        Pan_ID: normalizedData.panId || '',
+        Mobile_Number: normalizedData.mobileNumber,
+        Email: normalizedData.email,
+        Date_Of_Birth: normalizedData.dateOfBirth,
+        Gender: normalizedData.gender,
+        Community: normalizedData.community || '',
+        Caste: normalizedData.caste || '',
+        Class_Studying: normalizedData.classStudying || '',
+        Board_Of_Studying: normalizedData.boardOfStudying || '',
+        Type_Of_Institution: normalizedData.typeOfInstitution || '',
+        Cource_Of_Studying: normalizedData.courceOfStudying || '',
+        Degree_Type: normalizedData.degreeType || '',
+        Degree: normalizedData.degree || '',
+        Other_Degree: normalizedData.otherDegree || '',
+        Ph_D: normalizedData.phD || '',
+        Specialization: normalizedData.specialization || '',
+        Institution_Name: normalizedData.institutionName || '',
+        University: normalizedData.university || '',
+        Current_Year: normalizedData.currentYear || '',
+        Current_Semester: normalizedData.currentSemester || '',
+        Father_AnnualIncome: normalizedData.fatherAnnualIncome || '',
+        Bank_Account_Number: normalizedData.bankAccountNumber || '',
+        Bank_Name: normalizedData.bankName || '',
+        Bank_Branch: normalizedData.bankBranch || '',
+        IFSC_Code: normalizedData.ifscCode || '',
+        RequestAmount: normalizedData.requestAmount || 0,
+        Photo: normalizedData.photo || '',
+        AppliedOtherScholarship: normalizedData.appliedOtherScholarship || '',
+        Guardian_Name: normalizedData.guardianName || '',
+        Guardian_Occupation: normalizedData.guardianOccupation || '',
+        Guardian_Occupation_Other: normalizedData.guardianOccupationOther || '',
+        Guardian_Designation: normalizedData.guardianDesignation || '',
+        GuardianAnnulIncome: normalizedData.guardianAnnualIncome || '',
+        Guardian_OfficeName: normalizedData.guardianOfficeName || '',
+        Mother_AnnualIncome: normalizedData.motherAnnualIncome || '',
         Scholarship_Status: '',
         Scholarship_No: '',
         Payment_Mode: '',

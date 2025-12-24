@@ -159,9 +159,9 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           }}
         >
           <PopoverTrigger disableButtonEnhancement>
-            <div className="w-9 h-9 rounded-full bg-[#C8D1FA] flex items-center justify-center">
-              <PersonRegular className="w-5 h-5 text-[#2C3C85]" />
-            </div>
+              <div className="w-9 h-9 rounded-full bg-[#C8D1FA] flex items-center justify-center">
+                <PersonRegular className="w-5 h-5 text-[#2C3C85]" />
+              </div>
           </PopoverTrigger>
           <PopoverContent 
             className="w-[280px] p-0"
