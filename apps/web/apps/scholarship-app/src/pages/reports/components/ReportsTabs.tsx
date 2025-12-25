@@ -1,10 +1,23 @@
 import * as React from "react";
-import { Tabs, TabsTrigger } from "@shared/components";
 import { ReportTab } from "../types";
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from "@shared/components";
+import {
+  ArrowDown20Regular,
+  ChevronDown20Regular,
+  MoreVerticalRegular
+} from "@fluentui/react-icons";
 
 interface ReportsTabsProps {
   activeTab: ReportTab;
   onTabChange: (tab: ReportTab) => void;
+  onExport: (format: "excel" | "pdf" | "csv") => void;
+  showActions?: boolean;
 }
 
 const tabLabels = [
@@ -13,46 +26,141 @@ const tabLabels = [
   { value: "approved-form" as ReportTab, label: "Approved Form" },
 ];
 
-const ReportsTabs: React.FC<ReportsTabsProps> = ({ activeTab, onTabChange }) => {
+const ReportsTabs: React.FC<ReportsTabsProps> = ({ activeTab, onTabChange, onExport, showActions = false }) => {
+  const [exportMenuOpen, setExportMenuOpen] = React.useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = React.useState(false);
+
   return (
     <div style={{ flex: 1 }}>
-      <Tabs
-        value={activeTab}
-        defaultValue="scholarship-issued"
-        onValueChange={(value) => onTabChange(value as ReportTab)}
-        style={{ width: "100%" }}
-      >
-        <div style={{
-          display: "flex",
-          gap: "24px",
-          borderBottom: "1px solid #e0e0e0",
-        }}>
-          {tabLabels.map((tab) => (
-            <TabsTrigger 
-              key={tab.value}
-              value={tab.value}
-              style={{
-                paddingBottom: "12px",
-                paddingLeft: 0,
-                paddingRight: 0,
-                borderBottom: `2px solid ${activeTab === tab.value ? "#0f6cbd" : "transparent"}`,
-                fontSize: "14px",
-                lineHeight: "20px",
-                fontWeight: activeTab === tab.value ? 600 : 400,
-                color: activeTab === tab.value ? "#0f6cbd" : "#616161",
-                fontFamily: "'Inter', sans-serif",
-                transition: "all 0.2s",
-                cursor: "pointer",
-                backgroundColor: "transparent",
-                border: "none",
-              }}
-              className={activeTab !== tab.value ? "hover:text-[#242424]" : ""}
-            >
-              {tab.label}
-            </TabsTrigger>
-          ))}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: "24px",
+        borderBottom: "none",
+        height: "2.75rem",
+        backgroundColor: "#F5F5F5",
+        paddingRight: "16px",
+      }}>
+        {/* Tabs Left */}
+        <div style={{ display: "flex", gap: "24px", height: "100%" }}>
+          {tabLabels.map((tab) => {
+            const isActive = activeTab === tab.value;
+            return (
+              <button
+                key={tab.value}
+                onClick={() => onTabChange(tab.value)}
+                style={{
+                  padding: "12px 22px",
+                  fontSize: "13px",
+                  lineHeight: "20px",
+                  fontWeight: 600,
+                  color: isActive ? "black" : "#616161",
+                  fontFamily: "'Inter', sans-serif",
+                  border: "none",
+                  borderBottom: `2px solid ${isActive ? "#0f6cbd" : "transparent"}`,
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  outline: "none",
+                  backgroundColor: "transparent",
+                }}
+                className="hover:text-[#242424]"
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
-      </Tabs>
+
+        {/* Actions Right */}
+        {showActions && (
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <DropdownMenu open={exportMenuOpen} onOpenChange={setExportMenuOpen}>
+              <DropdownMenuTrigger>
+                <Button
+                  appearance="primary"
+                  size="small"
+                  style={{
+                    backgroundColor: "#0f6cbd",
+                    color: "#ffffff",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    height: "32px",
+                    padding: "0 12px",
+                    margin: 0,
+                    border: "none",
+                  }}
+                >
+                  <ArrowDown20Regular style={{ width: "16px", height: "16px" }} />
+                  Export
+                  <ChevronDown20Regular style={{ width: "16px", height: "16px" }} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {/* ... items ... */}
+                <DropdownMenuItem
+                  label="Excel (.xlsx)"
+                  onClick={() => {
+                    onExport("excel");
+                    setExportMenuOpen(false);
+                  }}
+                />
+                <DropdownMenuItem
+                  label="PDF"
+                  onClick={() => {
+                    onExport("pdf");
+                    setExportMenuOpen(false);
+                  }}
+                />
+                <DropdownMenuItem
+                  label="CSV"
+                  onClick={() => {
+                    onExport("csv");
+                    setExportMenuOpen(false);
+                  }}
+                />
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu open={moreMenuOpen} onOpenChange={setMoreMenuOpen}>
+              <DropdownMenuTrigger>
+                <Button
+                  appearance="subtle"
+                  onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+                  aria-label="More options"
+                  style={{
+                    width: "24px",
+                    minWidth: "24px",
+                    height: "32px",
+                    padding: 0,
+                    margin: 0,
+                    border: "none",
+                  }}
+                >
+                  <MoreVerticalRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem
+                  label="Refresh"
+                  onClick={() => {
+                    console.log("Refresh clicked");
+                    setMoreMenuOpen(false);
+                  }}
+                />
+                <DropdownMenuItem
+                  label="Settings"
+                  onClick={() => {
+                    console.log("Settings clicked");
+                    setMoreMenuOpen(false);
+                  }}
+                />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
