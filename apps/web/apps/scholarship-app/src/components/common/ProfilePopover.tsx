@@ -25,6 +25,7 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
   onLogout,
   onChangePassword,
   children,
+  position = "top",
 }) => {
 
   return (
@@ -34,15 +35,13 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
         const openState = (data as { open?: boolean })?.open ?? false;
         onOpenChange(openState);
       }}
+      positioning={positioning}
     >
       <PopoverTrigger disableButtonEnhancement>{children}</PopoverTrigger>
       <PopoverContent
+        ref={popoverContentRef}
         className="w-[280px]"
-        style={{
-          borderRadius: "8px",
-          // padding: "12px 16px",
-          marginLeft: "60px",
-        }}
+        style={contentStyle}
       >
         {/* User Info Section */}
         <div
