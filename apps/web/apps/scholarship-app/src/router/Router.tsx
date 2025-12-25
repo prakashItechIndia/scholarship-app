@@ -12,6 +12,7 @@ const CreatePasswordPage = lazy(() => import('../pages/auth/CreatePassword'));
 const ForgotPasswordPage = lazy(() => import('../pages/auth/ForgotPassword'));
 const ResetPasswordPage = lazy(() => import('../pages/auth/ResetPassword'));
 const ChangePasswordPage = lazy(() => import('../pages/auth/ChangePassword'));
+const ScholarshipChangePasswordPage = lazy(() => import('../pages/auth/ScholarshipChangePassword'));
 const MfaVerifyPage = lazy(() => import('../pages/auth/MfaVerify'));
 const RegistrationPage = lazy(() => import('../pages/registration/RegistrationForm'));
 const VerificationPage = lazy(() => import('../pages/auth/Verification'));
@@ -244,6 +245,18 @@ export const Router = () => {
               <Suspense fallback={<LoadingScreen message="Loading..." />}>
                 <ErrorBoundary>
                   <UserFormPage />
+                </ErrorBoundary>
+              </Suspense>
+            </ProcessLayout>
+          }
+        />
+        <Route
+          path="/scholarship-change-password"
+          element={
+            <ProcessLayout>
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <ScholarshipChangePasswordPage />
                 </ErrorBoundary>
               </Suspense>
             </ProcessLayout>

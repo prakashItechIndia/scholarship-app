@@ -39,3 +39,7 @@ firebase-adminsdk-*.json
 !**/package-lock.json
 !**/pnpm-lock.yaml
 !**/yarn.lock
+
+# Upload directories (user-uploaded files)
+**/uploads/
+**/ScholerShipData/

@@ -1,9 +1,9 @@
 import * as React from "react";
-import { ScholarshipReportData } from "../types";
+import { ScholarshipReportData, ApprovedFormData, ReportTab } from "../types";
 import {
   ArrowSort20Regular,
   MoreHorizontalRegular,
-  PrintRegular, // Assuming PrintRegular exists? Yes usually.
+  PrintRegular,
 } from "@fluentui/react-icons";
 import {
   Button,
@@ -11,15 +11,15 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  // Tooltip, // if needed
 } from "@shared/components";
 
 interface UseReportsTableProps {
-  onRowSelect?: (item: ScholarshipReportData, selected: boolean) => void;
+  onRowSelect?: (item: ScholarshipReportData | ApprovedFormData, selected: boolean) => void;
   onSelectAll?: (selected: boolean) => void;
   selectedRows?: Set<string>;
-  data?: ScholarshipReportData[];
-  onViewPdf?: (item: ScholarshipReportData) => void;
+  data?: (ScholarshipReportData | ApprovedFormData)[];
+  onViewPdf?: (item: ScholarshipReportData | ApprovedFormData) => void;
+  activeTab?: ReportTab;
 }
 
 export const useReportsTable = ({
@@ -28,32 +28,184 @@ export const useReportsTable = ({
   selectedRows = new Set(),
   data = [],
   onViewPdf,
+  activeTab = "categories-wise",
 }: UseReportsTableProps) => {
-  const columns = React.useMemo(() => {
-    // Helper function to create sortable header
-    const createSortableHeader = (name: string) => (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "4px",
-          cursor: "pointer",
-        }}
-      >
-        <span style={{
-          fontSize: "13px",
-          lineHeight: "20px",
-          fontWeight: 600,
-          color: "#616161",
-          fontFamily: "'Inter', sans-serif",
-        }}>
-          {name}
-        </span>
-        <ArrowSort20Regular style={{ width: "16px", height: "16px", color: "#616161" }} />
-      </div>
-    );
+  // Helper function to create sortable header
+  const createSortableHeader = React.useCallback((name: string) => (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "4px",
+        cursor: "pointer",
+      }}
+    >
+      <span style={{
+        fontSize: "13px",
+        lineHeight: "20px",
+        fontWeight: 600,
+        color: "#616161",
+        fontFamily: "'Inter', sans-serif",
+      }}>
+        {name}
+      </span>
+      <ArrowSort20Regular style={{ width: "16px", height: "16px", color: "#616161" }} />
+    </div>
+  ), []);
 
-    return [
+  // Helper function to get application number from any data type
+  const getApplicationNo = (item: ScholarshipReportData | ApprovedFormData | undefined): string => {
+    if (!item) return "";
+    return (item as ScholarshipReportData).applicationNo || (item as ApprovedFormData).applicationNo || "";
+  };
+
+  // Common checkbox column
+  const checkboxColumn = React.useMemo(() => ({
+    key: "checkbox",
+    name: "",
+    fieldName: "checkbox",
+    minWidth: 48,
+    maxWidth: 48,
+    isSortable: false,
+    onRender: (item?: ScholarshipReportData | ApprovedFormData) => (
+      <input
+        type="checkbox"
+        checked={item ? selectedRows.has(getApplicationNo(item)) : false}
+        onChange={(e) => {
+          e.stopPropagation();
+          if (item && onRowSelect) {
+            onRowSelect(item, e.target.checked);
+          }
+        }}
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: "16px",
+          height: "16px",
+          cursor: "pointer",
+          accentColor: "#0f6cbd",
+        }}
+      />
+    ),
+    onRenderHeader: () => {
+      const allSelected = data.length > 0 && selectedRows.size === data.length;
+      const someSelected = selectedRows.size > 0 && selectedRows.size < data.length;
+      return (
+        <input
+          type="checkbox"
+          checked={allSelected}
+          ref={(input) => {
+            if (input) {
+              input.indeterminate = someSelected;
+            }
+          }}
+          onChange={(e) => {
+            e.stopPropagation();
+            if (onSelectAll) {
+              onSelectAll(e.target.checked);
+            }
+          }}
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            width: "16px",
+            height: "16px",
+            cursor: "pointer",
+            accentColor: "#0f6cbd",
+          }}
+        />
+      );
+    },
+  }), [selectedRows, data, onRowSelect, onSelectAll]);
+
+  // Common actions column
+  const actionsColumn = React.useMemo(() => ({
+    key: "actions",
+    name: "",
+    fieldName: "actions",
+    minWidth: 50,
+    isSortable: false,
+    onRender: (item?: ScholarshipReportData | ApprovedFormData) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Button appearance="subtle" style={{ minWidth: "auto", padding: "4px" }}>
+            <MoreHorizontalRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem
+            icon={<PrintRegular style={{ width: "20px", height: "20px" }} />}
+            label="Print Details"
+            onClick={() => item && onViewPdf && onViewPdf(item)}
+          />
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
+  }), [onViewPdf]);
+
+  // Helper to get field value from data object
+  const getFieldValue = (item: any, fieldName: string): string => {
+    if (!item) return "";
+    
+    // Handle different field name variations - map frontend field names to database field names
+    const fieldMap: Record<string, string[]> = {
+      "applicationNo": ["Application Id", "Application_Id", "Application_No", "applicationNo", "ApplicationId", "application_id"],
+      "aadhaarId": ["Aadhaar Id", "Aadhaar_Id", "Aadhaar_No", "Aadhaar_ID", "aadhaarId", "aadhaar_id"],
+      "studentName": ["Applicant Name", "Applicant_Name", "Student_Name", "Student Name", "studentName", "applicant_name"],
+      "studentId": ["Student Id", "Student_Id", "Student_ID", "studentId", "student_id"],
+      "classStudying": ["Class Studying", "Class_Studying", "classStudying", "class_studying"],
+      "institutionName": ["Institution Name", "Institution_Name", "institutionName", "institution_name"],
+      "fatherName": ["Father Name", "Father_Name", "fatherName", "father_name"],
+      "fatherOfficeName": ["Father Office Name", "Father_Office_Name", "Father Office", "Father_Office", "fatherOfficeName", "father_office_name"],
+      "motherName": ["Mother Name", "Mother_Name", "motherName", "mother_name"],
+      "motherOfficeName": ["Mother Office Name", "Mother_Office_Name", "Mother Office", "Mother_Office", "motherOfficeName", "mother_office_name"],
+      "guardianName": ["Guardian Name", "Guardian_Name", "guardianName", "guardian_name"],
+      "guardianOfficeName": ["Guardian Office Name", "Guardian_Office_Name", "Guardian Office", "Guardian_Office", "guardianOfficeName", "guardian_office_name"],
+      "gender": ["Gender", "gender"],
+      "checkInFavor": ["DDCheque In Favor", "DDCheque_In_Favor", "Cheque In Favor", "Cheque_In_Favor", "checkInFavor", "cheque_in_favor"],
+      "approvedAmount": ["Scholarship Approved Amount", "Scholarship_Approved_Amount", "Approved Amount", "Approved_Amount", "approvedAmount", "approved_amount"],
+      "issuedAmount": ["Issued Amount", "Issued_Amount", "issuedAmount", "issued_amount"],
+      "scholarshipId": ["Scholarship No", "Scholarship_No", "Scholarship Id", "Scholarship_Id", "Scholarship_ID", "scholarshipId", "scholarship_id"],
+      "scholarship": ["Scholarship No", "Scholarship_No", "Scholarship", "scholarship"],
+      "ddCheckNo": ["DDCheque No", "DDCheque_No", "DD Cheque No", "DD_Cheque_No", "ddCheckNo", "dd_check_no"],
+      "donateDate": ["Donated Date", "Donated_Date", "Donate Date", "Donate_Date", "donateDate", "donated_date"],
+      "bankName": ["Bank Name", "Bank_Name", "bankName", "bank_name"],
+      "appliedDate": ["Applied Date", "Applied_Date", "appliedDate", "applied_date"],
+      "scholarshipYear": ["ScholarshipYear Name", "ScholarshipYear_Name", "Scholarship Year", "Scholarship_Year", "scholarshipYear", "scholarship_year"],
+      "scholarshipFor": ["Scholarship For", "Scholarship_For", "scholarshipFor", "scholarship_for"],
+      "status": ["Status", "status"],
+      "fatherAnnualIncome": ["Father Annual Income", "Father_Annual_Income", "Annual Income", "Annual_Income", "fatherAnnualIncome", "father_annual_income"],
+      "mobileNumber": ["Mobile Number", "Mobile_Number", "Mobile No", "Mobile_No", "mobileNumber", "mobile_number"],
+      "fatherOccupation": ["Father Occupation", "Father_Occupation", "Occupation", "fatherOccupation", "father_occupation"],
+    };
+    
+    const possibleFields = fieldMap[fieldName] || [fieldName];
+    
+    // First try exact matches (case-sensitive)
+    for (const field of possibleFields) {
+      if (Object.prototype.hasOwnProperty.call(item, field) && item[field] !== undefined && item[field] !== null && item[field] !== "") {
+        return String(item[field]);
+      }
+    }
+    
+    // Then try case-insensitive matches
+    const itemKeys = Object.keys(item || {});
+    for (const field of possibleFields) {
+      const matchingKey = itemKeys.find(key => key.toLowerCase() === field.toLowerCase());
+      if (matchingKey && item[matchingKey] !== undefined && item[matchingKey] !== null && item[matchingKey] !== "") {
+        return String(item[matchingKey]);
+      }
+    }
+    
+    // Last resort: try the fieldName directly (case-insensitive)
+    const directMatch = itemKeys.find(key => key.toLowerCase() === fieldName.toLowerCase());
+    if (directMatch && item[directMatch] !== undefined && item[directMatch] !== null && item[directMatch] !== "") {
+      return String(item[directMatch]);
+    }
+    
+    return "";
+  };
+
+  // Columns for Categories Report and Scholarship Issued Report (Tabs 1 & 2)
+  const standardReportColumns = React.useMemo(() => [
       {
         key: "checkbox",
         name: "",
@@ -61,10 +213,10 @@ export const useReportsTable = ({
         minWidth: 48,
         maxWidth: 48,
         isSortable: false,
-        onRender: (item?: ScholarshipReportData) => (
+        onRender: (item?: ScholarshipReportData | any) => (
           <input
             type="checkbox"
-            checked={item ? selectedRows.has(item.applicationNo) : false}
+            checked={item ? selectedRows.has(getApplicationNo(item)) : false}
             onChange={(e) => {
               e.stopPropagation();
               if (item && onRowSelect) {
@@ -116,9 +268,9 @@ export const useReportsTable = ({
         minWidth: 150,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Application No."),
-        onRender: (item?: ScholarshipReportData) => (
+        onRender: (item?: ScholarshipReportData | any) => (
           <span style={{ fontSize: "14px", lineHeight: "20px", color: "#0f6cbd", fontWeight: 500, fontFamily: "'Inter', sans-serif" }}>
-            {item?.applicationNo}
+            {getFieldValue(item, "applicationNo")}
           </span>
         ),
       },
@@ -129,9 +281,9 @@ export const useReportsTable = ({
         minWidth: 150,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Aadhaar Id"),
-        onRender: (item?: ScholarshipReportData) => (
+        onRender: (item?: ScholarshipReportData | any) => (
           <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
-            {item?.aadhaarId}
+            {getFieldValue(item, "aadhaarId")}
           </span>
         ),
       },
@@ -142,9 +294,9 @@ export const useReportsTable = ({
         minWidth: 150,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Student Name"),
-        onRender: (item?: ScholarshipReportData) => (
+        onRender: (item?: ScholarshipReportData | any) => (
           <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
-            {item?.studentName}
+            {getFieldValue(item, "studentName")}
           </span>
         ),
       },
@@ -155,9 +307,9 @@ export const useReportsTable = ({
         minWidth: 120,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Student Id"),
-        onRender: (item?: ScholarshipReportData) => (
+        onRender: (item?: ScholarshipReportData | any) => (
           <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
-            {item?.studentId}
+            {getFieldValue(item, "studentId")}
           </span>
         ),
       },
@@ -168,9 +320,9 @@ export const useReportsTable = ({
         minWidth: 150,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Class Studying"),
-        onRender: (item?: ScholarshipReportData) => (
+        onRender: (item?: ScholarshipReportData | any) => (
           <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
-            {item?.classStudying}
+            {getFieldValue(item, "classStudying")}
           </span>
         ),
       },
@@ -181,9 +333,9 @@ export const useReportsTable = ({
         minWidth: 200,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Institution Name"),
-        onRender: (item?: ScholarshipReportData) => (
+        onRender: (item?: ScholarshipReportData | any) => (
           <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
-            {item?.institutionName}
+            {getFieldValue(item, "institutionName")}
           </span>
         ),
       },
@@ -194,8 +346,8 @@ export const useReportsTable = ({
         minWidth: 150,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Father Name"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.fatherName}</span>
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "fatherName")}</span>
         ),
       },
       {
@@ -205,8 +357,8 @@ export const useReportsTable = ({
         minWidth: 180,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Father Office Name"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.fatherOfficeName}</span>
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "fatherOfficeName")}</span>
         ),
       },
       {
@@ -216,8 +368,8 @@ export const useReportsTable = ({
         minWidth: 150,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Mother Name"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.motherName}</span>
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "motherName")}</span>
         ),
       },
       {
@@ -227,8 +379,8 @@ export const useReportsTable = ({
         minWidth: 180,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Mother Office Name"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.motherOfficeName}</span>
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "motherOfficeName")}</span>
         ),
       },
       {
@@ -238,8 +390,8 @@ export const useReportsTable = ({
         minWidth: 150,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Guardian Name"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.guardianName}</span>
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "guardianName")}</span>
         ),
       },
       {
@@ -249,8 +401,8 @@ export const useReportsTable = ({
         minWidth: 180,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Guardian Office Name"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.guardianOfficeName}</span>
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "guardianOfficeName")}</span>
         ),
       },
       {
@@ -260,19 +412,19 @@ export const useReportsTable = ({
         minWidth: 100,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Gender"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.gender}</span>
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "gender")}</span>
         ),
       },
       {
         key: "checkInFavor",
-        name: "Check In Favor",
+        name: "Cheque In Favor",
         fieldName: "checkInFavor",
         minWidth: 150,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Check In Favor"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.checkInFavor}</span>
+        onRenderHeader: () => createSortableHeader("Cheque In Favor"),
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "checkInFavor")}</span>
         ),
       },
       {
@@ -282,8 +434,8 @@ export const useReportsTable = ({
         minWidth: 130,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Approved Amount"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.approvedAmount}</span>
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "approvedAmount")}</span>
         ),
       },
       {
@@ -293,41 +445,54 @@ export const useReportsTable = ({
         minWidth: 130,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Issued Amount"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.issuedAmount}</span>
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "issuedAmount")}</span>
         ),
       },
       {
         key: "scholarshipId",
-        name: "Scholarship Id",
+        name: "Scholarship ID",
         fieldName: "scholarshipId",
         minWidth: 150,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Scholarship Id"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.scholarshipId}</span>
+        onRenderHeader: () => createSortableHeader("Scholarship ID"),
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "scholarshipId")}</span>
+        ),
+      },
+      {
+        key: "scholarship",
+        name: "Scholarship",
+        fieldName: "scholarship",
+        minWidth: 150,
+        isSortable: true,
+        onRenderHeader: () => createSortableHeader("Scholarship"),
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+            {getFieldValue(item, "scholarship") || getFieldValue(item, "scholarshipId")}
+          </span>
         ),
       },
       {
         key: "ddCheckNo",
-        name: "DD Check No",
+        name: "DDCheckNo",
         fieldName: "ddCheckNo",
         minWidth: 150,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("DD Check No"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.ddCheckNo}</span>
+        onRenderHeader: () => createSortableHeader("DDCheckNo"),
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "ddCheckNo")}</span>
         ),
       },
       {
         key: "donateDate",
-        name: "Donate Date",
+        name: "Donated Date",
         fieldName: "donateDate",
         minWidth: 120,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Donate Date"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.donateDate}</span>
+        onRenderHeader: () => createSortableHeader("Donated Date"),
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "donateDate")}</span>
         ),
       },
       {
@@ -337,8 +502,8 @@ export const useReportsTable = ({
         minWidth: 150,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Bank Name"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.bankName}</span>
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "bankName")}</span>
         ),
       },
       {
@@ -348,8 +513,8 @@ export const useReportsTable = ({
         minWidth: 120,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Applied Date"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.appliedDate}</span>
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "appliedDate")}</span>
         ),
       },
       {
@@ -359,8 +524,8 @@ export const useReportsTable = ({
         minWidth: 130,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Scholarship Year"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.scholarshipYear}</span>
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "scholarshipYear")}</span>
         ),
       },
       {
@@ -370,8 +535,8 @@ export const useReportsTable = ({
         minWidth: 150,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Scholarship For"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.scholarshipFor}</span>
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "scholarshipFor")}</span>
         ),
       },
       {
@@ -381,8 +546,8 @@ export const useReportsTable = ({
         minWidth: 120,
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Status"),
-        onRender: (item?: ScholarshipReportData) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{item?.status}</span>
+        onRender: (item?: ScholarshipReportData | any) => (
+          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "status")}</span>
         ),
       },
       {
@@ -391,7 +556,7 @@ export const useReportsTable = ({
         fieldName: "actions",
         minWidth: 50,
         isSortable: false,
-        onRender: (item?: ScholarshipReportData) => (
+        onRender: (item?: ScholarshipReportData | any) => (
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Button appearance="subtle" style={{ minWidth: "auto", padding: "4px" }}>
@@ -408,8 +573,214 @@ export const useReportsTable = ({
           </DropdownMenu>
         ),
       },
-    ];
-  }, [selectedRows, onRowSelect, onSelectAll, data]);
+    ], [selectedRows, onRowSelect, onSelectAll, data, createSortableHeader, onViewPdf, getApplicationNo, getFieldValue]);
+
+  // Columns for Approved Form Report (Tab 3)
+  const approvedFormColumns = React.useMemo(() => [
+    {
+      key: "checkbox",
+      name: "",
+      fieldName: "checkbox",
+      minWidth: 48,
+      maxWidth: 48,
+      isSortable: false,
+      onRender: (item?: ApprovedFormData | any) => (
+        <input
+          type="checkbox"
+          checked={item ? selectedRows.has(getApplicationNo(item)) : false}
+          onChange={(e) => {
+            e.stopPropagation();
+            if (item && onRowSelect) {
+              onRowSelect(item, e.target.checked);
+            }
+          }}
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            width: "16px",
+            height: "16px",
+            cursor: "pointer",
+            accentColor: "#0f6cbd",
+          }}
+        />
+      ),
+      onRenderHeader: () => {
+        const allSelected = data.length > 0 && selectedRows.size === data.length;
+        const someSelected = selectedRows.size > 0 && selectedRows.size < data.length;
+        return (
+          <input
+            type="checkbox"
+            checked={allSelected}
+            ref={(input) => {
+              if (input) {
+                input.indeterminate = someSelected;
+              }
+            }}
+            onChange={(e) => {
+              e.stopPropagation();
+              if (onSelectAll) {
+                onSelectAll(e.target.checked);
+              }
+            }}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "16px",
+              height: "16px",
+              cursor: "pointer",
+              accentColor: "#0f6cbd",
+            }}
+          />
+        );
+      },
+    },
+    {
+      key: "applicationNo",
+      name: "Application No",
+      fieldName: "applicationNo",
+      minWidth: 150,
+      isSortable: true,
+      onRenderHeader: () => createSortableHeader("Application No"),
+      onRender: (item?: ApprovedFormData | any) => (
+        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#0f6cbd", fontWeight: 500, fontFamily: "'Inter', sans-serif" }}>
+          {getFieldValue(item, "applicationNo")}
+        </span>
+      ),
+    },
+    {
+      key: "studentName",
+      name: "Student Name",
+      fieldName: "studentName",
+      minWidth: 150,
+      isSortable: true,
+      onRenderHeader: () => createSortableHeader("Student Name"),
+      onRender: (item?: ApprovedFormData | any) => (
+        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+          {getFieldValue(item, "studentName")}
+        </span>
+      ),
+    },
+    {
+      key: "classStudying",
+      name: "Class Studying",
+      fieldName: "classStudying",
+      minWidth: 150,
+      isSortable: true,
+      onRenderHeader: () => createSortableHeader("Class Studying"),
+      onRender: (item?: ApprovedFormData | any) => (
+        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+          {getFieldValue(item, "classStudying")}
+        </span>
+      ),
+    },
+    {
+      key: "institutionName",
+      name: "Institution Name",
+      fieldName: "institutionName",
+      minWidth: 200,
+      isSortable: true,
+      onRenderHeader: () => createSortableHeader("Institution Name"),
+      onRender: (item?: ApprovedFormData | any) => (
+        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+          {getFieldValue(item, "institutionName")}
+        </span>
+      ),
+    },
+    {
+      key: "fatherAnnualIncome",
+      name: "Father Annual Income",
+      fieldName: "fatherAnnualIncome",
+      minWidth: 180,
+      isSortable: true,
+      onRenderHeader: () => createSortableHeader("Father Annual Income"),
+      onRender: (item?: ApprovedFormData | any) => (
+        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+          {getFieldValue(item, "fatherAnnualIncome")}
+        </span>
+      ),
+    },
+    {
+      key: "mobileNumber",
+      name: "Mobile Number",
+      fieldName: "mobileNumber",
+      minWidth: 150,
+      isSortable: true,
+      onRenderHeader: () => createSortableHeader("Mobile Number"),
+      onRender: (item?: ApprovedFormData | any) => (
+        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+          {getFieldValue(item, "mobileNumber")}
+        </span>
+      ),
+    },
+    {
+      key: "fatherOccupation",
+      name: "Father Occupation",
+      fieldName: "fatherOccupation",
+      minWidth: 180,
+      isSortable: true,
+      onRenderHeader: () => createSortableHeader("Father Occupation"),
+      onRender: (item?: ApprovedFormData | any) => (
+        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+          {getFieldValue(item, "fatherOccupation")}
+        </span>
+      ),
+    },
+    {
+      key: "scholarship",
+      name: "Scholarship",
+      fieldName: "scholarship",
+      minWidth: 150,
+      isSortable: true,
+      onRenderHeader: () => createSortableHeader("Scholarship"),
+      onRender: (item?: ApprovedFormData | any) => (
+        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+          {getFieldValue(item, "scholarship")}
+        </span>
+      ),
+    },
+    {
+      key: "status",
+      name: "Status",
+      fieldName: "status",
+      minWidth: 120,
+      isSortable: true,
+      onRenderHeader: () => createSortableHeader("Status"),
+      onRender: (item?: ApprovedFormData | any) => (
+        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+          {getFieldValue(item, "status")}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      name: "",
+      fieldName: "actions",
+      minWidth: 50,
+      isSortable: false,
+      onRender: (item?: ApprovedFormData | any) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button appearance="subtle" style={{ minWidth: "auto", padding: "4px" }}>
+              <MoreHorizontalRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem
+              icon={<PrintRegular style={{ width: "20px", height: "20px" }} />}
+              label="Print Details"
+              onClick={() => item && onViewPdf && onViewPdf(item)}
+            />
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ], [selectedRows, onRowSelect, onSelectAll, data, createSortableHeader, onViewPdf, getApplicationNo, getFieldValue]);
+
+  // Return columns based on active tab
+  const columns = React.useMemo(() => {
+    if (activeTab === "approved-form") {
+      return approvedFormColumns;
+    }
+    return standardReportColumns;
+  }, [activeTab, standardReportColumns, approvedFormColumns]);
 
   return { columns };
 };

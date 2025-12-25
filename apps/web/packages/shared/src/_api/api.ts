@@ -4131,14 +4131,23 @@ export const ReportsApiAxiosParamCreator = function (configuration?: Configurati
          * 
          * @summary Get categories wise report
          * @param {number} [academicYear] 
-         * @param {string} [appliedDate] 
-         * @param {string} [gender] 
+         * @param {string} [mainCategory] 
          * @param {string} [status] 
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {string} [amount] 
+         * @param {string} [gender] 
+         * @param {string} [issuedTo] 
+         * @param {string} [sairamCategory] 
+         * @param {string} [institutionName] 
+         * @param {string} [parentOffice] 
+         * @param {string} [favourCategory] 
+         * @param {string} [favourGroup] 
          * @param {string} [keyword] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        reportsControllerGetCategoriesWiseReport: async (academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, options: any = {}): Promise<RequestArgs> => {
+        reportsControllerGetCategoriesWiseReport: async (academicYear?: number, mainCategory?: string, status?: string, fromDate?: string, toDate?: string, amount?: string, gender?: string, issuedTo?: string, sairamCategory?: string, institutionName?: string, parentOffice?: string, favourCategory?: string, favourGroup?: string, keyword?: string, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/reports/categories`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4155,16 +4164,52 @@ export const ReportsApiAxiosParamCreator = function (configuration?: Configurati
                 localVarQueryParameter['academicYear'] = academicYear;
             }
 
-            if (appliedDate !== undefined) {
-                localVarQueryParameter['appliedDate'] = appliedDate;
+            if (mainCategory !== undefined) {
+                localVarQueryParameter['mainCategory'] = mainCategory;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (fromDate !== undefined) {
+                localVarQueryParameter['fromDate'] = fromDate;
+            }
+
+            if (toDate !== undefined) {
+                localVarQueryParameter['toDate'] = toDate;
+            }
+
+            if (amount !== undefined) {
+                localVarQueryParameter['amount'] = amount;
             }
 
             if (gender !== undefined) {
                 localVarQueryParameter['gender'] = gender;
             }
 
-            if (status !== undefined) {
-                localVarQueryParameter['status'] = status;
+            if (issuedTo !== undefined) {
+                localVarQueryParameter['issuedTo'] = issuedTo;
+            }
+
+            if (sairamCategory !== undefined) {
+                localVarQueryParameter['sairamCategory'] = sairamCategory;
+            }
+
+            if (institutionName !== undefined) {
+                localVarQueryParameter['institutionName'] = institutionName;
+            }
+
+            if (parentOffice !== undefined) {
+                localVarQueryParameter['parentOffice'] = parentOffice;
+            }
+
+            if (favourCategory !== undefined) {
+                localVarQueryParameter['favourCategory'] = favourCategory;
+            }
+
+            if (favourGroup !== undefined) {
+                localVarQueryParameter['favourGroup'] = favourGroup;
             }
 
             if (keyword !== undefined) {
@@ -4184,15 +4229,48 @@ export const ReportsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Get scholarship issued report
-         * @param {number} [academicYear] 
-         * @param {string} [appliedDate] 
-         * @param {string} [gender] 
-         * @param {string} [keyword] 
+         * @summary Get all cheque issued by options
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        reportsControllerGetScholarshipIssuedReport: async (academicYear?: number, appliedDate?: string, gender?: string, keyword?: string, options: any = {}): Promise<RequestArgs> => {
+        reportsControllerGetChequeIssuedBy: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/reports/cheque-issued-by`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get scholarship issued report
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {number} [institutionId] 
+         * @param {string} [strInstitution] 
+         * @param {string} [chequeInFavorType] 
+         * @param {number} [intIssuedBy] 
+         * @param {string} [strIssuedBy] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportsControllerGetScholarshipIssuedReport: async (fromDate?: string, toDate?: string, institutionId?: number, strInstitution?: string, chequeInFavorType?: string, intIssuedBy?: number, strIssuedBy?: string, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/reports/scholarship-issued`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4205,20 +4283,32 @@ export const ReportsApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-            if (academicYear !== undefined) {
-                localVarQueryParameter['academicYear'] = academicYear;
+            if (fromDate !== undefined) {
+                localVarQueryParameter['fromDate'] = fromDate;
             }
 
-            if (appliedDate !== undefined) {
-                localVarQueryParameter['appliedDate'] = appliedDate;
+            if (toDate !== undefined) {
+                localVarQueryParameter['toDate'] = toDate;
             }
 
-            if (gender !== undefined) {
-                localVarQueryParameter['gender'] = gender;
+            if (institutionId !== undefined) {
+                localVarQueryParameter['institutionId'] = institutionId;
             }
 
-            if (keyword !== undefined) {
-                localVarQueryParameter['keyword'] = keyword;
+            if (strInstitution !== undefined) {
+                localVarQueryParameter['strInstitution'] = strInstitution;
+            }
+
+            if (chequeInFavorType !== undefined) {
+                localVarQueryParameter['chequeInFavorType'] = chequeInFavorType;
+            }
+
+            if (intIssuedBy !== undefined) {
+                localVarQueryParameter['intIssuedBy'] = intIssuedBy;
+            }
+
+            if (strIssuedBy !== undefined) {
+                localVarQueryParameter['strIssuedBy'] = strIssuedBy;
             }
 
 
@@ -4268,29 +4358,51 @@ export const ReportsApiFp = function(configuration?: Configuration) {
          * 
          * @summary Get categories wise report
          * @param {number} [academicYear] 
-         * @param {string} [appliedDate] 
-         * @param {string} [gender] 
+         * @param {string} [mainCategory] 
          * @param {string} [status] 
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {string} [amount] 
+         * @param {string} [gender] 
+         * @param {string} [issuedTo] 
+         * @param {string} [sairamCategory] 
+         * @param {string} [institutionName] 
+         * @param {string} [parentOffice] 
+         * @param {string} [favourCategory] 
+         * @param {string} [favourGroup] 
          * @param {string} [keyword] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async reportsControllerGetCategoriesWiseReport(academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerGetCategoriesWiseReport(academicYear, appliedDate, gender, status, keyword, options);
+        async reportsControllerGetCategoriesWiseReport(academicYear?: number, mainCategory?: string, status?: string, fromDate?: string, toDate?: string, amount?: string, gender?: string, issuedTo?: string, sairamCategory?: string, institutionName?: string, parentOffice?: string, favourCategory?: string, favourGroup?: string, keyword?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerGetCategoriesWiseReport(academicYear, mainCategory, status, fromDate, toDate, amount, gender, issuedTo, sairamCategory, institutionName, parentOffice, favourCategory, favourGroup, keyword, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get all cheque issued by options
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async reportsControllerGetChequeIssuedBy(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerGetChequeIssuedBy(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
          * @summary Get scholarship issued report
-         * @param {number} [academicYear] 
-         * @param {string} [appliedDate] 
-         * @param {string} [gender] 
-         * @param {string} [keyword] 
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {number} [institutionId] 
+         * @param {string} [strInstitution] 
+         * @param {string} [chequeInFavorType] 
+         * @param {number} [intIssuedBy] 
+         * @param {string} [strIssuedBy] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async reportsControllerGetScholarshipIssuedReport(academicYear?: number, appliedDate?: string, gender?: string, keyword?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerGetScholarshipIssuedReport(academicYear, appliedDate, gender, keyword, options);
+        async reportsControllerGetScholarshipIssuedReport(fromDate?: string, toDate?: string, institutionId?: number, strInstitution?: string, chequeInFavorType?: string, intIssuedBy?: number, strIssuedBy?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerGetScholarshipIssuedReport(fromDate, toDate, institutionId, strInstitution, chequeInFavorType, intIssuedBy, strIssuedBy, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -4327,28 +4439,49 @@ export const ReportsApiFactory = function (configuration?: Configuration, basePa
          * 
          * @summary Get categories wise report
          * @param {number} [academicYear] 
-         * @param {string} [appliedDate] 
-         * @param {string} [gender] 
+         * @param {string} [mainCategory] 
          * @param {string} [status] 
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {string} [amount] 
+         * @param {string} [gender] 
+         * @param {string} [issuedTo] 
+         * @param {string} [sairamCategory] 
+         * @param {string} [institutionName] 
+         * @param {string} [parentOffice] 
+         * @param {string} [favourCategory] 
+         * @param {string} [favourGroup] 
          * @param {string} [keyword] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        reportsControllerGetCategoriesWiseReport(academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, options?: any): AxiosPromise<void> {
-            return localVarFp.reportsControllerGetCategoriesWiseReport(academicYear, appliedDate, gender, status, keyword, options).then((request) => request(axios, basePath));
+        reportsControllerGetCategoriesWiseReport(academicYear?: number, mainCategory?: string, status?: string, fromDate?: string, toDate?: string, amount?: string, gender?: string, issuedTo?: string, sairamCategory?: string, institutionName?: string, parentOffice?: string, favourCategory?: string, favourGroup?: string, keyword?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.reportsControllerGetCategoriesWiseReport(academicYear, mainCategory, status, fromDate, toDate, amount, gender, issuedTo, sairamCategory, institutionName, parentOffice, favourCategory, favourGroup, keyword, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all cheque issued by options
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportsControllerGetChequeIssuedBy(options?: any): AxiosPromise<void> {
+            return localVarFp.reportsControllerGetChequeIssuedBy(options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Get scholarship issued report
-         * @param {number} [academicYear] 
-         * @param {string} [appliedDate] 
-         * @param {string} [gender] 
-         * @param {string} [keyword] 
+         * @param {string} [fromDate] 
+         * @param {string} [toDate] 
+         * @param {number} [institutionId] 
+         * @param {string} [strInstitution] 
+         * @param {string} [chequeInFavorType] 
+         * @param {number} [intIssuedBy] 
+         * @param {string} [strIssuedBy] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        reportsControllerGetScholarshipIssuedReport(academicYear?: number, appliedDate?: string, gender?: string, keyword?: string, options?: any): AxiosPromise<void> {
-            return localVarFp.reportsControllerGetScholarshipIssuedReport(academicYear, appliedDate, gender, keyword, options).then((request) => request(axios, basePath));
+        reportsControllerGetScholarshipIssuedReport(fromDate?: string, toDate?: string, institutionId?: number, strInstitution?: string, chequeInFavorType?: string, intIssuedBy?: number, strIssuedBy?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.reportsControllerGetScholarshipIssuedReport(fromDate, toDate, institutionId, strInstitution, chequeInFavorType, intIssuedBy, strIssuedBy, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -4388,31 +4521,54 @@ export class ReportsApi extends BaseAPI {
      * 
      * @summary Get categories wise report
      * @param {number} [academicYear] 
-     * @param {string} [appliedDate] 
-     * @param {string} [gender] 
+     * @param {string} [mainCategory] 
      * @param {string} [status] 
+     * @param {string} [fromDate] 
+     * @param {string} [toDate] 
+     * @param {string} [amount] 
+     * @param {string} [gender] 
+     * @param {string} [issuedTo] 
+     * @param {string} [sairamCategory] 
+     * @param {string} [institutionName] 
+     * @param {string} [parentOffice] 
+     * @param {string} [favourCategory] 
+     * @param {string} [favourGroup] 
      * @param {string} [keyword] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ReportsApi
      */
-    public reportsControllerGetCategoriesWiseReport(academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, options?: any) {
-        return ReportsApiFp(this.configuration).reportsControllerGetCategoriesWiseReport(academicYear, appliedDate, gender, status, keyword, options).then((request) => request(this.axios, this.basePath));
+    public reportsControllerGetCategoriesWiseReport(academicYear?: number, mainCategory?: string, status?: string, fromDate?: string, toDate?: string, amount?: string, gender?: string, issuedTo?: string, sairamCategory?: string, institutionName?: string, parentOffice?: string, favourCategory?: string, favourGroup?: string, keyword?: string, options?: any) {
+        return ReportsApiFp(this.configuration).reportsControllerGetCategoriesWiseReport(academicYear, mainCategory, status, fromDate, toDate, amount, gender, issuedTo, sairamCategory, institutionName, parentOffice, favourCategory, favourGroup, keyword, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get all cheque issued by options
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ReportsApi
+     */
+    public reportsControllerGetChequeIssuedBy(options?: any) {
+        return ReportsApiFp(this.configuration).reportsControllerGetChequeIssuedBy(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Get scholarship issued report
-     * @param {number} [academicYear] 
-     * @param {string} [appliedDate] 
-     * @param {string} [gender] 
-     * @param {string} [keyword] 
+     * @param {string} [fromDate] 
+     * @param {string} [toDate] 
+     * @param {number} [institutionId] 
+     * @param {string} [strInstitution] 
+     * @param {string} [chequeInFavorType] 
+     * @param {number} [intIssuedBy] 
+     * @param {string} [strIssuedBy] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ReportsApi
      */
-    public reportsControllerGetScholarshipIssuedReport(academicYear?: number, appliedDate?: string, gender?: string, keyword?: string, options?: any) {
-        return ReportsApiFp(this.configuration).reportsControllerGetScholarshipIssuedReport(academicYear, appliedDate, gender, keyword, options).then((request) => request(this.axios, this.basePath));
+    public reportsControllerGetScholarshipIssuedReport(fromDate?: string, toDate?: string, institutionId?: number, strInstitution?: string, chequeInFavorType?: string, intIssuedBy?: number, strIssuedBy?: string, options?: any) {
+        return ReportsApiFp(this.configuration).reportsControllerGetScholarshipIssuedReport(fromDate, toDate, institutionId, strInstitution, chequeInFavorType, intIssuedBy, strIssuedBy, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -13,6 +13,7 @@ export interface ProfilePopoverProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onLogout: () => void;
+  onChangePassword: () => void;
   children: React.ReactNode;
 }
 
@@ -22,9 +23,9 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
   open,
   onOpenChange,
   onLogout,
+  onChangePassword,
   children,
 }) => {
-  const navigate = useNavigate();
 
   return (
     <Popover
@@ -127,7 +128,7 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
             <button
               onClick={() => {
                 onOpenChange(false);
-                void navigate("/change-password");
+                onChangePassword();
               }}
               className="w-full flex items-center gap-2 py-2.5 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left focus:outline-none focus:bg-gray-50"
               style={{

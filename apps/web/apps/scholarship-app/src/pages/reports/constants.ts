@@ -163,3 +163,110 @@ export const issuedTypeOptions = [
   { value: "concession", label: "Concession" },
 ];
 
+// Main Category options for Categories Report
+export const mainCategoryOptions = [
+  { value: "", label: "--Select--" },
+  { value: "Applied Date", label: "Applied Date" },
+  { value: "Amount", label: "Amount" },
+  { value: "Gender", label: "Gender" },
+  { value: "Issued to", label: "Issued to" },
+  { value: "Processed Date", label: "Processed Date" },
+  { value: "Status", label: "Status" },
+  { value: "Sairam Group", label: "Sairam Group" },
+  { value: "Parent Office", label: "Parent Office" },
+  { value: "Favour Type", label: "Favour Type" },
+];
+
+// Amount options
+export const amountOptions = [
+  { value: "", label: "--Select--" },
+  { value: "Below 5000", label: "Below 5000" },
+  { value: "5000-10000", label: "5000-10000" },
+  { value: "10000-20000", label: "10000-20000" },
+  { value: "20000-50000", label: "20000-50000" },
+  { value: "Above 50000", label: "Above 50000" },
+];
+
+// Issued To options
+export const issuedToOptions = [
+  { value: "", label: "--Select--" },
+  { value: "All", label: "All" },
+  { value: "College", label: "College" },
+  { value: "Research", label: "Research" },
+  { value: "School", label: "School" },
+];
+
+// Sairam Category options
+export const sairamCategoryOptions = [
+  { value: "All", label: "All" },
+  { value: "College", label: "College" },
+  { value: "School", label: "School" },
+  { value: "Polytechnic", label: "Polytechnic" },
+  { value: "Medical", label: "Medical" },
+];
+
+// College options
+export const collegeOptions = [
+  { value: "All", label: "All" },
+  { value: "Sri Sai Ram Engineering College", label: "Sri Sai Ram Engineering College" },
+  { value: "Sri Sai Ram Institute Of Technology", label: "Sri Sai Ram Institute Of Technology" },
+  { value: "Sri Sairam College Of Engineering", label: "Sri Sairam College Of Engineering" },
+];
+
+// School options
+export const schoolOptions = [
+  { value: "All", label: "All" },
+  { value: "Sai Ram Matriculation Hr. Sec. School,West Tambaram,Chennai", label: "Sai Ram Matriculation Hr. Sec. School,West Tambaram,Chennai" },
+  { value: "Sai Matriculation Hr Sec School,Madipakkam", label: "Sai Matriculation Hr Sec School,Madipakkam" },
+  { value: "Sai Ram Vidyalaya,Madipakkam,Chennai", label: "Sai Ram Vidyalaya,Madipakkam,Chennai" },
+  { value: "Sai Ram Vidyalaya,Ullavaikal,Pondicherry", label: "Sai Ram Vidyalaya,Ullavaikal,Pondicherry" },
+  { value: "Sai Ram Matriculation Hr Sec School,Thiruthuripoondi", label: "Sai Ram Matriculation Hr Sec School,Thiruthuripoondi" },
+  { value: "Sai Ram Matriculation School,Thiruvarur", label: "Sai Ram Matriculation School,Thiruvarur" },
+  { value: "Sai Ram Matriculation Hr Sec School,Goripalayam,Madurai", label: "Sai Ram Matriculation Hr Sec School,Goripalayam,Madurai" },
+];
+
+// Polytechnic options
+export const polytechnicOptions = [
+  { value: "All", label: "All" },
+  { value: "Sri Sai Ram Polytechnic College,West Tambaram,Chennai", label: "Sri Sai Ram Polytechnic College,West Tambaram,Chennai" },
+  { value: "Sai Jothi Polytechnic College,Ellayarpathi,Madurai", label: "Sai Jothi Polytechnic College,Ellayarpathi,Madurai" },
+];
+
+// Medical options
+export const medicalOptions = [
+  { value: "All", label: "All" },
+  { value: "Sri Sai Ram Siddha,West Tambaram,Chennai", label: "Sri Sai Ram Siddha,West Tambaram,Chennai" },
+  { value: "Sri Sai Ram Ayur. Medical College & Research Centre,West Tambaram,Chennai", label: "Sri Sai Ram Ayur. Medical College & Research Centre,West Tambaram,Chennai" },
+  { value: "Sri Sai Ram Homoeopathy Medical College & Research,West Tambaram,Chennai", label: "Sri Sai Ram Homoeopathy Medical College & Research,West Tambaram,Chennai" },
+];
+
+// Favour Category options
+export const favourCategoryOptions = [
+  { value: "All", label: "All" },
+  { value: "Individual", label: "Cheque" },
+  { value: "Concession", label: "Concession" },
+  { value: "Institution", label: "Institution" },
+];
+
+// Favour Group options
+export const favourGroupOptions = [
+  { value: "All", label: "All" },
+  { value: "Sairam Group", label: "Sairam Group" },
+  { value: "Out Of Sairam Group", label: "Out Of Sairam Group" },
+];
+
+// Main Category options for Scholarship Issued Report
+export const scholarshipIssuedMainCategoryOptions = [
+  { value: "", label: "--Select--" },
+  { value: "Issued By", label: "Issued By" },
+  { value: "Issued Date", label: "Issued Date" },
+];
+
+// Cheque In Favor Type options
+export const chequeInFavorTypeOptions = [
+  { value: "All", label: "All" },
+  { value: "Individual", label: "Individual" },
+  { value: "Institution", label: "Institution" },
+  { value: "Concession", label: "Concession" },
+];
+

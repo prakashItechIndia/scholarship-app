@@ -884,5 +884,115 @@ export const reports = {
     const response = await apiClient.get('/reports/academic-years');
     return response.data;
   },
+
+  /**
+   * Get categories wise report
+   */
+  getCategoriesWiseReport: async (filters: {
+    academicYear?: number;
+    mainCategory?: string;
+    status?: string;
+    fromDate?: string;
+    toDate?: string;
+    amount?: string;
+    gender?: string;
+    issuedTo?: string;
+    sairamCategory?: string;
+    institutionName?: string;
+    parentOffice?: string;
+    favourCategory?: string;
+    favourGroup?: string;
+    keyword?: string;
+  }) => {
+    const params = new URLSearchParams();
+    if (filters.academicYear) params.append('academicYear', filters.academicYear.toString());
+    if (filters.mainCategory) params.append('mainCategory', filters.mainCategory);
+    if (filters.status) params.append('status', filters.status);
+    if (filters.fromDate) params.append('fromDate', filters.fromDate);
+    if (filters.toDate) params.append('toDate', filters.toDate);
+    if (filters.amount) params.append('amount', filters.amount);
+    if (filters.gender) params.append('gender', filters.gender);
+    if (filters.issuedTo) params.append('issuedTo', filters.issuedTo);
+    if (filters.sairamCategory) params.append('sairamCategory', filters.sairamCategory);
+    if (filters.institutionName) params.append('institutionName', filters.institutionName);
+    if (filters.parentOffice) params.append('parentOffice', filters.parentOffice);
+    if (filters.favourCategory) params.append('favourCategory', filters.favourCategory);
+    if (filters.favourGroup) params.append('favourGroup', filters.favourGroup);
+    if (filters.keyword) params.append('keyword', filters.keyword);
+
+    const response = await apiClient.get(`/reports/categories?${params.toString()}`);
+    return response.data;
+  },
+
+  /**
+   * Get scholarship issued report
+   */
+  getScholarshipIssuedReport: async (filters: {
+    fromDate?: string;
+    toDate?: string;
+    institutionId?: number;
+    strInstitution?: string;
+    chequeInFavorType?: string;
+    intIssuedBy?: number;
+    strIssuedBy?: string;
+  }) => {
+    const params = new URLSearchParams();
+    if (filters.fromDate) params.append('fromDate', filters.fromDate);
+    if (filters.toDate) params.append('toDate', filters.toDate);
+    if (filters.institutionId) params.append('institutionId', filters.institutionId.toString());
+    if (filters.strInstitution) params.append('strInstitution', filters.strInstitution);
+    if (filters.chequeInFavorType) params.append('chequeInFavorType', filters.chequeInFavorType);
+    if (filters.intIssuedBy) params.append('intIssuedBy', filters.intIssuedBy.toString());
+    if (filters.strIssuedBy) params.append('strIssuedBy', filters.strIssuedBy);
+
+    const response = await apiClient.get(`/reports/scholarship-issued?${params.toString()}`);
+    return response.data;
+  },
+
+  /**
+   * Get cheque issued by options
+   */
+  getChequeIssuedBy: async () => {
+    const response = await apiClient.get('/reports/cheque-issued-by');
+    return response.data;
+  },
+
+  /**
+   * Export report to PDF
+   */
+  exportToPdf: async (reportType: 'categories' | 'scholarship-issued', filters: any) => {
+    const endpoint = reportType === 'categories' ? '/reports/categories' : '/reports/scholarship-issued';
+    const params = new URLSearchParams();
+    Object.keys(filters).forEach((key) => {
+      if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+        params.append(key, filters[key].toString());
+      }
+    });
+    params.append('format', 'pdf');
+
+    const response = await apiClient.get(`${endpoint}?${params.toString()}`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  },
+
+  /**
+   * Export report to Excel
+   */
+  exportToExcel: async (reportType: 'categories' | 'scholarship-issued', filters: any) => {
+    const endpoint = reportType === 'categories' ? '/reports/categories' : '/reports/scholarship-issued';
+    const params = new URLSearchParams();
+    Object.keys(filters).forEach((key) => {
+      if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+        params.append(key, filters[key].toString());
+      }
+    });
+    params.append('format', 'excel');
+
+    const response = await apiClient.get(`${endpoint}?${params.toString()}`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  },
 };
 

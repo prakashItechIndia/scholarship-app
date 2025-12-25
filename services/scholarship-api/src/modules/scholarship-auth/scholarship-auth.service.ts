@@ -305,7 +305,17 @@ export class ScholarshipAuthService {
     // Encrypt new password
     const encryptedNewPassword = this.encryptPassword(newPassword);
 
-    // Update password
+    // Use stored procedure USP_ChangePassword (following old app pattern)
+    try {
+      await this.db.execute('USP_ChangePassword', {
+        ConfirmPassword: encryptedNewPassword,
+        UserId: username,
+      });
+    } catch (error) {
+      // Fallback to direct SQL if stored procedure doesn't exist
+      this.logger.warn(
+        'USP_ChangePassword stored procedure not found, using direct SQL update',
+      );
     const updateQuery = `
       UPDATE Tbl_UserMaster
       SET 
@@ -321,6 +331,7 @@ export class ScholarshipAuthService {
       modifiedBy,
       username,
     });
+    }
 
     return { message: 'Password changed successfully' };
   }

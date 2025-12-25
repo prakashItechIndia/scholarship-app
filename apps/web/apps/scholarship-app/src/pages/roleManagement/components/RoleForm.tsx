@@ -731,7 +731,7 @@ const RoleForm: React.FC = () => {
               selectedScreenIds={selectedScreenIds}
               onScreenSelectionChange={setSelectedScreenIds}
               errors={errors}
-            />
+          />
           </div>
         </div>
 

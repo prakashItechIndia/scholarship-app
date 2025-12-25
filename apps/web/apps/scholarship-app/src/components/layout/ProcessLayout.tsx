@@ -18,6 +18,7 @@ import { Button, TopNavProps, Popover, PopoverTrigger, PopoverContent, Modal } f
 import * as React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { NavbarLogo } from "../common";
+import { ChangePasswordModal } from "@/components/common/ChangePasswordModal";
 import { ProfilePopover } from "../common/ProfilePopover";
 import { PageLayout, SideNavConfig } from "./PageLayout";
 import { usePermissions } from "../../contexts/PermissionContext";
@@ -49,6 +50,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
   const [profilePopoverOpen, setProfilePopoverOpen] = React.useState(false);
   const [settingsPopoverOpen, setSettingsPopoverOpen] = React.useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = React.useState(false);
+  const [changePasswordModalOpen, setChangePasswordModalOpen] = React.useState(false);
   const [userData, setUserData] = React.useState<ScholarshipAuthData | null>(null);
 
   // Get user data from localStorage
@@ -74,7 +76,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
   // Get user name and role from user data
   const userName = userData?.user?.userName || userData?.email || 'User';
   const userRole = userData?.user?.userType || 'User';
-  
+
   // Get permissions
   const { hasPermission } = usePermissions();
 
@@ -150,6 +152,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
             open={settingsPopoverOpen}
             onOpenChange={setSettingsPopoverOpen}
             onLogout={() => setLogoutModalOpen(true)}
+            onChangePassword={() => setChangePasswordModalOpen(true)}
           >
             <SettingsRegular className="w-5 h-5" />
           </ProfilePopover>
@@ -161,16 +164,22 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
     ],
   };
 
-  // Handle logout
+  // Handle logout (following old app pattern - clear session and redirect to login)
   const handleLogout = () => {
-    // Clear scholarship auth data
+    // Clear all scholarship auth data from localStorage
     localStorage.removeItem('scholarship_auth');
     localStorage.removeItem('scholarship_session_token');
+    
+    // Clear all scholarship auth data from sessionStorage
     sessionStorage.removeItem('scholarship_session_token');
     sessionStorage.removeItem('scholarship_auth');
     
-    // Redirect to sign in
-    void navigate('/user-login');
+    // Clear any other related auth data
+    localStorage.removeItem('scholarship_user');
+    sessionStorage.removeItem('scholarship_user');
+    
+    // Redirect to admin login page (following old app pattern)
+    window.location.href = '/admin-login';
   };
 
   const topNavConfig: TopNavProps = {
@@ -196,6 +205,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           open={profilePopoverOpen}
           onOpenChange={setProfilePopoverOpen}
           onLogout={() => setLogoutModalOpen(true)}
+          onChangePassword={() => setChangePasswordModalOpen(true)}
         >
           <div className="w-9 h-9 rounded-full bg-[#C8D1FA] flex items-center justify-center cursor-pointer">
             <PersonRegular className="w-5 h-5 text-[#2C3C85]" />
@@ -323,6 +333,13 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           </p>
         </div>
       </Modal>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        open={changePasswordModalOpen}
+        onOpenChange={setChangePasswordModalOpen}
+        username={userName}
+      />
     </>
   );
 };
