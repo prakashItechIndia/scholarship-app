@@ -1248,8 +1248,8 @@ export class ProcessManagementService {
       // Map results to match frontend expectations
       const mappedData = (historyResult.recordset || []).map(
         (row: Record<string, unknown>, index: number) => {
-          const rowRecord = row as Record<string, unknown>;
-          return {
+        const rowRecord = row as Record<string, unknown>;
+        return {
             id: Number(rowRecord.ID) || (getAllRecords ? index + 1 : offset + index + 1),
             action: String(rowRecord.Action ?? ''),
             processUndergone: String(rowRecord.ProcessUndergone ?? ''),
@@ -1257,7 +1257,7 @@ export class ProcessManagementService {
               rowRecord.HandledBy ?? rowRecord.User_ID ?? 'Admin',
             ),
             date: String(rowRecord.Date ?? ''),
-          };
+        };
         },
       );
 

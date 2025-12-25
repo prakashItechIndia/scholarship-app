@@ -36,11 +36,11 @@ export class DashboardService {
 
       return (
         result.recordset[0] || {
-          Total_Amount_Spent: 0,
-          School_Students_Amount: 0,
-          College_Students_Amount: 0,
-          Research_Scholars_Amount: 0,
-          Medical_Assistance_Amount: 0,
+        Total_Amount_Spent: 0,
+        School_Students_Amount: 0,
+        College_Students_Amount: 0,
+        Research_Scholars_Amount: 0,
+        Medical_Assistance_Amount: 0,
         }
       );
     } catch (error) {
@@ -76,10 +76,10 @@ export class DashboardService {
 
       return (
         result.recordset[0] || {
-          Total_Applications: 0,
-          Submitted: 0,
-          Approved: 0,
-          Under_Review: 0,
+        Total_Applications: 0,
+        Submitted: 0,
+        Approved: 0,
+        Under_Review: 0,
         }
       );
     } catch (error) {

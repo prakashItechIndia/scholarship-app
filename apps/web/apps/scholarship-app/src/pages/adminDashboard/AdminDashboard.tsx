@@ -1,15 +1,11 @@
 import * as React from "react";
-import { Select, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, PageActionButtons } from "@shared/components";
+import { Select, PageActionButtons, CardSkeleton, TableSkeleton, Card, Skeleton } from "@shared/components";
 import {
-  ArrowDown24Regular,
-  ArrowDownload20Regular,
-  ArrowDownload24Regular,
-  ChevronDown20Regular,
-  ChevronDown24Regular,
   DocumentBulletList24Regular,
   DocumentCheckmark24Regular,
   DocumentTableSearch24Regular,
 } from "@fluentui/react-icons";
+import { ExportButton } from "@/components/common";
 import {
   People20Regular,
 } from "@fluentui/react-icons";
@@ -25,13 +21,14 @@ import { RecentApplicationsTable } from "./components/RecentApplicationsTable";
 import { Separator } from "./components/Separator";
 import { dashboard, reports } from "@/services/scholarship.service";
 import { useToast } from "@/components/ui/toast";
+import { exportDashboardToExcel, exportDashboardToWord } from "@/utils/exportUtils";
 import type { FinancialSummary, ApplicationMetrics, RecentApplication, ApplicationActivityData, ScholarshipDistributionData } from "./types";
 
 const AdminDashboard: React.FC = () => {
   const { error: showError } = useToast();
   const [selectedAcademicYear, setSelectedAcademicYear] = React.useState("");
   const [selectedMonth, setSelectedMonth] = React.useState<string>("September 2024");
-  const [selectedPeriod, setSelectedPeriod] = React.useState<string>("Monthly");
+  const [selectedPeriod, setSelectedPeriod] = React.useState("Monthly");
   const [selectedStatusMonth, setSelectedStatusMonth] = React.useState<string>("October 2025");
   const [selectedYear, setSelectedYear] = React.useState<string>("2024 - 2025");
   
@@ -102,6 +99,9 @@ const AdminDashboard: React.FC = () => {
     type?: "meeting" | "deadline" | "activity";
   }[]>([]);
 
+  // Loading state
+  const [loading, setLoading] = React.useState(true);
+
   // Get username from localStorage
   React.useEffect(() => {
     try {
@@ -142,6 +142,7 @@ const AdminDashboard: React.FC = () => {
     const fetchDashboardData = async () => {
       if (!selectedAcademicYear) return;
       
+      setLoading(true);
       try {
         const academicYearId = parseInt(selectedAcademicYear, 10);
         
@@ -332,24 +333,47 @@ const AdminDashboard: React.FC = () => {
       } catch (err: any) {
         console.error('Error fetching dashboard data:', err);
         showError('Error', err.message || 'Failed to load dashboard data');
+      } finally {
+        setLoading(false);
       }
     };
 
     void fetchDashboardData();
   }, [selectedAcademicYear, selectedStatusMonth, selectedYear, showError]);
 
-  const handleExportExcel = () => {
-    console.log("Exporting to Excel...");
-    // Implement Excel export logic
-  };
+  const handleExport = async (format: "excel" | "word" | "pdf" | "csv") => {
+    try {
+      const selectedYearLabel = academicYearOptions.find(
+        (opt) => opt.value === selectedAcademicYear,
+      )?.label || selectedAcademicYear;
 
-  const handleExportWord = () => {
-    console.log("Exporting to Word...");
-    // Implement Word export logic
+      if (format === "excel") {
+        await exportDashboardToExcel(
+          financialData,
+          applicationMetrics,
+          recentApplications,
+          selectedYearLabel,
+          userName,
+        );
+      } else if (format === "word") {
+        await exportDashboardToWord(
+          financialData,
+          applicationMetrics,
+          recentApplications,
+          selectedYearLabel,
+          userName,
+        );
+      } else {
+        console.warn(`Export format ${format} not yet implemented`);
+      }
+    } catch (error) {
+      console.error("Error exporting dashboard:", error);
+      showError("Error", "Failed to export dashboard. Please try again.");
+    }
   };
 
   // Indian Rupee symbol function
-  const getIndianRupeeIcon = (color: string = "#2453C3") => (
+  const getIndianRupeeIcon = (color = "#2453C3") => (
     <span style={{
       fontSize: "28px",
       // fontWeight: 700,
@@ -416,39 +440,14 @@ const AdminDashboard: React.FC = () => {
               onValueChange={(value) => setSelectedAcademicYear(value)}
             />
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <button
-                style={{
-                  backgroundColor: "#0f6cbd",
-                  color: "#ffffff",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "8px 16px",
-                  borderRadius: "6px",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  fontFamily: "'Inter', sans-serif",
-                  height: "43px",
-                }}
-              >
-                <ArrowDownload24Regular style={{ width: "16px", height: "16px",color:"#FFFFFF"}} />
-                Export
-                <ChevronDown24Regular style={{ width: "16px", height: "16px" ,color:"#FFFFFF"}} />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={handleExportExcel}>
-                Export to Excel
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportWord}>
-                Export to Word
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ExportButton
+            options={[
+              { format: "excel", label: "Export to Excel" },
+              { format: "word", label: "Export to Word" },
+            ]}
+            onExport={handleExport}
+            size="medium"
+          />
         </div>
       </PageActionButtons>
       </div>
@@ -463,63 +462,92 @@ const AdminDashboard: React.FC = () => {
         paddingRight: "24px",
         borderBottom: "1px solid #e0e0e0",
       }}>
-        {/* First row - 4 cards */}
-        <div style={{
-          display: "flex",
-          alignItems: "stretch",
-          gap: "15px",
-          marginBottom: "16px",
-        }}>
-          <UnifiedCard
-            icon={getIndianRupeeIcon("#2453C3")}
-            value={financialData.totalAmountSpentThisYear}
-            label="Total Amount Spent This Year"
-            showCurrency={true}
-            iconBgColor="#FFFFFF"
-            color="#EFF6FF"
-          />
-          <Separator height="auto" />
-          <UnifiedCard
-            icon={getIndianRupeeIcon("#2453C3")}
-            value={financialData.amountSpentForSchoolStudents}
-            label="Amount Spent for School Students"
-            showCurrency={true}
-            iconBgColor="#FFFFFF"
-            color="#F0FDF4"
-          />
-          <Separator height="auto" />
-          <UnifiedCard
-            icon={getIndianRupeeIcon("#2453C3")}
-            value={financialData.amountSpentForCollegeStudents}
-            label="Amount Spent for College Students"
-            showCurrency={true}
-            iconBgColor="#FFFFFF"
-            color="#FAF5FF"
-          />
-          <Separator height="auto" />
-          <UnifiedCard
-            icon={getIndianRupeeIcon("#2453C3")}
-            value={financialData.amountSpentForResearchScholars}
-            label="Amount Spent for Research Scholars"
-            showCurrency={true}
-            iconBgColor="#FFFFFF"
-            color="#FFFBEB"
-          />
-        </div>
-        {/* Second row - 5th card */}
-        <div style={{
-          display: "flex",
-          gap: "16px",
-        }}>
-          <UnifiedCard
-            icon={getIndianRupeeIcon("#2453C3")}
-            value={financialData.amountSpentForMedicalAssistance}
-            label="Amount Spent for Medical Assistance"
-            showCurrency={true}
-            iconBgColor="#FFFFFF"
-            color="#FFEFEE"
-          />
-        </div>
+        {loading ? (
+          <>
+            {/* First row - 4 cards skeleton */}
+            <div style={{
+              display: "flex",
+              alignItems: "stretch",
+              gap: "15px",
+              marginBottom: "16px",
+            }}>
+              <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ backgroundColor: "#EFF6FF", minWidth: "430px", height: "100px" }} />
+              <Separator height="auto" />
+              <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ backgroundColor: "#F0FDF4", minWidth: "430px", height: "100px" }} />
+              <Separator height="auto" />
+              <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ backgroundColor: "#FAF5FF", minWidth: "430px", height: "100px" }} />
+              <Separator height="auto" />
+              <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ backgroundColor: "#FFFBEB", minWidth: "430px", height: "100px" }} />
+            </div>
+            {/* Second row - 5th card skeleton */}
+            <div style={{
+              display: "flex",
+              gap: "16px",
+            }}>
+              <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ backgroundColor: "#FFEFEE", minWidth: "430px", height: "100px" }} />
+            </div>
+          </>
+        ) : (
+          <>
+            {/* First row - 4 cards */}
+            <div style={{
+              display: "flex",
+              alignItems: "stretch",
+              gap: "15px",
+              marginBottom: "16px",
+            }}>
+              <UnifiedCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.totalAmountSpentThisYear}
+                label="Total Amount Spent This Year"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#EFF6FF"
+              />
+              <Separator height="auto" />
+              <UnifiedCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.amountSpentForSchoolStudents}
+                label="Amount Spent for School Students"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#F0FDF4"
+              />
+              <Separator height="auto" />
+              <UnifiedCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.amountSpentForCollegeStudents}
+                label="Amount Spent for College Students"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#FAF5FF"
+              />
+              <Separator height="auto" />
+              <UnifiedCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.amountSpentForResearchScholars}
+                label="Amount Spent for Research Scholars"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#FFFBEB"
+              />
+            </div>
+            {/* Second row - 5th card */}
+            <div style={{
+              display: "flex",
+              gap: "16px",
+            }}>
+              <UnifiedCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.amountSpentForMedicalAssistance}
+                label="Amount Spent for Medical Assistance"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#FFEFEE"
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Applications Analytics Section */}
@@ -534,106 +562,172 @@ const AdminDashboard: React.FC = () => {
         }}>
           Applications Analytics & Reports
         </h2>
-        <div style={{
-          display: "flex",
-          gap: "16px",
-        }}>
-          <UnifiedCard
-            icon={<People20Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
-            value={applicationMetrics.totalApplications}
-            label="Total Applications"
-            iconBgColor="#FFFFFF"
-          />
-          <Separator height="auto" />
-          <UnifiedCard
-            icon={<DocumentBulletList24Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
-            value={applicationMetrics.submitted}
-            label="Submitted"
-            iconBgColor="#FFFFFF"
-          />
-          <Separator height="auto" />
-          <UnifiedCard
-            icon={<DocumentCheckmark24Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
-            value={applicationMetrics.approved}
-            label="Approved"
-            iconBgColor="#FFFFFF"
-          />
-          <Separator height="auto" />
-          <UnifiedCard
-            icon={<DocumentTableSearch24Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
-            value={applicationMetrics.underReview}
-            label="Funded (Inactive)"
-            iconBgColor="#FFFFFF"
-          />
-        </div>
+        {loading ? (
+          <div style={{
+            display: "flex",
+            gap: "16px",
+          }}>
+            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ minWidth: "430px", height: "100px" }} />
+            <Separator height="auto" />
+            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ minWidth: "430px", height: "100px" }} />
+            <Separator height="auto" />
+            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ minWidth: "430px", height: "100px" }} />
+            <Separator height="auto" />
+            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ minWidth: "430px", height: "100px" }} />
+          </div>
+        ) : (
+          <div style={{
+            display: "flex",
+            gap: "16px",
+          }}>
+            <UnifiedCard
+              icon={<People20Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
+              value={applicationMetrics.totalApplications}
+              label="Total Applications"
+              iconBgColor="#FFFFFF"
+            />
+            <Separator height="auto" />
+            <UnifiedCard
+              icon={<DocumentBulletList24Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
+              value={applicationMetrics.submitted}
+              label="Submitted"
+              iconBgColor="#FFFFFF"
+            />
+            <Separator height="auto" />
+            <UnifiedCard
+              icon={<DocumentCheckmark24Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
+              value={applicationMetrics.approved}
+              label="Approved"
+              iconBgColor="#FFFFFF"
+            />
+            <Separator height="auto" />
+            <UnifiedCard
+              icon={<DocumentTableSearch24Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
+              value={applicationMetrics.underReview}
+              label="Funded (Inactive)"
+              iconBgColor="#FFFFFF"
+            />
+          </div>
+        )}
       </div>
 
       {/* Application Activity Chart - Full Width */}
-      <div style={{ marginBottom: "32px" }}>
-        <ApplicationActivityChart
-          data={applicationActivityData}
-          selectedMonth={selectedMonth}
-          onMonthChange={setSelectedMonth}
-        />
-      </div>
+      {loading ? (
+        <div style={{ marginBottom: "32px" }}>
+          <CardSkeleton variant="elevated" showIcon={false} showHeader={true} contentSections={0} style={{ height: "400px" }} />
+        </div>
+      ) : (
+        <div style={{ marginBottom: "32px" }}>
+          <ApplicationActivityChart
+            data={applicationActivityData}
+            selectedMonth={selectedMonth}
+            onMonthChange={setSelectedMonth}
+          />
+        </div>
+      )}
 
       {/* Application Status and Recent Activity Row - 2 Columns */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "24px",
-        marginBottom: "32px",
-      }}>
-        {/* Application Status Donut Chart */}
-        <ApplicationStatusChart
-          data={applicationStatusData}
-          selectedMonth={selectedStatusMonth}
-          onMonthChange={setSelectedStatusMonth}
-        />
-
-        {/* Recent Activity Widget */}
-        <RecentActivityWidget activities={recentActivities} />
-      </div>
-
-      {/* Performance Metrics, Fund Spending, and Scholarship Distribution - 3 Columns */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr 1fr",
-        gap: "24px",
-        marginBottom: "32px",
-      }}>
-        {/* Performance Metrics Chart */}
-        <PerformanceMetricsChart metrics={performanceMetrics} />
-
-        {/* Fund Spending Chart */}
-        <FundSpendingChart
-          data={fundSpendingData}
-          selectedYear={selectedYear}
-          onYearChange={setSelectedYear}
-        />
-
-        {/* Scholarship Distribution Chart */}
-        <ScholarshipDistributionChart
-          data={programDistributionData}
-          selectedPeriod={selectedPeriod}
-          onPeriodChange={setSelectedPeriod}
-        />
-      </div>
-
-      {/* Schedule Calendar - Full Width or Right Aligned */}
-      <div style={{ marginBottom: "32px" }}>
+      {loading ? (
         <div style={{
-          display: "flex",
-          justifyContent: "flex-end",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "24px",
+          marginBottom: "32px",
         }}>
-          <div style={{ width: "400px" }}>
-            <ScheduleCalendar events={calendarEvents} />
-          </div>
+          <CardSkeleton variant="elevated" showIcon={false} showHeader={true} contentSections={0} style={{ height: "400px" }} />
+          <CardSkeleton variant="elevated" showIcon={false} showHeader={true} contentSections={0} style={{ height: "400px" }} />
         </div>
-      </div>
+      ) : (
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "24px",
+          marginBottom: "32px",
+        }}>
+          {/* Application Status Donut Chart */}
+          <ApplicationStatusChart
+            data={applicationStatusData}
+            selectedMonth={selectedStatusMonth}
+            onMonthChange={setSelectedStatusMonth}
+          />
+
+          {/* Recent Activity Widget */}
+          <RecentActivityWidget 
+            activities={recentActivities}
+            selectedMonth={selectedStatusMonth}
+            onMonthChange={setSelectedStatusMonth}
+          />
+        </div>
+      )}
+
+      {/* Performance Metrics, Fund Spending, Scholarship Distribution, and Schedule Calendar - 2x2 Grid */}
+      {loading ? (
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "24px",
+          marginBottom: "32px",
+        }}>
+          <CardSkeleton variant="elevated" showIcon={false} showHeader={true} contentSections={0} style={{ height: "400px" }} />
+          <CardSkeleton variant="elevated" showIcon={false} showHeader={true} contentSections={0} style={{ height: "400px" }} />
+          <CardSkeleton variant="elevated" showIcon={false} showHeader={true} contentSections={0} style={{ height: "400px" }} />
+          <CardSkeleton variant="elevated" showIcon={false} showHeader={true} contentSections={0} style={{ height: "400px" }} />
+        </div>
+      ) : (
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "24px",
+          marginBottom: "32px",
+        }}>
+          {/* Top Row - Left: Performance Metrics */}
+          <PerformanceMetricsChart metrics={performanceMetrics} />
+
+          {/* Top Row - Right: Fund Spending */}
+          <FundSpendingChart
+            data={fundSpendingData}
+            selectedYear={selectedYear}
+            onYearChange={setSelectedYear}
+          />
+
+          {/* Bottom Row - Left: Scholarship Distribution */}
+          <ScholarshipDistributionChart
+            data={programDistributionData}
+            selectedPeriod={selectedPeriod}
+            onPeriodChange={setSelectedPeriod}
+          />
+
+          {/* Bottom Row - Right: Schedule Calendar */}
+          <ScheduleCalendar events={calendarEvents} />
+        </div>
+      )}
 
       {/* Recent Applications Table */}
-      <RecentApplicationsTable data={recentApplications} />
+      {loading ? (
+        <Card variant="elevated" style={{
+          border: "1px solid #e0e0e0",
+          backgroundColor: "#ffffff",
+          borderRadius: "8px",
+          padding: "24px",
+        }}>
+          <div style={{
+            marginBottom: "16px",
+          }}>
+            <Skeleton width="200px" height={24} variant="rounded" />
+            <Skeleton width="300px" height={20} variant="rounded" style={{ marginTop: "4px" }} />
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <TableSkeleton
+              columnCount={7}
+              rowCount={5}
+              columnWidths={[150, 150, 180, 200, 150, 120, 120]}
+              showCheckbox={true}
+            />
+          </div>
+        </Card>
+      ) : (
+        <RecentApplicationsTable data={recentApplications} />
+      )}
     </div>
   );
 };

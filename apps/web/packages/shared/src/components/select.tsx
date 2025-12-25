@@ -48,6 +48,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             placeholder={placeholder}
             selectedOptions={selectedKey ? [String(selectedKey)] : []}
             onOptionSelect={handleChange}
+            size="small"
             style={{
               width: "100%",
               border: `1px solid ${borderColor}`,
@@ -55,8 +56,8 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
               backgroundColor: tokens.colorNeutralBackground1,
               color: tokens.colorNeutralForeground1,
               fontSize: tokens.fontSizeBase300,
-              height: "45px",
-              minHeight: "45px",
+              // height: "45px",
+              // minHeight: "45px",
               // paddingLeft: "12px",
               // paddingRight: "12px",
               paddingTop: "8px",

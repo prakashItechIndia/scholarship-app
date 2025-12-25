@@ -86,10 +86,11 @@ export const ApplicationStatusChart: React.FC<ApplicationStatusChartProps> = ({
       <div style={{
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "center",
+        alignItems: "flex-start",
         marginBottom: "24px",
+        gap: "16px",
       }}>
-        <div>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <h3 style={{
             fontSize: "18px",
             lineHeight: "24px",
@@ -109,7 +110,7 @@ export const ApplicationStatusChart: React.FC<ApplicationStatusChartProps> = ({
             View real-time updates on submitted applications.
           </p>
         </div>
-        <div style={{ width: "150px" }}>
+        <div style={{ width: "150px", flexShrink: 0 }}>
           <Select
             placeholder="Select Month"
             options={monthOptions}
@@ -147,24 +148,14 @@ export const ApplicationStatusChart: React.FC<ApplicationStatusChartProps> = ({
             {/* Center text */}
             <text
               x={centerX}
-              y={centerY - 10}
-              fontSize="20"
+              y={centerY - 5}
+              fontSize="18"
               fontWeight={600}
               fill="#242424"
               fontFamily="'Inter', sans-serif"
               textAnchor="middle"
             >
-              {total.toLocaleString()}
-            </text>
-            <text
-              x={centerX}
-              y={centerY + 15}
-              fontSize="14"
-              fill="#616161"
-              fontFamily="'Inter', sans-serif"
-              textAnchor="middle"
-            >
-              Applications
+              {total.toLocaleString()} Applications
             </text>
           </svg>
         </div>

@@ -2,6 +2,7 @@ import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   DataTable,
+  TableSkeleton,
   Button,
   Modal,
   Input,
@@ -10,6 +11,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  Card,
 } from "@shared/components";
 import {
   Filter24Regular,
@@ -334,24 +336,51 @@ const UserManagementPage: React.FC = () => {
       </div>
 
       {/* Table Section - Full Width */}
-      <DataTable
-        columns={columns}
-        data={paginatedData}
-        fullWidth={true}
-        pagination={{
-          currentPage,
-          totalPages,
-          pageSize,
-          totalItems,
-          onPageChange: setCurrentPage,
-          onPageSizeChange: setPageSize,
-          pageSizeOptions: [5, 10, 20, 50, 100],
-          showFirstLast: true,
-          showPageSize: true,
-          showPageNumbers: true,
-          maxPageButtons: 7,
-        }}
-      />
+      {loading ? (
+        <Card
+          variant="elevated"
+          style={{
+            overflow: "hidden",
+            border: "1px solid #e0e0e0",
+            backgroundColor: "#ffffff",
+            borderRadius: 0,
+            width: "100%",
+            margin: 0,
+            padding: "24px",
+            boxShadow: "none",
+            borderLeft: "none",
+            borderRight: "none",
+          }}
+        >
+          <div style={{ overflowX: "auto", width: "100%" }}>
+            <TableSkeleton
+              columnCount={6}
+              rowCount={5}
+              columnWidths={[150, 180, 150, 150, 150, 120]}
+              showCheckbox={true}
+            />
+          </div>
+        </Card>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={paginatedData}
+          fullWidth={true}
+          pagination={{
+            currentPage,
+            totalPages,
+            pageSize,
+            totalItems,
+            onPageChange: setCurrentPage,
+            onPageSizeChange: setPageSize,
+            pageSizeOptions: [5, 10, 20, 50, 100],
+            showFirstLast: true,
+            showPageSize: true,
+            showPageNumbers: true,
+            maxPageButtons: 7,
+          }}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
       <Modal

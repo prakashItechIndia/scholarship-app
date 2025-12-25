@@ -812,6 +812,8 @@ export const processManagement = {
     academicYearId?: number;
     page?: number;
     pageSize?: number;
+    sortField?: string;
+    sortOrder?: 'asc' | 'desc';
   }) => {
     const response = await apiClient.get('/process-management/applications/overview', {
       params,
@@ -828,6 +830,8 @@ export const processManagement = {
     academicYearId?: number;
     page?: number;
     pageSize?: number;
+    sortField?: string;
+    sortOrder?: 'asc' | 'desc';
   }) => {
     const response = await apiClient.get('/process-management/applications/documents', {
       params,
@@ -844,6 +848,8 @@ export const processManagement = {
     academicYearId?: number;
     page?: number;
     pageSize?: number;
+    sortField?: string;
+    sortOrder?: 'asc' | 'desc';
   }) => {
     const response = await apiClient.get('/process-management/applications/verify', {
       params,
@@ -860,6 +866,8 @@ export const processManagement = {
     academicYearId?: number;
     page?: number;
     pageSize?: number;
+    sortField?: string;
+    sortOrder?: 'asc' | 'desc';
   }) => {
     const response = await apiClient.get('/process-management/applications/suggest', {
       params,
@@ -876,6 +884,8 @@ export const processManagement = {
     academicYearId?: number;
     page?: number;
     pageSize?: number;
+    sortField?: string;
+    sortOrder?: 'asc' | 'desc';
   }) => {
     const response = await apiClient.get('/process-management/applications/approve', {
       params,
@@ -892,6 +902,8 @@ export const processManagement = {
     academicYearId?: number;
     page?: number;
     pageSize?: number;
+    sortField?: string;
+    sortOrder?: 'asc' | 'desc';
   }) => {
     const response = await apiClient.get('/process-management/applications/issue-amount', {
       params,
@@ -949,10 +961,51 @@ export const processManagement = {
     ddChequeNo?: string;
     ddChequeInFavor?: string;
     ddChequeDate?: string;
+    bankName?: string;
+    branchDetails?: string;
+    documents?: File[];
     issuedBy?: number;
   }) => {
-    const response = await apiClient.post('/process-management/issue-amount', data);
+    const formData = new FormData();
+    formData.append('applicationId', data.applicationId);
+    formData.append('paymentMode', data.paymentMode);
+    if (data.comments) formData.append('comments', data.comments);
+    if (data.ddChequeNo) formData.append('ddChequeNo', data.ddChequeNo);
+    if (data.ddChequeInFavor) formData.append('ddChequeInFavor', data.ddChequeInFavor);
+    if (data.ddChequeDate) formData.append('ddChequeDate', data.ddChequeDate);
+    if (data.bankName) formData.append('bankName', data.bankName);
+    if (data.branchDetails) formData.append('branchDetails', data.branchDetails);
+    if (data.issuedBy) formData.append('issuedBy', data.issuedBy.toString());
+    
+    // Append uploaded documents
+    if (data.documents && data.documents.length > 0) {
+      data.documents.forEach((file, index) => {
+        formData.append(`documents`, file);
+      });
+    }
+
+    const response = await apiClient.post('/process-management/issue-amount', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
+  },
+
+  /**
+   * Get merged scholarship PDF (with uploaded document in middle)
+   */
+  getMergedScholarshipPDF: async (params: {
+    applicationId: string;
+    scholarshipId: string;
+  }) => {
+    const response = await apiClient.get('/process-management/scholarship-pdf', {
+      params,
+      responseType: 'blob',
+    });
+    // Create a blob URL from the response
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    return URL.createObjectURL(blob);
   },
 
   /**

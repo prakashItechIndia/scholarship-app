@@ -9,7 +9,6 @@ import FamilyDetails from './steps/FamilyDetails';
 import EducationMedicalDetails from './steps/EducationMedicalDetails';
 import BankDetails from './steps/BankDetails';
 import DocumentsUpload from './steps/DocumentsUpload';
-// import ReviewSubmit from './steps/ReviewSubmit';
 import logo from '@shared/assets/icons/LMS Logo.png';
 import background from '@shared/assets/icons/header-bg.png';
 import checkmarkIcon from '@shared/assets/icons/Checkmark.svg';
@@ -21,6 +20,8 @@ interface Step {
   key: string;
 }
 
+// BRD Section 6.1.1: Application Steps Summary - 5 steps + Review & Submit (6 total)
+// Note: Education/Medical Details (Step 4) is an additional step not in BRD but kept for enhanced functionality
 const STEPS: Step[] = [
   { id: 1, title: 'Identity Details', key: 'identity' },
   { id: 2, title: 'Personal Details', key: 'personal' },
@@ -152,6 +153,7 @@ const RegistrationContent = () => {
   // Direct destructuring - TypeScript should infer types from the hook's return type
   const { currentStep, completedSteps, prevStep, isLoading, formData, previousButtonConfig } = useRegistration();
   
+  // BRD Section 6.6.2: Minimum 3 documents required before submission
   // Check if documents step has minimum 3 files (step 6 is DocumentsUpload)
   const isDocumentsStepValid = currentStep === 6 
     ? (formData?.documents && Array.isArray(formData.documents) && formData.documents.length >= 3)
@@ -210,6 +212,8 @@ const RegistrationContent = () => {
   };
 
   const renderStepObject = () => {
+    // BRD Section 6.1.1: 5 steps + Review & Submit (6 total)
+    // Note: Education/Medical Details (Step 4) is an additional step not in BRD but kept for enhanced functionality
     switch (currentStep) {
       case 1: return <IdentityDetails />;
       case 2: return <PersonalDetails />;

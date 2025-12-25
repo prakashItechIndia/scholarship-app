@@ -1,5 +1,5 @@
 import * as React from "react";
-import { DataTable } from "@shared/components";
+import { DataTable, TableSkeleton, Skeleton } from "@shared/components";
 import { roleManagement, Screen } from "../../../services/scholarship.service";
 
 interface RoleScreenPermissionsProps {
@@ -175,7 +175,19 @@ export const RoleScreenPermissions: React.FC<RoleScreenPermissionsProps> = ({
   ];
 
   if (loading && screens.length === 0) {
-    return <div>Loading screens...</div>;
+    return (
+      <div>
+        <div style={{ marginBottom: "8px" }}>
+          <Skeleton width="150px" height={20} variant="rounded" />
+        </div>
+        <TableSkeleton
+          columnCount={3}
+          rowCount={5}
+          columnWidths={[300, 200, 150]}
+          showCheckbox={false}
+        />
+      </div>
+    );
   }
 
   return (

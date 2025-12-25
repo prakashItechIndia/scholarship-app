@@ -1,6 +1,7 @@
 import * as React from "react";
 import {
   Table,
+  TableSkeleton,
   Pagination,
   Card,
 } from "@shared/components";
@@ -314,7 +315,7 @@ const ReportsPage: React.FC = () => {
     setCurrentPage(1);
   }, []);
 
-  const handleExport = React.useCallback(async (format: "excel" | "pdf" | "csv") => {
+  const handleExport = React.useCallback(async (format: "excel" | "pdf" | "csv" | "word") => {
     try {
       setLoading(true);
       setError(null);
@@ -503,19 +504,8 @@ const ReportsPage: React.FC = () => {
           </div>
         )}
 
-        {/* Loading Indicator */}
-        {loading && (
-          <div style={{
-            padding: "16px 24px",
-            textAlign: "center",
-            color: "#616161",
-          }}>
-            Loading report data...
-          </div>
-        )}
-
         {/* Actions and Table Section */}
-        {hasAppliedFilters && !loading && filteredData.length > 0 ? (
+        {hasAppliedFilters && filteredData.length > 0 ? (
           <>
             {/* Table Section */}
             <Card variant="elevated" style={{
@@ -539,7 +529,18 @@ const ReportsPage: React.FC = () => {
                 overflowY: "auto", // Enable vertical scrolling
                 width: "100%"
               }}>
-                <Table columns={columns} data={paginatedData} />
+                {loading ? (
+                  <TableSkeleton
+                    columnCount={columns.length - (columns.some(col => col.key === 'checkbox') ? 1 : 0)}
+                    rowCount={5}
+                    columnWidths={columns
+                      .filter(col => col.key !== 'checkbox')
+                      .map(col => col.minWidth || 150)}
+                    showCheckbox={columns.some(col => col.key === 'checkbox')}
+                  />
+                ) : (
+                  <Table columns={columns} data={paginatedData} />
+                )}
               </div>
 
               {/* Pagination */}

@@ -262,15 +262,21 @@ const SignInPage = () => {
         setTimeout(() => void navigate('/registration'), 300);
       }
     } catch (err: unknown) {
-      // Handle specific error cases per BRD Section 5.4.3
+      // BRD Section 5.4.3: Login Validations and Error Handling
+      // BRD Section 5.5: Failed Attempt Limit (5 attempts) and Lockout Duration (15 minutes)
       let errorMessage = 'Invalid credentials. Please try again.';
       if (err instanceof Error) {
-        if (err.message.includes('Invalid') || err.message.includes('password') || err.message.includes('credentials')) {
-          errorMessage = 'Incorrect password. Try again.'; // BRD: "Invalid password" -> "Incorrect password. Try again."
+        // Check for account lockout (BRD Section 5.4.2, Step 4b)
+        if (err.message.includes('locked') || err.message.includes('Lockout') || err.message.includes('temporarily locked')) {
+          errorMessage = 'Account temporarily locked. Please try again in 15 minutes.'; // BRD Section 5.4.2, Step 4b
+        } else if (err.message.includes('Invalid') || err.message.includes('password') || err.message.includes('credentials')) {
+          errorMessage = 'Incorrect password. Try again.'; // BRD Section 5.4.3: "Invalid password" -> "Incorrect password. Try again."
         } else if (err.message.includes('not active') || err.message.includes('Account')) {
           errorMessage = 'Account is not active. Please contact support.';
         } else if (err.message.includes('not found') || err.message.includes('Email')) {
-          errorMessage = 'Email not registered. Please check or sign up.'; // BRD: "Invalid email" -> "Email not registered. Please check or sign up."
+          errorMessage = 'Email not registered. Please check or sign up.'; // BRD Section 5.4.3: "Invalid email" -> "Email not registered. Please check or sign up."
+        } else if (err.message.includes('not verified') || err.message.includes('verify')) {
+          errorMessage = 'Please verify your email before logging in.'; // BRD Section 5.4.2, Step 4a
         } else {
           errorMessage = err.message;
         }

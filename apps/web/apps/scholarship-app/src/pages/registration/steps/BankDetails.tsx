@@ -68,7 +68,7 @@ const bankSchema = z.object({
 const BankDetails = () => {
     const { form, onSubmit } = useRegistrationForm({
         schema: bankSchema,
-        stepNumber: 5,
+        stepNumber: 5, // Step 5 - Bank Details (Step 4 is Education/Medical Details)
         defaultValues: (formData) => ({
             bankAccountName: getStringValue(formData, 'bankAccountName'),
             bankAccountNumber: getStringValue(formData, 'bankAccountNumber'),

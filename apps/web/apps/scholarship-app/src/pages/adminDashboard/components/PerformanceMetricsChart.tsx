@@ -96,7 +96,7 @@ export const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = (
           color: "#616161",
           fontFamily: "'Inter', sans-serif",
         }}>
-          Measure the overall performance of the scholarship program.
+          Key performance Indicators for scholarship programs.
         </p>
       </div>
 
@@ -132,8 +132,8 @@ export const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = (
             {/* Center text */}
             <text
               x={centerX}
-              y={centerY - 20}
-              fontSize="16"
+              y={centerY - 5}
+              fontSize="14"
               fontWeight={600}
               fill="#242424"
               fontFamily="'Inter', sans-serif"
@@ -143,13 +143,13 @@ export const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = (
             </text>
             <text
               x={centerX}
-              y={centerY}
-              fontSize="14"
+              y={centerY + 12}
+              fontSize="12"
               fill="#616161"
               fontFamily="'Inter', sans-serif"
               textAnchor="middle"
             >
-              {metrics[0]?.label}
+              {metrics[0]?.label.includes('Processing Time') ? 'Avg. Processing Time' : metrics[0]?.label}
             </text>
           </svg>
         </div>

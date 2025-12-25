@@ -12,10 +12,21 @@ import { useToast } from '@/components/ui/toast';
 
 /**
  * Verhoeff checksum validation for AADHAAR ID
- * Verhoeff algorithm is used to validate AADHAAR numbers
+ * BRD Section 6.2.2: AADHAAR Validation Logic
+ * - Length check: Must be exactly 12 digits
+ * - Character check: Only numeric characters (0-9) allowed
+ * - First digit check: Cannot start with 0 or 1
+ * - Verhoeff checksum: Mathematical validation of the complete number
+ * - Uniqueness check: No duplicate AADHAAR numbers across submitted applications (handled by API)
  */
 function verhoeffCheck(aadhaar: string): boolean {
     if (aadhaar.length !== 12) return false;
+    
+    // BRD Section 6.2.2: First digit check - Cannot start with 0 or 1
+    const firstDigit = parseInt(aadhaar[0], 10);
+    if (firstDigit === 0 || firstDigit === 1) {
+        return false;
+    }
     
     const d = [
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -61,6 +72,21 @@ const identitySchema = z
             .min(12, 'AADHAAR ID must be exactly 12 digits')
             .max(12, 'AADHAAR ID must be exactly 12 digits')
             .regex(/^\d+$/, 'AADHAAR ID must contain only digits')
+            .refine(
+                (val) => {
+                    // BRD Section 6.2.2: First digit check - Cannot start with 0 or 1
+                    if (val.length > 0) {
+                        const firstDigit = parseInt(val[0], 10);
+                        if (firstDigit === 0 || firstDigit === 1) {
+                            return false;
+                        }
+                    }
+                    return true;
+                },
+                {
+                    message: 'AADHAAR ID cannot start with 0 or 1. Please enter a valid AADHAAR number.',
+                }
+            )
             .refine(
                 (val) => verhoeffCheck(val),
                 {

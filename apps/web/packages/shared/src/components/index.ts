@@ -11,6 +11,8 @@ export * from "./top-nav";
 export * from "./popover";
 export * from "./pagination";
 export * from "./skeleton";
+export * from "./table-skeleton";
+export * from "./card-skeleton";
 export * from "./avatar";
 export * from "./card";
 export * from "./search";

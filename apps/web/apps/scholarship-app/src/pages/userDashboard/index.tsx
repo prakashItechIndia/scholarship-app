@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Button, Card, DocumentIcon, MoreIcon, ReopenIcon, PrintIcon, FilterIcon } from "@shared/components";
+import { Button, Card, CardSkeleton, DocumentIcon, MoreIcon, ReopenIcon, PrintIcon, FilterIcon } from "@shared/components";
 import {
   AddRegular,
 } from "@fluentui/react-icons";
@@ -740,9 +740,17 @@ const UserDashboard: React.FC = () => {
         {/* Application Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 rounded-[18px] px-6">
           {isLoading ? (
-            <div style={{ padding: '24px', textAlign: 'center', color: '#616161' }}>
-              Loading applications...
-            </div>
+            <>
+              {Array.from({ length: 4 }).map((_, index) => (
+                <CardSkeleton
+                  key={index}
+                  variant="elevated"
+                  showIcon={false}
+                  showHeader={true}
+                  contentSections={3}
+                />
+              ))}
+            </>
           ) : filteredApplications.length === 0 ? (
             <div style={{ padding: '24px', textAlign: 'center', color: '#616161' }}>
               {applications.length === 0 

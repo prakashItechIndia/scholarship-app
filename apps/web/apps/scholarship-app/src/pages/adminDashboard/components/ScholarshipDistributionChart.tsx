@@ -45,10 +45,11 @@ export const ScholarshipDistributionChart: React.FC<ScholarshipDistributionChart
       <div style={{
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "center",
+        alignItems: "flex-start",
         marginBottom: "24px",
+        gap: "16px",
       }}>
-        <div>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <h3 style={{
             fontSize: "18px",
             lineHeight: "24px",
@@ -68,7 +69,7 @@ export const ScholarshipDistributionChart: React.FC<ScholarshipDistributionChart
             Analyze and manage program-wise scholarship distribution.
           </p>
         </div>
-        <div style={{ width: "120px" }}>
+        <div style={{ width: "150px", flexShrink: 0 }}>
           <Select
             placeholder="Select Period"
             options={periodOptions}

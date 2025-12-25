@@ -3407,10 +3407,11 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
          * @param {string} applicationId 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {boolean} [getAllRecords] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processManagementControllerGetApplicationHistory: async (applicationId: string, page?: number, pageSize?: number, options: any = {}): Promise<RequestArgs> => {
+        processManagementControllerGetApplicationHistory: async (applicationId: string, page?: number, pageSize?: number, getAllRecords?: boolean, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'applicationId' is not null or undefined
             assertParamExists('processManagementControllerGetApplicationHistory', 'applicationId', applicationId)
             const localVarPath = `/process-management/history/{applicationId}`
@@ -3432,6 +3433,10 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
 
             if (pageSize !== undefined) {
                 localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+            if (getAllRecords !== undefined) {
+                localVarQueryParameter['getAllRecords'] = getAllRecords;
             }
 
 
@@ -3940,11 +3945,12 @@ export const ProcessManagementApiFp = function(configuration?: Configuration) {
          * @param {string} applicationId 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {boolean} [getAllRecords] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async processManagementControllerGetApplicationHistory(applicationId: string, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetApplicationHistory(applicationId, page, pageSize, options);
+        async processManagementControllerGetApplicationHistory(applicationId: string, page?: number, pageSize?: number, getAllRecords?: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetApplicationHistory(applicationId, page, pageSize, getAllRecords, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4106,11 +4112,12 @@ export const ProcessManagementApiFactory = function (configuration?: Configurati
          * @param {string} applicationId 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {boolean} [getAllRecords] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processManagementControllerGetApplicationHistory(applicationId: string, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
-            return localVarFp.processManagementControllerGetApplicationHistory(applicationId, page, pageSize, options).then((request) => request(axios, basePath));
+        processManagementControllerGetApplicationHistory(applicationId: string, page?: number, pageSize?: number, getAllRecords?: boolean, options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetApplicationHistory(applicationId, page, pageSize, getAllRecords, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4263,12 +4270,13 @@ export class ProcessManagementApi extends BaseAPI {
      * @param {string} applicationId 
      * @param {number} [page] 
      * @param {number} [pageSize] 
+     * @param {boolean} [getAllRecords] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProcessManagementApi
      */
-    public processManagementControllerGetApplicationHistory(applicationId: string, page?: number, pageSize?: number, options?: any) {
-        return ProcessManagementApiFp(this.configuration).processManagementControllerGetApplicationHistory(applicationId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    public processManagementControllerGetApplicationHistory(applicationId: string, page?: number, pageSize?: number, getAllRecords?: boolean, options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetApplicationHistory(applicationId, page, pageSize, getAllRecords, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -1,5 +1,4 @@
 import * as React from "react";
-import { VectorIcon } from "@shared/components";
 
 interface ActivityItemProps {
   name: string;
@@ -14,6 +13,9 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
   timestamp,
   color,
 }) => {
+  // Get first letter of name for avatar
+  const firstLetter = name.charAt(0).toUpperCase();
+
   return (
     <div
       style={{
@@ -22,26 +24,26 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
         gap: "12px",
         padding: "12px",
         backgroundColor: `${color}15`,
-        borderRadius: "4px",
+        borderRadius: "8px",
       }}
     >
       <div
         style={{
-          width: "32px",
-          height: "32px",
+          width: "40px",
+          height: "40px",
           borderRadius: "50%",
           backgroundColor: color,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           flexShrink: 0,
+          color: "#ffffff",
+          fontSize: "16px",
+          fontWeight: 600,
+          fontFamily: "'Inter', sans-serif",
         }}
       >
-        <VectorIcon
-          width="16px"
-          height="16px"
-          fill="#242424"
-        />
+        {firstLetter}
       </div>
       <div
         style={{
@@ -59,21 +61,12 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
             fontFamily: "'Inter', sans-serif",
           }}
         >
-          {name}
+          {name}: {action}
         </div>
         <div
           style={{
             fontSize: "12px",
             color: "#616161",
-            fontFamily: "'Inter', sans-serif",
-          }}
-        >
-          {action}
-        </div>
-        <div
-          style={{
-            fontSize: "11px",
-            color: "#9ca3af",
             fontFamily: "'Inter', sans-serif",
           }}
         >

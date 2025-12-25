@@ -302,7 +302,7 @@ const fileItemStyles = mergeStyles({
             // Show loading for a few seconds before moving to next step
             await new Promise(resolve => setTimeout(resolve, 2000));
             updateFormData({ documents: uploadedFiles });
-            markStepComplete(5);
+            markStepComplete(6); // Step 6 - Documents Upload
             nextStep(); // This now navigates to the Review & Submit step
         } finally {
             setIsLoading(false);

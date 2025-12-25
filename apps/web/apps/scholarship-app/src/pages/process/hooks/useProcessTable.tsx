@@ -4,6 +4,8 @@ import StatusBadge from "../components/StatusBadge";
 import {
   MoreHorizontalRegular,
   ArrowSort20Regular,
+  ArrowSortUp20Regular,
+  ArrowSortDown20Regular,
   ArrowUploadRegular,
   DocumentRegular,
   HistoryRegular,
@@ -11,6 +13,9 @@ import {
   HatGraduationRegular,
 } from "@fluentui/react-icons";
 import { Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@shared/components";
+
+type SortOrder = 'asc' | 'desc';
+type SortField = string | null;
 
 interface UseProcessTableProps {
   activeTab: string;
@@ -23,7 +28,11 @@ interface UseProcessTableProps {
   handleViewHistory?: (item: ApplicationData) => void;
   handleViewScholarshipHistory?: (item: ApplicationData) => void;
   handlePrintDetails?: (item: ApplicationData) => void;
+  handleViewScholarshipPDF?: (item: ApplicationData) => void;
   handleProcess?: (item: ApplicationData) => void;
+  sortField?: SortField;
+  sortOrder?: SortOrder;
+  onSort?: (field: string) => void;
 }
 
 export const useProcessTable = ({
@@ -37,7 +46,11 @@ export const useProcessTable = ({
   handleViewScholarshipHistory,
   handlePrintDetails,
   handleUpload,
+  handleViewScholarshipPDF,
   handleProcess,
+  sortField,
+  sortOrder,
+  onSort,
 }: UseProcessTableProps) => {
   const getColumnsForTab = React.useCallback((tab: string) => {
     const baseColumns = [
@@ -74,27 +87,44 @@ export const useProcessTable = ({
     ];
 
     // Helper function to create sortable header
-    const createSortableHeader = (name: string) => (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "4px",
-          cursor: "pointer",
-        }}
-      >
-        <span style={{
-          fontSize: "13px",
-          lineHeight: "20px",
-          fontWeight: 600,
-          color: "#616161",
-          fontFamily: "'Inter', sans-serif",
-        }}>
-          {name}
-        </span>
-        <ArrowSort20Regular style={{ width: "16px", height: "16px", color: "#616161" }} />
-      </div>
-    );
+    const createSortableHeader = (name: string, fieldName: string) => {
+      const isActive = sortField === fieldName;
+      const currentOrder = isActive ? sortOrder : null;
+      
+      const getSortIcon = () => {
+        if (!isActive) {
+          return <ArrowSort20Regular style={{ width: "16px", height: "16px", color: "#616161" }} />;
+        }
+        if (currentOrder === 'asc') {
+          return <ArrowSortUp20Regular style={{ width: "16px", height: "16px", color: "#0F6CBD" }} />;
+        }
+        return <ArrowSortDown20Regular style={{ width: "16px", height: "16px", color: "#0F6CBD" }} />;
+      };
+
+      return (
+        <div
+          onClick={() => onSort && onSort(fieldName)}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+            cursor: "pointer",
+            userSelect: "none",
+          }}
+        >
+          <span style={{
+            fontSize: "13px",
+            lineHeight: "20px",
+            fontWeight: 600,
+            color: isActive ? "#0F6CBD" : "#616161",
+            fontFamily: "'Inter', sans-serif",
+          }}>
+            {name}
+          </span>
+          {getSortIcon()}
+        </div>
+      );
+    };
 
     // Generic Action column renderer for Overview, Verify, Suggest, Approve, Issue Amount
     const renderActions = (item: ApplicationData) => {
@@ -525,7 +555,7 @@ export const useProcessTable = ({
         minWidth: 160,
         isResizable: true,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Application No."),
+        onRenderHeader: () => createSortableHeader("Application No.", "Application_Id"),
         onRender: renderApplicationNo,
       },
       {
@@ -535,7 +565,7 @@ export const useProcessTable = ({
         minWidth: 180,
         isResizable: true,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Student Name"),
+        onRenderHeader: () => createSortableHeader("Student Name", "Applicant_Name"),
         onRender: (item: ApplicationData) => renderText(item.studentName, item),
       },
       {
@@ -545,7 +575,7 @@ export const useProcessTable = ({
         minWidth: 180,
         isResizable: true,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Class Studying"),
+        onRenderHeader: () => createSortableHeader("Class Studying", "Class_Studying"),
         onRender: (item: ApplicationData) => renderText(item.classStudying, item),
       },
       {
@@ -555,7 +585,7 @@ export const useProcessTable = ({
         minWidth: 220,
         isResizable: true,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Institution Name"),
+        onRenderHeader: () => createSortableHeader("Institution Name", "Institution_Name"),
         onRender: (item: ApplicationData) => renderText(item.institutionName, item),
       },
       {
@@ -565,7 +595,7 @@ export const useProcessTable = ({
         minWidth: 180,
         isResizable: true,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Father Annual Income"),
+        onRenderHeader: () => createSortableHeader("Father Annual Income", "Father_AnnualIncome"),
         onRender: (item: ApplicationData) => renderText(item.fatherAnnualIncome, item),
       },
       {
@@ -575,7 +605,7 @@ export const useProcessTable = ({
         minWidth: 160,
         isResizable: true,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Mobile Number"),
+        onRenderHeader: () => createSortableHeader("Mobile Number", "Mobile_Number"),
         onRender: (item: ApplicationData) => renderText(item.mobileNumber, item),
       },
       {
@@ -585,7 +615,7 @@ export const useProcessTable = ({
         minWidth: 180,
         isResizable: true,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Father Occupation"),
+        onRenderHeader: () => createSortableHeader("Father Occupation", "Father_Occupation"),
         onRender: (item: ApplicationData) => renderText(item.fatherOccupation, item),
       },
     ];
@@ -602,7 +632,7 @@ export const useProcessTable = ({
             minWidth: 160,
             isResizable: true,
             isSortable: true,
-            onRenderHeader: () => createSortableHeader("Scholarship Number"),
+            onRenderHeader: () => createSortableHeader("Scholarship Number", "Scholarship_No"),
             onRender: (item: ApplicationData) => renderText(item.scholarshipNumber, item),
           },
           {
@@ -612,7 +642,7 @@ export const useProcessTable = ({
             minWidth: 120,
             isResizable: true,
             isSortable: true,
-            onRenderHeader: () => createSortableHeader("Scholarship"),
+            onRenderHeader: () => createSortableHeader("Scholarship", "Scholarship_Id"),
             onRender: (item: ApplicationData) => renderText(item.scholarship, item),
           },
           {
@@ -622,7 +652,7 @@ export const useProcessTable = ({
             minWidth: 140,
             isResizable: true,
             isSortable: true,
-            onRenderHeader: () => createSortableHeader("Prepared By"),
+            onRenderHeader: () => createSortableHeader("Prepared By", "Prepared_By"),
             onRender: (item: ApplicationData) => renderText(item.preparedBy, item),
           },
           {
@@ -632,7 +662,7 @@ export const useProcessTable = ({
             minWidth: 140,
             isResizable: true,
             isSortable: true,
-            onRenderHeader: () => createSortableHeader("Verified By"),
+            onRenderHeader: () => createSortableHeader("Verified By", "Verified_By"),
             onRender: (item: ApplicationData) => renderText(item.verifiedBy, item),
           },
           {
@@ -642,7 +672,7 @@ export const useProcessTable = ({
             minWidth: 140,
             isResizable: true,
             isSortable: true,
-            onRenderHeader: () => createSortableHeader("Suggested By"),
+            onRenderHeader: () => createSortableHeader("Suggested By", "Suggested_By"),
             onRender: (item: ApplicationData) => renderText(item.suggestedBy, item),
           },
           {
@@ -652,7 +682,7 @@ export const useProcessTable = ({
             minWidth: 140,
             isResizable: true,
             isSortable: true,
-            onRenderHeader: () => createSortableHeader("Status"),
+            onRenderHeader: () => createSortableHeader("Status", "Status"),
             onRender: (item: ApplicationData) => (
               <div
                 onClick={() => handleViewPDF && handleViewPDF(item)}
@@ -666,10 +696,71 @@ export const useProcessTable = ({
         ];
 
       case "documents":
+        // BRD Section 7.3.4.2: Documents Sub-Module Table Columns
+        // Required columns: Class Studying, Institution Name, Father Annual Income, 
+        // Mobile Number, Father Occupation, Scholarship, Status, Action
         return [
-          ...baseColumns,
-          ...commonColumns,
-
+          ...baseColumns, // Checkbox (BRD allows checkbox for bulk operations)
+          {
+            key: "classStudying",
+            name: "Class Studying",
+            fieldName: "classStudying",
+            minWidth: 180,
+            isResizable: true,
+            isSortable: true,
+            onRenderHeader: () => createSortableHeader("Class Studying", "Class_Studying"),
+            onRender: (item: ApplicationData) => renderText(item.classStudying, item),
+          },
+          {
+            key: "institutionName",
+            name: "Institution Name",
+            fieldName: "institutionName",
+            minWidth: 220,
+            isResizable: true,
+            isSortable: true,
+            onRenderHeader: () => createSortableHeader("Institution Name", "Institution_Name"),
+            onRender: (item: ApplicationData) => renderText(item.institutionName, item),
+          },
+          {
+            key: "fatherAnnualIncome",
+            name: "Father Annual Income",
+            fieldName: "fatherAnnualIncome",
+            minWidth: 180,
+            isResizable: true,
+            isSortable: true,
+            onRenderHeader: () => createSortableHeader("Father Annual Income", "Father_AnnualIncome"),
+            onRender: (item: ApplicationData) => renderText(item.fatherAnnualIncome, item),
+          },
+          {
+            key: "mobileNumber",
+            name: "Mobile Number",
+            fieldName: "mobileNumber",
+            minWidth: 160,
+            isResizable: true,
+            isSortable: true,
+            onRenderHeader: () => createSortableHeader("Mobile Number", "Mobile_Number"),
+            onRender: (item: ApplicationData) => renderText(item.mobileNumber, item),
+          },
+          {
+            key: "fatherOccupation",
+            name: "Father Occupation",
+            fieldName: "fatherOccupation",
+            minWidth: 180,
+            isResizable: true,
+            isSortable: true,
+            onRenderHeader: () => createSortableHeader("Father Occupation", "Father_Occupation"),
+            onRender: (item: ApplicationData) => renderText(item.fatherOccupation, item),
+          },
+          {
+            key: "scholarship",
+            name: "Scholarship",
+            fieldName: "scholarship",
+            minWidth: 120,
+            isResizable: true,
+            isSortable: true,
+            onRenderHeader: () => createSortableHeader("Scholarship", "Scholarship_Id"),
+            onRender: (item: ApplicationData) => renderText(item.scholarship, item),
+          },
           {
             key: "status",
             name: "Status",
@@ -677,19 +768,19 @@ export const useProcessTable = ({
             minWidth: 140,
             isResizable: true,
             isSortable: true,
-            onRenderHeader: () => createSortableHeader("Status"),
+            onRenderHeader: () => createSortableHeader("Status", "Status"),
             onRender: (item: ApplicationData) => (
               <StatusBadge status={item.status ?? "Pending"} />
             ),
           },
           {
             key: "actions",
-            name: "Actions",
+            name: "Action",
             fieldName: "actions",
             minWidth: 160,
             maxWidth: 160,
             isSortable: false,
-            onRenderHeader: () => createSortableHeader("Actions"),
+            onRenderHeader: () => "Action",
             onRender: renderDocumentActions, // Document tab specific logic (upload button)
           },
         ];
@@ -705,7 +796,7 @@ export const useProcessTable = ({
             minWidth: 120,
             isResizable: true,
             isSortable: true,
-            onRenderHeader: () => createSortableHeader("Scholarship"),
+            onRenderHeader: () => createSortableHeader("Scholarship", "Scholarship_Id"),
             onRender: (item: ApplicationData) => renderText(item.scholarship, item),
           },
           {
@@ -715,7 +806,7 @@ export const useProcessTable = ({
             minWidth: 140,
             isResizable: true,
             isSortable: true,
-            onRenderHeader: () => createSortableHeader("Status"),
+            onRenderHeader: () => createSortableHeader("Status", "Status"),
             onRender: (item: ApplicationData) => {
               const status = item.status ?? "Pending";
               // In verify tab, make status badges clickable
@@ -750,7 +841,6 @@ export const useProcessTable = ({
 
       case "suggest":
       case "approve":
-      case "issue-amount":
         return [
           ...baseColumns,
           ...commonColumns,
@@ -761,7 +851,7 @@ export const useProcessTable = ({
             minWidth: 120,
             isResizable: true,
             isSortable: true,
-            onRenderHeader: () => createSortableHeader("Scholarship"),
+            onRenderHeader: () => createSortableHeader("Scholarship", "Scholarship_Id"),
             onRender: (item: ApplicationData) => renderText(item.scholarship, item),
           },
           {
@@ -771,7 +861,7 @@ export const useProcessTable = ({
             minWidth: 140,
             isResizable: true,
             isSortable: true,
-            onRenderHeader: () => createSortableHeader("Status"),
+            onRenderHeader: () => createSortableHeader("Status", "Status"),
             onRender: (item: ApplicationData) => {
               const status = item.status ?? "Pending";
               // Make status badges clickable in suggest, approve, and issue-amount tabs
@@ -795,7 +885,82 @@ export const useProcessTable = ({
             minWidth: 140,
             isResizable: false,
             isSortable: false,
-            onRenderHeader: () => createSortableHeader("Process"),
+            onRenderHeader: () => "Process",
+            onRender: renderProcessAction,
+          },
+          actionColumnDefinition, // Add Actions back
+        ];
+
+      case "issue-amount":
+        return [
+          ...baseColumns,
+          ...commonColumns,
+          {
+            key: "scholarshipNumber",
+            name: "Scholarship ID",
+            fieldName: "scholarshipNumber",
+            minWidth: 160,
+            isResizable: true,
+            isSortable: true,
+            onRenderHeader: () => createSortableHeader("Scholarship ID", "Scholarship_No"),
+            onRender: (item: ApplicationData) => {
+              const scholarshipId = item.scholarshipNumber || item.scholarship || '-';
+              // Make Scholarship ID clickable to view merged PDF
+              if (scholarshipId !== '-' && handleViewScholarshipPDF) {
+                return (
+                  <div
+                    onClick={() => handleViewScholarshipPDF(item)}
+                    style={{
+                      cursor: "pointer",
+                      color: "#0F6CBD",
+                      textDecoration: "underline",
+                      fontWeight: 500,
+                      fontFamily: "'Inter', sans-serif",
+                    }}
+                  >
+                    {scholarshipId}
+                  </div>
+                );
+              }
+              return (
+                <span style={{ color: "#616161", fontFamily: "'Inter', sans-serif" }}>
+                  {scholarshipId}
+                </span>
+              );
+            },
+          },
+          {
+            key: "status",
+            name: "Status",
+            fieldName: "status",
+            minWidth: 140,
+            isResizable: true,
+            isSortable: true,
+            onRenderHeader: () => createSortableHeader("Status", "Status"),
+            onRender: (item: ApplicationData) => {
+              const status = item.status ?? "Pending";
+              // Make status badges clickable in suggest, approve, and issue-amount tabs
+              if (activeTab === "suggest" || activeTab === "approve" || activeTab === "issue-amount") {
+                return (
+                  <div
+                    onClick={() => handleViewPDF && handleViewPDF(item)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <StatusBadge status={status} />
+                  </div>
+                );
+              }
+              return <StatusBadge status={status} />;
+            },
+          },
+          {
+            key: "process",
+            name: "Process",
+            fieldName: "process",
+            minWidth: 140,
+            isResizable: false,
+            isSortable: false,
+            onRenderHeader: () => "Process",
             onRender: renderProcessAction,
           },
           actionColumnDefinition, // Add Actions back
@@ -820,7 +985,11 @@ export const useProcessTable = ({
     handleViewHistory,
     handleViewScholarshipHistory,
     handlePrintDetails,
+    handleViewScholarshipPDF,
     handleProcess,
+    sortField,
+    sortOrder,
+    onSort,
   ]);
 
   const columns = React.useMemo(

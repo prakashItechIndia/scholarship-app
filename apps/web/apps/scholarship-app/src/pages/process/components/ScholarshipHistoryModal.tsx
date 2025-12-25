@@ -3,6 +3,8 @@ import {
     Modal,
     Button,
     Table,
+    TableSkeleton,
+    Skeleton,
 } from "@shared/components";
 import {
     ArrowDownload24Regular,
@@ -135,7 +137,37 @@ const ScholarshipHistoryModal: React.FC<ScholarshipHistoryModalProps> = ({
             hideDefaultHeader={true}
         >
             {loading ? (
-                <div style={{ padding: "20px", textAlign: "center" }}>Loading...</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "24px", padding: "8px 0" }}>
+                    {/* Details Section Skeleton */}
+                    <div style={{ border: "1px solid #e0e0e0", borderRadius: "8px", overflow: "hidden", padding: "12px 16px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                            <div style={{ display: "flex", gap: "12px" }}>
+                                <Skeleton style={{ width: "30%", height: "20px" }} variant="rounded" />
+                                <Skeleton style={{ width: "60%", height: "20px" }} variant="rounded" />
+                            </div>
+                            <div style={{ display: "flex", gap: "12px" }}>
+                                <Skeleton style={{ width: "30%", height: "20px" }} variant="rounded" />
+                                <Skeleton style={{ width: "60%", height: "20px" }} variant="rounded" />
+                            </div>
+                            <div style={{ display: "flex", gap: "12px" }}>
+                                <Skeleton style={{ width: "30%", height: "20px" }} variant="rounded" />
+                                <Skeleton style={{ width: "60%", height: "20px" }} variant="rounded" />
+                            </div>
+                        </div>
+                    </div>
+                    {/* Table Skeleton */}
+                    <div>
+                        <Skeleton style={{ width: "200px", height: "24px", marginBottom: "12px" }} variant="rounded" />
+                        <div style={{ border: "1px solid #e0e0e0", borderRadius: "8px", overflow: "hidden" }}>
+                            <TableSkeleton
+                                columnCount={2}
+                                rowCount={5}
+                                columnWidths={[200, 150]}
+                                showCheckbox={false}
+                            />
+                        </div>
+                    </div>
+                </div>
             ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "24px", padding: "8px 0" }}>
 

@@ -87,26 +87,26 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
   }, []);
 
   const handleDownload = async () => {
-    try {
-      const response = await fetch(displayUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
+                  try {
+                    const response = await fetch(displayUrl);
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
       link.download = displayFileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Download failed:", error);
-      const link = document.createElement("a");
-      link.href = displayUrl;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                  } catch (error) {
+                    console.error("Download failed:", error);
+                    const link = document.createElement("a");
+                    link.href = displayUrl;
       link.download = displayFileName;
-      link.target = "_blank";
-      link.click();
-    }
-  };
+                    link.target = "_blank";
+                    link.click();
+                  }
+                };
 
   const handlePrint = () => {
     window.open(displayUrl, "_blank");
@@ -129,9 +129,9 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
 
   if (!open) return null;
 
-  return (
-    <div
-      style={{
+                return (
+                  <div
+                    style={{
         position: "fixed",
         top: 0,
         left: 0,
@@ -140,7 +140,7 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
         backgroundColor: "rgba(0, 0, 0, 0.5)",
         zIndex: 9999,
         display: "flex",
-        alignItems: "center",
+                      alignItems: "center",
         justifyContent: "center",
       }}
       onClick={(e) => {
@@ -168,14 +168,14 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
         <div
           style={{
             height: "48px",
-            display: "flex",
+                      display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
+                      justifyContent: "space-between",
             padding: "0 16px",
             borderBottom: "1px solid #e0e0e0",
             backgroundColor: "#ffffff",
-          }}
-        >
+                    }}
+                  >
           <span
             style={{
               fontSize: "16px",
@@ -202,7 +202,7 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
           >
             <DismissRegular style={{ width: "20px", height: "20px" }} />
           </button>
-        </div>
+                      </div>
 
         {/* Toolbar */}
         <div
@@ -286,7 +286,7 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
               >
                 <ChevronRightRegular style={{ width: "16px", height: "16px" }} />
               </button>
-            </div>
+                      </div>
             <span
               style={{
                 fontSize: "14px",
@@ -296,7 +296,7 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
             >
               {zoomLevel}%
             </span>
-          </div>
+                      </div>
 
           {/* Right side - Toolbar icons */}
           <div
@@ -376,7 +376,7 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
             >
               <ArrowRotateClockwiseRegular
                 style={{ width: "18px", height: "18px" }}
-              />
+                        />
             </button>
             <button
               onClick={handleDownload}
@@ -418,7 +418,7 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
                 border: "none",
                 cursor: "pointer",
                 padding: "6px",
-                display: "flex",
+        display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 color: "#616161",
@@ -434,9 +434,9 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
         {/* PDF Content Area */}
         <div
           style={{
-            flex: 1,
-            position: "relative",
-            overflow: "hidden",
+          flex: 1,
+          position: "relative",
+          overflow: "hidden",
             backgroundColor: "#f5f5f5",
             display: "flex",
             alignItems: "center",
@@ -446,33 +446,33 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
           {isLoading && (
             <div
               style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "12px",
-                zIndex: 10,
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "12px",
+              zIndex: 10,
               }}
             >
               <div
                 style={{
-                  width: "40px",
-                  height: "40px",
-                  border: "4px solid #e0e0e0",
-                  borderTop: "4px solid #0f6cbd",
-                  borderRadius: "50%",
-                  animation: "spin 1s linear infinite",
+                width: "40px",
+                height: "40px",
+                border: "4px solid #e0e0e0",
+                borderTop: "4px solid #0f6cbd",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite",
                 }}
               />
               <span
                 style={{
-                  fontSize: "14px",
-                  lineHeight: "20px",
-                  color: "#616161",
-                  fontFamily: "'Inter', sans-serif",
+                fontSize: "14px",
+                lineHeight: "20px",
+                color: "#616161",
+                fontFamily: "'Inter', sans-serif",
                 }}
               >
                 Loading PDF...
@@ -483,24 +483,24 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
           {error ? (
             <div
               style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "12px",
-                padding: "24px",
-                zIndex: 10,
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "12px",
+              padding: "24px",
+              zIndex: 10,
               }}
             >
               <span
                 style={{
-                  fontSize: "14px",
-                  lineHeight: "20px",
-                  color: "#c50f1f",
-                  fontFamily: "'Inter', sans-serif",
+                fontSize: "14px",
+                lineHeight: "20px",
+                color: "#c50f1f",
+                fontFamily: "'Inter', sans-serif",
                 }}
               >
                 {error}
@@ -534,9 +534,9 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
                   maxHeight: "100%",
                 }}
               >
-                <Viewer
-                  fileUrl={displayUrl}
-                  plugins={plugins}
+              <Viewer
+                fileUrl={displayUrl}
+                plugins={plugins}
                 onDocumentLoad={(e: any) => {
                   setIsLoading(false);
                   if (e?.doc?.numPages) {
@@ -545,9 +545,9 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
                 }}
                   onLoadError={(error: Error) => {
                     setIsLoading(false);
-                    setError("Failed to load PDF document: " + error.message);
-                  }}
-                />
+                  setError("Failed to load PDF document: " + error.message);
+                }}
+              />
               </div>
             </div>
           ) : (

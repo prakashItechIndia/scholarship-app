@@ -1,9 +1,9 @@
 import * as React from "react";
 import {
   Table,
+  TableSkeleton,
   Pagination,
   Button,
-
   Modal,
   DropdownMenu,
   DropdownMenuTrigger,
@@ -52,7 +52,7 @@ const tabHeaderInfo: Record<string, { title: string; subtitle: string }> = {
   },
   approve: {
     title: "Approve",
-    subtitle: "Review application for final approval",
+    subtitle: "Review and Confirm the Requested Funds",
   },
   "issue-amount": {
     title: "Issue Amount",
@@ -60,12 +60,17 @@ const tabHeaderInfo: Record<string, { title: string; subtitle: string }> = {
   },
 };
 
+type SortOrder = 'asc' | 'desc';
+type SortField = string | null;
+
 const ProcessPage: React.FC = () => {
   const { success, error: showError } = useToast();
   const [activeTab, setActiveTab] = React.useState("overview");
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [pageSize, setPageSize] = React.useState(5);
+  const [pageSize, setPageSize] = React.useState(10); // Default 10 records per page (BRD requirement)
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [sortField, setSortField] = React.useState<SortField>("Application_Id"); // Default sort by Application No (BRD OVW-001)
+  const [sortOrder, setSortOrder] = React.useState<SortOrder>("desc"); // Default descending (BRD OVW-001)
   const [loading, setLoading] = React.useState(false);
   const [applications, setApplications] = React.useState<ApplicationData[]>([]);
   const [totalItems, setTotalItems] = React.useState(0);
@@ -193,6 +198,12 @@ const ProcessPage: React.FC = () => {
           params.academicYearId = academicYearId;
         }
 
+        // Add sorting parameters (BRD OVW-001, OVW-002) - API handles sorting
+        if (sortField && sortOrder) {
+          params.sortField = sortField;
+          params.sortOrder = sortOrder;
+        }
+
         let response: { data: unknown[]; total: number; page: number; pageSize: number } | unknown[] = [];
 
         switch (activeTab) {
@@ -203,6 +214,8 @@ const ProcessPage: React.FC = () => {
               academicYearId: params.academicYearId as number | undefined,
               page: params.page as number,
               pageSize: params.pageSize as number,
+              sortField: params.sortField as string | undefined,
+              sortOrder: params.sortOrder as 'asc' | 'desc' | undefined,
               selectedStatusText: undefined,
               fromDate: undefined,
               toDate: undefined,
@@ -215,6 +228,8 @@ const ProcessPage: React.FC = () => {
               academicYearId: params.academicYearId as number | undefined,
               page: params.page as number,
               pageSize: params.pageSize as number,
+              sortField: params.sortField as string | undefined,
+              sortOrder: params.sortOrder as 'asc' | 'desc' | undefined,
             });
             break;
           case 'verify':
@@ -224,6 +239,8 @@ const ProcessPage: React.FC = () => {
               academicYearId: params.academicYearId as number | undefined,
               page: params.page as number,
               pageSize: params.pageSize as number,
+              sortField: params.sortField as string | undefined,
+              sortOrder: params.sortOrder as 'asc' | 'desc' | undefined,
             });
             break;
           case 'suggest':
@@ -233,6 +250,8 @@ const ProcessPage: React.FC = () => {
               academicYearId: params.academicYearId as number | undefined,
               page: params.page as number,
               pageSize: params.pageSize as number,
+              sortField: params.sortField as string | undefined,
+              sortOrder: params.sortOrder as 'asc' | 'desc' | undefined,
             });
             break;
           case 'approve':
@@ -242,6 +261,8 @@ const ProcessPage: React.FC = () => {
               academicYearId: params.academicYearId as number | undefined,
               page: params.page as number,
               pageSize: params.pageSize as number,
+              sortField: params.sortField as string | undefined,
+              sortOrder: params.sortOrder as 'asc' | 'desc' | undefined,
             });
             break;
           case 'issue-amount':
@@ -251,6 +272,8 @@ const ProcessPage: React.FC = () => {
               academicYearId: params.academicYearId as number | undefined,
               page: params.page as number,
               pageSize: params.pageSize as number,
+              sortField: params.sortField as string | undefined,
+              sortOrder: params.sortOrder as 'asc' | 'desc' | undefined,
             });
             break;
           default:
@@ -258,6 +281,7 @@ const ProcessPage: React.FC = () => {
         }
 
         // Handle both old format (array) and new format (object with data, total, page, pageSize)
+        // API handles sorting, pagination, and search - no client-side processing needed
         if (Array.isArray(response)) {
           const mappedData = (response as Record<string, unknown>[]).map(mapApiResponseToApplicationData);
           setApplications(mappedData);
@@ -278,7 +302,7 @@ const ProcessPage: React.FC = () => {
     };
 
     void fetchApplications();
-  }, [activeTab, searchQuery, academicYearId, currentPage, pageSize, showError]);
+  }, [activeTab, searchQuery, academicYearId, currentPage, pageSize, sortField, sortOrder, showError]);
 
   // Fetch academic years on component mount
   React.useEffect(() => {
@@ -297,10 +321,16 @@ const ProcessPage: React.FC = () => {
     void fetchAcademicYears();
   }, [showError]);
 
-  // Reset to page 1 when tab changes, search query changes, or academic year changes
+  // Reset to page 1 when tab changes, search query changes, academic year changes, or pageSize changes
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [activeTab, searchQuery, academicYearId]);
+  }, [activeTab, searchQuery, academicYearId, pageSize]);
+
+  // Reset sort to default (Application No descending) when tab changes (BRD OVW-001)
+  React.useEffect(() => {
+    setSortField("Application_Id");
+    setSortOrder("desc");
+  }, [activeTab]);
 
   // Handle view action
   const handleView = React.useCallback((item: ApplicationData) => {
@@ -356,6 +386,38 @@ const ProcessPage: React.FC = () => {
     setPrintDetailsModalOpen(true);
   }, []);
 
+  // Handle viewing scholarship issued PDF (merged with uploaded document)
+  const handleViewScholarshipPDF = React.useCallback(async (item: ApplicationData) => {
+    try {
+      // Call API to generate/merge PDF with:
+      // - Upper section: Template with scholarship data (dynamically filled)
+      // - Middle section: Uploaded document (cheque, etc.)
+      // - Lower section: Template with scholarship data (dynamically filled)
+      const scholarshipId = item.scholarshipNumber || item.scholarship;
+      if (!scholarshipId || scholarshipId === '-') {
+        showError('Error', 'Scholarship ID not found');
+        return;
+      }
+
+      // Call API to get merged PDF
+      const mergedPdfUrl = await processManagement.getMergedScholarshipPDF({
+        applicationId: item.applicationNo,
+        scholarshipId: String(scholarshipId),
+      });
+      
+      setSelectedPdfUrl(mergedPdfUrl);
+      setSelectedPdfApplicationNo(item.applicationNo);
+      setPdfViewerOpen(true);
+    } catch (err) {
+      // Fallback to existing PDF if merge fails
+      const fallbackUrl = `https://scholarship.leomuthu.com/Registered_Pdf_ScholerShip/${item.applicationNo}.pdf`;
+      setSelectedPdfUrl(fallbackUrl);
+      setSelectedPdfApplicationNo(item.applicationNo);
+      setPdfViewerOpen(true);
+      console.warn('Failed to load merged PDF, using fallback:', err);
+    }
+  }, [showError]);
+
   // Handle process action
   const handleProcess = React.useCallback((item: ApplicationData) => {
     const actionLabel = item.processActionLabel;
@@ -404,6 +466,12 @@ const ProcessPage: React.FC = () => {
           params.academicYearId = academicYearId;
         }
 
+        // Add sorting parameters (BRD OVW-001, OVW-002) - API handles sorting
+        if (sortField && sortOrder) {
+          params.sortField = sortField;
+          params.sortOrder = sortOrder;
+        }
+
         let response: { data: unknown[]; total: number; page: number; pageSize: number } | unknown[] = [];
 
         switch (activeTab) {
@@ -414,6 +482,8 @@ const ProcessPage: React.FC = () => {
               academicYearId: params.academicYearId as number | undefined,
               page: params.page as number,
               pageSize: params.pageSize as number,
+              sortField: params.sortField as string | undefined,
+              sortOrder: params.sortOrder as 'asc' | 'desc' | undefined,
               selectedStatusText: undefined,
               fromDate: undefined,
               toDate: undefined,
@@ -426,6 +496,8 @@ const ProcessPage: React.FC = () => {
               academicYearId: params.academicYearId as number | undefined,
               page: params.page as number,
               pageSize: params.pageSize as number,
+              sortField: params.sortField as string | undefined,
+              sortOrder: params.sortOrder as 'asc' | 'desc' | undefined,
             });
             break;
           case 'verify':
@@ -435,6 +507,8 @@ const ProcessPage: React.FC = () => {
               academicYearId: params.academicYearId as number | undefined,
               page: params.page as number,
               pageSize: params.pageSize as number,
+              sortField: params.sortField as string | undefined,
+              sortOrder: params.sortOrder as 'asc' | 'desc' | undefined,
             });
             break;
           case 'suggest':
@@ -444,6 +518,8 @@ const ProcessPage: React.FC = () => {
               academicYearId: params.academicYearId as number | undefined,
               page: params.page as number,
               pageSize: params.pageSize as number,
+              sortField: params.sortField as string | undefined,
+              sortOrder: params.sortOrder as 'asc' | 'desc' | undefined,
             });
             break;
           case 'approve':
@@ -453,6 +529,8 @@ const ProcessPage: React.FC = () => {
               academicYearId: params.academicYearId as number | undefined,
               page: params.page as number,
               pageSize: params.pageSize as number,
+              sortField: params.sortField as string | undefined,
+              sortOrder: params.sortOrder as 'asc' | 'desc' | undefined,
             });
             break;
           case 'issue-amount':
@@ -462,6 +540,8 @@ const ProcessPage: React.FC = () => {
               academicYearId: params.academicYearId as number | undefined,
               page: params.page as number,
               pageSize: params.pageSize as number,
+              sortField: params.sortField as string | undefined,
+              sortOrder: params.sortOrder as 'asc' | 'desc' | undefined,
             });
             break;
           default:
@@ -469,6 +549,7 @@ const ProcessPage: React.FC = () => {
         }
 
         // Handle both old format (array) and new format (object with data, total, page, pageSize)
+        // API handles sorting, pagination, and search - no client-side processing needed
         if (Array.isArray(response)) {
           const mappedData = (response as Record<string, unknown>[]).map(mapApiResponseToApplicationData);
           setApplications(mappedData);
@@ -486,7 +567,7 @@ const ProcessPage: React.FC = () => {
       }
     };
     void fetchApplications();
-  }, [activeTab, searchQuery, academicYearId, currentPage, pageSize, showError]);
+  }, [activeTab, searchQuery, academicYearId, currentPage, pageSize, sortField, sortOrder, showError]);
 
   // Handle viewing a specific document from the drawer - opens in new tab
   const handleViewSpecificDocument = React.useCallback((doc: { url: string; name: string }) => {
@@ -504,6 +585,20 @@ const ProcessPage: React.FC = () => {
     document.body.removeChild(link);
   }, []);
 
+  // Handle sort change
+  const handleSort = React.useCallback((field: string) => {
+    if (sortField === field) {
+      // Toggle sort order if same field
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new sort field with default descending order
+      setSortField(field);
+      setSortOrder('desc');
+    }
+    // Reset to page 1 when sort changes
+    setCurrentPage(1);
+  }, [sortField, sortOrder]);
+
   // Get table columns using custom hook
   const { columns } = useProcessTable({
     activeTab,
@@ -516,7 +611,11 @@ const ProcessPage: React.FC = () => {
     handleViewHistory,
     handleViewScholarshipHistory,
     handlePrintDetails,
+    handleViewScholarshipPDF,
     handleProcess,
+    sortField,
+    sortOrder,
+    onSort: handleSort,
   });
 
   // Data is already paginated from the server
@@ -671,22 +770,43 @@ const ProcessPage: React.FC = () => {
             paddingRight: "24px",
             flexShrink: 0,
           }}>
-            <div>
-              <Button
-                variant="ghost"
-                onClick={() => console.log("Search clicked")}
-                aria-label="Search"
-                className="w-32px h-32px rounded-md bg-white hover:bg-gray-50 p-0 flex items-center justify-center"
-              >
-                <SearchRegular className="w-5 h-5 text-gray-600" />
-                <input
-                  id='search'
-                  type="text"
-                  placeholder="Search"
-                  className="w-full h-full bg-transparent border-none outline-none text-gray-600 pl-2"
-                />
-              </Button>
-
+            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+              <SearchRegular style={{ 
+                position: "absolute", 
+                left: "8px", 
+                width: "16px", 
+                height: "16px", 
+                color: "#616161",
+                pointerEvents: "none"
+              }} />
+              <input
+                id='search'
+                type="text"
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  // Pagination will reset automatically via useEffect
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    // Search is already handled by onChange, but we can prevent default
+                    e.preventDefault();
+                  }
+                }}
+                style={{
+                  width: "200px",
+                  height: "32px",
+                  paddingLeft: "32px",
+                  paddingRight: "12px",
+                  borderRadius: "4px",
+                  border: "1px solid #d1d5db",
+                  fontSize: "14px",
+                  fontFamily: "'Inter', sans-serif",
+                  outline: "none",
+                  backgroundColor: "#fff",
+                }}
+              />
             </div>
 
             <DropdownMenu>
@@ -800,11 +920,22 @@ const ProcessPage: React.FC = () => {
         </style>
 
         <div style={{ minWidth: "fit-content" }}>
-          <Table
-            columns={columns}
-            data={paginatedData}
-            disableScroll={true}
-          />
+          {loading ? (
+            <TableSkeleton
+              columnCount={columns.length - (columns.some(col => col.key === 'checkbox') ? 1 : 0)}
+              rowCount={5}
+              columnWidths={columns
+                .filter(col => col.key !== 'checkbox')
+                .map(col => col.minWidth || 150)}
+              showCheckbox={columns.some(col => col.key === 'checkbox')}
+            />
+          ) : (
+            <Table
+              columns={columns}
+              data={paginatedData}
+              disableScroll={true}
+            />
+          )}
         </div>
       </div>
 
@@ -824,8 +955,13 @@ const ProcessPage: React.FC = () => {
             totalPages={totalPages}
             pageSize={pageSize}
             totalItems={totalItems}
-            onPageChange={setCurrentPage}
-            onPageSizeChange={setPageSize}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+            }}
+            onPageSizeChange={(newPageSize) => {
+              setPageSize(newPageSize);
+              // Reset to page 1 when page size changes (already handled by useEffect)
+            }}
             pageSizeOptions={[5, 10, 20, 50, 100]}
             showFirstLast={true}
             showPageSize={true}

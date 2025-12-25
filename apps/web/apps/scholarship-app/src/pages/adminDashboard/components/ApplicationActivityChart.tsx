@@ -40,8 +40,9 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
         justifyContent: "space-between",
         alignItems: "flex-start",
         marginBottom: "24px",
+        gap: "16px",
       }}>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <h3 style={{
             fontSize: "18px",
             lineHeight: "24px",
@@ -63,7 +64,6 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
         </div>
         <div style={{ 
           width: "180px",
-          marginLeft: "16px",
           flexShrink: 0,
         }}>
           <Select
@@ -144,6 +144,22 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
           {/* X-axis labels */}
           {data.map((item, index) => {
             const x = 30 + index * (barWidth + spacing) + barWidth / 2;
+            // Format date to show month format (e.g., "2025-01" or "Jan 2025")
+            let displayDate = item.date;
+            // If date is in format like "2025-01", keep it as is
+            // If date is in other format, try to format it
+            if (displayDate && !displayDate.includes('-')) {
+              try {
+                const date = new Date(displayDate);
+                if (!isNaN(date.getTime())) {
+                  const year = date.getFullYear();
+                  const month = String(date.getMonth() + 1).padStart(2, '0');
+                  displayDate = `${year}-${month}`;
+                }
+              } catch (e) {
+                // Keep original format if parsing fails
+              }
+            }
             return (
               <text
                 key={index}
@@ -154,7 +170,7 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
                 fontFamily="'Inter', sans-serif"
                 textAnchor="middle"
               >
-                {item.date}
+                {displayDate}
               </text>
             );
           })}

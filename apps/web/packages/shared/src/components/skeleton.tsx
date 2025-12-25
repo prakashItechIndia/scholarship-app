@@ -9,23 +9,22 @@ export interface SkeletonProps extends Omit<FluentSkeletonProps, "shape"> {
 }
 
 const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
-  ({ className, variant = "default", width, height, ...props }, ref) => {
-    const getShape = (): "rectangle" | "circle" => {
-      return variant === "circle" ? "circle" : "rectangle";
-    };
-
-    const style: React.CSSProperties = {
+  ({ className, variant = "default", width, height, style, ...props }, ref) => {
+    const combinedStyle: React.CSSProperties = {
       width: width || "100%",
       height: height || "20px",
-      borderRadius: variant === "rounded" ? "8px" : variant === "square" ? "0" : undefined,
+      borderRadius: variant === "rounded" ? "8px" : variant === "circle" ? "50%" : variant === "square" ? "0" : undefined,
+      backgroundColor: "#e5e7eb", // Default gray color for skeleton
+      ...style, // Allow style prop to override
     };
 
     return (
       <FluentSkeleton
         ref={ref}
-        shape={getShape()}
         className={cn(className)}
-        style={style}
+        animation="wave"
+        appearance="opaque"
+        style={combinedStyle}
         {...props}
       />
     );

@@ -8,15 +8,14 @@ import {
   DropdownMenuItem
 } from "@shared/components";
 import {
-  ArrowDown20Regular,
-  ChevronDown20Regular,
   MoreVerticalRegular
 } from "@fluentui/react-icons";
+import { ExportButton, type ExportFormat } from "@/components/common";
 
 interface ReportsTabsProps {
   activeTab: ReportTab;
   onTabChange: (tab: ReportTab) => void;
-  onExport: (format: "excel" | "pdf" | "csv") => void;
+  onExport: (format: ExportFormat) => void;
   showActions?: boolean;
 }
 
@@ -27,7 +26,6 @@ const tabLabels = [
 ];
 
 const ReportsTabs: React.FC<ReportsTabsProps> = ({ activeTab, onTabChange, onExport, showActions = false }) => {
-  const [exportMenuOpen, setExportMenuOpen] = React.useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = React.useState(false);
 
   return (
@@ -75,53 +73,15 @@ const ReportsTabs: React.FC<ReportsTabsProps> = ({ activeTab, onTabChange, onExp
         {/* Actions Right */}
         {showActions && (
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <DropdownMenu open={exportMenuOpen} onOpenChange={setExportMenuOpen}>
-              <DropdownMenuTrigger>
-                <Button
-                  appearance="primary"
-                  size="small"
-                  style={{
-                    backgroundColor: "#0f6cbd",
-                    color: "#ffffff",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    height: "32px",
-                    padding: "0 12px",
-                    margin: 0,
-                    border: "none",
-                  }}
-                >
-                  <ArrowDown20Regular style={{ width: "16px", height: "16px" }} />
-                  Export
-                  <ChevronDown20Regular style={{ width: "16px", height: "16px" }} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {/* ... items ... */}
-                <DropdownMenuItem
-                  label="Excel (.xlsx)"
-                  onClick={() => {
-                    onExport("excel");
-                    setExportMenuOpen(false);
-                  }}
-                />
-                <DropdownMenuItem
-                  label="PDF"
-                  onClick={() => {
-                    onExport("pdf");
-                    setExportMenuOpen(false);
-                  }}
-                />
-                <DropdownMenuItem
-                  label="CSV"
-                  onClick={() => {
-                    onExport("csv");
-                    setExportMenuOpen(false);
-                  }}
-                />
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <ExportButton
+              options={[
+                { format: "excel", label: "Excel (.xlsx)" },
+                { format: "pdf", label: "PDF" },
+                { format: "csv", label: "CSV" },
+              ]}
+              onExport={onExport}
+              size="small"
+            />
 
             <DropdownMenu open={moreMenuOpen} onOpenChange={setMoreMenuOpen}>
               <DropdownMenuTrigger>

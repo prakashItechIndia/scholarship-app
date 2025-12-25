@@ -3,6 +3,7 @@ import {
     Modal,
     Button,
     Table,
+    TableSkeleton,
     Pagination,
 } from "@shared/components";
 import {
@@ -102,7 +103,7 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
             // Add title and metadata
             doc.setFontSize(16);
             doc.text(`History Against Application Number: ${applicationNo}`, 14, 15);
-            
+
             doc.setFontSize(10);
             const currentDate = new Date().toLocaleString('en-US', {
                 year: 'numeric',
@@ -331,7 +332,12 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
             <div style={{ display: "flex", flexDirection: "column", height: "60vh" }}>
                 <div style={{ flex: 1, overflow: "auto" }}>
                     {loading ? (
-                        <div style={{ padding: "20px", textAlign: "center" }}>Loading...</div>
+                        <TableSkeleton
+                            columnCount={5}
+                            rowCount={5}
+                            columnWidths={[60, 150, 250, 120, 150]}
+                            showCheckbox={false}
+                        />
                     ) : (
                         <Table
                             columns={columns}

@@ -2,15 +2,13 @@ import * as React from "react";
 import {
     Modal,
     Button,
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem
+    Input,
+    Select,
+    Label
 } from "@shared/components";
 import {
     Dismiss24Regular,
-    CheckmarkCircle24Regular,
-    ChevronDownRegular
+    CheckmarkCircle24Regular
 } from "@fluentui/react-icons";
 import { ApplicationData } from "../types";
 import { processManagement } from "../../../services/scholarship.service";
@@ -35,6 +33,9 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
     const [ddChequeNo, setDdChequeNo] = React.useState("");
     const [ddChequeInFavor, setDdChequeInFavor] = React.useState("");
     const [ddChequeDate, setDdChequeDate] = React.useState("");
+    const [bankName, setBankName] = React.useState("");
+    const [branchDetails, setBranchDetails] = React.useState("");
+    const [uploadedFiles, setUploadedFiles] = React.useState<File[]>([]);
     const [isSubmitted, setIsSubmitted] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
 
@@ -46,6 +47,9 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
             setDdChequeNo("");
             setDdChequeInFavor("");
             setDdChequeDate("");
+            setBankName("");
+            setBranchDetails("");
+            setUploadedFiles([]);
             setIsSubmitted(false);
         }
     }, [open]);
@@ -163,9 +167,12 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
                 applicationId: data.applicationNo,
                 paymentMode,
                 comments: comment,
-                ddChequeNo: paymentMode === 'DD' || paymentMode === 'Cheque' ? ddChequeNo : '',
-                ddChequeInFavor: paymentMode === 'DD' || paymentMode === 'Cheque' ? ddChequeInFavor : '',
-                ddChequeDate: paymentMode === 'DD' || paymentMode === 'Cheque' ? ddChequeDate : '',
+                ddChequeNo: paymentMode === 'Demand Draft (DD)' || paymentMode === 'Cheque' ? ddChequeNo : '',
+                ddChequeInFavor: paymentMode === 'Demand Draft (DD)' || paymentMode === 'Cheque' ? ddChequeInFavor : '',
+                ddChequeDate: paymentMode === 'Demand Draft (DD)' || paymentMode === 'Cheque' ? ddChequeDate : '',
+                bankName: paymentMode === 'Demand Draft (DD)' || paymentMode === 'Cheque' ? bankName : '',
+                branchDetails: paymentMode === 'Demand Draft (DD)' || paymentMode === 'Cheque' ? branchDetails : '',
+                documents: uploadedFiles,
                 issuedBy: userId,
             });
 
@@ -310,46 +317,190 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
 
                     {/* Payment Mode Select */}
                     <div style={{ width: "100%" }}>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger>
-                                <Button
-                                    appearance="outline"
-                                    style={{
-                                        width: "100%",
-                                        justifyContent: "space-between",
-                                        fontWeight: "normal",
-                                        color: paymentMode ? "#242424" : "#616161",
-                                        fontFamily: "'Inter', sans-serif",
-                                        borderColor: "#d1d1d1",
-                                        height: "40px",
-                                        padding: "8px 12px",
-                                    }}
-                                    iconPosition="after"
-                                    icon={<ChevronDownRegular />}
-                                >
-                                    {paymentMode || "Select mode of payment"}
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                {["Demand Draft (DD)", "NEFT/RTGS Transfer", "Cheque", "UPI Transfer"].map((option) => (
-                                    <DropdownMenuItem
-                                        key={option}
-                                        onClick={() => setPaymentMode(option)}
-                                        style={{ fontFamily: "'Inter', sans-serif", fontSize: "14px" }}
+                        <Label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+                            Select mode of payment
+                        </Label>
+                        <Select
+                            placeholder="Select mode of payment"
+                            selectedKey={paymentMode}
+                            onValueChange={(value) => setPaymentMode(value)}
+                            options={[
+                                { value: "Demand Draft (DD)", label: "Demand Draft (DD)" },
+                                { value: "NEFT/RTGS Transfer", label: "NEFT/RTGS Transfer" },
+                                { value: "Cheque", label: "Cheque" },
+                                { value: "UPI Transfer", label: "UPI Transfer" }
+                            ]}
+                        />
+                    </div>
+
+                    {/* Cheque/DD Details - Show when Cheque or DD is selected */}
+                    {(paymentMode === "Cheque" || paymentMode === "Demand Draft (DD)") && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                                {/* Cheque Number */}
+                                <div>
+                                    <Label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+                                        Cheque Number
+                                    </Label>
+                                    <Input
+                                        type="text"
+                                        value={ddChequeNo}
+                                        onChange={(e) => setDdChequeNo(e.target.value)}
+                                        placeholder="Enter cheque number"
+                                    />
+                                </div>
+
+                                {/* Cheque Date */}
+                                <div>
+                                    <Label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+                                        Cheque Date
+                                    </Label>
+                                    <Input
+                                        type="date"
+                                        value={ddChequeDate}
+                                        onChange={(e) => setDdChequeDate(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                                {/* Bank Name */}
+                                <div>
+                                    <Label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+                                        Bank Name
+                                    </Label>
+                                    <Select
+                                        placeholder="Select Bank"
+                                        selectedKey={bankName}
+                                        onValueChange={(value) => setBankName(value)}
+                                        options={[
+                                            { value: "HDFC Bank", label: "HDFC Bank" },
+                                            { value: "State Bank of India", label: "State Bank of India" },
+                                            { value: "ICICI Bank", label: "ICICI Bank" },
+                                            { value: "Axis Bank", label: "Axis Bank" },
+                                            { value: "Punjab National Bank", label: "Punjab National Bank" },
+                                            { value: "Bank of Baroda", label: "Bank of Baroda" },
+                                            { value: "Canara Bank", label: "Canara Bank" },
+                                            { value: "Union Bank of India", label: "Union Bank of India" }
+                                        ]}
+                                    />
+                                </div>
+
+                                {/* Branch Details */}
+                                <div>
+                                    <Label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+                                        Branch Details
+                                    </Label>
+                                    <Input
+                                        type="text"
+                                        value={branchDetails}
+                                        onChange={(e) => setBranchDetails(e.target.value)}
+                                        placeholder="Enter branch details"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Document Upload Area */}
+                    <div>
+                        <Label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+                            Upload Documents
+                        </Label>
+                        <div
+                            style={{
+                                border: "2px dashed #d1d1d1",
+                                borderRadius: "4px",
+                                padding: "24px",
+                                textAlign: "center",
+                                backgroundColor: "#fafafa",
+                                cursor: "pointer",
+                                transition: "all 0.2s"
+                            }}
+                            onDragOver={(e) => {
+                                e.preventDefault();
+                                e.currentTarget.style.borderColor = "#0F6CBD";
+                                e.currentTarget.style.backgroundColor = "#f0f7ff";
+                            }}
+                            onDragLeave={(e) => {
+                                e.currentTarget.style.borderColor = "#d1d1d1";
+                                e.currentTarget.style.backgroundColor = "#fafafa";
+                            }}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                e.currentTarget.style.borderColor = "#d1d1d1";
+                                e.currentTarget.style.backgroundColor = "#fafafa";
+                                const files = Array.from(e.dataTransfer.files);
+                                const validFiles = files.filter(file => {
+                                    const ext = file.name.split('.').pop()?.toLowerCase();
+                                    return ['jpg', 'jpeg', 'docx', 'pdf'].includes(ext || '');
+                                });
+                                setUploadedFiles([...uploadedFiles, ...validFiles]);
+                            }}
+                            onClick={() => {
+                                const input = document.createElement('input');
+                                input.type = 'file';
+                                input.accept = '.jpg,.jpeg,.docx,.pdf';
+                                input.multiple = true;
+                                input.onchange = (e) => {
+                                    const files = Array.from((e.target as HTMLInputElement).files || []);
+                                    setUploadedFiles([...uploadedFiles, ...files]);
+                                };
+                                input.click();
+                            }}
+                        >
+                            <div style={{ fontSize: "14px", color: "#616161", fontFamily: "'Inter', sans-serif" }}>
+                                Drop files here or Choose File
+                            </div>
+                            <div style={{ fontSize: "12px", color: "#9ca3af", marginTop: "4px", fontFamily: "'Inter', sans-serif" }}>
+                                JPG, DOCX and PDF (up to 20MB)
+                            </div>
+                        </div>
+                        {uploadedFiles.length > 0 && (
+                            <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                                {uploadedFiles.map((file, index) => (
+                                    <div
+                                        key={index}
+                                        style={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "center",
+                                            padding: "8px 12px",
+                                            backgroundColor: "#f5f5f5",
+                                            borderRadius: "4px",
+                                            fontSize: "14px",
+                                            fontFamily: "'Inter', sans-serif"
+                                        }}
                                     >
-                                        {option}
-                                    </DropdownMenuItem>
+                                        <span style={{ color: "#242424" }}>{file.name}</span>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
+                                            }}
+                                            style={{
+                                                background: "none",
+                                                border: "none",
+                                                color: "#dc2626",
+                                                cursor: "pointer",
+                                                fontSize: "14px",
+                                                padding: "4px 8px"
+                                            }}
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
                                 ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                            </div>
+                        )}
                     </div>
 
                     {/* Comments Section */}
                     <div>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-                            <label style={{ fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+                            <Label style={{ fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
                                 Comments
-                            </label>
+                            </Label>
                             <span style={{ fontSize: "12px", color: "#616161", fontFamily: "'Inter', sans-serif" }}>
                                 200 words
                             </span>

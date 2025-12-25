@@ -80,10 +80,11 @@ export const FundSpendingChart: React.FC<FundSpendingChartProps> = ({
       <div style={{
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "center",
+        alignItems: "flex-start",
         marginBottom: "24px",
+        gap: "16px",
       }}>
-        <div>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <h3 style={{
             fontSize: "18px",
             lineHeight: "24px",
@@ -100,10 +101,10 @@ export const FundSpendingChart: React.FC<FundSpendingChartProps> = ({
             color: "#616161",
             fontFamily: "'Inter', sans-serif",
           }}>
-            Track budget utilization.
+            Total budget utilization.
           </p>
         </div>
-        <div style={{ width: "150px" }}>
+        <div style={{ width: "150px", flexShrink: 0 }}>
           <Select
             placeholder="Select Year"
             options={yearOptions}

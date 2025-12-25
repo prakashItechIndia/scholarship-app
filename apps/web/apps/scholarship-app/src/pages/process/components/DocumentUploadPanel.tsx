@@ -1,6 +1,7 @@
 import * as React from "react";
 import {
     Button,
+    TableSkeleton,
 } from "@shared/components";
 import {
     DismissRegular,
@@ -377,8 +378,13 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                     }}
                 >
                     {loading && documents.length === 0 ? (
-                        <div style={{ padding: "40px", textAlign: "center", color: "#616161" }}>
-                            Loading documents...
+                        <div style={{ padding: "24px" }}>
+                            <TableSkeleton
+                                columnCount={4}
+                                rowCount={5}
+                                columnWidths={[40, 200, 150, 120]}
+                                showCheckbox={true}
+                            />
                         </div>
                     ) : (
                         <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'Inter', sans-serif" }}>
