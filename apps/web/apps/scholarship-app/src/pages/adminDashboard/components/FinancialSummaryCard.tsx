@@ -1,54 +1,88 @@
 import * as React from "react";
 import { Card } from "@shared/components";
 
-interface FinancialSummaryCardProps {
+interface MetricCardProps {
+  icon: React.ReactNode;
+  value: number;
   label: string;
-  amount: number;
-  color: string;
+  showCurrency?: boolean;
+  iconBgColor?: string;
 }
 
-export const FinancialSummaryCard: React.FC<FinancialSummaryCardProps> = ({
+export const MetricCard: React.FC<MetricCardProps> = ({
+  icon,
+  value,
   label,
-  amount,
-  color,
+  showCurrency = false,
+  iconBgColor = "#2453C3",
 }) => {
-  const formatAmount = (value: number): string => {
-    return `₹${value.toLocaleString("en-IN")}`;
+  const formatValue = (val: number): string => {
+    if (showCurrency) {
+      return ` ${val.toLocaleString("en-IN")}`;
+    }
+    return val.toLocaleString("en-IN");
   };
 
   return (
-    <Card variant="elevated" style={{
-      border: "1px solid #e0e0e0",
-      backgroundColor: "#ffffff",
-      borderRadius: "8px",
-      padding: "24px",
-      minHeight: "120px",
-    }}>
+    <Card 
+      variant="elevated" 
+      style={{
+        border: "1px solid #e0e0e0",
+        backgroundColor: "#ffffff",
+        borderRadius: "8px",
+        padding: "20px",
+        height: "100%",
+      }}
+    >
       <div style={{
         display: "flex",
-        flexDirection: "column",
-        gap: "8px",
+        alignItems: "center",
+        gap: "16px",
       }}>
+        {/* Icon on left */}
         <div style={{
-          fontSize: "14px",
-          lineHeight: "20px",
-          fontWeight: 500,
-          color: "#616161",
-          fontFamily: "'Inter', sans-serif",
+          width: "56px",
+          height: "56px",
+          borderRadius: "8px",
+          backgroundColor: `${iconBgColor}15`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
         }}>
-          {label}
+          {icon}
         </div>
+
+        {/* Content on right */}
         <div style={{
-          fontSize: "32px",
-          lineHeight: "40px",
-          fontWeight: 700,
-          color: color,
-          fontFamily: "'Inter', sans-serif",
+          display: "flex",
+          flexDirection: "column",
+          gap: "4px",
+          flex: 1,
         }}>
-          {formatAmount(amount)}
+          {/* Value on top */}
+          <div style={{
+            fontSize: "28px",
+            lineHeight: "36px",
+            fontWeight: 700,
+            color: "#242424",
+            fontFamily: "'Inter', sans-serif",
+          }}>
+            {formatValue(value)}
+          </div>
+
+          {/* Label below */}
+          <div style={{
+            fontSize: "13px",
+            lineHeight: "18px",
+            fontWeight: 400,
+            color: "#616161",
+            fontFamily: "'Inter', sans-serif",
+          }}>
+            {label}
+          </div>
         </div>
       </div>
     </Card>
   );
 };
-

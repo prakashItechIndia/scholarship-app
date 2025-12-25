@@ -16,8 +16,10 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
 }) => {
   const maxValue = Math.max(...data.map((d) => d.count));
   const chartHeight = 200;
-  const chartWidth = 800;
-  const barWidth = chartWidth / data.length - 2;
+  const spacing = 8; // Spacing between bars
+  const chartWidth = Math.max(600, data.length * (40 + spacing)); // Dynamic width based on data length
+  const availableWidth = chartWidth - 30; // Account for left margin
+  const barWidth = (availableWidth - (data.length - 1) * spacing) / data.length;
 
   const monthOptions = [
     { value: "September 2024", label: "September 2024" },
@@ -36,10 +38,10 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
       <div style={{
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "center",
+        alignItems: "flex-start",
         marginBottom: "24px",
       }}>
-        <div>
+        <div style={{ flex: 1 }}>
           <h3 style={{
             fontSize: "18px",
             lineHeight: "24px",
@@ -59,7 +61,11 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
             Track the number of applications received each month.
           </p>
         </div>
-        <div style={{ width: "180px" }}>
+        <div style={{ 
+          width: "180px",
+          marginLeft: "16px",
+          flexShrink: 0,
+        }}>
           <Select
             placeholder="Select Month"
             options={monthOptions}
@@ -107,7 +113,7 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
           {/* Bars */}
           {data.map((item, index) => {
             const barHeight = (item.count / maxValue) * chartHeight;
-            const x = 30 + index * (barWidth + 2);
+            const x = 30 + index * (barWidth + spacing);
             const y = chartHeight - barHeight;
 
             return (
@@ -118,9 +124,10 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
                   width={barWidth}
                   height={barHeight}
                   fill="#0f6cbd"
-                  rx="4"
+                  rx="10"
+                  ry="10"
                 />
-                <text
+                {/* <text
                   x={x + barWidth / 2}
                   y={y - 5}
                   fontSize="10"
@@ -129,14 +136,14 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
                   textAnchor="middle"
                 >
                   {item.count}
-                </text>
+                </text> */}
               </g>
             );
           })}
 
           {/* X-axis labels */}
           {data.map((item, index) => {
-            const x = 30 + index * (barWidth + 2) + barWidth / 2;
+            const x = 30 + index * (barWidth + spacing) + barWidth / 2;
             return (
               <text
                 key={index}

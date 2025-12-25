@@ -4,17 +4,14 @@ import {
     QuestionCircleRegular,
     SearchRegular,
     SettingsRegular,
-    LockClosedRegular,
     DismissRegular,
     TaskListSquareAdd24Regular,
     PeopleTeam24Regular,
     DocumentDataRegular,
     DocumentOnePageSparkleRegular,
     AlertBadgeRegular,
-    ArrowExit24Regular,
-    KeyRegular,
 } from "@fluentui/react-icons";
-import { Button, TopNavProps, Popover, PopoverTrigger, PopoverContent, Modal } from "@shared/components";
+import { Button, TopNavProps, Modal } from "@shared/components";
 import * as React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { NavbarLogo } from "../common";
@@ -124,6 +121,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
             open={settingsPopoverOpen}
             onOpenChange={setSettingsPopoverOpen}
             onLogout={() => setLogoutModalOpen(true)}
+            position="side"
           >
             <SettingsRegular className="w-5 h-5" />
           </ProfilePopover>

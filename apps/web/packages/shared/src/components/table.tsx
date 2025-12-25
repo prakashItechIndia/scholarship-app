@@ -62,8 +62,6 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
                     maxWidth: col.maxWidth,
                     width: col.width,
                     height: "2.5rem",
-                    // paddingTop: "8px",
-                    // paddingBottom: "8px",
                     paddingLeft: col.cellPaddingLeft !== undefined ? (typeof col.cellPaddingLeft === "number" ? `${col.cellPaddingLeft}px` : col.cellPaddingLeft) : "16px",
                     paddingRight: col.cellPaddingRight !== undefined ? (typeof col.cellPaddingRight === "number" ? `${col.cellPaddingRight}px` : col.cellPaddingRight) : "16px",
                     fontSize: "12px",

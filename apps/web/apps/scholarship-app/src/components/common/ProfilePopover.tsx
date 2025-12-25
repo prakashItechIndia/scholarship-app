@@ -13,7 +13,8 @@ export interface ProfilePopoverProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onLogout: () => void;
-  children: React.ReactNode;
+  children: React.ReactElement;
+  position?: "top" | "side";
 }
 
 export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
@@ -23,8 +24,47 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
   onOpenChange,
   onLogout,
   children,
+  position = "top",
 }) => {
   const navigate = useNavigate();
+  const popoverContentRef = React.useRef<HTMLDivElement>(null);
+
+  // Force position update when popover opens (for side nav)
+  React.useEffect(() => {
+    if (open && position === "side") {
+      // Use requestAnimationFrame to ensure popover is rendered before applying styles
+      const frameId = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (popoverContentRef.current) {
+            const element = popoverContentRef.current;
+            // Force the marginLeft to ensure it positions correctly on initial render
+            element.style.marginLeft = "40px";
+            element.style.setProperty("margin-left", "30px", "important");
+          }
+        });
+      });
+      return () => cancelAnimationFrame(frameId);
+    }
+  }, [open, position]);
+
+  // Determine positioning style based on position prop
+  const contentStyle: React.CSSProperties = {
+    borderRadius: "8px",
+  };
+
+  // Configure positioning for Popover
+  // For side nav, use "after" to position to the right; for top nav, use "below"
+  const positioning = position === "side" 
+    ? { position: "after" as const, align: "start" as const }
+    : { position: "below" as const, align: "end" as const };
+
+  if (position === "side") {
+    // For side nav, ensure it positions to the right on initial render
+    contentStyle.marginLeft = "20px";
+  } else {
+    // For top nav, keep existing positioning (below and to the right)
+    contentStyle.marginLeft = "60px";
+  }
 
   return (
     <Popover
@@ -33,15 +73,13 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
         const openState = (data as { open?: boolean })?.open ?? false;
         onOpenChange(openState);
       }}
+      positioning={positioning}
     >
       <PopoverTrigger disableButtonEnhancement>{children}</PopoverTrigger>
       <PopoverContent
+        ref={popoverContentRef}
         className="w-[280px]"
-        style={{
-          borderRadius: "8px",
-          // padding: "12px 16px",
-          marginLeft: "60px",
-        }}
+        style={contentStyle}
       >
         {/* User Info Section */}
         <div
