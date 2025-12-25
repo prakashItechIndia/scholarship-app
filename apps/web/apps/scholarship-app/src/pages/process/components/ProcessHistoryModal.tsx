@@ -14,6 +14,7 @@ import {
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { processManagement } from "../../../services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
 
 interface ProcessHistoryModalProps {
     open: boolean;
@@ -34,6 +35,7 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
     onOpenChange,
     applicationNo,
 }) => {
+    const { success, error: showError, warning } = useToast();
     const [currentPage, setCurrentPage] = React.useState(1);
     const [pageSize, setPageSize] = React.useState(10);
     const [historyData, setHistoryData] = React.useState<HistoryItem[]>([]);
@@ -60,6 +62,7 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
             setTotalItems(response.total || 0);
         } catch (error) {
             console.error('Error fetching history:', error);
+            showError('Failed to Load History', 'Failed to fetch application history. Please try again.');
             setHistoryData([]);
             setTotalItems(0);
         } finally {
@@ -119,7 +122,7 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
             autoTable(doc, {
                 startY: 35,
                 head: [["S.No.", "Action", "Process Undergone", "Handled by", "Date"]],
-                body: allHistoryData.map((item: HistoryItem, index: number) => [
+                body: allHistoryData?.map((item: HistoryItem, index: number) => [
                     index + 1,
                     item.action || '',
                     item.processUndergone || '',
@@ -133,9 +136,10 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
             });
 
             doc.save(`${applicationNo}_history.pdf`);
+            success('Download Successful', 'History PDF downloaded successfully');
         } catch (error) {
             console.error('Error downloading history:', error);
-            alert('Failed to download history. Please try again.');
+            showError('Download Failed', 'Failed to download history. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -155,7 +159,7 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
             // Create a print-friendly HTML document
             const printWindow = window.open('', '_blank');
             if (!printWindow) {
-                alert('Please allow popups to print the history.');
+                warning('Popup Blocked', 'Please allow popups to print the history.');
                 setLoading(false);
                 return;
             }
@@ -254,7 +258,7 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
                             </tr>
                         </thead>
                         <tbody>
-                            ${allHistoryData.map((item: HistoryItem, index: number) => `
+                            ${allHistoryData?.map((item: HistoryItem, index: number) => `
                                 <tr>
                                     <td>${index + 1}</td>
                                     <td>${item.action || ''}</td>
@@ -282,9 +286,10 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
                     printWindow.close();
                 }, 250);
             };
+            success('Print Ready', 'Print dialog opened successfully');
         } catch (error) {
             console.error('Error printing history:', error);
-            alert('Failed to print history. Please try again.');
+            showError('Print Failed', 'Failed to print history. Please try again.');
         } finally {
             setLoading(false);
         }

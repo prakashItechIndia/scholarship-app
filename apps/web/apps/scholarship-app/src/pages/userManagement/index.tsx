@@ -56,7 +56,7 @@ const UserManagementPage: React.FC = () => {
           return 'Standard User';
         };
 
-        const mappedUsers: User[] = data.map((user: {
+        const mappedUsers: User[] = data?.map((user: {
           ID: number;
           User_ID: string;
           User_Name: string;
@@ -109,7 +109,7 @@ const UserManagementPage: React.FC = () => {
             return 'Standard User';
           };
 
-          const mappedUsers: User[] = data.map((user: {
+          const mappedUsers: User[] = data?.map((user: {
             ID: number;
             User_ID: string;
             User_Name: string;
@@ -183,7 +183,7 @@ const UserManagementPage: React.FC = () => {
     },
     onSelectAll: (selected: boolean) => {
       if (selected) {
-        const allIds = new Set(paginatedData.map(item => item.id));
+        const allIds = new Set(paginatedData?.map(item => item.id));
         setSelectedRows(allIds);
       } else {
         setSelectedRows(new Set());

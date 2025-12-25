@@ -27,9 +27,12 @@ export const mockScholarshipDistributionData: ScholarshipDistributionData[] = [
 
 // Mock calendar events
 export const mockCalendarEvents: CalendarEvent[] = [
-  { date: "2024-10-07", title: "Annual Review Meeting", type: "meeting" },
-  { date: "2024-10-15", title: "Application Deadline", type: "deadline" },
-  { date: "2024-10-20", title: "Scholarship Distribution", type: "activity" },
+  { date: "2025-10-07", title: "Application Review Meeting", type: "meeting" },
+  { date: "2025-10-11", title: "Team Meeting", type: "meeting" },
+  { date: "2025-10-12", title: "Document Review", type: "activity" },
+  { date: "2025-10-22", title: "Scholarship Distribution", type: "activity" },
+  { date: "2025-10-27", title: "Application Deadline", type: "deadline" },
+  { date: "2025-10-29", title: "Monthly Review", type: "meeting" },
 ];
 
 // Mock recent applications

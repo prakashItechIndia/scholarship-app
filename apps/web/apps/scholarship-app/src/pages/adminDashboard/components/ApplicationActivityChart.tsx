@@ -14,7 +14,7 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
   selectedMonth = "September 2024",
   onMonthChange,
 }) => {
-  const maxValue = Math.max(...data.map((d) => d.count));
+  const maxValue = Math.max(...data?.map((d) => d.count));
   const chartHeight = 200;
   const spacing = 8; // Spacing between bars
   const chartWidth = Math.max(600, data.length * (40 + spacing)); // Dynamic width based on data length
@@ -111,7 +111,7 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
           ))}
 
           {/* Bars */}
-          {data.map((item, index) => {
+          {data?.map((item, index) => {
             const barHeight = (item.count / maxValue) * chartHeight;
             const x = 30 + index * (barWidth + spacing);
             const y = chartHeight - barHeight;
@@ -142,7 +142,7 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
           })}
 
           {/* X-axis labels */}
-          {data.map((item, index) => {
+          {data?.map((item, index) => {
             const x = 30 + index * (barWidth + spacing) + barWidth / 2;
             // Format date to show month format (e.g., "2025-01" or "Jan 2025")
             let displayDate = item.date;

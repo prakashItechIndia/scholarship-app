@@ -13,8 +13,10 @@ import EmptyState from "./components/EmptyState";
 import { useReportsTable } from "./hooks/useReportsTable";
 import PrintDetailsModal from "../process/components/PrintDetailsModal";
 import { reports } from "../../services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
 
 const ReportsPage: React.FC = () => {
+  const { success, error: showError } = useToast();
   const [activeTab, setActiveTab] = React.useState<ReportTab>("categories-wise");
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(5);
@@ -144,7 +146,9 @@ const ReportsPage: React.FC = () => {
       setReportData(data || []);
     } catch (err: any) {
       console.error("Error fetching report data:", err);
-      setError(err?.response?.data?.message || "Failed to fetch report data");
+      const errorMessage = err?.response?.data?.message || "Failed to fetch report data";
+      setError(errorMessage);
+      showError('Failed to Load Report', errorMessage);
       setReportData([]);
     } finally {
       setLoading(false);
@@ -231,7 +235,7 @@ const ReportsPage: React.FC = () => {
     },
     onSelectAll: (selected) => {
       if (selected) {
-        const allIds = new Set(filteredData.map(item => getApplicationNo(item)));
+        const allIds = new Set(filteredData?.map(item => getApplicationNo(item)));
         setSelectedRows(allIds);
       } else {
         setSelectedRows(new Set());
@@ -402,9 +406,12 @@ const ReportsPage: React.FC = () => {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      success('Export Successful', `Report exported as ${filename} successfully`);
     } catch (err: any) {
       console.error("Error exporting report:", err);
-      setError(err?.response?.data?.message || "Failed to export report");
+      const errorMessage = err?.response?.data?.message || "Failed to export report";
+      setError(errorMessage);
+      showError('Export Failed', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -417,7 +424,7 @@ const ReportsPage: React.FC = () => {
     const headers = Object.keys(data[0]);
     const csvRows = [
       headers.join(","),
-      ...data.map(row =>
+      ...data?.map(row =>
         headers.map(header => {
           const value = row[header];
           return typeof value === "string" && value.includes(",")

@@ -6,6 +6,7 @@ import {
 import { WelcomeBanner } from "../../components/common";
 import React, { useEffect, useState } from "react";
 import { scholarshipApplication } from "../../services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
 
 interface ApplicationCardData {
   applicationNo: string;
@@ -432,6 +433,7 @@ const DetailRow: React.FC<{ label: string; value: string }> = ({
 
 const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { error: showError, info } = useToast();
   const [applications, setApplications] = useState<ApplicationCardData[]>([]);
   const [filteredApplications, setFilteredApplications] = useState<ApplicationCardData[]>([]);
   const [userName, setUserName] = useState<string>("");
@@ -504,7 +506,7 @@ const UserDashboard: React.FC = () => {
         }
       } catch (error: unknown) {
         console.error('Error fetching applications:', error);
-        // On error, show empty state or redirect to login
+        showError('Failed to Load Applications', 'Unable to fetch your applications. Please try again.');
         setApplications([]);
       } finally {
         setIsLoading(false);
@@ -553,6 +555,7 @@ const UserDashboard: React.FC = () => {
       })
       .catch((error) => {
         console.error("Error fetching application details:", error);
+        showError('Failed to Load Details', 'Unable to fetch application details. Please try again.');
       });
   };
 
@@ -569,8 +572,7 @@ const UserDashboard: React.FC = () => {
   const handleDownloadReceipt = (data: ApplicationCardData) => {
     // TODO: Implement receipt download
     // This would typically call an API endpoint to generate/download PDF
-    console.log("Download receipt for:", data.applicationNo);
-    // For now, we can show a message or implement PDF generation
+    info('Coming Soon', 'Receipt download feature will be available soon.');
   };
 
   return (

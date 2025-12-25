@@ -82,7 +82,7 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((item, rowIndex) => (
+            {data?.map((item, rowIndex) => (
               <TableRow
                 key={rowIndex}
                 style={{

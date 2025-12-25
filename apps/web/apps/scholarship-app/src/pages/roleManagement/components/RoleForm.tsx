@@ -97,14 +97,14 @@ const RoleForm: React.FC = () => {
       // Validate file type
       const validTypes = ["image/png", "image/jpeg", "image/jpg"];
       if (!validTypes.includes(file.type)) {
-        alert("Please upload only PNG, JPG, or JPEG files");
+        showError('Invalid File Type', 'Please upload only PNG, JPG, or JPEG files');
         return;
       }
 
       // Validate file size (5MB)
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
-        alert("File size must be less than 5MB");
+        showError('File Too Large', 'File size must be less than 5MB');
         return;
       }
 

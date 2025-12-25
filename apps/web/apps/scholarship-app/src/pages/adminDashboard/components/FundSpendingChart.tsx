@@ -154,7 +154,7 @@ export const FundSpendingChart: React.FC<FundSpendingChartProps> = ({
           })}
 
           {/* Grid lines */}
-          {data.map((_, index) => {
+          {data?.map((_, index) => {
             const x = getX(index);
             return (
               <line
@@ -179,7 +179,7 @@ export const FundSpendingChart: React.FC<FundSpendingChartProps> = ({
             strokeLinejoin="round"
           />
           {/* 2024 Data points */}
-          {data.map((point, index) => {
+          {data?.map((point, index) => {
             const x = getX(index);
             const y = getY(point.budget2024);
             return (
@@ -205,7 +205,7 @@ export const FundSpendingChart: React.FC<FundSpendingChartProps> = ({
             strokeLinejoin="round"
           />
           {/* 2025 Data points */}
-          {data.map((point, index) => {
+          {data?.map((point, index) => {
             const x = getX(index);
             const y = getY(point.budget2025);
             return (
@@ -222,7 +222,7 @@ export const FundSpendingChart: React.FC<FundSpendingChartProps> = ({
           })}
 
           {/* X-axis labels */}
-          {data.map((point, index) => {
+          {data?.map((point, index) => {
             const x = getX(index);
             return (
               <text

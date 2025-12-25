@@ -42,8 +42,7 @@ export const UnifiedCard: React.FC<UnifiedCardProps> = ({
         padding: "10px 10px 20px 20px",
         height: "100%",
         minHeight: "100px",
-        minWidth: "430px",
-        // gap: "16px",
+        width: "100%",
         boxShadow: "none",
       }}
     >

@@ -14,6 +14,7 @@ import {
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { processManagement } from "../../../services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
 
 interface ScholarshipHistoryModalProps {
     open: boolean;
@@ -33,6 +34,7 @@ const ScholarshipHistoryModal: React.FC<ScholarshipHistoryModalProps> = ({
     applicationNo,
     studentName,
 }) => {
+    const { success, error: showError } = useToast();
     const [alreadyApplied, setAlreadyApplied] = React.useState<string>("");
     const [issuedHistoryData, setIssuedHistoryData] = React.useState<IssuedHistoryItem[]>([]);
     const [loading, setLoading] = React.useState(false);
@@ -56,6 +58,7 @@ const ScholarshipHistoryModal: React.FC<ScholarshipHistoryModalProps> = ({
             setStudentNameFromApi(response.studentName || studentName || "");
         } catch (error) {
             console.error('Error fetching scholarship history:', error);
+            showError('Failed to Load History', 'Failed to fetch scholarship history. Please try again.');
             setAlreadyApplied("No previous applications");
             setIssuedHistoryData([]);
         } finally {
@@ -69,33 +72,45 @@ const ScholarshipHistoryModal: React.FC<ScholarshipHistoryModalProps> = ({
     ];
 
     const handleDownload = () => {
-        const doc = new jsPDF();
-        doc.setFontSize(16);
-        doc.text("Previous Scholarship History", 14, 15);
+        try {
+            const doc = new jsPDF();
+            doc.setFontSize(16);
+            doc.text("Previous Scholarship History", 14, 15);
 
-        doc.setFontSize(12);
-        doc.text(`Application No: ${applicationNo}`, 14, 25);
-        doc.text(`Student Name: ${studentName}`, 14, 32);
+            doc.setFontSize(12);
+            doc.text(`Application No: ${applicationNo}`, 14, 25);
+            doc.text(`Student Name: ${studentName}`, 14, 32);
 
-        // Wrap text for "Already Applied"
-        const splitApplied = doc.splitTextToSize(`Already Applied: ${alreadyApplied}`, 180);
-        doc.text(splitApplied, 14, 40);
+            // Wrap text for "Already Applied"
+            const splitApplied = doc.splitTextToSize(`Already Applied: ${alreadyApplied}`, 180);
+            doc.text(splitApplied, 14, 40);
 
-        const startY = 40 + (splitApplied.length * 7) + 10;
+            const startY = 40 + (splitApplied.length * 7) + 10;
 
-        doc.text("Already Scholarship Issued", 14, startY);
+            doc.text("Already Scholarship Issued", 14, startY);
 
-        autoTable(doc, {
-            startY: startY + 5,
-            head: [["ScholarshipYear", "Issued Amount"]],
-            body: issuedHistoryData.map(item => [item.year, item.amount]),
-        });
+            autoTable(doc, {
+                startY: startY + 5,
+                head: [["ScholarshipYear", "Issued Amount"]],
+                body: issuedHistoryData?.map(item => [item.year, item.amount]),
+            });
 
-        doc.save(`${applicationNo}_scholarship_history.pdf`);
+            doc.save(`${applicationNo}_scholarship_history.pdf`);
+            success('Download Successful', 'Scholarship history PDF downloaded successfully');
+        } catch (error) {
+            console.error('Error downloading scholarship history:', error);
+            showError('Download Failed', 'Failed to download scholarship history. Please try again.');
+        }
     };
 
     const handlePrint = () => {
-        window.print();
+        try {
+            window.print();
+            success('Print Ready', 'Print dialog opened successfully');
+        } catch (error) {
+            console.error('Error printing scholarship history:', error);
+            showError('Print Failed', 'Failed to open print dialog. Please try again.');
+        }
     };
 
     return (

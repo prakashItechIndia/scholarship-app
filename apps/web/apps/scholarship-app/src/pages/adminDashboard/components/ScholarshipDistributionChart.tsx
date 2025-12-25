@@ -15,7 +15,7 @@ export const ScholarshipDistributionChart: React.FC<ScholarshipDistributionChart
   onPeriodChange,
 }) => {
   const maxValue = Math.max(
-    ...data.map((d) => d.meritExcellence + d.stemInnovation + d.concessions + d.sports)
+    ...data?.map((d) => d.meritExcellence + d.stemInnovation + d.concessions + d.sports)
   );
   const chartHeight = 200;
   const chartWidth = 700;
@@ -115,7 +115,7 @@ export const ScholarshipDistributionChart: React.FC<ScholarshipDistributionChart
           ))}
 
           {/* Stacked bars */}
-          {data.map((item, index) => {
+          {data?.map((item, index) => {
             const x = 40 + index * (barWidth + barGap);
             let currentY = chartHeight;
 

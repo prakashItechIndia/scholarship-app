@@ -32,7 +32,7 @@ const RoleManagementPage: React.FC = () => {
         setLoading(true);
         const data = await roleManagement.getAllRoles();
         // Map API response to Role interface
-        const mappedRoles: Role[] = data.map((role: {
+        const mappedRoles: Role[] = data?.map((role: {
           id: string | number;
           roleName: string;
           userType: string;
@@ -69,7 +69,7 @@ const RoleManagementPage: React.FC = () => {
       const fetchRoles = async () => {
         try {
           const data = await roleManagement.getAllRoles();
-          const mappedRoles: Role[] = data.map((role: {
+          const mappedRoles: Role[] = data?.map((role: {
             id: string | number;
             roleName: string;
             userType: string;
@@ -128,7 +128,7 @@ const RoleManagementPage: React.FC = () => {
     },
     onSelectAll: (selected: boolean) => {
       if (selected) {
-        const allIds = new Set(paginatedData.map(item => item.id));
+        const allIds = new Set(paginatedData?.map(item => item.id));
         setSelectedRows(allIds);
       } else {
         setSelectedRows(new Set());
