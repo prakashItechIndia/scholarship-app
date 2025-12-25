@@ -24,7 +24,6 @@ export class RoleManagementService {
         SELECT
           Id,
           Role_Name,
-          User_Type,
           Is_Active,
           CASE Is_Active
             WHEN 0 THEN 'Inactive'
@@ -41,7 +40,7 @@ export class RoleManagementService {
         return {
           id: getCaseInsensitiveValue<string>(rowRecord, 'Id') || '',
           roleName: getCaseInsensitiveValue<string>(rowRecord, 'Role_Name') || '',
-          userType: getCaseInsensitiveValue<string>(rowRecord, 'User_Type') || '',
+          userType: '', // User_Type column doesn't exist in T_ROLES table
           status: getCaseInsensitiveValue<string>(rowRecord, 'Status') || 'Inactive',
           isActive: getCaseInsensitiveValue<number>(rowRecord, 'Is_Active') || 0,
         };
@@ -63,7 +62,6 @@ export class RoleManagementService {
         SELECT
           Id,
           Role_Name,
-          User_Type,
           Is_Active
         FROM T_ROLES
         WHERE Id = @roleId
@@ -79,7 +77,7 @@ export class RoleManagementService {
       return {
         id: getCaseInsensitiveValue<string>(row, 'Id') || '',
         roleName: getCaseInsensitiveValue<string>(row, 'Role_Name') || '',
-        userType: getCaseInsensitiveValue<string>(row, 'User_Type') || '',
+        userType: '', // User_Type column doesn't exist in T_ROLES table
         isActive: getCaseInsensitiveValue<number>(row, 'Is_Active') || 0,
       };
     } catch (error) {
@@ -148,14 +146,14 @@ export class RoleManagementService {
       }
 
       // Insert role
+      // Note: User_Type column doesn't exist in T_ROLES table, so it's not included in the INSERT
       const query = `
-        INSERT INTO T_ROLES (Role_Name, User_Type, Is_Active, Created_Date, Created_By)
-        VALUES (@roleName, @userType, @isActive, GETDATE(), 'System')
+        INSERT INTO T_ROLES (Role_Name, Is_Active, Created_Date, Created_By)
+        VALUES (@roleName, @isActive, GETDATE(), 'System')
       `;
 
       await this.db.query(query, {
         roleName: roleData.roleName,
-        userType: roleData.userType,
         isActive: roleData.isActive,
       });
 
@@ -184,11 +182,11 @@ export class RoleManagementService {
       }
 
       // Update role
+      // Note: User_Type column doesn't exist in T_ROLES table, so it's not included in the UPDATE
       const query = `
         UPDATE T_ROLES
         SET
           Role_Name = @roleName,
-          User_Type = @userType,
           Is_Active = @isActive,
           Modified_Date = GETDATE(),
           Modified_By = 'System'
@@ -198,7 +196,6 @@ export class RoleManagementService {
       await this.db.query(query, {
         roleId,
         roleName: roleData.roleName,
-        userType: roleData.userType,
         isActive: roleData.isActive,
       });
 

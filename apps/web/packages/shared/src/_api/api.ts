@@ -1425,10 +1425,12 @@ export const DocumentUploadApiAxiosParamCreator = function (configuration?: Conf
          * 
          * @summary Delete document
          * @param {number} documentId 
+         * @param {string} [applicationId] 
+         * @param {string} [documentType] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        documentUploadControllerDeleteDocument: async (documentId: number, options: any = {}): Promise<RequestArgs> => {
+        documentUploadControllerDeleteDocument: async (documentId: number, applicationId?: string, documentType?: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'documentId' is not null or undefined
             assertParamExists('documentUploadControllerDeleteDocument', 'documentId', documentId)
             const localVarPath = `/document-upload/document/{documentId}`
@@ -1443,6 +1445,14 @@ export const DocumentUploadApiAxiosParamCreator = function (configuration?: Conf
             const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (applicationId !== undefined) {
+                localVarQueryParameter['applicationId'] = applicationId;
+            }
+
+            if (documentType !== undefined) {
+                localVarQueryParameter['documentType'] = documentType;
+            }
 
 
     
@@ -1467,6 +1477,36 @@ export const DocumentUploadApiAxiosParamCreator = function (configuration?: Conf
             assertParamExists('documentUploadControllerGetApplicationDocuments', 'applicationId', applicationId)
             const localVarPath = `/document-upload/documents/{applicationId}`
                 .replace(`{${"applicationId"}}`, encodeURIComponent(String(applicationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get standard document types list
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerGetDocumentTypes: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/document-upload/document-types`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1744,11 +1784,13 @@ export const DocumentUploadApiFp = function(configuration?: Configuration) {
          * 
          * @summary Delete document
          * @param {number} documentId 
+         * @param {string} [applicationId] 
+         * @param {string} [documentType] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async documentUploadControllerDeleteDocument(documentId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerDeleteDocument(documentId, options);
+        async documentUploadControllerDeleteDocument(documentId: number, applicationId?: string, documentType?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerDeleteDocument(documentId, applicationId, documentType, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -1760,6 +1802,16 @@ export const DocumentUploadApiFp = function(configuration?: Configuration) {
          */
         async documentUploadControllerGetApplicationDocuments(applicationId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerGetApplicationDocuments(applicationId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get standard document types list
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async documentUploadControllerGetDocumentTypes(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerGetDocumentTypes(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -1839,11 +1891,13 @@ export const DocumentUploadApiFactory = function (configuration?: Configuration,
          * 
          * @summary Delete document
          * @param {number} documentId 
+         * @param {string} [applicationId] 
+         * @param {string} [documentType] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        documentUploadControllerDeleteDocument(documentId: number, options?: any): AxiosPromise<void> {
-            return localVarFp.documentUploadControllerDeleteDocument(documentId, options).then((request) => request(axios, basePath));
+        documentUploadControllerDeleteDocument(documentId: number, applicationId?: string, documentType?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.documentUploadControllerDeleteDocument(documentId, applicationId, documentType, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1854,6 +1908,15 @@ export const DocumentUploadApiFactory = function (configuration?: Configuration,
          */
         documentUploadControllerGetApplicationDocuments(applicationId: string, options?: any): AxiosPromise<void> {
             return localVarFp.documentUploadControllerGetApplicationDocuments(applicationId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get standard document types list
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerGetDocumentTypes(options?: any): AxiosPromise<void> {
+            return localVarFp.documentUploadControllerGetDocumentTypes(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1927,12 +1990,14 @@ export class DocumentUploadApi extends BaseAPI {
      * 
      * @summary Delete document
      * @param {number} documentId 
+     * @param {string} [applicationId] 
+     * @param {string} [documentType] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentUploadApi
      */
-    public documentUploadControllerDeleteDocument(documentId: number, options?: any) {
-        return DocumentUploadApiFp(this.configuration).documentUploadControllerDeleteDocument(documentId, options).then((request) => request(this.axios, this.basePath));
+    public documentUploadControllerDeleteDocument(documentId: number, applicationId?: string, documentType?: string, options?: any) {
+        return DocumentUploadApiFp(this.configuration).documentUploadControllerDeleteDocument(documentId, applicationId, documentType, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1945,6 +2010,17 @@ export class DocumentUploadApi extends BaseAPI {
      */
     public documentUploadControllerGetApplicationDocuments(applicationId: string, options?: any) {
         return DocumentUploadApiFp(this.configuration).documentUploadControllerGetApplicationDocuments(applicationId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get standard document types list
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentUploadApi
+     */
+    public documentUploadControllerGetDocumentTypes(options?: any) {
+        return DocumentUploadApiFp(this.configuration).documentUploadControllerGetDocumentTypes(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2963,6 +3039,50 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
         },
         /**
          * 
+         * @summary Get application history (View History)
+         * @param {string} applicationId 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetApplicationHistory: async (applicationId: string, page?: number, pageSize?: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'applicationId' is not null or undefined
+            assertParamExists('processManagementControllerGetApplicationHistory', 'applicationId', applicationId)
+            const localVarPath = `/process-management/history/{applicationId}`
+                .replace(`{${"applicationId"}}`, encodeURIComponent(String(applicationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get applications for Approve tab
          * @param {string} [mainCategory] 
          * @param {string} [key] 
@@ -3198,6 +3318,40 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
         },
         /**
          * 
+         * @summary Get scholarship history (Previous Scholarship History)
+         * @param {string} applicationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetScholarshipHistory: async (applicationId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'applicationId' is not null or undefined
+            assertParamExists('processManagementControllerGetScholarshipHistory', 'applicationId', applicationId)
+            const localVarPath = `/process-management/scholarship-history/{applicationId}`
+                .replace(`{${"applicationId"}}`, encodeURIComponent(String(applicationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get applications for Suggest tab
          * @param {string} [mainCategory] 
          * @param {string} [key] 
@@ -3418,6 +3572,19 @@ export const ProcessManagementApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get application history (View History)
+         * @param {string} applicationId 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processManagementControllerGetApplicationHistory(applicationId: string, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetApplicationHistory(applicationId, page, pageSize, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get applications for Approve tab
          * @param {string} [mainCategory] 
          * @param {string} [key] 
@@ -3477,6 +3644,17 @@ export const ProcessManagementApiFp = function(configuration?: Configuration) {
          */
         async processManagementControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, academicYearId, page, pageSize, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get scholarship history (Previous Scholarship History)
+         * @param {string} applicationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processManagementControllerGetScholarshipHistory(applicationId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetScholarshipHistory(applicationId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3560,6 +3738,18 @@ export const ProcessManagementApiFactory = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Get application history (View History)
+         * @param {string} applicationId 
+         * @param {number} [page] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetApplicationHistory(applicationId: string, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetApplicationHistory(applicationId, page, pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get applications for Approve tab
          * @param {string} [mainCategory] 
          * @param {string} [key] 
@@ -3616,6 +3806,16 @@ export const ProcessManagementApiFactory = function (configuration?: Configurati
          */
         processManagementControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
             return localVarFp.processManagementControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, academicYearId, page, pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get scholarship history (Previous Scholarship History)
+         * @param {string} applicationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetScholarshipHistory(applicationId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetScholarshipHistory(applicationId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3695,6 +3895,20 @@ export class ProcessManagementApi extends BaseAPI {
 
     /**
      * 
+     * @summary Get application history (View History)
+     * @param {string} applicationId 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProcessManagementApi
+     */
+    public processManagementControllerGetApplicationHistory(applicationId: string, page?: number, pageSize?: number, options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetApplicationHistory(applicationId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Get applications for Approve tab
      * @param {string} [mainCategory] 
      * @param {string} [key] 
@@ -3758,6 +3972,18 @@ export class ProcessManagementApi extends BaseAPI {
      */
     public processManagementControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any) {
         return ProcessManagementApiFp(this.configuration).processManagementControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, academicYearId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get scholarship history (Previous Scholarship History)
+     * @param {string} applicationId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProcessManagementApi
+     */
+    public processManagementControllerGetScholarshipHistory(applicationId: string, options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetScholarshipHistory(applicationId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4361,6 +4587,36 @@ export const RoleManagementApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * 
+         * @summary Get all available screens
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerGetAllScreens: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/role-management/screens`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get role by ID
          * @param {number} roleId 
          * @param {*} [options] Override http request option.
@@ -4395,6 +4651,149 @@ export const RoleManagementApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * 
+         * @summary Get permissions for a role
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerGetRolePermissions: async (roleId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'roleId' is not null or undefined
+            assertParamExists('roleManagementControllerGetRolePermissions', 'roleId', roleId)
+            const localVarPath = `/role-management/role/{roleId}/permissions`
+                .replace(`{${"roleId"}}`, encodeURIComponent(String(roleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get role with all permissions
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerGetRoleWithPermissions: async (roleId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'roleId' is not null or undefined
+            assertParamExists('roleManagementControllerGetRoleWithPermissions', 'roleId', roleId)
+            const localVarPath = `/role-management/role/{roleId}/permissions-full`
+                .replace(`{${"roleId"}}`, encodeURIComponent(String(roleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get permissions for a user
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerGetUserPermissions: async (userId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('roleManagementControllerGetUserPermissions', 'userId', userId)
+            const localVarPath = `/role-management/user/{userId}/permissions`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Check if user has permission to access a screen
+         * @param {number} userId 
+         * @param {string} screenUrl 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerHasScreenPermission: async (userId: number, screenUrl: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('roleManagementControllerHasScreenPermission', 'userId', userId)
+            // verify required parameter 'screenUrl' is not null or undefined
+            assertParamExists('roleManagementControllerHasScreenPermission', 'screenUrl', screenUrl)
+            const localVarPath = `/role-management/user/{userId}/has-permission`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (screenUrl !== undefined) {
+                localVarQueryParameter['screenUrl'] = screenUrl;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Update role
          * @param {number} roleId 
          * @param {*} [options] Override http request option.
@@ -4404,6 +4803,40 @@ export const RoleManagementApiAxiosParamCreator = function (configuration?: Conf
             // verify required parameter 'roleId' is not null or undefined
             assertParamExists('roleManagementControllerUpdateRole', 'roleId', roleId)
             const localVarPath = `/role-management/role/{roleId}`
+                .replace(`{${"roleId"}}`, encodeURIComponent(String(roleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Update permissions for a role
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerUpdateRolePermissions: async (roleId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'roleId' is not null or undefined
+            assertParamExists('roleManagementControllerUpdateRolePermissions', 'roleId', roleId)
+            const localVarPath = `/role-management/role/{roleId}/permissions`
                 .replace(`{${"roleId"}}`, encodeURIComponent(String(roleId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4492,6 +4925,16 @@ export const RoleManagementApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get all available screens
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerGetAllScreens(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerGetAllScreens(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get role by ID
          * @param {number} roleId 
          * @param {*} [options] Override http request option.
@@ -4503,6 +4946,51 @@ export const RoleManagementApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get permissions for a role
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerGetRolePermissions(roleId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerGetRolePermissions(roleId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get role with all permissions
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerGetRoleWithPermissions(roleId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerGetRoleWithPermissions(roleId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get permissions for a user
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerGetUserPermissions(userId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerGetUserPermissions(userId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Check if user has permission to access a screen
+         * @param {number} userId 
+         * @param {string} screenUrl 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerHasScreenPermission(userId: number, screenUrl: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerHasScreenPermission(userId, screenUrl, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Update role
          * @param {number} roleId 
          * @param {*} [options] Override http request option.
@@ -4510,6 +4998,17 @@ export const RoleManagementApiFp = function(configuration?: Configuration) {
          */
         async roleManagementControllerUpdateRole(roleId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerUpdateRole(roleId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Update permissions for a role
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerUpdateRolePermissions(roleId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerUpdateRolePermissions(roleId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -4572,6 +5071,15 @@ export const RoleManagementApiFactory = function (configuration?: Configuration,
         },
         /**
          * 
+         * @summary Get all available screens
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerGetAllScreens(options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerGetAllScreens(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get role by ID
          * @param {number} roleId 
          * @param {*} [options] Override http request option.
@@ -4582,6 +5090,47 @@ export const RoleManagementApiFactory = function (configuration?: Configuration,
         },
         /**
          * 
+         * @summary Get permissions for a role
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerGetRolePermissions(roleId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerGetRolePermissions(roleId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get role with all permissions
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerGetRoleWithPermissions(roleId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerGetRoleWithPermissions(roleId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get permissions for a user
+         * @param {number} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerGetUserPermissions(userId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerGetUserPermissions(userId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Check if user has permission to access a screen
+         * @param {number} userId 
+         * @param {string} screenUrl 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerHasScreenPermission(userId: number, screenUrl: string, options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerHasScreenPermission(userId, screenUrl, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Update role
          * @param {number} roleId 
          * @param {*} [options] Override http request option.
@@ -4589,6 +5138,16 @@ export const RoleManagementApiFactory = function (configuration?: Configuration,
          */
         roleManagementControllerUpdateRole(roleId: number, options?: any): AxiosPromise<void> {
             return localVarFp.roleManagementControllerUpdateRole(roleId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update permissions for a role
+         * @param {number} roleId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerUpdateRolePermissions(roleId: number, options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerUpdateRolePermissions(roleId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -4660,6 +5219,17 @@ export class RoleManagementApi extends BaseAPI {
 
     /**
      * 
+     * @summary Get all available screens
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerGetAllScreens(options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerGetAllScreens(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Get role by ID
      * @param {number} roleId 
      * @param {*} [options] Override http request option.
@@ -4672,6 +5242,55 @@ export class RoleManagementApi extends BaseAPI {
 
     /**
      * 
+     * @summary Get permissions for a role
+     * @param {number} roleId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerGetRolePermissions(roleId: number, options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerGetRolePermissions(roleId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get role with all permissions
+     * @param {number} roleId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerGetRoleWithPermissions(roleId: number, options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerGetRoleWithPermissions(roleId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get permissions for a user
+     * @param {number} userId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerGetUserPermissions(userId: number, options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerGetUserPermissions(userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Check if user has permission to access a screen
+     * @param {number} userId 
+     * @param {string} screenUrl 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerHasScreenPermission(userId: number, screenUrl: string, options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerHasScreenPermission(userId, screenUrl, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Update role
      * @param {number} roleId 
      * @param {*} [options] Override http request option.
@@ -4680,6 +5299,18 @@ export class RoleManagementApi extends BaseAPI {
      */
     public roleManagementControllerUpdateRole(roleId: number, options?: any) {
         return RoleManagementApiFp(this.configuration).roleManagementControllerUpdateRole(roleId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update permissions for a role
+     * @param {number} roleId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerUpdateRolePermissions(roleId: number, options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerUpdateRolePermissions(roleId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

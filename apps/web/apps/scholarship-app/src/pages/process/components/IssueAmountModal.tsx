@@ -50,16 +50,101 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
         }
     }, [open]);
 
-    // Mock data values if not present in ApplicationData
+    // Helper to safely convert to string
+    const safeString = (value: unknown): string => {
+        if (value === null || value === undefined) return "-";
+        if (typeof value === "string") return value || "-";
+        if (typeof value === "number") return String(value);
+        if (typeof value === "boolean") return String(value);
+        return "-";
+    };
+
+    // Get scholarship seeking for text based on Scholarship_For (matching old app logic)
+    const getScholarshipSeekingFor = (): string => {
+        if (!data) return "-";
+        const apiData = data as Record<string, unknown>;
+        const scholarshipFor = safeString(apiData.Scholarship_For ?? apiData.scholarshipFor);
+        
+        if (scholarshipFor === "School") {
+            return safeString(apiData.Class_Studying ?? data.classStudying);
+        } else if (scholarshipFor === "College") {
+            const degreeType = safeString(apiData.Degree_Type);
+            const degree = safeString(apiData.Degree);
+            return degreeType !== "-" && degree !== "-" ? `${degreeType}-${degree}` : "-";
+        } else if (scholarshipFor === "Research") {
+            return safeString(apiData.Ph_D);
+        }
+        return "-";
+    };
+
+    // Helper to safely get string value from data
+    const getStringValue = (primary: string | undefined, ...fallbacks: unknown[]): string => {
+        if (primary) return primary;
+        for (const fallback of fallbacks) {
+            const str = safeString(fallback);
+            if (str !== "-") return str;
+        }
+        return "-";
+    };
+
+    // Helper to safely get number value from data
+    const getNumberValue = (...values: unknown[]): string => {
+        for (const value of values) {
+            if (value === null || value === undefined) continue;
+            if (typeof value === "number" && !isNaN(value)) return String(value);
+            if (typeof value === "string") {
+                const num = Number(value);
+                if (!isNaN(num)) return String(num);
+            }
+        }
+        return "0";
+    };
+
+    // Map data dynamically from API response (matching old app: ScholarshipFinal.aspx.cs)
+    const apiData = data as Record<string, unknown> | undefined;
     const details = [
-        { label: "Application No", value: data?.applicationNo || "-" },
-        { label: "Student Name", value: data?.studentName || "-" },
-        { label: "Father's Name", value: "MURUGAN S" }, // Mocked
-        { label: "Father's Occupation", value: data?.fatherOccupation || "-" },
-        { label: "Scholarship Seeking For", value: "UG-BE - Semester I" }, // Mocked
-        { label: "Request Amount", value: "50000" }, // Mocked
-        { label: "Suggested Amount", value: "25000" }, // Mocked
-        { label: "Approved Amount", value: "25000" }, // Mocked
+        { 
+            label: "Application No", 
+            value: getStringValue(data?.applicationNo, apiData?.Application_Id)
+        },
+        { 
+            label: "Student Name", 
+            value: getStringValue(data?.studentName, apiData?.Applicant_Name)
+        },
+        { 
+            label: "Father's Name", 
+            value: getStringValue(data?.fatherName, apiData?.Father_Name)
+        },
+        { 
+            label: "Father's Occupation", 
+            value: getStringValue(data?.fatherOccupation, apiData?.Father_Occupation)
+        },
+        { 
+            label: "Scholarship Seeking For", 
+            value: data?.scholarshipSeekingFor ? safeString(data.scholarshipSeekingFor) : getScholarshipSeekingFor()
+        },
+        { 
+            label: "Request Amount", 
+            value: getNumberValue(
+                data?.requestAmount,
+                apiData?.RequestAmount,
+                apiData?.Request_Amount
+            )
+        },
+        { 
+            label: "Suggested Amount", 
+            value: getNumberValue(
+                data?.suggestedAmount,
+                apiData?.Scholarship_Suggest_Amount
+            )
+        },
+        { 
+            label: "Approved Amount", 
+            value: getNumberValue(
+                data?.approvedAmount,
+                apiData?.Scholarship_Approved_Amount
+            )
+        },
     ];
 
     const handleSubmit = async () => {

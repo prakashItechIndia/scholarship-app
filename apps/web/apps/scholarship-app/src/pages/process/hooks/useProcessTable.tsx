@@ -368,6 +368,100 @@ export const useProcessTable = ({
     // Process Action renderer (Suggest/Approve/Issue)
     const renderProcessAction = (item: ApplicationData) => {
       const label = item.processActionLabel || "Process";
+      const status = item.status || "";
+      
+      // For approve tab: if status is "Approved" or "Rejected", show as plain text (non-clickable)
+      if (activeTab === "approve" && (status === "Approved" || status === "Rejected")) {
+        return (
+          <span
+            style={{
+              fontSize: "14px",
+              lineHeight: "20px",
+              color: "#242424",
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 400,
+            }}
+          >
+            {label}
+          </span>
+        );
+      }
+      
+      // For suggest tab: handle Suggest 1, Suggest 2, Suggest 3, etc., Rejected, Completed
+      if (activeTab === "suggest") {
+        // If lblReject is true, show "Rejected" as plain text
+        if (item.lblReject) {
+          return (
+            <span
+              style={{
+                fontSize: "15px",
+                lineHeight: "20px",
+                color: "#F80606",
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 600,
+              }}
+            >
+              Rejected
+            </span>
+          );
+        }
+        
+        // If lblSuggested is true (for Waiting status), show "Suggested" as plain text
+        if (item.lblSuggested && status === "Waiting") {
+          return (
+            <span
+              style={{
+                fontSize: "15px",
+                lineHeight: "20px",
+                color: "#d26e3e",
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 600,
+              }}
+            >
+              Suggested
+            </span>
+          );
+        }
+        
+        // If suggestLinkEnable is false, show as plain text (non-clickable)
+        if (!item.suggestLinkEnable) {
+          return (
+            <span
+              style={{
+                fontSize: "14px",
+                lineHeight: "20px",
+                color: "#0F6CBD",
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 400,
+              }}
+            >
+              {label}
+            </span>
+          );
+        }
+        
+        // For Completed status, show "Suggest X" as clickable button (no "---" label)
+        // For other statuses, show "Suggest X" as clickable button
+        return (
+          <Button
+            appearance="subtle"
+            onClick={() => handleProcess && handleProcess(item)}
+            style={{
+              backgroundColor: "transparent",
+              color: "#0F6CBD",
+              minWidth: "120px",
+              height: "32px",
+              fontWeight: 600,
+              fontSize: "13px",
+              border: "none",
+            }}
+          >
+            {label}
+          </Button>
+        );
+      }
+      
+      // For other cases, show as clickable button
       const isCustomStyled = label.includes("Approve") || label.includes("Issue") || label.includes("Suggest");
 
       return (

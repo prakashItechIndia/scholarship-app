@@ -9,6 +9,34 @@ interface DocumentUploadData {
   uploadedBy?: number;
 }
 
+/**
+ * Helper function to convert 1/0 or '1'/'0' to boolean
+ */
+function toBoolean(value: unknown): boolean {
+  return value === 1 || value === '1' || value === true || String(value).toLowerCase() === 'true';
+}
+
+/**
+ * Helper function to map boolean fields in query results
+ */
+function mapBooleanFields(rows: Record<string, unknown>[]): Record<string, unknown>[] {
+  const booleanFields = [
+    'ReUploadLinkEnable',
+    'UploadLinkEnable',
+    'lblApproved',
+  ];
+
+  return rows.map((row) => {
+    const mappedRow = { ...row };
+    booleanFields.forEach((field) => {
+      if (field in mappedRow) {
+        mappedRow[field] = toBoolean(mappedRow[field]);
+      }
+    });
+    return mappedRow;
+  });
+}
+
 @Injectable()
 export class DocumentUploadService {
   private readonly logger = new Logger(DocumentUploadService.name);
@@ -42,22 +70,22 @@ export class DocumentUploadService {
           R.IFSC_Code,
           P.Scholarship_Issued_AccNo, P.User_ID, P.Status, P.Update_Date, P.Scholarship_Id,
           CASE P.IsUpload_Status
-            WHEN '0' THEN 'False'
-            WHEN '1' THEN 'True'
-            WHEN '2' THEN 'False'
-            ELSE 'False'
+            WHEN '0' THEN 0
+            WHEN '1' THEN 1
+            WHEN '2' THEN 0
+            ELSE 0
           END as ReUploadLinkEnable,
           CASE P.IsUpload_Status
-            WHEN '0' THEN 'False'
-            WHEN '1' THEN 'False'
-            WHEN '2' THEN 'True'
-            ELSE 'False'
+            WHEN '0' THEN 0
+            WHEN '1' THEN 0
+            WHEN '2' THEN 1
+            ELSE 0
           END as UploadLinkEnable,
           CASE P.IsUpload_Status
-            WHEN '0' THEN 'True'
-            WHEN '1' THEN 'False'
-            WHEN '2' THEN 'False'
-            ELSE 'False'
+            WHEN '0' THEN 1
+            WHEN '1' THEN 0
+            WHEN '2' THEN 0
+            ELSE 0
           END as lblApproved
         FROM t_Registration R
         JOIN t_Registration_Process as P ON P.Application_Id = R.Application_Id,
@@ -95,7 +123,7 @@ export class DocumentUploadService {
         Statement: query,
       });
 
-      return result.recordset || [];
+      return mapBooleanFields((result.recordset || []) as Record<string, unknown>[]);
     } catch (error) {
       this.logger.error('Error fetching upload applications', error);
       throw new BadRequestException('Failed to fetch upload applications');
@@ -308,46 +336,124 @@ export class DocumentUploadService {
 
   /**
    * Get documents for an application
+   * Matches old app logic - uses t_esch_ApplicantDocuments table
+   * Column names: Application_Id, DocumentType, DocumentPath, Is_Verified
+   * Note: Table does NOT have Document_Id, Uploaded_Date, or Uploaded_By columns
    */
   async getApplicationDocuments(applicationId: string) {
     try {
-      const query = `
+      // Query t_esch_ApplicantDocuments (matches old app - viewdocs.aspx.cs line 92-93)
+      // Actual columns: Application_Id, DocumentType, DocumentPath, Is_Verified
+      // IMPORTANT: Only select columns that actually exist in the table
+      let query = `
         SELECT
-          Document_Id,
           Application_Id,
-          Document_Type,
-          Document_Path,
-          Uploaded_Date,
-          Uploaded_By
-        FROM t_Registration_Documents
+          DocumentType,
+          DocumentPath,
+          Is_Verified
+        FROM t_esch_ApplicantDocuments
         WHERE Application_Id = @applicationId
-        ORDER BY Uploaded_Date DESC
+        ORDER BY DocumentType ASC
       `;
 
-      const result = await this.db.query(query, { applicationId });
+      let result = await this.db.query(query, { applicationId });
 
-      return result.recordset || [];
+      // If no results from t_esch_ApplicantDocuments, try t_Registration_Documents as fallback
+      if (!result.recordset || result.recordset.length === 0) {
+        query = `
+          SELECT
+            Application_Id,
+            Document_Type,
+            Document_Path,
+            NULL as Is_Verified
+          FROM t_Registration_Documents
+          WHERE Application_Id = @applicationId
+          ORDER BY Document_Type ASC
+        `;
+        result = await this.db.query(query, { applicationId });
+      }
+
+      // Map results to match frontend expectations
+      // Generate Document_Id as sequential number since table doesn't have it
+      // Set Uploaded_Date and Uploaded_By as null since table doesn't have these columns
+      const mappedResults = (result.recordset || []).map((row: Record<string, unknown>, index: number) => {
+        const rowRecord = row as Record<string, unknown>;
+        // Handle both column name formats (DocumentType vs Document_Type)
+        const documentType = rowRecord.DocumentType || rowRecord.Document_Type || '';
+        const documentPath = rowRecord.DocumentPath || rowRecord.Document_Path || '';
+        
+        return {
+          Document_Id: index + 1, // Generate sequential ID since table doesn't have Document_Id
+          Application_Id: rowRecord.Application_Id || applicationId,
+          Document_Type: documentType,
+          Document_Path: documentPath,
+          Uploaded_Date: null, // Table doesn't have this column - set to null
+          Uploaded_By: null, // Table doesn't have this column - set to null
+          Is_Verified: rowRecord.Is_Verified || 0,
+        };
+      });
+
+      return mappedResults;
     } catch (error) {
       this.logger.error('Error fetching documents', error);
+      if (error instanceof Error) {
+        throw new BadRequestException(`Failed to fetch documents: ${error.message}`);
+      }
       throw new BadRequestException('Failed to fetch documents');
     }
   }
 
   /**
-   * Delete document
+   * Get standard document types list (matches old app)
    */
-  async deleteDocument(documentId: number) {
-    try {
-      const query = `
-        DELETE FROM t_Registration_Documents
-        WHERE Document_Id = @documentId
-      `;
+  getStandardDocumentTypes(): string[] {
+    return [
+      'Birth Certificate',
+      'Student ID Card',
+      'Ration Card',
+      'Voter ID',
+      'Driving License',
+      'Bank Pass Book',
+      'AADHAAR ID',
+      'PAN Card',
+      'Bonafide (Student)',
+      'Bonafide (Parent)',
+      'Academic Performance',
+      'Student Letter',
+    ];
+  }
 
-      await this.db.query(query, { documentId });
+  /**
+   * Delete document
+   * Note: t_esch_ApplicantDocuments doesn't have Document_Id, so we delete by Application_Id and DocumentType
+   * The documentId parameter should be the index or we need Application_Id and DocumentType
+   */
+  async deleteDocument(documentId: number, applicationId?: string, documentType?: string) {
+    try {
+      // Since t_esch_ApplicantDocuments doesn't have Document_Id, we need Application_Id and DocumentType
+      // For now, we'll delete from t_Registration_Documents if it exists, otherwise we need the applicationId and documentType
+      if (applicationId && documentType) {
+        // Delete from t_esch_ApplicantDocuments using Application_Id and DocumentType
+        const query = `
+          DELETE FROM t_esch_ApplicantDocuments
+          WHERE Application_Id = @applicationId AND DocumentType = @documentType
+        `;
+        await this.db.query(query, { applicationId, documentType });
+      } else {
+        // Try t_Registration_Documents as fallback (if it has Document_Id)
+        const query = `
+          DELETE FROM t_Registration_Documents
+          WHERE Document_Id = @documentId
+        `;
+        await this.db.query(query, { documentId });
+      }
 
       return { message: 'Document deleted successfully' };
     } catch (error) {
       this.logger.error('Error deleting document', error);
+      if (error instanceof Error) {
+        throw new BadRequestException(`Failed to delete document: ${error.message}`);
+      }
       throw new BadRequestException('Failed to delete document');
     }
   }

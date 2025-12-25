@@ -23,6 +23,48 @@ export interface ApplicationRecord {
   [key: string]: unknown;
 }
 
+/**
+ * Helper function to convert 1/0 or '1'/'0' to boolean
+ */
+function toBoolean(value: unknown): boolean {
+  return value === 1 || value === '1' || value === true || String(value).toLowerCase() === 'true';
+}
+
+/**
+ * Helper function to map boolean fields in query results
+ */
+function mapBooleanFields(rows: Record<string, unknown>[]): ApplicationRecord[] {
+  const booleanFields = [
+    'PrintLinkEnable',
+    'lblNotCompleted',
+    'lblSCReject',
+    'SuggestLinkEnable',
+    'lblSuggested',
+    'lblReject',
+    'lblCompleted',
+    'ReVerifyLinkEnable',
+    'VerifyLinkEnable',
+    'lblVerified',
+    'ReUploadLinkEnable',
+    'UploadLinkEnable',
+    'lblApproved',
+    'ApproveLinkText',
+    'RejectApprovalLinkText',
+    'lblRejected',
+    'ApprovedOverrideLinkText',
+  ];
+
+  return rows.map((row) => {
+    const mappedRow = { ...row } as ApplicationRecord;
+    booleanFields.forEach((field) => {
+      if (field in mappedRow) {
+        mappedRow[field] = toBoolean(mappedRow[field]);
+      }
+    });
+    return mappedRow;
+  });
+}
+
 @Injectable()
 export class AdminPanelService {
   private readonly logger = new Logger(AdminPanelService.name);
@@ -33,7 +75,7 @@ export class AdminPanelService {
    * Get applications for Overview module
    * Matches GetAdminPanelLoadApprove from AjaxAdminPanelHome.aspx.cs
    */
-  async getOverviewApplications(filter: GetApplicationsFilter) {
+  async getOverviewApplications(filter: GetApplicationsFilter): Promise<ApplicationRecord[]> {
     const {
       mainCategory = '',
       key = '',
@@ -61,24 +103,24 @@ export class AdminPanelService {
         UV.User_Name as Verified_By,
         US.User_Name as Suggested_By,
         CASE P.Status
-          WHEN 'Completed' THEN 'True'
-          WHEN 'Registered' THEN 'False'
-          WHEN 'Waiting' THEN 'False'
-          WHEN 'Approved' THEN 'False'
-          WHEN 'Rejected' THEN 'False'
-          ELSE 'False'
+          WHEN 'Completed' THEN 1
+          WHEN 'Registered' THEN 0
+          WHEN 'Waiting' THEN 0
+          WHEN 'Approved' THEN 0
+          WHEN 'Rejected' THEN 0
+          ELSE 0
         END as PrintLinkEnable,
         CASE P.Status
-          WHEN 'Completed' THEN 'False'
-          WHEN 'Registered' THEN 'True'
-          WHEN 'Waiting' THEN 'True'
-          WHEN 'Approved' THEN 'True'
-          WHEN 'Rejected' THEN 'True'
-          ELSE 'False'
+          WHEN 'Completed' THEN 0
+          WHEN 'Registered' THEN 1
+          WHEN 'Waiting' THEN 1
+          WHEN 'Approved' THEN 1
+          WHEN 'Rejected' THEN 1
+          ELSE 0
         END as lblNotCompleted,
         CASE P.Scholar_Reject
-          WHEN 'Rejected' THEN 'true'
-          ELSE 'false'
+          WHEN 'Rejected' THEN 1
+          ELSE 0
         END as lblSCReject,
         CASE P.Status
           WHEN 'Registered' THEN '1'
@@ -161,7 +203,7 @@ export class AdminPanelService {
         Statement: query,
       });
 
-      return result.recordset || [];
+      return mapBooleanFields(result.recordset || []);
     } catch (error) {
       this.logger.error('Error fetching overview applications', error);
       throw new BadRequestException('Failed to fetch applications');
@@ -172,7 +214,7 @@ export class AdminPanelService {
    * Get applications for Process/Documents module
    * Matches GetAdminPanelLoadProcess from AjaxAdminPanelProcess.aspx.cs
    */
-  async getProcessApplications(filter: GetApplicationsFilter) {
+  async getProcessApplications(filter: GetApplicationsFilter): Promise<ApplicationRecord[]> {
     const { mainCategory = '', key = '', acyearId = 0 } = filter;
 
     let query = `
@@ -198,29 +240,29 @@ export class AdminPanelService {
           ELSE CONCAT('Suggest-', (SELECT MAX(Scholarship_Id) + 1 as Id FROM t_Registration_Process WHERE Application_Id = R.Application_Id))
         END as SuggestText,
         CASE P.Status
-          WHEN 'Registered' THEN 'True'
-          WHEN 'Waiting' THEN 'False'
-          WHEN 'Rejected' THEN 'False'
-          ELSE 'True'
+          WHEN 'Registered' THEN 1
+          WHEN 'Waiting' THEN 0
+          WHEN 'Rejected' THEN 0
+          ELSE 1
         END as SuggestLinkEnable,
         CASE P.Status
-          WHEN 'Waiting' THEN 'False'
-          WHEN 'Registered' THEN 'False'
-          WHEN 'Rejected' THEN 'False'
-          ELSE 'False'
+          WHEN 'Waiting' THEN 0
+          WHEN 'Registered' THEN 0
+          WHEN 'Rejected' THEN 0
+          ELSE 0
         END as lblSuggested,
         CASE P.Scholar_Reject
-          WHEN 'Waiting' THEN 'False'
-          WHEN 'Registered' THEN 'False'
-          WHEN 'Rejected' THEN 'True'
-          ELSE 'False'
+          WHEN 'Waiting' THEN 0
+          WHEN 'Registered' THEN 0
+          WHEN 'Rejected' THEN 1
+          ELSE 0
         END as lblReject,
         CASE P.Status
-          WHEN 'Completed' THEN 'True'
-          WHEN 'Waiting' THEN 'True'
-          WHEN 'Registered' THEN 'False'
-          WHEN 'Rejected' THEN 'False'
-          ELSE 'False'
+          WHEN 'Completed' THEN 1
+          WHEN 'Waiting' THEN 1
+          WHEN 'Registered' THEN 0
+          WHEN 'Rejected' THEN 0
+          ELSE 0
         END as lblCompleted
       FROM t_Registration R
       JOIN t_Registration_Process as P ON P.Application_Id = R.Application_Id,
@@ -269,7 +311,7 @@ export class AdminPanelService {
         Statement: query,
       });
 
-      return result.recordset || [];
+      return mapBooleanFields(result.recordset || []);
     } catch (error) {
       this.logger.error('Error fetching process applications', error);
       throw new BadRequestException('Failed to fetch process applications');
@@ -385,7 +427,7 @@ export class AdminPanelService {
         Statement: query,
       });
 
-      return result.recordset || [];
+      return mapBooleanFields(result.recordset || []);
     } catch (error) {
       this.logger.error('Error fetching suggest applications', error);
       throw new BadRequestException('Failed to fetch suggest applications');
@@ -396,7 +438,7 @@ export class AdminPanelService {
    * Get applications for Verify module
    * Matches GetAdminPanelLoadProcess from AjaxDocumentVerification.aspx.cs
    */
-  async getVerifyApplications(filter: GetApplicationsFilter) {
+  async getVerifyApplications(filter: GetApplicationsFilter): Promise<ApplicationRecord[]> {
     const { mainCategory = '', key = '', acyearId = 0 } = filter;
 
     let query = `
@@ -414,22 +456,22 @@ export class AdminPanelService {
         P.Scholarship_Issued_AccNo, P.User_ID, P.Status, P.Update_Date, P.Scholarship_Id,
         P.Suggesred_Date, P.Verifed_Date,
         CASE P.IsVerify
-          WHEN '0' THEN 'False'
-          WHEN '1' THEN 'True'
-          WHEN '2' THEN 'False'
-          ELSE 'False'
+          WHEN '0' THEN 0
+          WHEN '1' THEN 1
+          WHEN '2' THEN 0
+          ELSE 0
         END as ReVerifyLinkEnable,
         CASE P.IsVerify
-          WHEN '0' THEN 'False'
-          WHEN '1' THEN 'False'
-          WHEN '2' THEN 'True'
-          ELSE 'False'
+          WHEN '0' THEN 0
+          WHEN '1' THEN 0
+          WHEN '2' THEN 1
+          ELSE 0
         END as VerifyLinkEnable,
         CASE P.IsVerify
-          WHEN '0' THEN 'True'
-          WHEN '1' THEN 'False'
-          WHEN '2' THEN 'False'
-          ELSE 'False'
+          WHEN '0' THEN 1
+          WHEN '1' THEN 0
+          WHEN '2' THEN 0
+          ELSE 0
         END as lblVerified
       FROM t_Registration R
       JOIN t_Registration_Process as P ON P.Application_Id = R.Application_Id,
@@ -471,7 +513,7 @@ export class AdminPanelService {
         Statement: query,
       });
 
-      return result.recordset || [];
+      return mapBooleanFields(result.recordset || []);
     } catch (error) {
       this.logger.error('Error fetching verify applications', error);
       throw new BadRequestException('Failed to fetch verify applications');
@@ -482,7 +524,7 @@ export class AdminPanelService {
    * Get applications for Approve module
    * Matches GetAdminPanelLoadProcess from AjaxAdminPanelApprove.aspx.cs
    */
-  async getApproveApplications(filter: GetApplicationsFilter, roleId: number) {
+  async getApproveApplications(filter: GetApplicationsFilter, roleId: number): Promise<ApplicationRecord[]> {
     const { mainCategory = '', key = '', acyearId = 0 } = filter;
 
     let query = `
@@ -500,43 +542,43 @@ export class AdminPanelService {
         P.Scholarship_Issued_AccNo, P.User_ID, P.Status, P.Update_Date, P.Scholar_Reject, P.Scholarship_Id,
         CONCAT('Approve-', P.Scholarship_Id) as ApproveText,
         CASE P.Status
-          WHEN 'Registered' THEN 'false'
-          WHEN 'Approved' THEN 'false'
-          WHEN 'Waiting' THEN 'true'
-          ELSE 'false'
+          WHEN 'Registered' THEN 0
+          WHEN 'Approved' THEN 0
+          WHEN 'Waiting' THEN 1
+          ELSE 0
         END as ProcessLinkText
     `;
 
     if (roleId === 7) {
       query += `,
-        CASE P.Status WHEN 'Rejected' THEN 'true' ELSE 'false' END as RejectApprovalLinkText,
-        CASE P.Status WHEN 'Rejected' THEN 'False' ELSE 'false' END as lblRejected,
+        CASE P.Status WHEN 'Rejected' THEN 1 ELSE 0 END as RejectApprovalLinkText,
+        CASE P.Status WHEN 'Rejected' THEN 0 ELSE 0 END as lblRejected,
         CASE P.Status
-          WHEN 'Registered' THEN 'false'
-          WHEN 'Approved' THEN 'true'
-          WHEN 'Waiting' THEN 'false'
-          WHEN 'Completed' THEN 'false'
-          ELSE 'false'
+          WHEN 'Registered' THEN 0
+          WHEN 'Approved' THEN 1
+          WHEN 'Waiting' THEN 0
+          WHEN 'Completed' THEN 0
+          ELSE 0
         END as ApprovedOverrideLinkText,
         CASE P.Status
-          WHEN 'Registered' THEN 'false'
-          WHEN 'Approved' THEN 'False'
-          WHEN 'Waiting' THEN 'false'
-          WHEN 'Completed' THEN 'false'
-          ELSE 'false'
+          WHEN 'Registered' THEN 0
+          WHEN 'Approved' THEN 0
+          WHEN 'Waiting' THEN 0
+          WHEN 'Completed' THEN 0
+          ELSE 0
         END as lblApproved
       `;
     } else {
       query += `,
-        CASE P.Status WHEN 'Rejected' THEN 'false' ELSE 'false' END as RejectApprovalLinkText,
-        CASE P.Status WHEN 'Rejected' THEN 'true' ELSE 'false' END as lblRejected,
-        CASE P.Status WHEN 'Registered' THEN 'false' ELSE 'false' END as ApprovedOverrideLinkText,
+        CASE P.Status WHEN 'Rejected' THEN 0 ELSE 0 END as RejectApprovalLinkText,
+        CASE P.Status WHEN 'Rejected' THEN 1 ELSE 0 END as lblRejected,
+        CASE P.Status WHEN 'Registered' THEN 0 ELSE 0 END as ApprovedOverrideLinkText,
         CASE P.Status
-          WHEN 'Registered' THEN 'false'
-          WHEN 'Approved' THEN 'true'
-          WHEN 'Waiting' THEN 'false'
-          WHEN 'Completed' THEN 'false'
-          ELSE 'false'
+          WHEN 'Registered' THEN 0
+          WHEN 'Approved' THEN 1
+          WHEN 'Waiting' THEN 0
+          WHEN 'Completed' THEN 0
+          ELSE 0
         END as lblApproved
       `;
     }
@@ -582,7 +624,7 @@ export class AdminPanelService {
         Statement: query,
       });
 
-      return result.recordset || [];
+      return mapBooleanFields(result.recordset || []);
     } catch (error) {
       this.logger.error('Error fetching approve applications', error);
       throw new BadRequestException('Failed to fetch approve applications');

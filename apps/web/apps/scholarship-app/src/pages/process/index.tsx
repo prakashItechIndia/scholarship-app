@@ -126,7 +126,26 @@ const ProcessPage: React.FC = () => {
       preparedBy: String(apiData.Prepared_By || '-'),
       verifiedBy: String(apiData.Verified_By || '-'),
       suggestedBy: String(apiData.Suggested_By || '-'),
-      processActionLabel: getProcessActionLabel(String(apiData.Status || ''), activeTab),
+      processActionLabel: activeTab === 'suggest' && apiData.SuggestText 
+        ? String(apiData.SuggestText ?? '').trim() 
+        : getProcessActionLabel(String(apiData.Status ?? ''), activeTab),
+      suggestLinkEnable: Boolean(apiData.SuggestLinkEnable),
+      lblSuggested: Boolean(apiData.lblSuggested),
+      lblReject: Boolean(apiData.lblReject),
+      lblCompleted: Boolean(apiData.lblCompleted),
+      suggestScholarshipId: apiData.SuggestScholarshipId ? (typeof apiData.SuggestScholarshipId === 'number' ? apiData.SuggestScholarshipId : Number(apiData.SuggestScholarshipId)) : undefined,
+      // Issue Amount fields
+      requestAmount: apiData.RequestAmount || apiData.Request_Amount || 0,
+      suggestedAmount: apiData.Scholarship_Suggest_Amount || 0,
+      approvedAmount: apiData.Scholarship_Approved_Amount || 0,
+      fatherName: String(apiData.Father_Name || ''),
+      scholarshipSeekingFor: apiData.Scholarship_For === 'School' 
+        ? String(apiData.Class_Studying || '')
+        : apiData.Scholarship_For === 'College'
+        ? `${String(apiData.Degree_Type || '')}-${String(apiData.Degree || '')}`
+        : apiData.Scholarship_For === 'Research'
+        ? String(apiData.Ph_D || '')
+        : '',
       ...apiData,
     };
   };
@@ -142,7 +161,13 @@ const ProcessPage: React.FC = () => {
     if (tab === 'documents') return 'Upload';
     if (tab === 'verify') return 'Verify';
     if (tab === 'suggest') return 'Suggest';
-    if (tab === 'approve') return 'Approve';
+    if (tab === 'approve') {
+      // For approve tab: show "Approve" for Waiting, show status text for Approved/Rejected
+      if (status === 'Waiting') return 'Approve';
+      if (status === 'Approved') return 'Approved';
+      if (status === 'Rejected') return 'Rejected';
+      return 'Approve';
+    }
     if (tab === 'issue-amount') return 'Issue Amount';
     return 'View';
   };
@@ -1003,8 +1028,12 @@ const ProcessPage: React.FC = () => {
       />
       <DocumentUploadPanel
         isOpen={uploadPanelOpen}
-        onClose={() => setUploadPanelOpen(false)}
+        onClose={() => {
+          setUploadPanelOpen(false);
+          void refreshApplications(); // Refresh the applications list after closing
+        }}
         data={selectedUploadApplication}
+        onUploadComplete={refreshApplications}
       />
       <ProcessHistoryModal
         open={historyModalOpen}

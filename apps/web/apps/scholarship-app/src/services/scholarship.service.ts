@@ -310,7 +310,7 @@ export const documentUpload = {
   /**
    * Get documents for an application
    */
-  getDocuments: async (applicationId: string) => {
+  getApplicationDocuments: async (applicationId: string) => {
     const response = await apiClient.get<
       {
         Document_Id: number;
@@ -321,6 +321,35 @@ export const documentUpload = {
         Uploaded_By?: number;
       }[]
     >(`/document-upload/documents/${applicationId}`);
+    return response.data;
+  },
+
+  /**
+   * Get document types
+   */
+  getDocumentTypes: async () => {
+    const response = await apiClient.get<{
+      documentTypes: string[];
+    }>('/document-upload/document-types');
+    return response.data;
+  },
+
+  /**
+   * Delete document
+   */
+  deleteDocument: async (
+    documentId: number,
+    applicationId?: string,
+    documentType?: string,
+  ) => {
+    const response = await apiClient.delete<{
+      message: string;
+    }>(`/document-upload/document/${documentId}`, {
+      params: {
+        applicationId,
+        documentType,
+      },
+    });
     return response.data;
   },
 };
@@ -446,6 +475,16 @@ export const dropdownOptions = {
 };
 
 /**
+ * Screen interface
+ */
+export interface Screen {
+  id: number;
+  screenName: string;
+  url: string;
+  isActive: boolean;
+}
+
+/**
  * Role Management Service
  */
 export const roleManagement = {
@@ -510,6 +549,65 @@ export const roleManagement = {
    */
   deleteRole: async (roleId: number) => {
     const response = await apiClient.delete(`/role-management/role/${roleId}`);
+    return response.data;
+  },
+
+  /**
+   * Get all available screens
+   */
+  getAllScreens: async () => {
+    const response = await apiClient.get('/role-management/screens');
+    return response.data;
+  },
+
+  /**
+   * Get permissions for a role
+   */
+  getRolePermissions: async (roleId: number) => {
+    const response = await apiClient.get(
+      `/role-management/role/${roleId}/permissions`,
+    );
+    return response.data;
+  },
+
+  /**
+   * Get role with all permissions
+   */
+  getRoleWithPermissions: async (roleId: number) => {
+    const response = await apiClient.get(
+      `/role-management/role/${roleId}/permissions-full`,
+    );
+    return response.data;
+  },
+
+  /**
+   * Get permissions for a user
+   */
+  getUserPermissions: async (userId: number) => {
+    const response = await apiClient.get(
+      `/role-management/user/${userId}/permissions`,
+    );
+    return response.data;
+  },
+
+  /**
+   * Check if user has permission to access a screen
+   */
+  hasScreenPermission: async (userId: number, screenUrl: string) => {
+    const response = await apiClient.get(
+      `/role-management/user/${userId}/has-permission?screenUrl=${encodeURIComponent(screenUrl)}`,
+    );
+    return response.data.hasPermission;
+  },
+
+  /**
+   * Update permissions for a role
+   */
+  updateRolePermissions: async (roleId: number, screenIds: number[]) => {
+    const response = await apiClient.put(
+      `/role-management/role/${roleId}/permissions`,
+      { screenIds },
+    );
     return response.data;
   },
 };
@@ -747,6 +845,30 @@ export const processManagement = {
     issuedBy?: number;
   }) => {
     const response = await apiClient.post('/process-management/issue-amount', data);
+    return response.data;
+  },
+
+  /**
+   * Get application history (View History)
+   */
+  getApplicationHistory: async (
+    applicationId: string,
+    params?: { page?: number; pageSize?: number },
+  ) => {
+    const response = await apiClient.get(`/process-management/history/${applicationId}`, {
+      params: {
+        page: params?.page,
+        pageSize: params?.pageSize,
+      },
+    });
+    return response.data;
+  },
+
+  /**
+   * Get scholarship history (Previous Scholarship History)
+   */
+  getScholarshipHistory: async (applicationId: string) => {
+    const response = await apiClient.get(`/process-management/scholarship-history/${applicationId}`);
     return response.data;
   },
 };

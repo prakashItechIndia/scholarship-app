@@ -45,6 +45,41 @@ interface IssueAmountData {
   issuedBy?: number;
 }
 
+/**
+ * Helper function to convert 1/0 or '1'/'0' to boolean
+ */
+function toBoolean(value: unknown): boolean {
+  return value === 1 || value === '1' || value === true || String(value).toLowerCase() === 'true';
+}
+
+/**
+ * Helper function to map boolean fields in query results
+ */
+function mapBooleanFields(rows: Record<string, unknown>[]): Record<string, unknown>[] {
+  const booleanFields = [
+    'SuggestLinkEnable',
+    'lblSuggested',
+    'lblReject',
+    'lblCompleted',
+    'PrintLinkEnable',
+    'lblNotCompleted',
+    'lblSCReject',
+    'ReVerifyLinkEnable',
+    'VerifyLinkEnable',
+    'lblVerified',
+  ];
+
+  return rows.map((row) => {
+    const mappedRow = { ...row };
+    booleanFields.forEach((field) => {
+      if (field in mappedRow) {
+        mappedRow[field] = toBoolean(mappedRow[field]);
+      }
+    });
+    return mappedRow;
+  });
+}
+
 @Injectable()
 export class ProcessManagementService {
   private readonly logger = new Logger(ProcessManagementService.name);
@@ -126,24 +161,24 @@ export class ProcessManagementService {
           UV.User_Name as Verified_By,
           US.User_Name as Suggested_By,
           CASE P.Status
-            WHEN 'Completed' THEN 'True'
-            WHEN 'Registered' THEN 'False'
-            WHEN 'Waiting' THEN 'False'
-            WHEN 'Approved' THEN 'False'
-            WHEN 'Rejected' THEN 'False'
-            ELSE 'False'
+            WHEN 'Completed' THEN 1
+            WHEN 'Registered' THEN 0
+            WHEN 'Waiting' THEN 0
+            WHEN 'Approved' THEN 0
+            WHEN 'Rejected' THEN 0
+            ELSE 0
           END as PrintLinkEnable,
           CASE P.Status
-            WHEN 'Completed' THEN 'False'
-            WHEN 'Registered' THEN 'True'
-            WHEN 'Waiting' THEN 'True'
-            WHEN 'Approved' THEN 'True'
-            WHEN 'Rejected' THEN 'True'
-            ELSE 'False'
+            WHEN 'Completed' THEN 0
+            WHEN 'Registered' THEN 1
+            WHEN 'Waiting' THEN 1
+            WHEN 'Approved' THEN 1
+            WHEN 'Rejected' THEN 1
+            ELSE 0
           END as lblNotCompleted,
           CASE P.Scholar_Reject
-            WHEN 'Rejected' THEN 'true'
-            ELSE 'false'
+            WHEN 'Rejected' THEN 1
+            ELSE 0
           END as lblSCReject,
           CASE P.Status
             WHEN 'Registered' THEN '1'
@@ -222,8 +257,9 @@ export class ProcessManagementService {
       query += ` OFFSET ${offset} ROWS FETCH NEXT ${pageSize} ROWS ONLY`;
 
       const result = await this.db.query(query, queryParams);
+      const mappedData = mapBooleanFields((result.recordset || []) as Record<string, unknown>[]);
       return {
-        data: result.recordset || [],
+        data: mappedData,
         total: Number(total),
         page: Number(page),
         pageSize: Number(pageSize),
@@ -256,7 +292,10 @@ export class ProcessManagementService {
           R.Mobile_Number,
           R.Father_Occupation,
           P.Scholarship_No,
-          P.Status,
+          CASE 
+            WHEN P.IsUpload_Status = '0' OR P.IsUpload_Status = '1' THEN 'Document Submitted'
+            ELSE P.Status
+          END as Status,
           P.IsUpload_Status
         FROM t_Registration R
         JOIN t_Registration_Process P ON P.Application_Id = R.Application_Id
@@ -298,8 +337,9 @@ export class ProcessManagementService {
       query += ` OFFSET ${offset} ROWS FETCH NEXT ${pageSize} ROWS ONLY`;
 
       const result = await this.db.query(query, queryParams);
+      const mappedData = mapBooleanFields((result.recordset || []) as Record<string, unknown>[]);
       return {
-        data: result.recordset || [],
+        data: mappedData,
         total: Number(total),
         page: Number(page),
         pageSize: Number(pageSize),
@@ -372,7 +412,12 @@ export class ProcessManagementService {
           R.IFSC_Code,
           P.Scholarship_Issued_AccNo,
           P.User_ID,
-          P.Status,
+          CASE 
+            WHEN P.IsVerify = '0' THEN 'Verified'
+            WHEN P.IsVerify = '1' THEN 'Verified'
+            WHEN P.IsVerify = '2' THEN 'Verify'
+            ELSE P.Status
+          END as Status,
           P.Update_Date,
           P.Scholarship_Id,
           P.Suggesred_Date,
@@ -381,22 +426,22 @@ export class ProcessManagementService {
           P.IsVerify,
           P.IsUpload_Status,
           CASE P.IsVerify
-            WHEN '0' THEN 'False'
-            WHEN '1' THEN 'True'
-            WHEN '2' THEN 'False'
-            ELSE 'False'
+            WHEN '0' THEN 1
+            WHEN '1' THEN 0
+            WHEN '2' THEN 0
+            ELSE 0
           END as ReVerifyLinkEnable,
           CASE P.IsVerify
-            WHEN '0' THEN 'False'
-            WHEN '1' THEN 'False'
-            WHEN '2' THEN 'True'
-            ELSE 'False'
+            WHEN '0' THEN 0
+            WHEN '1' THEN 0
+            WHEN '2' THEN 1
+            ELSE 0
           END as VerifyLinkEnable,
           CASE P.IsVerify
-            WHEN '0' THEN 'True'
-            WHEN '1' THEN 'False'
-            WHEN '2' THEN 'False'
-            ELSE 'False'
+            WHEN '0' THEN 1
+            WHEN '1' THEN 0
+            WHEN '2' THEN 0
+            ELSE 0
           END as lblVerified
         FROM t_Registration R
         JOIN t_Registration_Process P ON P.Application_Id = R.Application_Id
@@ -447,8 +492,9 @@ export class ProcessManagementService {
       query += ` OFFSET ${offset} ROWS FETCH NEXT ${pageSize} ROWS ONLY`;
 
       const result = await this.db.query(query, queryParams);
+      const mappedData = mapBooleanFields((result.recordset || []) as Record<string, unknown>[]);
       return {
-        data: result.recordset || [],
+        data: mappedData,
         total: Number(total),
         page: Number(page),
         pageSize: Number(pageSize),
@@ -543,9 +589,43 @@ export class ProcessManagementService {
             WHEN 'Approved' THEN '3'
             WHEN 'Waiting' THEN '2'
             ELSE '4'
-          END as statuspriority
+          END as statuspriority,
+          CASE P.Status
+            WHEN 'Registered' THEN CONCAT('Suggest ', P.Scholarship_Id)
+            ELSE CONCAT('Suggest ', (SELECT ISNULL(MAX(Scholarship_Id), 0) + 1 FROM t_Registration_Process WHERE Application_Id = R.Application_Id))
+          END as SuggestText,
+          CASE P.Status
+            WHEN 'Registered' THEN P.Scholarship_Id
+            ELSE (SELECT ISNULL(MAX(Scholarship_Id), 0) + 1 FROM t_Registration_Process WHERE Application_Id = R.Application_Id)
+          END as SuggestScholarshipId,
+          CASE P.Status
+            WHEN 'Registered' THEN 1
+            WHEN 'Waiting' THEN 0
+            WHEN 'Rejected' THEN 0
+            ELSE 1
+          END as SuggestLinkEnable,
+          CASE P.Status
+            WHEN 'Waiting' THEN 0
+            WHEN 'Registered' THEN 0
+            WHEN 'Rejected' THEN 0
+            ELSE 0
+          END as lblSuggested,
+          CASE P.Scholar_Reject
+            WHEN 'Waiting' THEN 0
+            WHEN 'Registered' THEN 0
+            WHEN 'Rejected' THEN 1
+            ELSE 0
+          END as lblReject,
+          CASE P.Status
+            WHEN 'Completed' THEN 1
+            WHEN 'Waiting' THEN 1
+            WHEN 'Registered' THEN 0
+            WHEN 'Rejected' THEN 0
+            ELSE 0
+          END as lblCompleted
         FROM t_Registration R
         JOIN t_Registration_Process P ON P.Application_Id = R.Application_Id
+        JOIN T_Scholarship_Year SY ON R.Scholarship_Year_Id = SY.ScholarshipYear_Id
         WHERE 1=1
       `;
 
@@ -595,8 +675,28 @@ export class ProcessManagementService {
       query += ` OFFSET ${offset} ROWS FETCH NEXT ${pageSize} ROWS ONLY`;
 
       const result = await this.db.query(query, queryParams);
+      
+      // Map boolean fields from 1/0 to true/false
+      const mappedData = (result.recordset || []).map((row: Record<string, unknown>) => {
+        const mappedRow = { ...row };
+        // Convert 1/0 to boolean for suggest-related fields
+        if ('SuggestLinkEnable' in mappedRow) {
+          mappedRow.SuggestLinkEnable = Boolean(mappedRow.SuggestLinkEnable === 1 || mappedRow.SuggestLinkEnable === '1');
+        }
+        if ('lblSuggested' in mappedRow) {
+          mappedRow.lblSuggested = Boolean(mappedRow.lblSuggested === 1 || mappedRow.lblSuggested === '1');
+        }
+        if ('lblReject' in mappedRow) {
+          mappedRow.lblReject = Boolean(mappedRow.lblReject === 1 || mappedRow.lblReject === '1');
+        }
+        if ('lblCompleted' in mappedRow) {
+          mappedRow.lblCompleted = Boolean(mappedRow.lblCompleted === 1 || mappedRow.lblCompleted === '1');
+        }
+        return mappedRow;
+      });
+      
       return {
-        data: result.recordset || [],
+        data: mappedData,
         total: Number(total),
         page: Number(page),
         pageSize: Number(pageSize),
@@ -614,7 +714,7 @@ export class ProcessManagementService {
 
   /**
    * Get applications for Approve tab
-   * Shows applications with Waiting status
+   * Shows applications with Waiting, Approved, or Rejected status
    */
   async getApproveApplications(params: ProcessQueryParams) {
     try {
@@ -641,7 +741,7 @@ export class ProcessManagementService {
           P.Scholarship_Approved_Amount
         FROM t_Registration R
         JOIN t_Registration_Process P ON P.Application_Id = R.Application_Id
-        WHERE P.Status = 'Waiting'
+        WHERE P.Status IN ('Waiting', 'Approved', 'Rejected')
       `;
 
       const queryParams: Record<string, unknown> = {};
@@ -651,18 +751,30 @@ export class ProcessManagementService {
         queryParams.academicYearId = academicYearId;
       }
 
-      if (mainCategory === 'Application No' && key) {
-        query += ' AND R.Application_Id LIKE @key';
-        queryParams.key = `%${key}%`;
-      } else if (mainCategory === 'Name' && key) {
-        query += ' AND R.Applicant_Name LIKE @key';
-        queryParams.key = `%${key}%`;
-      } else if (mainCategory === 'Mobile No' && key) {
-        query += ' AND R.Mobile_Number LIKE @key';
-        queryParams.key = `%${key}%`;
-      } else if (mainCategory === 'Scholarship No' && key) {
-        query += ' AND P.Scholarship_No LIKE @key';
-        queryParams.key = `%${key}%`;
+      // Apply filters based on mainCategory
+      if (key) {
+        if (mainCategory === 'Application No') {
+          query += ' AND R.Application_Id LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (mainCategory === 'Name') {
+          query += ' AND R.Applicant_Name LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (mainCategory === 'Mobile No') {
+          query += ' AND R.Mobile_Number LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (mainCategory === 'Cheque No') {
+          query += ' AND P.DDCheque_No LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (mainCategory === 'Student Id') {
+          query += ' AND R.Student_ID LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (mainCategory === 'Aadhaar ID') {
+          query += ' AND R.Aadhaar_ID LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (mainCategory === 'Scholarship No') {
+          query += ' AND P.Scholarship_No LIKE @key';
+          queryParams.key = `%${key}%`;
+        }
       }
 
       // Get total count before adding ORDER BY
@@ -682,8 +794,9 @@ export class ProcessManagementService {
       query += ` OFFSET ${offset} ROWS FETCH NEXT ${pageSize} ROWS ONLY`;
 
       const result = await this.db.query(query, queryParams);
+      const mappedData = mapBooleanFields((result.recordset || []) as Record<string, unknown>[]);
       return {
-        data: result.recordset || [],
+        data: mappedData,
         total: Number(total),
         page: Number(page),
         pageSize: Number(pageSize),
@@ -708,18 +821,67 @@ export class ProcessManagementService {
 
       let query = `
         SELECT
-          R.Application_Id,
-          R.Applicant_Name,
-          R.Father_Name,
-          R.Father_Occupation,
+          R.Sch_Year,
           R.Scholarship_For,
-          P.Request_Amount as RequestAmount,
-          P.Scholarship_No,
+          R.Application_Id,
+          R.Applicant_Type,
+          R.Student_ID,
+          R.Applicant_Name,
+          R.Guardian_Name,
+          R.Father_Name,
+          R.Aadhaar_ID,
+          R.Pan_ID,
+          R.Father_Occupation,
+          R.Father_OfficeName,
+          R.Mother_Name,
+          R.Mother_Occupation,
+          R.Mother_OfficeName,
+          R.Address_Line1,
+          R.Address_Line2,
+          R.City,
+          R.PinCode,
+          R.State,
+          R.District,
+          R.Country,
+          R.Mobile_Number,
+          R.Email,
+          R.Date_Of_Birth,
+          R.Gender,
+          R.Community,
+          R.Caste,
+          R.Class_Studying,
+          R.Board_Of_Studying,
+          R.Type_Of_Institution,
+          R.Cource_Of_Studying,
+          R.Degree_Type,
+          R.Degree,
+          R.Other_Degree,
+          R.Ph_D,
+          R.Specialization,
+          R.Institution_Name,
+          R.University,
+          R.Current_Year,
+          R.Current_Semester,
+          R.Father_AnnualIncome,
+          R.Bank_Account_Number,
+          R.Bank_Name,
+          R.Bank_Branch,
+          R.IFSC_Code,
+          P.Scholarship_Issued_AccNo,
+          P.User_ID,
           P.Status,
+          P.Scholarship_No,
+          P.Update_Date,
+          P.Scholarship_Id,
+          P.Suggesred_Date,
+          P.Scholar_Reject,
+          P.DDCheque_No,
           P.Scholarship_Suggest_Amount,
-          P.Scholarship_Approved_Amount
+          P.Scholarship_Approved_Amount,
+          P.Request_Amount as RequestAmount
         FROM t_Registration R
         JOIN t_Registration_Process P ON P.Application_Id = R.Application_Id
+        JOIN T_Scholarship_Year SY ON R.Scholarship_Year_Id = SY.ScholarshipYear_Id
         WHERE P.Status = 'Approved'
       `;
 
@@ -766,8 +928,9 @@ export class ProcessManagementService {
       query += ` OFFSET ${offset} ROWS FETCH NEXT ${pageSize} ROWS ONLY`;
 
       const result = await this.db.query(query, queryParams);
+      const mappedData = mapBooleanFields((result.recordset || []) as Record<string, unknown>[]);
       return {
-        data: result.recordset || [],
+        data: mappedData,
         total: Number(total),
         page: Number(page),
         pageSize: Number(pageSize),
@@ -1017,6 +1180,180 @@ export class ProcessManagementService {
       }
       this.logger.error('Error issuing amount', error);
       throw new BadRequestException('Failed to issue amount');
+    }
+  }
+
+  /**
+   * Get application history (View History) for a specific application
+   * Returns paginated history from TBL_HISTORY table (matching old application)
+   */
+  async getApplicationHistory(
+    applicationId: string,
+    page: number = 1,
+    pageSize: number = 10,
+  ) {
+    try {
+      const validatedPage = Math.max(1, Math.floor(Number(page)));
+      const validatedPageSize = Math.max(1, Math.min(100, Math.floor(Number(pageSize))));
+      const offset = (validatedPage - 1) * validatedPageSize;
+
+      // Query from TBL_HISTORY table (matching old application structure)
+      // TBL_HISTORY columns: ID, Application_Id, Process, Action, Data_Date, User_ID
+      // Display: S.No, Action (from Process), Process Undergone (from Action), Handled by (from User_ID/User_Name), Date
+      const historyQuery = `
+        SELECT
+          H.ID,
+          H.Application_Id,
+          H.Process as Action,
+          H.Action as ProcessUndergone,
+          H.User_ID,
+          FORMAT(H.Data_Date, 'dd/MM/yyyy hh:mm tt') as Date,
+          COALESCE(U.User_Name, H.User_ID) as HandledBy
+        FROM TBL_HISTORY H
+        LEFT JOIN TBL_USERMASTER U ON H.User_ID = U.User_ID
+        WHERE H.Application_Id = @applicationId
+        ORDER BY H.Data_Date ASC, H.ID ASC
+        OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY
+      `;
+
+      // Count query
+      const countQuery = `
+        SELECT COUNT(*) as total
+        FROM TBL_HISTORY
+        WHERE Application_Id = @applicationId
+      `;
+
+      const queryParams = {
+        applicationId,
+        offset,
+        pageSize: validatedPageSize,
+      };
+
+      const [historyResult, countResult] = await Promise.all([
+        this.db.query(historyQuery, queryParams),
+        this.db.query(countQuery, { applicationId }),
+      ]);
+
+      const total = (countResult.recordset?.[0] as { total?: number })?.total || 0;
+
+      // Map results to match frontend expectations
+      const mappedData = (historyResult.recordset || []).map((row: Record<string, unknown>, index: number) => {
+        const rowRecord = row as Record<string, unknown>;
+        return {
+          id: Number(rowRecord.ID) || offset + index + 1,
+          action: String(rowRecord.Action || ''),
+          processUndergone: String(rowRecord.ProcessUndergone || ''),
+          handledBy: String(rowRecord.HandledBy || rowRecord.User_ID || 'Admin'),
+          date: String(rowRecord.Date || ''),
+        };
+      });
+
+      return {
+        data: mappedData,
+        total: Number(total),
+        page: Number(validatedPage),
+        pageSize: Number(validatedPageSize),
+      };
+    } catch (error) {
+      this.logger.error('Error fetching application history', error);
+      if (error instanceof Error) {
+        throw new BadRequestException(`Failed to fetch application history: ${error.message}`);
+      }
+      throw new BadRequestException('Failed to fetch application history');
+    }
+  }
+
+  /**
+   * Get scholarship history (Previous Scholarship History) for a student
+   * Uses stored procedure GetPreviousIssuedAmountDetails_ByAadhaarId (matching old application)
+   */
+  async getScholarshipHistory(applicationId: string) {
+    try {
+      // First, get the current application details to find Aadhaar and Pan
+      const currentAppQuery = `
+        SELECT 
+          R.Aadhaar_Number,
+          R.Pan_ID,
+          R.Applicant_Name
+        FROM t_Registration R
+        WHERE R.Application_Id = @applicationId
+      `;
+
+      const currentAppResult = await this.db.query(currentAppQuery, { applicationId });
+      const currentApp = currentAppResult.recordset?.[0] as {
+        Aadhaar_Number?: string;
+        Pan_ID?: string;
+        Applicant_Name?: string;
+      };
+
+      if (!currentApp) {
+        throw new BadRequestException('Application not found');
+      }
+
+      const aadhaarId = currentApp.Aadhaar_Number || '0';
+      const panId = currentApp.Pan_ID || '0';
+
+      // Get issued amount details using stored procedure (matching old app)
+      const issuedAmountQuery = `
+        EXEC GetPreviousIssuedAmountDetails_ByAadhaarId 
+          @AadhaarID = @aadhaarId,
+          @Pan_ID = @panId
+      `;
+
+      const issuedAmountResult = await this.db.query(issuedAmountQuery, {
+        aadhaarId,
+        panId,
+      });
+
+      // Get already applied list using stored procedure (matching old app)
+      const alreadyAppliedQuery = `
+        EXEC GetPreviousScholorshipApplied 
+          @AadhaarID = @aadhaarId,
+          @Pan_ID = @panId
+      `;
+
+      const alreadyAppliedResult = await this.db.query(alreadyAppliedQuery, {
+        aadhaarId,
+        panId,
+      });
+
+      // Format already applied list from stored procedure result
+      const alreadyAppliedRows = alreadyAppliedResult.recordset || [];
+      const alreadyApplied = alreadyAppliedRows
+        .filter((row: { ScholarshipYear_Code?: string }) => row.ScholarshipYear_Code !== 'Total')
+        .map((row: { ScholarshipYear_Code?: string; Application_Id?: string }) => {
+          const year = row.ScholarshipYear_Code || '';
+          const appId = row.Application_Id || '';
+          // Format: "2018 ( AF1810636 ), 2019 ( AF1910749 )"
+          return `${year} ( ${appId} )`;
+        })
+        .join(', ') || 'No previous applications';
+
+      // Format issued history from stored procedure result
+      const issuedHistoryRows = issuedAmountResult.recordset || [];
+      const issuedHistory = issuedHistoryRows
+        .filter((row: { ScholarshipYear_Code?: string }) => row.ScholarshipYear_Code !== 'Total')
+        .map((row: {
+          ScholarshipYear_Code?: string;
+          Scholarship_No?: string;
+          Scholarship_Issued_Amount?: number;
+        }) => ({
+          year: `${row.ScholarshipYear_Code || ''} ( ${row.Scholarship_No || ''} )`,
+          amount: String(row.Scholarship_Issued_Amount || '0'),
+        }));
+
+      return {
+        applicationNo: applicationId,
+        studentName: currentApp.Applicant_Name || '',
+        alreadyApplied,
+        issuedHistory,
+      };
+    } catch (error) {
+      this.logger.error('Error fetching scholarship history', error);
+      if (error instanceof Error) {
+        throw new BadRequestException(`Failed to fetch scholarship history: ${error.message}`);
+      }
+      throw new BadRequestException('Failed to fetch scholarship history');
     }
   }
 }

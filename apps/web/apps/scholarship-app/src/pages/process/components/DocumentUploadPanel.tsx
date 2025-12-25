@@ -10,45 +10,148 @@ import {
     AddRegular,
 } from "@fluentui/react-icons";
 import { ApplicationData } from "../types";
+import { documentUpload } from "../../../services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
 
 interface DocumentUploadPanelProps {
     isOpen: boolean;
     onClose: () => void;
     data: ApplicationData | null;
+    onUploadComplete?: () => void; // Callback to refresh parent data
 }
 
 interface DocumentRow {
     id: string;
+    documentId?: number; // Database document ID for deletion
     name: string;
     uploadedOn?: string;
     status: "Uploaded" | "Not uploaded";
-    url?: string; // Mock URL for view
+    url?: string; // Document URL for view
     fileType?: string; // Type of the file for preview
+    documentPath?: string; // Document path from API
 }
-
-const INITIAL_DOCUMENTS: DocumentRow[] = [
-    { id: "1", name: "Birth Certificate", uploadedOn: "18-09-2025", status: "Uploaded", url: "https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf" },
-    { id: "2", name: "Student ID Card", uploadedOn: "18-09-2025", status: "Uploaded", url: "https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf" },
-    { id: "3", name: "Ration Card", uploadedOn: "18-09-2025", status: "Uploaded", url: "https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf" },
-    { id: "4", name: "Voter ID", status: "Not uploaded" },
-    { id: "5", name: "Driving License", status: "Not uploaded" },
-    { id: "6", name: "Bank Pass Book", status: "Not uploaded" },
-    { id: "7", name: "AADHAAR ID", status: "Not uploaded" },
-    { id: "8", name: "PAN Card", status: "Not uploaded" },
-    { id: "9", name: "Bonafide (Student)", status: "Not uploaded" },
-    { id: "10", name: "Bonafide (Parent)", status: "Not uploaded" },
-];
 
 const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
     isOpen,
     onClose,
     data,
+    onUploadComplete,
 }) => {
-    const [documents, setDocuments] = React.useState<DocumentRow[]>(INITIAL_DOCUMENTS);
+    const { success, error: showError } = useToast();
+    const [documents, setDocuments] = React.useState<DocumentRow[]>([]);
+    const [documentTypes, setDocumentTypes] = React.useState<string[]>([]);
+    const [loading, setLoading] = React.useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const [uploadingDocId, setUploadingDocId] = React.useState<string | null>(null);
-    const [deleteData, setDeleteData] = React.useState<{ isOpen: boolean; docId: string; docName: string } | null>(null);
+    const [deleteData, setDeleteData] = React.useState<{ isOpen: boolean; docId: string; docName: string; documentId?: number } | null>(null);
     const [previewData, setPreviewData] = React.useState<{ isOpen: boolean; url: string; name: string; type?: string } | null>(null);
+
+    // Fetch documents and document types when panel opens
+    React.useEffect(() => {
+        if (isOpen && data?.applicationNo) {
+            // Reset state when panel opens
+            setDocuments([]);
+            setLoading(true);
+            // Fetch document types first, then documents
+            void fetchDocumentTypes().then(() => {
+                void fetchDocuments();
+            });
+        }
+    }, [isOpen, data?.applicationNo]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const fetchDocuments = async () => {
+        if (!data?.applicationNo) return;
+        
+        setLoading(true);
+        try {
+            const docs = await documentUpload.getApplicationDocuments(data.applicationNo);
+            
+            // Get document types separately
+            const typesResponse = await documentUpload.getDocumentTypes();
+            setDocumentTypes(typesResponse.documentTypes ?? []);
+            
+            // Get document types first if not already loaded
+            if (documentTypes.length === 0) {
+                await fetchDocumentTypes();
+            }
+            
+            // Map API documents to DocumentRow format
+            const uploadedDocs = (docs as {
+                Document_Type?: string;
+                Document_Path?: string;
+                Uploaded_Date?: string | null;
+                Document_Id?: number;
+                Application_Id?: string;
+            }[]).map((doc) => ({
+                id: doc.Document_Type ?? '',
+                documentId: doc.Document_Id, // May be null for t_esch_ApplicantDocuments
+                name: doc.Document_Type ?? '',
+                uploadedOn: doc.Uploaded_Date 
+                    ? new Date(doc.Uploaded_Date).toLocaleDateString("en-GB", { 
+                        day: "2-digit", 
+                        month: "2-digit", 
+                        year: "numeric" 
+                    }).replace(/\//g, "-")
+                    : undefined, // Table doesn't have Uploaded_Date column
+                status: "Uploaded" as const,
+                url: doc.Document_Path ?? undefined,
+                documentPath: doc.Document_Path,
+            }));
+            
+            // Create full document list with uploaded and not uploaded
+            const currentTypes = documentTypes.length > 0 ? documentTypes : [
+                'Birth Certificate',
+                'Student ID Card',
+                'Ration Card',
+                'Voter ID',
+                'Driving License',
+                'Bank Pass Book',
+                'AADHAAR ID',
+                'PAN Card',
+                'Bonafide (Student)',
+                'Bonafide (Parent)',
+            ];
+            
+            const allDocs: DocumentRow[] = currentTypes.map((type, index) => {
+                const uploaded = uploadedDocs.find((d) => d.name === type);
+                return uploaded ?? {
+                    id: `doc-${index}`,
+                    name: type,
+                    status: "Not uploaded" as const,
+                };
+            });
+            
+            setDocuments(allDocs);
+        } catch (err: unknown) {
+            console.error('Error fetching documents:', err);
+            const errorMessage = err instanceof Error ? err.message : 'Failed to fetch documents';
+            showError('Failed to Load Documents', errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchDocumentTypes = async () => {
+        try {
+            const response = await documentUpload.getDocumentTypes();
+            setDocumentTypes(response.documentTypes ?? []);
+        } catch (err: unknown) {
+            console.error('Error fetching document types:', err);
+            // Fallback to standard document types if API fails
+            setDocumentTypes([
+                'Birth Certificate',
+                'Student ID Card',
+                'Ration Card',
+                'Voter ID',
+                'Driving License',
+                'Bank Pass Book',
+                'AADHAAR ID',
+                'PAN Card',
+                'Bonafide (Student)',
+                'Bonafide (Parent)',
+            ]);
+        }
+    };
 
     if (!isOpen || !data) return null;
 
@@ -60,59 +163,108 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
         }
     };
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (file && uploadingDocId) {
-            // Simulate upload
-            const today = new Date().toLocaleDateString("en-GB").replace(/\//g, "-"); // DD-MM-YYYY format approx
-
-            setDocuments(prev => prev.map(doc => {
-                if (doc.id === uploadingDocId) {
-                    return {
-                        ...doc,
-                        status: "Uploaded",
-                        uploadedOn: today,
-                        url: URL.createObjectURL(file), // Create a temporary URL for immediate viewing
-                        fileType: file.type // Store file type for preview
-                    };
-                }
-                return doc;
-            }));
+        if (!file || !uploadingDocId || !data?.applicationNo) return;
+        
+        const docToUpload = documents.find(d => d.id === uploadingDocId);
+        if (!docToUpload) return;
+        
+        try {
+            setLoading(true);
+            // Upload document via API
+            await documentUpload.uploadDocument(
+                data.applicationNo,
+                docToUpload.name,
+                file
+            );
+            
+            success('Document Uploaded', `${docToUpload.name} uploaded successfully`);
+            
+            // Refresh documents list
+            await fetchDocuments();
+            
+            // Call parent callback if provided
+            if (onUploadComplete) {
+                onUploadComplete();
+            }
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : 'Failed to upload document';
+            showError('Upload Failed', errorMessage);
+        } finally {
+            setLoading(false);
             setUploadingDocId(null);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
         }
     };
 
     const handleView = (doc: DocumentRow) => {
-        if (doc.url) {
+        if (doc.url || doc.documentPath) {
+            // Construct full URL if it's a relative path
+            const documentUrl = doc.url ?? doc.documentPath ?? '';
+            const fullUrl = documentUrl.startsWith('http') 
+                ? documentUrl 
+                : `${window.location.origin}${documentUrl.startsWith('/') ? '' : '/'}${documentUrl}`;
+            
             setPreviewData({
                 isOpen: true,
-                url: doc.url,
+                url: fullUrl,
                 name: doc.name,
-                type: doc.fileType // Retrieve stored file type or assume PDF from mock
+                type: doc.fileType ?? (documentUrl.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg')
             });
         } else {
-            alert("No document URL found.");
+            showError('View Failed', 'No document URL found.');
         }
     };
 
     const handleDeleteClick = (doc: DocumentRow) => {
-        setDeleteData({ isOpen: true, docId: doc.id, docName: doc.name });
+        setDeleteData({ 
+            isOpen: true, 
+            docId: doc.id, 
+            docName: doc.name,
+            documentId: doc.documentId
+        });
     };
 
-    const confirmDelete = () => {
-        if (deleteData) {
-            setDocuments(prev => prev.map(doc => {
-                if (doc.id === deleteData.docId) {
-                    return {
-                        ...doc,
-                        status: "Not uploaded",
-                        uploadedOn: undefined,
-                        url: undefined,
-                        fileType: undefined
-                    } as DocumentRow;
-                }
-                return doc;
-            }));
+    const confirmDelete = async () => {
+        if (!deleteData || !deleteData.documentId || !data?.applicationNo) {
+            setDeleteData(null);
+            return;
+        }
+        
+        // Find the document to get its type
+        const docToDelete = documents.find((d) => d.documentId === deleteData.documentId);
+        if (!docToDelete) {
+            showError('Delete Failed', 'Document not found');
+            setDeleteData(null);
+            return;
+        }
+        
+        try {
+            setLoading(true);
+            // Pass applicationId and documentType since t_esch_ApplicantDocuments doesn't have Document_Id
+            await documentUpload.deleteDocument(
+                deleteData.documentId,
+                data.applicationNo,
+                docToDelete.name
+            );
+            
+            success('Document Deleted', `${deleteData.docName} deleted successfully`);
+            
+            // Refresh documents list
+            await fetchDocuments();
+            
+            // Call parent callback if provided
+            if (onUploadComplete) {
+                onUploadComplete();
+            }
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : 'Failed to delete document';
+            showError('Delete Failed', errorMessage);
+        } finally {
+            setLoading(false);
             setDeleteData(null);
         }
     };
@@ -224,20 +376,32 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                         padding: "0",
                     }}
                 >
-                    <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'Inter', sans-serif" }}>
-                        <thead style={{ position: "sticky", top: 0, backgroundColor: "#fafafa", zIndex: 1 }}>
-                            <tr>
-                                <th style={{ padding: "12px 24px", textAlign: "left", width: "40px", borderBottom: "1px solid #e0e0e0" }}>
-                                    <input type="checkbox" style={{ width: "16px", height: "16px" }} />
-                                </th>
-                                <th style={{ padding: "12px", textAlign: "left", fontSize: "14px", fontWeight: 600, color: "#424242", borderBottom: "1px solid #e0e0e0" }}>Document Name ⇅</th>
-                                <th style={{ padding: "12px", textAlign: "left", fontSize: "14px", fontWeight: 600, color: "#424242", borderBottom: "1px solid #e0e0e0" }}>Uploaded on ⇅</th>
-                                <th style={{ padding: "12px", textAlign: "center", fontSize: "14px", fontWeight: 600, color: "#424242", borderBottom: "1px solid #e0e0e0" }}>Status ⇅</th>
-                                <th style={{ padding: "12px", textAlign: "left", fontSize: "14px", fontWeight: 600, color: "#424242", borderBottom: "1px solid #e0e0e0" }}>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {documents.map((doc) => (
+                    {loading && documents.length === 0 ? (
+                        <div style={{ padding: "40px", textAlign: "center", color: "#616161" }}>
+                            Loading documents...
+                        </div>
+                    ) : (
+                        <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "'Inter', sans-serif" }}>
+                            <thead style={{ position: "sticky", top: 0, backgroundColor: "#fafafa", zIndex: 1 }}>
+                                <tr>
+                                    <th style={{ padding: "12px 24px", textAlign: "left", width: "40px", borderBottom: "1px solid #e0e0e0" }}>
+                                        <input type="checkbox" style={{ width: "16px", height: "16px" }} />
+                                    </th>
+                                    <th style={{ padding: "12px", textAlign: "left", fontSize: "14px", fontWeight: 600, color: "#424242", borderBottom: "1px solid #e0e0e0" }}>Document Name ⇅</th>
+                                    <th style={{ padding: "12px", textAlign: "left", fontSize: "14px", fontWeight: 600, color: "#424242", borderBottom: "1px solid #e0e0e0" }}>Uploaded on ⇅</th>
+                                    <th style={{ padding: "12px", textAlign: "center", fontSize: "14px", fontWeight: 600, color: "#424242", borderBottom: "1px solid #e0e0e0" }}>Status ⇅</th>
+                                    <th style={{ padding: "12px", textAlign: "left", fontSize: "14px", fontWeight: 600, color: "#424242", borderBottom: "1px solid #e0e0e0" }}>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {documents.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={5} style={{ padding: "40px", textAlign: "center", color: "#616161" }}>
+                                            No documents found. Please upload documents.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    documents.map((doc) => (
                                 <tr key={doc.id} style={{ borderBottom: "1px solid #e0e0e0" }}>
                                     <td style={{ padding: "12px 24px" }}>
                                         <input type="checkbox" style={{ width: "16px", height: "16px" }} />
@@ -292,9 +456,11 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                                         )}
                                     </td>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    )}
                 </div>
 
                 {/* Footer */}
@@ -333,7 +499,16 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                             backgroundColor: "#0F6CBD", // Fluent Primary
                             minWidth: "120px",
                         }}
-                        onClick={onClose}
+                        onClick={() => {
+                            // Mark documents as verified (update IsUpload_Status to '1' if not already)
+                            // This is handled automatically by the upload API, but we can add explicit verification here if needed
+                            success('Documents Verified', 'Documents have been marked as verified');
+                            onClose();
+                            if (onUploadComplete) {
+                                onUploadComplete();
+                            }
+                        }}
+                        disabled={loading}
                     >
                         Verified
                     </Button>

@@ -25,7 +25,7 @@ const ProfileAvatar = ({ width = 80, height = 80, className = '' }: { width?: nu
     </svg>
   );
 };
-import { User, UserFormData, userRoleOptions } from "../types";
+import { UserFormData, userRoleOptions } from "../types";
 import { userManagement } from "../../../services/scholarship.service";
 import { useToast } from "@/components/ui/toast";
 
@@ -44,7 +44,8 @@ const UserForm: React.FC = () => {
     phoneNumber: "",
     status: "Active",
   });
-  const [profilePhoto, setProfilePhoto] = React.useState<File | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_profilePhoto, setProfilePhoto] = React.useState<File | null>(null);
   const [profilePhotoPreview, setProfilePhotoPreview] = React.useState<string | null>(null);
   const [isHovered, setIsHovered] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -255,7 +256,7 @@ const UserForm: React.FC = () => {
               paddingLeft: "24px",
               paddingTop: "15px",
             }}>
-              {isEditMode ? "Edit User" : "Add User"}
+              {isEditMode ? "Edit User" : "Add New User"}
             </h1>
             <p style={{
               fontSize: "12px",
@@ -264,7 +265,7 @@ const UserForm: React.FC = () => {
               fontFamily: "'Inter', sans-serif",
               paddingLeft: "24px",
             }}>
-              Create and manage user accounts with specific roles and access levels.
+              {isEditMode ? "Update user details and access levels." : "Enter user details to create a new account."}
             </p>
           </div>
         }

@@ -245,12 +245,31 @@ export class DocumentUploadController {
   @Delete('document/:documentId')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete document' })
+  @ApiQuery({ name: 'applicationId', required: false })
+  @ApiQuery({ name: 'documentType', required: false })
   @ApiResponse({
     status: 200,
     description: 'Document deleted successfully',
   })
-  async deleteDocument(@Param('documentId') documentId: number) {
-    return this.documentService.deleteDocument(Number(documentId));
+  async deleteDocument(
+    @Param('documentId') documentId: number,
+    @Query('applicationId') applicationId?: string,
+    @Query('documentType') documentType?: string,
+  ) {
+    return this.documentService.deleteDocument(Number(documentId), applicationId, documentType);
+  }
+
+  @Get('document-types')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get standard document types list' })
+  @ApiResponse({
+    status: 200,
+    description: 'Document types retrieved successfully',
+  })
+  async getDocumentTypes() {
+    return {
+      documentTypes: this.documentService.getStandardDocumentTypes(),
+    };
   }
 }
 

@@ -11,6 +11,7 @@ import {
 } from "@fluentui/react-icons";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import { processManagement } from "../../../services/scholarship.service";
 
 interface ScholarshipHistoryModalProps {
     open: boolean;
@@ -19,27 +20,50 @@ interface ScholarshipHistoryModalProps {
     studentName?: string;
 }
 
+interface IssuedHistoryItem {
+    year: string;
+    amount: string;
+}
+
 const ScholarshipHistoryModal: React.FC<ScholarshipHistoryModalProps> = ({
     open,
     onOpenChange,
     applicationNo,
     studentName,
 }) => {
+    const [alreadyApplied, setAlreadyApplied] = React.useState<string>("");
+    const [issuedHistoryData, setIssuedHistoryData] = React.useState<IssuedHistoryItem[]>([]);
+    const [loading, setLoading] = React.useState(false);
+    const [studentNameFromApi, setStudentNameFromApi] = React.useState<string>("");
 
-    // Mock Data
-    const alreadyApplied = "2018 ( AF1810636 ), 2019 ( AF1910749 ), 2020 ( AF2010002 ), 2021 ( AF2110755 ), 2022 ( AF2210061 ), 2023 ( AF2310003 ), 2024 ( AF2410001 )";
+    // Fetch scholarship history from API
+    React.useEffect(() => {
+        if (open && applicationNo) {
+            fetchScholarshipHistory();
+        }
+    }, [open, applicationNo]);
+
+    const fetchScholarshipHistory = async () => {
+        if (!applicationNo) return;
+        
+        setLoading(true);
+        try {
+            const response = await processManagement.getScholarshipHistory(applicationNo);
+            setAlreadyApplied(response.alreadyApplied || "No previous applications");
+            setIssuedHistoryData(response.issuedHistory || []);
+            setStudentNameFromApi(response.studentName || studentName || "");
+        } catch (error) {
+            console.error('Error fetching scholarship history:', error);
+            setAlreadyApplied("No previous applications");
+            setIssuedHistoryData([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const columns = [
-        { key: "scholarshipYear", name: "ScholarshipYear", minWidth: 200, style: { width: "70%" }, onRender: (item: any) => item.year },
-        { key: "issuedAmount", name: "Issued Amount", minWidth: 150, style: { width: "30%" }, onRender: (item: any) => item.amount },
-    ];
-
-    const issuedHistoryData = [
-        { year: "2018 ( 18LMSS1120 )", amount: "53750" },
-        { year: "2019 ( 19LMSS1215 )", amount: "57350" },
-        { year: "2020 ( 20LMSS1263 )", amount: "100000" },
-        { year: "2022 ( 22LMSS1002 )", amount: "100000" },
-        { year: "2024 ( 24LMSS1002 )", amount: "200000" },
+        { key: "scholarshipYear", name: "ScholarshipYear", minWidth: 200, style: { width: "70%" }, onRender: (item: IssuedHistoryItem) => item.year },
+        { key: "issuedAmount", name: "Issued Amount", minWidth: 150, style: { width: "30%" }, onRender: (item: IssuedHistoryItem) => item.amount },
     ];
 
     const handleDownload = () => {
@@ -110,6 +134,9 @@ const ScholarshipHistoryModal: React.FC<ScholarshipHistoryModalProps> = ({
             }
             hideDefaultHeader={true}
         >
+            {loading ? (
+                <div style={{ padding: "20px", textAlign: "center" }}>Loading...</div>
+            ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "24px", padding: "8px 0" }}>
 
                 {/* Details Section */}
@@ -127,7 +154,7 @@ const ScholarshipHistoryModal: React.FC<ScholarshipHistoryModalProps> = ({
                             Student Name
                         </div>
                         <div style={{ padding: "12px 16px", flex: 1, fontSize: "14px", color: "#242424" }}>
-                            {studentName}
+                            {studentNameFromApi || studentName || ""}
                         </div>
                     </div>
                     <div style={{ display: "flex" }}>
@@ -156,6 +183,7 @@ const ScholarshipHistoryModal: React.FC<ScholarshipHistoryModalProps> = ({
                 </div>
 
             </div>
+            )}
         </Modal>
     );
 };

@@ -34,6 +34,16 @@ export interface ApplicationData {
     size?: string;
   }>;
   processActionLabel?: string;
+  suggestLinkEnable?: boolean;
+  lblSuggested?: boolean;
+  lblReject?: boolean;
+  lblCompleted?: boolean;
+  suggestScholarshipId?: number | string;
+  requestAmount?: number | string;
+  suggestedAmount?: number | string;
+  approvedAmount?: number | string;
+  scholarshipSeekingFor?: string;
+  fatherName?: string;
   [key: string]: unknown;
 }
 

@@ -12,6 +12,7 @@ import {
 } from "@fluentui/react-icons";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import { processManagement } from "../../../services/scholarship.service";
 
 interface ProcessHistoryModalProps {
     open: boolean;
@@ -27,17 +28,6 @@ interface HistoryItem {
     date: string;
 }
 
-const mockHistoryData: HistoryItem[] = [
-    { id: 1, action: "Online Registration", processUndergone: "AF2510001 has registered successfully", handledBy: "Admin", date: "17/04/2025 12:15 PM" },
-    { id: 2, action: "Initial Document Upload", processUndergone: "Following Initial Document Upload...", handledBy: "Admin", date: "17/05/2025 06:30 PM" },
-    { id: 3, action: "Initial Document Upload", processUndergone: "Following Initial Document Upload...", handledBy: "Admin", date: "17/05/2025 06:45 PM" },
-    { id: 4, action: "Initial Document Upload", processUndergone: "Following Initial Document Upload...", handledBy: "Admin", date: "17/05/2025 07:00 PM" },
-    { id: 5, action: "Initial Document Upload", processUndergone: "Following Initial Document Upload...", handledBy: "Admin", date: "17/05/2025 07:15 PM" },
-    { id: 6, action: "Initial Document Upload", processUndergone: "Following Initial Document Upload...", handledBy: "Admin", date: "17/05/2025 07:30 PM" },
-    { id: 7, action: "Re-Print PDF", processUndergone: "Re-Print Application Form", handledBy: "Deepak", date: "30/05/2025 10:00 AM" },
-    { id: 8, action: "Document Verification", processUndergone: "Documents are Verified by deepak", handledBy: "Deepak", date: "26/07/2025 05:00 PM" },
-];
-
 const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
     open,
     onOpenChange,
@@ -45,17 +35,47 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
 }) => {
     const [currentPage, setCurrentPage] = React.useState(1);
     const [pageSize, setPageSize] = React.useState(10);
+    const [historyData, setHistoryData] = React.useState<HistoryItem[]>([]);
+    const [totalItems, setTotalItems] = React.useState(0);
+    const [loading, setLoading] = React.useState(false);
 
-    const totalItems = mockHistoryData.length;
+    // Fetch history data from API
+    React.useEffect(() => {
+        if (open && applicationNo) {
+            fetchHistory();
+        }
+    }, [open, applicationNo, currentPage, pageSize]);
+
+    const fetchHistory = async () => {
+        if (!applicationNo) return;
+        
+        setLoading(true);
+        try {
+            const response = await processManagement.getApplicationHistory(applicationNo, {
+                page: currentPage,
+                pageSize: pageSize,
+            });
+            setHistoryData(response.data || []);
+            setTotalItems(response.total || 0);
+        } catch (error) {
+            console.error('Error fetching history:', error);
+            setHistoryData([]);
+            setTotalItems(0);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const totalPages = Math.ceil(totalItems / pageSize);
 
-    const paginatedData = React.useMemo(() => {
-        const startIndex = (currentPage - 1) * pageSize;
-        return mockHistoryData.slice(startIndex, startIndex + pageSize);
-    }, [currentPage, pageSize]);
-
     const columns = [
-        { key: "id", name: "S.No.", minWidth: 60, maxWidth: 60, onRender: (item: HistoryItem) => item.id },
+        { 
+            key: "id", 
+            name: "S.No.", 
+            minWidth: 60, 
+            maxWidth: 60, 
+            onRender: (item: HistoryItem, index: number) => (currentPage - 1) * pageSize + index + 1 
+        },
         { key: "action", name: "Action", minWidth: 150, onRender: (item: HistoryItem) => item.action },
         { key: "processUndergone", name: "Process Undergone", minWidth: 250, onRender: (item: HistoryItem) => item.processUndergone },
         { key: "handledBy", name: "Handled by", minWidth: 120, onRender: (item: HistoryItem) => item.handledBy },
@@ -65,17 +85,36 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
     const handleClose = () => {
         onOpenChange(false); // Close the modal when the close icon is clicked
     };
-    const handleDownload = () => {
-        const doc = new jsPDF();
-        doc.text(`History Against Application Number : ${applicationNo}`, 14, 15);
+    const handleDownload = async () => {
+        if (!applicationNo) return;
+        
+        // Fetch all history data for download
+        try {
+            const response = await processManagement.getApplicationHistory(applicationNo, {
+                page: 1,
+                pageSize: 1000, // Get all records for download
+            });
+            const allHistoryData = response.data || [];
 
-        autoTable(doc, {
-            startY: 20,
-            head: [["S.No.", "Action", "Process Undergone", "Handled by", "Date"]],
-            body: mockHistoryData.map(item => [item.id, item.action, item.processUndergone, item.handledBy, item.date]),
-        });
+            const doc = new jsPDF();
+            doc.text(`History Against Application Number : ${applicationNo}`, 14, 15);
 
-        doc.save(`${applicationNo}_history.pdf`);
+            autoTable(doc, {
+                startY: 20,
+                head: [["S.No.", "Action", "Process Undergone", "Handled by", "Date"]],
+                body: allHistoryData.map((item: HistoryItem, index: number) => [
+                    index + 1,
+                    item.action,
+                    item.processUndergone,
+                    item.handledBy,
+                    item.date,
+                ]),
+            });
+
+            doc.save(`${applicationNo}_history.pdf`);
+        } catch (error) {
+            console.error('Error downloading history:', error);
+        }
     };
 
     const handlePrint = () => {
@@ -123,12 +162,16 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
         >
             <div style={{ display: "flex", flexDirection: "column", height: "60vh" }}>
                 <div style={{ flex: 1, overflow: "auto" }}>
-                    <Table
-                        columns={columns}
-                        data={paginatedData}
-                        disableScroll={true} // Modal handles scrolling
-                        className="w-full"
-                    />
+                    {loading ? (
+                        <div style={{ padding: "20px", textAlign: "center" }}>Loading...</div>
+                    ) : (
+                        <Table
+                            columns={columns}
+                            data={historyData}
+                            disableScroll={true} // Modal handles scrolling
+                            className="w-full"
+                        />
+                    )}
                 </div>
 
                 <div style={{
@@ -141,9 +184,14 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
                         totalPages={totalPages}
                         pageSize={pageSize}
                         totalItems={totalItems}
-                        onPageChange={setCurrentPage}
-                        onPageSizeChange={setPageSize}
-                        pageSizeOptions={[5, 10, 20]}
+                        onPageChange={(page) => {
+                            setCurrentPage(page);
+                        }}
+                        onPageSizeChange={(newPageSize) => {
+                            setPageSize(newPageSize);
+                            setCurrentPage(1); // Reset to first page when page size changes
+                        }}
+                        pageSizeOptions={[5, 10, 20, 50]}
                         showFirstLast={true}
                         showPageSize={true}
                         showPageNumbers={true}

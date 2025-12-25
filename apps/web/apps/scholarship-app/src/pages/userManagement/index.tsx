@@ -40,6 +40,20 @@ const UserManagementPage: React.FC = () => {
         setLoading(true);
         const data = await userManagement.getAllUsers();
         // Map API response to User interface
+        // Helper function to map role to user type
+        const getuserTypeFromRole = (roleName: string): "Administrator" | "Manager" | "Standard User" => {
+          const adminRoles = ['CEO', 'Super Admin', 'Supreme Admin', 'Document Super Admin'];
+          const managerRoles = ['Scholarship Admin', 'Document Admin'];
+          
+          if (adminRoles.some(adminRole => roleName.toLowerCase().includes(adminRole.toLowerCase()))) {
+            return 'Administrator';
+          }
+          if (managerRoles.some(managerRole => roleName.toLowerCase().includes(managerRole.toLowerCase()))) {
+            return 'Manager';
+          }
+          return 'Standard User';
+        };
+
         const mappedUsers: User[] = data.map((user: {
           ID: number;
           User_ID: string;
@@ -53,7 +67,7 @@ const UserManagementPage: React.FC = () => {
           id: user.User_ID,
           name: user.User_Name || user.User_ID,
           userRole: user.Role_Name || '',
-          userType: 'Standard User', // Can be derived from role if needed
+          userType: getuserTypeFromRole(user.Role_Name || ''),
           mobileNumber: user.Mobile_Number || '',
           emailId: user.EMail_Id || user.User_ID,
           status: user.ActiveStatus === 'Active' ? 'Active' : 'Inactive',
@@ -79,6 +93,20 @@ const UserManagementPage: React.FC = () => {
       const fetchUsers = async () => {
         try {
           const data = await userManagement.getAllUsers();
+          // Helper function to map role to user type
+          const getuserTypeFromRole = (roleName: string): "Administrator" | "Manager" | "Standard User" => {
+            const adminRoles = ['CEO', 'Super Admin', 'Supreme Admin', 'Document Super Admin'];
+            const managerRoles = ['Scholarship Admin', 'Document Admin'];
+            
+            if (adminRoles.some(adminRole => roleName.toLowerCase().includes(adminRole.toLowerCase()))) {
+              return 'Administrator';
+            }
+            if (managerRoles.some(managerRole => roleName.toLowerCase().includes(managerRole.toLowerCase()))) {
+              return 'Manager';
+            }
+            return 'Standard User';
+          };
+
           const mappedUsers: User[] = data.map((user: {
             ID: number;
             User_ID: string;
@@ -92,7 +120,7 @@ const UserManagementPage: React.FC = () => {
             id: user.User_ID,
             name: user.User_Name || user.User_ID,
             userRole: user.Role_Name || '',
-            userType: 'Standard User',
+            userType: getuserTypeFromRole(user.Role_Name || ''),
             mobileNumber: user.Mobile_Number || '',
             emailId: user.EMail_Id || user.User_ID,
             status: user.ActiveStatus === 'Active' ? 'Active' : 'Inactive',

@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   Query,
+  Param,
   HttpCode,
   HttpStatus,
   ParseIntPipe,
@@ -225,5 +226,27 @@ export class ProcessManagementController {
     return this.processService.issueAmount(
       data as Parameters<typeof this.processService.issueAmount>[0],
     );
+  }
+
+  @Get('history/:applicationId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get application history (View History)' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'pageSize', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Application history retrieved successfully' })
+  async getApplicationHistory(
+    @Param('applicationId') applicationId: string,
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+  ) {
+    return this.processService.getApplicationHistory(applicationId, page, pageSize);
+  }
+
+  @Get('scholarship-history/:applicationId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get scholarship history (Previous Scholarship History)' })
+  @ApiResponse({ status: 200, description: 'Scholarship history retrieved successfully' })
+  async getScholarshipHistory(@Param('applicationId') applicationId: string) {
+    return this.processService.getScholarshipHistory(applicationId);
   }
 }

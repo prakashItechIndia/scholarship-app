@@ -10,6 +10,7 @@ import {
 import { Role, RoleFormData, RolePermission } from "../types";
 import { defaultPermissions } from "../constants";
 import { RoleDetailsForm } from "./RoleDetailsForm";
+import { RoleScreenPermissions } from "./RoleScreenPermissions";
 import { roleManagement } from "../../../services/scholarship.service";
 import { useToast } from "@/components/ui/toast";
 
@@ -42,6 +43,7 @@ const RoleForm: React.FC = () => {
     status: "Active",
     permissions: [...defaultPermissions],
   });
+  const [selectedScreenIds, setSelectedScreenIds] = React.useState<number[]>([]);
   // Note: profilePhoto is stored for potential file upload functionality
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_profilePhoto, setProfilePhoto] = React.useState<File | null>(null);
@@ -62,11 +64,15 @@ const RoleForm: React.FC = () => {
           setLoading(true);
           const roleId = parseInt(id, 10);
           const roleData = await roleManagement.getRoleById(roleId);
+          // Load role with permissions to get screen IDs
+          const roleWithPermissions = await roleManagement.getRoleWithPermissions(roleId);
+          const screenIds = roleWithPermissions.permissions.map(p => p.screenId);
+          setSelectedScreenIds(screenIds);
           setFormData({
             roleName: roleData.roleName || "",
             userType: roleData.userType || "",
             status: roleData.isActive === 1 ? "Active" : "Inactive",
-            permissions: [...defaultPermissions], // Permissions not stored in DB yet
+            permissions: [...defaultPermissions], // Keep for backward compatibility
           });
         } catch (err) {
           showError('Failed to Load Role', err instanceof Error ? err.message : 'Failed to fetch role data');
@@ -201,12 +207,9 @@ const RoleForm: React.FC = () => {
       }
     }
 
-    // ROL-002: At least one permission shall be enabled for a valid role
-    const hasAnyPermission = formData.permissions.some(
-      (perm) => perm.create || perm.update || perm.view || perm.delete
-    );
-    if (!hasAnyPermission) {
-      newErrors.permissions = "At least one permission must be enabled for the role.";
+    // ROL-002: At least one screen permission shall be enabled for a valid role
+    if (selectedScreenIds.length === 0) {
+      newErrors.permissions = "At least one screen permission must be selected for the role.";
     }
 
     setErrors(newErrors);
@@ -227,9 +230,19 @@ const RoleForm: React.FC = () => {
       if (isEditMode && id) {
         const roleId = parseInt(id, 10);
         await roleManagement.updateRole(roleId, roleData);
+        // Update screen permissions
+        await roleManagement.updateRolePermissions(roleId, selectedScreenIds);
         success('Success', 'Role updated successfully');
       } else {
-        await roleManagement.createRole(roleData);
+        // Create role first, then get the ID to assign permissions
+        const createResult = await roleManagement.createRole(roleData);
+        // Get the newly created role ID - we need to fetch it by name
+        const allRoles = await roleManagement.getAllRoles();
+        const newRole = allRoles.find(r => r.roleName === roleData.roleName);
+        if (newRole && newRole.id) {
+          const newRoleId = typeof newRole.id === 'string' ? parseInt(newRole.id, 10) : newRole.id;
+          await roleManagement.updateRolePermissions(newRoleId, selectedScreenIds);
+        }
         success('Success', 'Role created successfully');
       }
       
@@ -681,12 +694,9 @@ const RoleForm: React.FC = () => {
           paddingLeft: "24px",
           paddingRight: "24px",
           paddingBottom: "32px", 
-          // borderBottom: "1px solid #e0e0e0" 
-          // paddingTop: "-24px",
         }}>
           <div style={{ 
             borderBottom: "1px solid #e0e0e0",
-            // paddingTop: "18px",
             paddingBottom: "34px",
             marginLeft: "-24px",
             marginRight: "-24px",
@@ -702,7 +712,7 @@ const RoleForm: React.FC = () => {
                 fontFamily: "'Inter', sans-serif",
                 margin: 0,
               }}>
-                Permissions
+                Screen Permissions
               </h3>
               {errors.permissions && (
                 <span style={{
@@ -716,19 +726,12 @@ const RoleForm: React.FC = () => {
                 </span>
               )}
             </div>
-          <DataTable
-            columns={permissionsColumns}
-            data={formData.permissions}
-            cardStyle={{
-              border: "1px solid #e0e0e0",
-              borderRadius: "8px",
-              padding: 0,
-              margin: 0,
-              boxShadow: "none",
-              width: "80%",
-            }}
-            showPagination={false}
-          />
+            <RoleScreenPermissions
+              roleId={isEditMode && id ? parseInt(id, 10) : undefined}
+              selectedScreenIds={selectedScreenIds}
+              onScreenSelectionChange={setSelectedScreenIds}
+              errors={errors}
+            />
           </div>
         </div>
 

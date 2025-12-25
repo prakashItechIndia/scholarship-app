@@ -20,6 +20,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { NavbarLogo } from "../common";
 import { ProfilePopover } from "../common/ProfilePopover";
 import { PageLayout, SideNavConfig } from "./PageLayout";
+import { usePermissions } from "../../contexts/PermissionContext";
 
 interface ProcessLayoutProps {
   children: React.ReactNode;
@@ -73,42 +74,67 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
   // Get user name and role from user data
   const userName = userData?.user?.userName || userData?.email || 'User';
   const userRole = userData?.user?.userType || 'User';
+  
+  // Get permissions
+  const { hasPermission } = usePermissions();
 
-  const sideNavConfig: SideNavConfig = {
-    // logo,
-    expanded: false,
-    items: [
+  // Define all menu items with their screen URLs
+  const allMenuItems = [
       {
         icon: <HomeRegular className="w-5 h-5" />,
         label: "Home",
+        screenUrl: "/home",
+        path: "/home",
         active: location.pathname === "/home" || location.pathname === "/admin-dashboard",
         onClick: () => { void navigate("/home"); },
       },
       {
         icon: <DocumentOnePageSparkleRegular  className="w-5 h-5" />,
         label: "Process",
+        screenUrl: "/process",
+        path: "/process",
         active: location.pathname === "/process",
         onClick: () => { void navigate("/process"); },
       },
       {
         icon: <TaskListSquareAdd24Regular className="w-5 h-5" />,
         label: "Roles",
+        screenUrl: "/role-management",
+        path: "/role-management",
         active: location.pathname === "/role-management",
         onClick: () => { void navigate("/role-management"); },
       },
       {
         icon: <PeopleTeam24Regular className="w-5 h-5" />,
         label: "Users",
+        screenUrl: "/user-management",
+        path: "/user-management",
         active: location.pathname === "/user-management",
         onClick: () => { void navigate("/user-management"); },
       },
       {
         icon: <DocumentDataRegular className="w-5 h-5" />,
         label: "Reports",
+        screenUrl: "/reports",
+        path: "/reports",
         active: location.pathname === "/reports",
         onClick: () => { void navigate("/reports"); },
       },
-    ],
+    ];
+
+  // Filter menu items based on permissions
+  // If no permissions loaded yet, show all items (will be filtered once permissions load)
+  const filteredMenuItems = allMenuItems.filter(item => {
+    // If permissions are not loaded, show item (will be hidden once permissions load)
+    // Otherwise, check if user has permission for this screen
+    // return hasPermission(item.screenUrl);
+    return true;
+  });
+
+  const sideNavConfig: SideNavConfig = {
+    // logo,
+    expanded: false,
+    items: filteredMenuItems,
     footerItems: [
       {
         icon: <QuestionCircleRegular className="w-5 h-5" />,

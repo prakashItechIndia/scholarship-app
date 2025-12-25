@@ -9,14 +9,19 @@ import {
   HttpCode,
   HttpStatus,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { RoleManagementService } from './role-management.service';
+import { RolePermissionsService } from './role-permissions.service';
 
 @ApiTags('Role Management')
 @Controller('role-management')
 export class RoleManagementController {
-  constructor(private readonly roleService: RoleManagementService) {}
+  constructor(
+    private readonly roleService: RoleManagementService,
+    private readonly permissionsService: RolePermissionsService,
+  ) {}
 
   @Get('roles')
   @HttpCode(HttpStatus.OK)
@@ -103,6 +108,87 @@ export class RoleManagementController {
   })
   async deleteRole(@Param('roleId', ParseIntPipe) roleId: number) {
     return this.roleService.deleteRole(roleId);
+  }
+
+  // Permission endpoints
+  @Get('screens')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all available screens' })
+  @ApiResponse({
+    status: 200,
+    description: 'Screens retrieved successfully',
+  })
+  async getAllScreens() {
+    return this.permissionsService.getAllScreens();
+  }
+
+  @Get('role/:roleId/permissions')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get permissions for a role' })
+  @ApiResponse({
+    status: 200,
+    description: 'Role permissions retrieved successfully',
+  })
+  async getRolePermissions(@Param('roleId', ParseIntPipe) roleId: number) {
+    return this.permissionsService.getRolePermissions(roleId);
+  }
+
+  @Get('role/:roleId/permissions-full')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get role with all permissions' })
+  @ApiResponse({
+    status: 200,
+    description: 'Role with permissions retrieved successfully',
+  })
+  async getRoleWithPermissions(@Param('roleId', ParseIntPipe) roleId: number) {
+    return this.permissionsService.getRoleWithPermissions(roleId);
+  }
+
+  @Get('user/:userId/permissions')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get permissions for a user' })
+  @ApiResponse({
+    status: 200,
+    description: 'User permissions retrieved successfully',
+  })
+  async getUserPermissions(@Param('userId', ParseIntPipe) userId: number) {
+    return this.permissionsService.getUserPermissions(userId);
+  }
+
+  @Get('user/:userId/has-permission')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Check if user has permission to access a screen' })
+  @ApiResponse({
+    status: 200,
+    description: 'Permission check result',
+  })
+  async hasScreenPermission(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query('screenUrl') screenUrl: string,
+  ) {
+    const hasPermission = await this.permissionsService.hasScreenPermission(
+      userId,
+      screenUrl,
+    );
+    return { hasPermission };
+  }
+
+  @Put('role/:roleId/permissions')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update permissions for a role' })
+  @ApiResponse({
+    status: 200,
+    description: 'Role permissions updated successfully',
+  })
+  async updateRolePermissions(
+    @Param('roleId', ParseIntPipe) roleId: number,
+    @Body() body: { screenIds: number[] },
+  ) {
+    await this.permissionsService.updateRolePermissions(
+      roleId,
+      body.screenIds,
+    );
+    return { message: 'Role permissions updated successfully' };
   }
 }
 
