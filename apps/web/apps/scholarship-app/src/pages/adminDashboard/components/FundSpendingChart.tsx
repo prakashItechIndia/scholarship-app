@@ -100,7 +100,7 @@ export const FundSpendingChart: React.FC<FundSpendingChartProps> = ({
             color: "#616161",
             fontFamily: "'Inter', sans-serif",
           }}>
-            Total budget utilization.
+            Track budget utilization.
           </p>
         </div>
         <div style={{ width: "150px" }}>

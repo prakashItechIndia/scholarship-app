@@ -78,6 +78,113 @@ export const scholarshipAuth = {
 };
 
 /**
+ * Dashboard Service
+ */
+export const dashboard = {
+  /**
+   * Get financial summary
+   */
+  getFinancialSummary: async (academicYearId?: number) => {
+    const params = academicYearId ? `?academicYearId=${academicYearId}` : '';
+    const response = await apiClient.get(`/dashboard/financial-summary${params}`);
+    return response.data;
+  },
+
+  /**
+   * Get application analytics
+   */
+  getApplicationAnalytics: async (academicYearId?: number) => {
+    const params = academicYearId ? `?academicYearId=${academicYearId}` : '';
+    const response = await apiClient.get(`/dashboard/application-analytics${params}`);
+    return response.data;
+  },
+
+  /**
+   * Get recent applications
+   */
+  getRecentApplications: async (limit = 10, academicYearId?: number) => {
+    const params = new URLSearchParams();
+    if (limit) params.append('limit', limit.toString());
+    if (academicYearId) params.append('academicYearId', academicYearId.toString());
+    const queryString = params.toString();
+    const response = await apiClient.get(`/dashboard/recent-applications${queryString ? `?${queryString}` : ''}`);
+    return response.data;
+  },
+
+  /**
+   * Get application activity by month
+   */
+  getApplicationActivity: async (academicYearId?: number) => {
+    const params = academicYearId ? `?academicYearId=${academicYearId}` : '';
+    const response = await apiClient.get(`/dashboard/application-activity${params}`);
+    return response.data;
+  },
+
+  /**
+   * Get scholarship program distribution
+   */
+  getProgramDistribution: async (academicYearId?: number) => {
+    const params = academicYearId ? `?academicYearId=${academicYearId}` : '';
+    const response = await apiClient.get(`/dashboard/program-distribution${params}`);
+    return response.data;
+  },
+
+  /**
+   * Get application status breakdown by month
+   */
+  getApplicationStatus: async (month?: string, academicYearId?: number) => {
+    const params = new URLSearchParams();
+    if (month) params.append('month', month);
+    if (academicYearId) params.append('academicYearId', academicYearId.toString());
+    const queryString = params.toString();
+    const response = await apiClient.get(`/dashboard/application-status${queryString ? `?${queryString}` : ''}`);
+    return response.data;
+  },
+
+  /**
+   * Get recent activities
+   */
+  getRecentActivities: async (limit = 5) => {
+    const params = limit ? `?limit=${limit}` : '';
+    const response = await apiClient.get(`/dashboard/recent-activities${params}`);
+    return response.data;
+  },
+
+  /**
+   * Get performance metrics
+   */
+  getPerformanceMetrics: async (academicYearId?: number) => {
+    const params = academicYearId ? `?academicYearId=${academicYearId}` : '';
+    const response = await apiClient.get(`/dashboard/performance-metrics${params}`);
+    return response.data;
+  },
+
+  /**
+   * Get fund spending data
+   */
+  getFundSpending: async (yearRange?: string, academicYearId?: number) => {
+    const params = new URLSearchParams();
+    if (yearRange) params.append('yearRange', yearRange);
+    if (academicYearId) params.append('academicYearId', academicYearId.toString());
+    const queryString = params.toString();
+    const response = await apiClient.get(`/dashboard/fund-spending${queryString ? `?${queryString}` : ''}`);
+    return response.data;
+  },
+
+  /**
+   * Get calendar events
+   */
+  getCalendarEvents: async (month?: string, academicYearId?: number) => {
+    const params = new URLSearchParams();
+    if (month) params.append('month', month);
+    if (academicYearId) params.append('academicYearId', academicYearId.toString());
+    const queryString = params.toString();
+    const response = await apiClient.get(`/dashboard/calendar-events${queryString ? `?${queryString}` : ''}`);
+    return response.data;
+  },
+};
+
+/**
  * Scholarship Application Service
  */
 export const scholarshipApplication = {
@@ -279,7 +386,7 @@ export const documentUpload = {
 
     const response = await apiClient.post<{
       message: string;
-      results: Array<{ message: string; documentPath: string }>;
+      results: { message: string; documentPath: string }[];
     }>('/document-upload/upload-multiple', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -363,7 +470,7 @@ export const dropdownOptions = {
    */
   getCountries: async () => {
     const response = await apiClient.get<
-      Array<{ value: string; label: string }>
+      { value: string; label: string }[]
     >('/dropdown-options/countries');
     return response.data;
   },
@@ -372,7 +479,7 @@ export const dropdownOptions = {
    * Get states by country ID
    */
   getStates: async (countryId?: string) => {
-    const response = await apiClient.get<Array<{ value: string; label: string }>>(
+    const response = await apiClient.get<{ value: string; label: string }[]>(
       '/dropdown-options/states',
       { params: countryId ? { countryId } : {} },
     );
@@ -383,7 +490,7 @@ export const dropdownOptions = {
    * Get districts by state ID
    */
   getDistricts: async (stateId?: string) => {
-    const response = await apiClient.get<Array<{ value: string; label: string }>>(
+    const response = await apiClient.get<{ value: string; label: string }[]>(
       '/dropdown-options/districts',
       { params: stateId ? { stateId } : {} },
     );
@@ -394,7 +501,7 @@ export const dropdownOptions = {
    * Get all communities
    */
   getCommunities: async () => {
-    const response = await apiClient.get<Array<{ value: string; label: string }>>(
+    const response = await apiClient.get<{ value: string; label: string }[]>(
       '/dropdown-options/communities',
     );
     return response.data;
@@ -404,7 +511,7 @@ export const dropdownOptions = {
    * Get castes by community
    */
   getCastes: async (community?: string) => {
-    const response = await apiClient.get<Array<{ value: string; label: string }>>(
+    const response = await apiClient.get<{ value: string; label: string }[]>(
       '/dropdown-options/castes',
       { params: community ? { community } : {} },
     );
@@ -415,7 +522,7 @@ export const dropdownOptions = {
    * Get all occupations
    */
   getOccupations: async () => {
-    const response = await apiClient.get<Array<{ value: string; label: string }>>(
+    const response = await apiClient.get<{ value: string; label: string }[]>(
       '/dropdown-options/occupations',
     );
     return response.data;
@@ -425,7 +532,7 @@ export const dropdownOptions = {
    * Get annual income ranges
    */
   getAnnualIncomeRanges: async () => {
-    const response = await apiClient.get<Array<{ value: string; label: string }>>(
+    const response = await apiClient.get<{ value: string; label: string }[]>(
       '/dropdown-options/annual-income-ranges',
     );
     return response.data;
@@ -435,7 +542,7 @@ export const dropdownOptions = {
    * Get all bank names
    */
   getBankNames: async () => {
-    const response = await apiClient.get<Array<{ value: string; label: string }>>(
+    const response = await apiClient.get<{ value: string; label: string }[]>(
       '/dropdown-options/bank-names',
     );
     return response.data;
@@ -853,12 +960,13 @@ export const processManagement = {
    */
   getApplicationHistory: async (
     applicationId: string,
-    params?: { page?: number; pageSize?: number },
+    params?: { page?: number; pageSize?: number; getAllRecords?: boolean },
   ) => {
     const response = await apiClient.get(`/process-management/history/${applicationId}`, {
       params: {
         page: params?.page,
         pageSize: params?.pageSize,
+        getAllRecords: params?.getAllRecords,
       },
     });
     return response.data;

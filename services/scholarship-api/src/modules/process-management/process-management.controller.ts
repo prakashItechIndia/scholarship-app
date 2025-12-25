@@ -233,13 +233,21 @@ export class ProcessManagementController {
   @ApiOperation({ summary: 'Get application history (View History)' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'pageSize', required: false, type: Number })
+  @ApiQuery({ name: 'getAllRecords', required: false, type: Boolean })
   @ApiResponse({ status: 200, description: 'Application history retrieved successfully' })
   async getApplicationHistory(
     @Param('applicationId') applicationId: string,
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('getAllRecords') getAllRecords?: string,
   ) {
-    return this.processService.getApplicationHistory(applicationId, page, pageSize);
+    const getAll = getAllRecords === 'true' || getAllRecords === '1';
+    return this.processService.getApplicationHistory(
+      applicationId,
+      page,
+      pageSize,
+      getAll,
+    );
   }
 
   @Get('scholarship-history/:applicationId')

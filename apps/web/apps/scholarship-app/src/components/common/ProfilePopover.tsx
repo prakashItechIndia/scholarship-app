@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
 import {
   PersonRegular,
   KeyRegular,
@@ -25,7 +24,6 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
   onLogout,
   onChangePassword,
   children,
-  position = "top",
 }) => {
 
   return (
@@ -35,13 +33,15 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
         const openState = (data as { open?: boolean })?.open ?? false;
         onOpenChange(openState);
       }}
-      positioning={positioning}
     >
-      <PopoverTrigger disableButtonEnhancement>{children}</PopoverTrigger>
+      <PopoverTrigger disableButtonEnhancement>
+        {children as React.ReactElement}
+      </PopoverTrigger>
       <PopoverContent
-        ref={popoverContentRef}
         className="w-[280px]"
-        style={contentStyle}
+        style={{
+          borderRadius: "8px",
+        }}
       >
         {/* User Info Section */}
         <div

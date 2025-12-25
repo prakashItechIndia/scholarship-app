@@ -1191,16 +1191,19 @@ export class ProcessManagementService {
     applicationId: string,
     page: number = 1,
     pageSize: number = 10,
+    getAllRecords: boolean = false,
   ) {
     try {
       const validatedPage = Math.max(1, Math.floor(Number(page)));
-      const validatedPageSize = Math.max(1, Math.min(100, Math.floor(Number(pageSize))));
-      const offset = (validatedPage - 1) * validatedPageSize;
+      const validatedPageSize = getAllRecords
+        ? 999999
+        : Math.max(1, Math.min(100, Math.floor(Number(pageSize))));
+      const offset = getAllRecords ? 0 : (validatedPage - 1) * validatedPageSize;
 
       // Query from TBL_HISTORY table (matching old application structure)
       // TBL_HISTORY columns: ID, Application_Id, Process, Action, Data_Date, User_ID
       // Display: S.No, Action (from Process), Process Undergone (from Action), Handled by (from User_ID/User_Name), Date
-      const historyQuery = `
+      let historyQuery = `
         SELECT
           H.ID,
           H.Application_Id,
@@ -1213,8 +1216,11 @@ export class ProcessManagementService {
         LEFT JOIN TBL_USERMASTER U ON H.User_ID = U.User_ID
         WHERE H.Application_Id = @applicationId
         ORDER BY H.Data_Date ASC, H.ID ASC
-        OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY
       `;
+
+      if (!getAllRecords) {
+        historyQuery += ` OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY`;
+      }
 
       // Count query
       const countQuery = `
@@ -1223,11 +1229,14 @@ export class ProcessManagementService {
         WHERE Application_Id = @applicationId
       `;
 
-      const queryParams = {
+      const queryParams: Record<string, unknown> = {
         applicationId,
-        offset,
-        pageSize: validatedPageSize,
       };
+
+      if (!getAllRecords) {
+        queryParams.offset = offset;
+        queryParams.pageSize = validatedPageSize;
+      }
 
       const [historyResult, countResult] = await Promise.all([
         this.db.query(historyQuery, queryParams),
@@ -1237,16 +1246,20 @@ export class ProcessManagementService {
       const total = (countResult.recordset?.[0] as { total?: number })?.total || 0;
 
       // Map results to match frontend expectations
-      const mappedData = (historyResult.recordset || []).map((row: Record<string, unknown>, index: number) => {
-        const rowRecord = row as Record<string, unknown>;
-        return {
-          id: Number(rowRecord.ID) || offset + index + 1,
-          action: String(rowRecord.Action || ''),
-          processUndergone: String(rowRecord.ProcessUndergone || ''),
-          handledBy: String(rowRecord.HandledBy || rowRecord.User_ID || 'Admin'),
-          date: String(rowRecord.Date || ''),
-        };
-      });
+      const mappedData = (historyResult.recordset || []).map(
+        (row: Record<string, unknown>, index: number) => {
+          const rowRecord = row as Record<string, unknown>;
+          return {
+            id: Number(rowRecord.ID) || (getAllRecords ? index + 1 : offset + index + 1),
+            action: String(rowRecord.Action ?? ''),
+            processUndergone: String(rowRecord.ProcessUndergone ?? ''),
+            handledBy: String(
+              rowRecord.HandledBy ?? rowRecord.User_ID ?? 'Admin',
+            ),
+            date: String(rowRecord.Date ?? ''),
+          };
+        },
+      );
 
       return {
         data: mappedData,

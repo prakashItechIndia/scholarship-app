@@ -1107,6 +1107,86 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
         },
         /**
          * 
+         * @summary Get application status breakdown by month
+         * @param {string} [month] 
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetApplicationStatusByMonth: async (month?: string, academicYearId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dashboard/application-status`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (month !== undefined) {
+                localVarQueryParameter['month'] = month;
+            }
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get calendar events
+         * @param {string} [month] 
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetCalendarEvents: async (month?: string, academicYearId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dashboard/calendar-events`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (month !== undefined) {
+                localVarQueryParameter['month'] = month;
+            }
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get financial summary for dashboard
          * @param {number} [academicYearId] 
          * @param {*} [options] Override http request option.
@@ -1127,6 +1207,116 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
             if (academicYearId !== undefined) {
                 localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get fund spending data
+         * @param {string} [yearRange] 
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetFundSpending: async (yearRange?: string, academicYearId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dashboard/fund-spending`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (yearRange !== undefined) {
+                localVarQueryParameter['yearRange'] = yearRange;
+            }
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get performance metrics
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetPerformanceMetrics: async (academicYearId?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dashboard/performance-metrics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (academicYearId !== undefined) {
+                localVarQueryParameter['academicYearId'] = academicYearId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get recent activities
+         * @param {number} [limit] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetRecentActivities: async (limit?: number, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/dashboard/recent-activities`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
             }
 
 
@@ -1249,6 +1439,30 @@ export const DashboardApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get application status breakdown by month
+         * @param {string} [month] 
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardControllerGetApplicationStatusByMonth(month?: string, academicYearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardControllerGetApplicationStatusByMonth(month, academicYearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get calendar events
+         * @param {string} [month] 
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardControllerGetCalendarEvents(month?: string, academicYearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardControllerGetCalendarEvents(month, academicYearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get financial summary for dashboard
          * @param {number} [academicYearId] 
          * @param {*} [options] Override http request option.
@@ -1256,6 +1470,40 @@ export const DashboardApiFp = function(configuration?: Configuration) {
          */
         async dashboardControllerGetFinancialSummary(academicYearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardControllerGetFinancialSummary(academicYearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get fund spending data
+         * @param {string} [yearRange] 
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardControllerGetFundSpending(yearRange?: string, academicYearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardControllerGetFundSpending(yearRange, academicYearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get performance metrics
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardControllerGetPerformanceMetrics(academicYearId?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardControllerGetPerformanceMetrics(academicYearId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get recent activities
+         * @param {number} [limit] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardControllerGetRecentActivities(limit?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardControllerGetRecentActivities(limit, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -1313,6 +1561,28 @@ export const DashboardApiFactory = function (configuration?: Configuration, base
         },
         /**
          * 
+         * @summary Get application status breakdown by month
+         * @param {string} [month] 
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetApplicationStatusByMonth(month?: string, academicYearId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.dashboardControllerGetApplicationStatusByMonth(month, academicYearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get calendar events
+         * @param {string} [month] 
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetCalendarEvents(month?: string, academicYearId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.dashboardControllerGetCalendarEvents(month, academicYearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get financial summary for dashboard
          * @param {number} [academicYearId] 
          * @param {*} [options] Override http request option.
@@ -1320,6 +1590,37 @@ export const DashboardApiFactory = function (configuration?: Configuration, base
          */
         dashboardControllerGetFinancialSummary(academicYearId?: number, options?: any): AxiosPromise<void> {
             return localVarFp.dashboardControllerGetFinancialSummary(academicYearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get fund spending data
+         * @param {string} [yearRange] 
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetFundSpending(yearRange?: string, academicYearId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.dashboardControllerGetFundSpending(yearRange, academicYearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get performance metrics
+         * @param {number} [academicYearId] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetPerformanceMetrics(academicYearId?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.dashboardControllerGetPerformanceMetrics(academicYearId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get recent activities
+         * @param {number} [limit] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardControllerGetRecentActivities(limit?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.dashboardControllerGetRecentActivities(limit, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1378,6 +1679,32 @@ export class DashboardApi extends BaseAPI {
 
     /**
      * 
+     * @summary Get application status breakdown by month
+     * @param {string} [month] 
+     * @param {number} [academicYearId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardControllerGetApplicationStatusByMonth(month?: string, academicYearId?: number, options?: any) {
+        return DashboardApiFp(this.configuration).dashboardControllerGetApplicationStatusByMonth(month, academicYearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get calendar events
+     * @param {string} [month] 
+     * @param {number} [academicYearId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardControllerGetCalendarEvents(month?: string, academicYearId?: number, options?: any) {
+        return DashboardApiFp(this.configuration).dashboardControllerGetCalendarEvents(month, academicYearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Get financial summary for dashboard
      * @param {number} [academicYearId] 
      * @param {*} [options] Override http request option.
@@ -1386,6 +1713,43 @@ export class DashboardApi extends BaseAPI {
      */
     public dashboardControllerGetFinancialSummary(academicYearId?: number, options?: any) {
         return DashboardApiFp(this.configuration).dashboardControllerGetFinancialSummary(academicYearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get fund spending data
+     * @param {string} [yearRange] 
+     * @param {number} [academicYearId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardControllerGetFundSpending(yearRange?: string, academicYearId?: number, options?: any) {
+        return DashboardApiFp(this.configuration).dashboardControllerGetFundSpending(yearRange, academicYearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get performance metrics
+     * @param {number} [academicYearId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardControllerGetPerformanceMetrics(academicYearId?: number, options?: any) {
+        return DashboardApiFp(this.configuration).dashboardControllerGetPerformanceMetrics(academicYearId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get recent activities
+     * @param {number} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardControllerGetRecentActivities(limit?: number, options?: any) {
+        return DashboardApiFp(this.configuration).dashboardControllerGetRecentActivities(limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

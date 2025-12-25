@@ -65,7 +65,7 @@ export const ScholarshipDistributionChart: React.FC<ScholarshipDistributionChart
             color: "#616161",
             fontFamily: "'Inter', sans-serif",
           }}>
-            Analysis and manage Program Wise Scholarship Distribution.
+            Analyze and manage program-wise scholarship distribution.
           </p>
         </div>
         <div style={{ width: "120px" }}>

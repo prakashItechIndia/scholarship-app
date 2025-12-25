@@ -36,8 +36,10 @@ export interface RecentApplication {
   applicationNo: string;
   studentName: string;
   classStudying: string;
+  courseStream?: string;
   institutionName: string;
-  mobileNumber: string;
+  roomNumber?: string;
+  mobileNumber?: string;
   status: string;
   scholarshipId: string;
 }

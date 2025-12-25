@@ -23,43 +23,320 @@ import { ScholarshipDistributionChart } from "./components/ScholarshipDistributi
 import { ScheduleCalendar } from "./components/ScheduleCalendar";
 import { RecentApplicationsTable } from "./components/RecentApplicationsTable";
 import { Separator } from "./components/Separator";
-import {
-  mockRecentApplications,
-} from "./constants";
+import { dashboard, reports } from "@/services/scholarship.service";
+import { useToast } from "@/components/ui/toast";
+import type { FinancialSummary, ApplicationMetrics, RecentApplication, ApplicationActivityData, ScholarshipDistributionData } from "./types";
 
 const AdminDashboard: React.FC = () => {
-  const [selectedAcademicYear, setSelectedAcademicYear] = React.useState<string>("2025");
+  const { error: showError } = useToast();
+  const [selectedAcademicYear, setSelectedAcademicYear] = React.useState("");
   const [selectedMonth, setSelectedMonth] = React.useState<string>("September 2024");
   const [selectedPeriod, setSelectedPeriod] = React.useState<string>("Monthly");
   const [selectedStatusMonth, setSelectedStatusMonth] = React.useState<string>("October 2025");
   const [selectedYear, setSelectedYear] = React.useState<string>("2024 - 2025");
   
-  // Mock user name - in real app, get from auth context
-  const userName = "Aakash";
-  const currentYear = new Date().getFullYear();
+  // Get user name from localStorage
+  const [userName, setUserName] = React.useState<string>("User");
 
-  // Generate academic year options from 2018 to 2025 (latest first)
-  const academicYearOptions = Array.from({ length: 2025 - 2018 + 1 }, (_, i) => {
-    const year = 2025 - i;
-    return { value: year.toString(), label: year.toString() };
+  // State for dashboard data
+  const [financialData, setFinancialData] = React.useState<FinancialSummary>({
+    totalAmountSpentThisYear: 0,
+    amountSpentForSchoolStudents: 0,
+    amountSpentForCollegeStudents: 0,
+    amountSpentForResearchScholars: 0,
+    amountSpentForMedicalAssistance: 0,
   });
 
-  // Financial summary data
-  const financialData = {
-    totalAmountSpentThisYear: 2165700,
-    amountSpentForSchoolStudents: 365700,
-    amountSpentForCollegeStudents: 965700,
-    amountSpentForResearchScholars: 465700,
-    amountSpentForMedicalAssistance: 50000,
-  };
+  const [applicationMetrics, setApplicationMetrics] = React.useState<ApplicationMetrics>({
+    totalApplications: 0,
+    submitted: 0,
+    approved: 0,
+    underReview: 0,
+  });
 
-  // Application metrics
-  const applicationMetrics = {
-    totalApplications: 72684,
-    submitted: 2658,
-    approved: 15210,
-    underReview: 12531,
-  };
+  const [recentApplications, setRecentApplications] = React.useState<RecentApplication[]>([]);
+  const [applicationActivityData, setApplicationActivityData] = React.useState<ApplicationActivityData[]>([]);
+  const [programDistributionData, setProgramDistributionData] = React.useState<ScholarshipDistributionData[]>([]);
+  const [academicYearOptions, setAcademicYearOptions] = React.useState<{ value: string; label: string }[]>([]);
+  
+  // Application Status Chart data
+  const [applicationStatusData, setApplicationStatusData] = React.useState<{
+    pending: number;
+    inReview: number;
+    rejected: number;
+    approved: number;
+  }>({
+    pending: 0,
+    inReview: 0,
+    rejected: 0,
+    approved: 0,
+  });
+
+  // Recent Activities data
+  const [recentActivities, setRecentActivities] = React.useState<{
+    name: string;
+    action: string;
+    timestamp: string;
+    color: string;
+  }[]>([]);
+
+  // Performance Metrics data
+  const [performanceMetrics, setPerformanceMetrics] = React.useState<{
+    label: string;
+    value: string;
+    percentage: number;
+    color: string;
+  }[]>([]);
+
+  // Fund Spending data
+  const [fundSpendingData, setFundSpendingData] = React.useState<{
+    month: string;
+    budget2024: number;
+    budget2025: number;
+  }[]>([]);
+
+  // Calendar Events data
+  const [calendarEvents, setCalendarEvents] = React.useState<{
+    date: string;
+    title: string;
+    type?: "meeting" | "deadline" | "activity";
+  }[]>([]);
+
+  // Get username from localStorage
+  React.useEffect(() => {
+    try {
+      const authData = localStorage.getItem('scholarship_auth');
+      if (authData) {
+        const parsed = JSON.parse(authData);
+        const name = parsed.user?.userName || parsed.user?.User_Name || parsed.email || "User";
+        setUserName(name);
+      }
+    } catch (e) {
+      console.error('Error reading username from storage:', e);
+    }
+  }, []);
+
+  // Fetch academic years
+  React.useEffect(() => {
+    const fetchAcademicYears = async () => {
+      try {
+        const years = await reports.getAcademicYears();
+        const options = years.map((year: any) => ({
+          value: year.ScholarshipYear_Id?.toString() || year.value?.toString() || "",
+          label: year.ScholarshipYear_Code || year.label || "",
+        }));
+        setAcademicYearOptions(options);
+        // Set default to first year if available
+        if (options.length > 0 && !selectedAcademicYear) {
+          setSelectedAcademicYear(options[0].value);
+        }
+      } catch (err) {
+        console.error('Error fetching academic years:', err);
+      }
+    };
+    void fetchAcademicYears();
+  }, [selectedAcademicYear]);
+
+  // Fetch dashboard data
+  React.useEffect(() => {
+    const fetchDashboardData = async () => {
+      if (!selectedAcademicYear) return;
+      
+      try {
+        const academicYearId = parseInt(selectedAcademicYear, 10);
+        
+        // Fetch all data in parallel
+        const [financial, analytics, recent, activity, distribution, statusData, activities, metrics, fundSpending, calendar] = await Promise.all([
+          dashboard.getFinancialSummary(academicYearId),
+          dashboard.getApplicationAnalytics(academicYearId),
+          dashboard.getRecentApplications(10, academicYearId),
+          dashboard.getApplicationActivity(academicYearId),
+          dashboard.getProgramDistribution(academicYearId),
+          dashboard.getApplicationStatus(selectedStatusMonth, academicYearId),
+          dashboard.getRecentActivities(5),
+          dashboard.getPerformanceMetrics(academicYearId),
+          dashboard.getFundSpending(selectedYear, academicYearId),
+          dashboard.getCalendarEvents(undefined, academicYearId),
+        ]);
+
+        // Map financial summary
+        setFinancialData({
+          totalAmountSpentThisYear: financial.Total_Amount_Spent || 0,
+          amountSpentForSchoolStudents: financial.School_Students_Amount || 0,
+          amountSpentForCollegeStudents: financial.College_Students_Amount || 0,
+          amountSpentForResearchScholars: financial.Research_Scholars_Amount || 0,
+          amountSpentForMedicalAssistance: financial.Medical_Assistance_Amount || 0,
+        });
+
+        // Map application analytics
+        setApplicationMetrics({
+          totalApplications: analytics.Total_Applications || 0,
+          submitted: analytics.Submitted || 0,
+          approved: analytics.Approved || 0,
+          underReview: analytics.Under_Review || 0,
+        });
+
+        // Map recent applications
+        const mappedRecent = recent.map((app: any) => ({
+          applicationNo: app.Application_Id || app.applicationNo || "",
+          studentName: app.Applicant_Name || app.studentName || "",
+          classStudying: app.Class_Studying || app.classStudying || "",
+          courseStream: app.Degree_Type || app.Degree || app.Course_Stream || app.courseStream || "",
+          institutionName: app.Institution_Name || app.institutionName || "",
+          roomNumber: app.Room_Number || app.roomNumber || "",
+          mobileNumber: app.Mobile_Number || app.mobileNumber || "",
+          status: app.Status || app.status || "Registered",
+          scholarshipId: app.Scholarship_No?.toString() || app.scholarshipId || "",
+        }));
+        setRecentApplications(mappedRecent);
+
+        // Map application activity data
+        const mappedActivity = activity.map((item: any) => ({
+          date: item.Month || item.date || "",
+          count: item.Application_Count || item.count || 0,
+        }));
+        setApplicationActivityData(mappedActivity);
+
+        // Map program distribution data (group by month and scholarship type)
+        const distributionMap = new Map<string, { month: string; meritExcellence: number; stemInnovation: number; concessions: number; sports: number }>();
+        distribution.forEach((item: any) => {
+          const month = item.Month || item.month || "";
+          const scholarshipFor = item.Scholarship_For || item.scholarshipFor || "";
+          const amount = Number(item.Total_Amount || item.amount || 0);
+          
+          if (!distributionMap.has(month)) {
+            distributionMap.set(month, {
+              month,
+              meritExcellence: 0,
+              stemInnovation: 0,
+              concessions: 0,
+              sports: 0,
+            });
+          }
+          
+          const entry = distributionMap.get(month)!;
+          if (scholarshipFor === "School" || scholarshipFor === "Merit Excellence") {
+            entry.meritExcellence += amount;
+          } else if (scholarshipFor === "College" || scholarshipFor === "STEM Innovation") {
+            entry.stemInnovation += amount;
+          } else if (scholarshipFor === "Research" || scholarshipFor === "Concessions") {
+            entry.concessions += amount;
+          } else if (scholarshipFor === "Medical" || scholarshipFor === "Sports") {
+            entry.sports += amount;
+          }
+        });
+        
+        setProgramDistributionData(Array.from(distributionMap.values()));
+
+        // Map application status data
+        setApplicationStatusData({
+          pending: statusData.Pending || 0,
+          inReview: statusData.In_Review || 0,
+          rejected: statusData.Rejected || 0,
+          approved: statusData.Approved || 0,
+        });
+
+        // Map recent activities
+        const mappedActivities = activities.map((act: any) => {
+          const userName = act.User_Name || act.ApplicantName || 'Unknown';
+          let action = act.ProcessUndergone || act.Action || 'Activity';
+          let color = '#3b82f6'; // Default blue
+          
+          // Determine action and color based on process
+          if (action.includes('Submitted') || action.includes('Registered')) {
+            color = '#10b981'; // Green
+            action = `Submitted Application${act.Scholarship_No ? ` - Scholarship ${act.Scholarship_No}` : ''}`;
+          } else if (action.includes('Updated') || action.includes('Profile')) {
+            color = '#f59e0b'; // Orange
+            action = 'Updated Profile';
+          } else if (action.includes('Uploaded') || action.includes('Document')) {
+            color = '#eab308'; // Yellow
+            action = 'Uploaded Document';
+          } else if (action.includes('Approved')) {
+            color = '#3b82f6'; // Blue
+            action = `Application Approved${act.Scholarship_No ? ` - Scholarship ${act.Scholarship_No}` : ''}`;
+          } else if (action.includes('Registered') || action.includes('Account')) {
+            color = '#8b5cf6'; // Purple
+            action = 'Registered Account';
+          }
+
+          // Format timestamp
+          const date = act.Data_Date ? new Date(act.Data_Date) : new Date();
+          const now = new Date();
+          const diffMs = now.getTime() - date.getTime();
+          const diffMins = Math.floor(diffMs / 60000);
+          const diffHours = Math.floor(diffMs / 3600000);
+          const diffDays = Math.floor(diffMs / 86400000);
+
+          let timestamp = '';
+          if (diffMins < 1) {
+            timestamp = 'Just now';
+          } else if (diffMins < 60) {
+            timestamp = `${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'} ago`;
+          } else if (diffHours < 24) {
+            timestamp = `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`;
+          } else if (diffDays === 1) {
+            const hours = date.getHours();
+            const mins = date.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            timestamp = `Yesterday, ${displayHours}:${mins.toString().padStart(2, '0')} ${ampm}`;
+          } else {
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            timestamp = `${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+          }
+
+          return {
+            name: userName,
+            action,
+            timestamp,
+            color,
+          };
+        });
+        setRecentActivities(mappedActivities);
+
+        // Map performance metrics
+        const mappedMetrics = [
+          {
+            label: 'Average Processing Time',
+            value: metrics.averageProcessingTime.value,
+            percentage: metrics.averageProcessingTime.percentage,
+            color: '#3b82f6',
+          },
+          {
+            label: 'Student Retention Rate',
+            value: metrics.studentRetentionRate.value,
+            percentage: metrics.studentRetentionRate.percentage,
+            color: '#f59e0b',
+          },
+          {
+            label: 'Satisfaction Score',
+            value: metrics.satisfactionScore.value,
+            percentage: metrics.satisfactionScore.percentage,
+            color: '#10b981',
+          },
+          {
+            label: 'Budget Utilization',
+            value: metrics.budgetUtilization.value,
+            percentage: metrics.budgetUtilization.percentage,
+            color: '#8b5cf6',
+          },
+        ];
+        setPerformanceMetrics(mappedMetrics);
+
+        // Map fund spending data
+        setFundSpendingData(fundSpending);
+
+        // Map calendar events
+        setCalendarEvents(calendar);
+      } catch (err: any) {
+        console.error('Error fetching dashboard data:', err);
+        showError('Error', err.message || 'Failed to load dashboard data');
+      }
+    };
+
+    void fetchDashboardData();
+  }, [selectedAcademicYear, selectedStatusMonth, selectedYear, showError]);
 
   const handleExportExcel = () => {
     console.log("Exporting to Excel...");
@@ -121,7 +398,7 @@ const AdminDashboard: React.FC = () => {
                 fontFamily: "'Inter', sans-serif",
                 margin: 0,
               }}>
-                Welcome back to the Leo Muthu Scholarship Portal. View your {currentYear} performance metrics below.
+                An initiative of Shri. Leo Mutha Scholarship Trust. View your LMS performance metrics below.
               </p>
             </div>
           }
@@ -285,7 +562,7 @@ const AdminDashboard: React.FC = () => {
           <UnifiedCard
             icon={<DocumentTableSearch24Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
             value={applicationMetrics.underReview}
-            label="Under Review"
+            label="Funded (Inactive)"
             iconBgColor="#FFFFFF"
           />
         </div>
@@ -294,6 +571,7 @@ const AdminDashboard: React.FC = () => {
       {/* Application Activity Chart - Full Width */}
       <div style={{ marginBottom: "32px" }}>
         <ApplicationActivityChart
+          data={applicationActivityData}
           selectedMonth={selectedMonth}
           onMonthChange={setSelectedMonth}
         />
@@ -308,12 +586,13 @@ const AdminDashboard: React.FC = () => {
       }}>
         {/* Application Status Donut Chart */}
         <ApplicationStatusChart
+          data={applicationStatusData}
           selectedMonth={selectedStatusMonth}
           onMonthChange={setSelectedStatusMonth}
         />
 
         {/* Recent Activity Widget */}
-        <RecentActivityWidget />
+        <RecentActivityWidget activities={recentActivities} />
       </div>
 
       {/* Performance Metrics, Fund Spending, and Scholarship Distribution - 3 Columns */}
@@ -324,16 +603,18 @@ const AdminDashboard: React.FC = () => {
         marginBottom: "32px",
       }}>
         {/* Performance Metrics Chart */}
-        <PerformanceMetricsChart />
+        <PerformanceMetricsChart metrics={performanceMetrics} />
 
         {/* Fund Spending Chart */}
         <FundSpendingChart
+          data={fundSpendingData}
           selectedYear={selectedYear}
           onYearChange={setSelectedYear}
         />
 
         {/* Scholarship Distribution Chart */}
         <ScholarshipDistributionChart
+          data={programDistributionData}
           selectedPeriod={selectedPeriod}
           onPeriodChange={setSelectedPeriod}
         />
@@ -346,13 +627,13 @@ const AdminDashboard: React.FC = () => {
           justifyContent: "flex-end",
         }}>
           <div style={{ width: "400px" }}>
-            <ScheduleCalendar />
+            <ScheduleCalendar events={calendarEvents} />
           </div>
         </div>
       </div>
 
       {/* Recent Applications Table */}
-      <RecentApplicationsTable data={mockRecentApplications} />
+      <RecentApplicationsTable data={recentApplications} />
     </div>
   );
 };

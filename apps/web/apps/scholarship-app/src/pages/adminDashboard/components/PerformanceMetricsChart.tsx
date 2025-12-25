@@ -96,7 +96,7 @@ export const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = (
           color: "#616161",
           fontFamily: "'Inter', sans-serif",
         }}>
-          Key performance Indicators for scholarship programs.
+          Measure the overall performance of the scholarship program.
         </p>
       </div>
 

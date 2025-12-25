@@ -88,37 +88,205 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
     const handleDownload = async () => {
         if (!applicationNo) return;
         
-        // Fetch all history data for download
+        setLoading(true);
         try {
+            // Fetch ALL history data without pagination
             const response = await processManagement.getApplicationHistory(applicationNo, {
-                page: 1,
-                pageSize: 1000, // Get all records for download
+                getAllRecords: true,
             });
             const allHistoryData = response.data || [];
 
+            // Generate PDF with all data
             const doc = new jsPDF();
-            doc.text(`History Against Application Number : ${applicationNo}`, 14, 15);
+            
+            // Add title and metadata
+            doc.setFontSize(16);
+            doc.text(`History Against Application Number: ${applicationNo}`, 14, 15);
+            
+            doc.setFontSize(10);
+            const currentDate = new Date().toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+            });
+            doc.text(`Generated on: ${currentDate}`, 14, 22);
+            doc.text(`Total Records: ${allHistoryData.length}`, 14, 28);
 
+            // Generate table with all data
             autoTable(doc, {
-                startY: 20,
+                startY: 35,
                 head: [["S.No.", "Action", "Process Undergone", "Handled by", "Date"]],
                 body: allHistoryData.map((item: HistoryItem, index: number) => [
                     index + 1,
-                    item.action,
-                    item.processUndergone,
-                    item.handledBy,
-                    item.date,
+                    item.action || '',
+                    item.processUndergone || '',
+                    item.handledBy || '',
+                    item.date || '',
                 ]),
+                styles: { fontSize: 8 },
+                headStyles: { fillColor: [15, 108, 189], textColor: 255, fontStyle: 'bold' },
+                alternateRowStyles: { fillColor: [245, 245, 245] },
+                margin: { top: 35 },
             });
 
             doc.save(`${applicationNo}_history.pdf`);
         } catch (error) {
             console.error('Error downloading history:', error);
+            alert('Failed to download history. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handlePrint = () => {
-        window.print();
+    const handlePrint = async () => {
+        if (!applicationNo) return;
+        
+        setLoading(true);
+        try {
+            // Fetch ALL history data without pagination
+            const response = await processManagement.getApplicationHistory(applicationNo, {
+                getAllRecords: true,
+            });
+            const allHistoryData = response.data || [];
+
+            // Create a print-friendly HTML document
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                alert('Please allow popups to print the history.');
+                setLoading(false);
+                return;
+            }
+
+            const printContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>History - ${applicationNo}</title>
+                    <style>
+                        @media print {
+                            @page {
+                                margin: 1cm;
+                                size: A4;
+                            }
+                            body {
+                                margin: 0;
+                                padding: 0;
+                            }
+                        }
+                        body {
+                            font-family: 'Inter', Arial, sans-serif;
+                            font-size: 12px;
+                            padding: 20px;
+                            color: #242424;
+                        }
+                        .header {
+                            margin-bottom: 20px;
+                            border-bottom: 2px solid #0f6cbd;
+                            padding-bottom: 10px;
+                        }
+                        .title {
+                            font-size: 18px;
+                            font-weight: 600;
+                            color: #242424;
+                            margin-bottom: 8px;
+                        }
+                        .metadata {
+                            font-size: 10px;
+                            color: #616161;
+                            margin-bottom: 4px;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 20px;
+                        }
+                        th {
+                            background-color: #0f6cbd;
+                            color: #ffffff;
+                            padding: 10px;
+                            text-align: left;
+                            font-weight: 600;
+                            border: 1px solid #0f6cbd;
+                        }
+                        td {
+                            padding: 8px 10px;
+                            border: 1px solid #e0e0e0;
+                        }
+                        tr:nth-child(even) {
+                            background-color: #f5f5f5;
+                        }
+                        tr:hover {
+                            background-color: #e6f2ff;
+                        }
+                        .footer {
+                            margin-top: 30px;
+                            padding-top: 10px;
+                            border-top: 1px solid #e0e0e0;
+                            font-size: 10px;
+                            color: #616161;
+                            text-align: center;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="title">History Against Application Number: ${applicationNo}</div>
+                        <div class="metadata">Generated on: ${new Date().toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        })}</div>
+                        <div class="metadata">Total Records: ${allHistoryData.length}</div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>S.No.</th>
+                                <th>Action</th>
+                                <th>Process Undergone</th>
+                                <th>Handled by</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${allHistoryData.map((item: HistoryItem, index: number) => `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${item.action || ''}</td>
+                                    <td>${item.processUndergone || ''}</td>
+                                    <td>${item.handledBy || ''}</td>
+                                    <td>${item.date || ''}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div class="footer">
+                        <p>This report contains all history records for Application Number: ${applicationNo}</p>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            
+            // Wait for content to load, then print
+            printWindow.onload = () => {
+                setTimeout(() => {
+                    printWindow.print();
+                    printWindow.close();
+                }, 250);
+            };
+        } catch (error) {
+            console.error('Error printing history:', error);
+            alert('Failed to print history. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
