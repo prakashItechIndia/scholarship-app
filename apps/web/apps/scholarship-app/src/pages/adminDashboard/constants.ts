@@ -10,19 +10,19 @@ export const mockApplicationActivityData: ApplicationActivityData[] = Array.from
   { length: 30 },
   (_, i) => ({
     date: `${i + 1}`,
-    count: Math.floor(Math.random() * 400) + 50,
+    count: Math.floor(Math.random() * 350) + 50,
   })
 );
 
 // Mock data for Scholarship Program Distribution
 export const mockScholarshipDistributionData: ScholarshipDistributionData[] = [
-  { month: "June", meritExcellence: 25, stemInnovation: 30, concessions: 20, sports: 15 },
-  { month: "July", meritExcellence: 30, stemInnovation: 35, concessions: 25, sports: 20 },
-  { month: "August", meritExcellence: 28, stemInnovation: 32, concessions: 22, sports: 18 },
-  { month: "September", meritExcellence: 35, stemInnovation: 40, concessions: 30, sports: 25 },
-  { month: "October", meritExcellence: 32, stemInnovation: 38, concessions: 28, sports: 22 },
-  { month: "November", meritExcellence: 30, stemInnovation: 35, concessions: 25, sports: 20 },
-  { month: "December", meritExcellence: 28, stemInnovation: 32, concessions: 22, sports: 18 },
+  { month: "June", meritExcellence: 26, stemInnovation: 50, achievement: 42, sports: 56 },
+  { month: "July", meritExcellence: 57, stemInnovation: 35, achievement: 91, sports: 11 },
+  { month: "August", meritExcellence: 57, stemInnovation: 80, achievement: 85, sports: 37 },
+  { month: "September", meritExcellence: 70, stemInnovation: 55, achievement: 83, sports: 54 },
+  { month: "October", meritExcellence: 13, stemInnovation: 39, achievement: 64, sports: 87 },
+  { month: "November", meritExcellence: 95, stemInnovation: 44, achievement: 91, sports: 15 },
+  { month: "December", meritExcellence: 95, stemInnovation: 44, achievement: 91, sports: 15 },
 ];
 
 // Mock calendar events

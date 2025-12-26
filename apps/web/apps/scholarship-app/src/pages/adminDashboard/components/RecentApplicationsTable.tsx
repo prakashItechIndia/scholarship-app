@@ -1,9 +1,8 @@
 import * as React from "react";
-import { Card, Table } from "@shared/components";
+import { Card, DataTable } from "@shared/components";
 import { RecentApplication } from "../types";
 import {
-  ArrowUp20Regular,
-  ArrowDown20Regular,
+  ArrowSort20Regular,
 } from "@fluentui/react-icons";
 
 interface RecentApplicationsTableProps {
@@ -14,7 +13,7 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
   data = [],
 }) => {
   const columns = React.useMemo(() => {
-    const createSortableHeader = (name: string) => (
+    const createSortableHeader = (name: string, isSortable: boolean = true) => (
       <div 
         style={{
           display: "flex",
@@ -25,18 +24,15 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
         className="hover:opacity-80"
       >
         <span style={{
-          fontSize: "14px",
+          fontSize: "13px",
           lineHeight: "20px",
-          fontWeight: 600,
-          color: "#242424",
+          fontWeight: 500,
+          color: "#424242",
           fontFamily: "'Inter', sans-serif",
         }}>
           {name}
         </span>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <ArrowUp20Regular style={{ width: "12px", height: "12px", color: "#616161" }} />
-          <ArrowDown20Regular style={{ width: "12px", height: "12px", color: "#616161", marginTop: "-4px" }} />
-        </div>
+        {isSortable && <ArrowSort20Regular style={{ width: "16px", height: "16px", color: "#616161" }} />}
       </div>
     );
 
@@ -46,9 +42,10 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
           fontSize: "12px",
           lineHeight: "16px",
           fontWeight: 500,
-          color: "#0f6cbd",
-          backgroundColor: "#e6f2ff",
-          padding: "4px 12px",
+          color: status === "Registered" ? "#0E1CDD" : "#0f6cbd",
+          backgroundColor: status === "Registered" ? "#E4EEFF" : "#e6f2ff",
+          border: status === "Registered" ? "1px solid #AFCAFF" : "none",
+          padding: "4px 30px",
           borderRadius: "12px",
           fontFamily: "'Inter', sans-serif",
           display: "inline-block",
@@ -60,9 +57,10 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
 
     const renderText = (value: string | undefined) => (
       <span style={{
-        fontSize: "14px",
-        lineHeight: "20px",
+        fontSize: "13px",
+        lineHeight: "19px",
         color: "#242424",
+        fontWeight: 400,
         fontFamily: "'Inter', sans-serif",
       }}>
         {value || "-"}
@@ -77,6 +75,17 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
         minWidth: 48,
         maxWidth: 48,
         isSortable: false,
+        onRenderHeader: () => (
+          <input
+            type="checkbox"
+            style={{
+              width: "16px",
+              height: "16px",
+              cursor: "pointer",
+              accentColor: "#0f6cbd",
+            }}
+          />
+        ),
         onRender: () => (
           <input
             type="checkbox"
@@ -139,7 +148,8 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
         name: "Status",
         fieldName: "status",
         minWidth: 120,
-        isSortable: false,
+        isSortable: true,
+        onRenderHeader: () => createSortableHeader("Status"),
         onRender: (item: RecentApplication) => renderStatus(item.status),
       },
       {
@@ -165,8 +175,8 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
         marginBottom: "16px",
       }}>
         <h3 style={{
-          fontSize: "18px",
-          lineHeight: "24px",
+          fontSize: "13px",
+          lineHeight: "20px",
           fontWeight: 600,
           color: "#242424",
           marginBottom: "4px",
@@ -175,18 +185,25 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
           Recent Applications
         </h3>
         <p style={{
-          fontSize: "14px",
-          lineHeight: "20px",
+          fontSize: "12px",
+          lineHeight: "16px",
           color: "#616161",
           fontFamily: "'Inter', sans-serif",
+          fontWeight: 400,
         }}>
           Overview of latest scholarship applications.
         </p>
       </div>
 
-      <div style={{ overflowX: "auto" }}>
-        <Table columns={columns} data={data} />
-      </div>
+      <DataTable 
+        columns={columns} 
+        data={data} 
+        cardStyle={{ 
+          boxShadow: "none", 
+          borderRadius: "8px",
+          border: "1px solid #e0e0e0"
+        }}
+      />
     </Card>
   );
 };

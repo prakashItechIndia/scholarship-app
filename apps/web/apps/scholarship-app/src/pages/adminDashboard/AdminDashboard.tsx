@@ -29,7 +29,7 @@ import {
 
 const AdminDashboard: React.FC = () => {
   const [selectedAcademicYear, setSelectedAcademicYear] = React.useState<string>("2025");
-  const [selectedMonth, setSelectedMonth] = React.useState<string>("September 2024");
+  const [selectedMonth, setSelectedMonth] = React.useState<Date>(new Date(2024, 8, 1)); // September 2024
   const [selectedPeriod, setSelectedPeriod] = React.useState<string>("Monthly");
   const [selectedStatusMonth, setSelectedStatusMonth] = React.useState<string>("October 2025");
   const [selectedYear, setSelectedYear] = React.useState<string>("2024 - 2025");
@@ -290,14 +290,15 @@ const AdminDashboard: React.FC = () => {
           />
         </div>
       </div>
-
-      {/* Application Activity Chart - Full Width */}
-      <div style={{ marginBottom: "32px" }}>
-        <ApplicationActivityChart
-          selectedMonth={selectedMonth}
-          onMonthChange={setSelectedMonth}
+        <div style={{
+          marginBottom: "30px",
+        }}>
+          <ApplicationActivityChart
+          selectedDate={selectedMonth}
+          onDateChange={(date) => date && setSelectedMonth(date)}
         />
-      </div>
+        </div>
+     
 
       {/* Application Status and Recent Activity Row - 2 Columns */}
       <div style={{
@@ -319,7 +320,7 @@ const AdminDashboard: React.FC = () => {
       {/* Performance Metrics, Fund Spending, and Scholarship Distribution - 3 Columns */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "1fr 1fr 1fr",
+        gridTemplateColumns: "1fr 1fr",
         gap: "24px",
         marginBottom: "32px",
       }}>
@@ -331,24 +332,21 @@ const AdminDashboard: React.FC = () => {
           selectedYear={selectedYear}
           onYearChange={setSelectedYear}
         />
+      </div>
 
-        {/* Scholarship Distribution Chart */}
+      {/* Schedule Calendar - Full Width or Right Aligned */}
+      {/* Scholarship Distribution and Schedule Calendar Row */}
+      <div style={{ 
+        display: "grid",
+        gridTemplateColumns: "1fr 550px",
+        gap: "24px",
+        marginBottom: "32px" 
+      }}>
         <ScholarshipDistributionChart
           selectedPeriod={selectedPeriod}
           onPeriodChange={setSelectedPeriod}
         />
-      </div>
-
-      {/* Schedule Calendar - Full Width or Right Aligned */}
-      <div style={{ marginBottom: "32px" }}>
-        <div style={{
-          display: "flex",
-          justifyContent: "flex-end",
-        }}>
-          <div style={{ width: "400px" }}>
-            <ScheduleCalendar />
-          </div>
-        </div>
+        <ScheduleCalendar />
       </div>
 
       {/* Recent Applications Table */}

@@ -3,7 +3,7 @@ import { DatePicker as FluentDatePicker, IDatePickerProps } from "@fluentui/reac
 import { useDarkMode } from "../hooks/useDarkMode";
 import { getThemeTokens } from "../config/theme";
 
-export interface DatePickerProps extends Omit<IDatePickerProps, "styles"> {
+export interface DatePickerProps extends IDatePickerProps {
   value?: Date;
   onSelectDate?: (date: Date | null | undefined) => void;
   errorMessage?: string;
@@ -74,7 +74,11 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       <div className="relative w-full" style={{ marginTop: 0, paddingTop: 0, marginBottom: 0, paddingBottom: 0 }}>
         <FluentDatePicker
           componentRef={ref as any}
-          styles={internalStyles}
+          {...props}
+          styles={{
+            ...internalStyles,
+            ...(props.styles as any),
+          }}
           className="!m-0 !p-0"
           textField={{
             ...(typeof textField === 'object' ? textField : {}),

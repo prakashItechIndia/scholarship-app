@@ -7,6 +7,7 @@ interface Activity {
   action: string;
   timestamp: string;
   color: string;
+  border:string
 }
 
 interface RecentActivityWidgetProps {
@@ -19,31 +20,36 @@ export const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
       name: "Saravanan",
       action: "Submitted Application - Merit Excellence Scholarship",
       timestamp: "Just now",
-      color: "#10b981",
+      color: "#E0F9E7",
+      border:"1px solid #58DB95"
     },
     {
       name: "Muthamilselvan",
       action: "Updated Profile",
       timestamp: "12 minutes ago",
-      color: "#f59e0b",
+      color: "#FDEEE4",
+      border:"1px solid #F58969"
     },
     {
       name: "Sarathi",
       action: "Uploaded Document - Academic Transcript",
       timestamp: "30 minutes ago",
-      color: "#eab308",
+      color: "#FFF8E5",
+      border:"1px solid #FECE79"
     },
     {
       name: "Parasuraman",
       action: "Application Approved - STEM Innovation Grant",
       timestamp: "12 hours ago",
-      color: "#3b82f6",
+      color: "#EFF6FF",
+      border:"1px solid #BFDBFE"
     },
     {
       name: "Annadurai",
       action: "Registered Account",
       timestamp: "Yesterday, 11:59 AM",
-      color: "#8b5cf6",
+      color: "#FAF5FF",
+      border:" 1px solid #E9D5FF"
     },
   ],
 }) => {
@@ -80,7 +86,7 @@ export const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
       <div style={{
         display: "flex",
         flexDirection: "column",
-        gap: "12px",
+        gap: "15px",
       }}>
         {activities.map((activity, index) => (
           <ActivityItem
@@ -89,6 +95,7 @@ export const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
             action={activity.action}
             timestamp={activity.timestamp}
             color={activity.color}
+            border={activity.border}
           />
         ))}
       </div>

@@ -32,4 +32,5 @@ export * from "./filter-icon";
 export * from "./vector-icon";
 export * from "./page-action-buttons";
 export * from "./data-table";
+export * from "./calendar-icon";
 

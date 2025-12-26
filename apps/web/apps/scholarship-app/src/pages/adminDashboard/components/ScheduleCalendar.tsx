@@ -18,7 +18,8 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
   currentMonth = new Date(),
   onMonthChange,
 }) => {
-  const [selectedDate, setSelectedDate] = React.useState(currentMonth);
+  const [viewDate, setViewDate] = React.useState(currentMonth);
+  const [selectedDay, setSelectedDay] = React.useState<number | null>(new Date().getDate());
 
   const monthNames = [
     "January", "February", "March", "April", "May", "June",
@@ -35,38 +36,46 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
     const daysInMonth = lastDay.getDate();
     const startingDayOfWeek = (firstDay.getDay() + 6) % 7; // Convert Sunday=0 to Monday=0
 
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    
     const days = [];
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(null);
+    // Add days from previous month
+    for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+      days.push({ day: prevMonthLastDay - i, isCurrentMonth: false });
     }
     // Add all days of the month
     for (let i = 1; i <= daysInMonth; i++) {
-      days.push(i);
+      days.push({ day: i, isCurrentMonth: true });
     }
+    
+    // Fill the rest of the grid to make it 6 rows (42 cells)
+    const remainingCells = 42 - days.length;
+    for (let i = 1; i <= remainingCells; i++) {
+      days.push({ day: i, isCurrentMonth: false });
+    }
+    
     return days;
   };
 
-  const days = getDaysInMonth(selectedDate);
-  const monthYear = `${monthNames[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
+  const days = getDaysInMonth(viewDate);
+  const monthYear = `${monthNames[viewDate.getMonth()]} ${viewDate.getFullYear()}`;
 
   const handlePreviousMonth = () => {
-    const newDate = new Date(selectedDate);
+    const newDate = new Date(viewDate);
     newDate.setMonth(newDate.getMonth() - 1);
-    setSelectedDate(newDate);
+    setViewDate(newDate);
     onMonthChange?.(newDate);
   };
 
   const handleNextMonth = () => {
-    const newDate = new Date(selectedDate);
+    const newDate = new Date(viewDate);
     newDate.setMonth(newDate.getMonth() + 1);
-    setSelectedDate(newDate);
+    setViewDate(newDate);
     onMonthChange?.(newDate);
   };
 
-  const getEventForDate = (day: number | null) => {
-    if (day === null) return null;
-    const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  const getEventForDate = (day: number) => {
+    const dateStr = `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
     return events.find((e) => e.date === dateStr);
   };
 
@@ -82,11 +91,12 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
         justifyContent: "space-between",
         alignItems: "center",
         marginBottom: "24px",
+        height: "10%",
       }}>
         <div>
           <h3 style={{
-            fontSize: "18px",
-            lineHeight: "24px",
+            fontSize: "16px",
+            lineHeight: "22px",
             fontWeight: 600,
             color: "#242424",
             marginBottom: "4px",
@@ -95,10 +105,11 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
             Schedule Calendar
           </h3>
           <p style={{
-            fontSize: "14px",
-            lineHeight: "20px",
+            fontSize: "12px",
+            lineHeight: "16px",
             color: "#616161",
             fontFamily: "'Inter', sans-serif",
+            fontWeight: 400,
           }}>
             Stay updated with meetings, deadlines, and activities.
           </p>
@@ -111,7 +122,11 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: "16px",
+          backgroundColor: "#EFF6FF",
+          height: "56px",
+          border: "1px solid #BFDBFE",
+          borderRadius: "8px 8px 0 0",
+          borderBottom: "none"
         }}>
           <button
             onClick={handlePreviousMonth}
@@ -122,6 +137,7 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
               padding: "4px",
               display: "flex",
               alignItems: "center",
+              marginLeft: "12px"
             }}
           >
             <ChevronLeft20Regular style={{ width: "20px", height: "20px", color: "#616161" }} />
@@ -143,6 +159,7 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
               padding: "4px",
               display: "flex",
               alignItems: "center",
+              marginRight: "12px"
             }}
           >
             <ChevronRight20Regular style={{ width: "20px", height: "20px", color: "#616161" }} />
@@ -153,84 +170,95 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(7, 1fr)",
-          gap: "8px",
+          border: "1px solid #E0E0E0",
+          borderRadius: "0 0 8px 8px",
         }}>
           {/* Day headers */}
-          {daysOfWeek.map((day) => (
-            <div
-              key={day}
-              style={{
-                fontSize: "12px",
-                fontWeight: 600,
-                color: "#616161",
-                textAlign: "center",
-                padding: "8px",
-                fontFamily: "'Inter', sans-serif",
-              }}
-            >
-              {day}
-            </div>
-          ))}
-
-          {/* Calendar days */}
-          {days.map((day, index) => {
-            const event = getEventForDate(day);
-            const isToday = day === new Date().getDate() &&
-              selectedDate.getMonth() === new Date().getMonth() &&
-              selectedDate.getFullYear() === new Date().getFullYear();
-
-            return (
+          <div style={{
+            gridColumn: "1 / 8",
+            display: "grid",
+            gridTemplateColumns: "repeat(7, 1fr)",
+            padding: "12px 20px 16px 18px"
+          }}>
+            {daysOfWeek.map((day) => (
               <div
-                key={index}
+                key={day}
                 style={{
-                  minHeight: "40px",
-                  padding: "4px",
-                  border: isToday ? "2px solid #0f6cbd" : "1px solid #e0e0e0",
-                  borderRadius: "4px",
-                  backgroundColor: isToday ? "#e6f2ff" : "#ffffff",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "flex-start",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  color: "#344051",
+                  textAlign: "center",
+                  paddingTop: "4px",
+                  fontFamily: "'Inter', sans-serif",
+                  lineHeight: "16px",
                 }}
               >
-                {day !== null && (
-                  <>
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Calendar days */}
+          <div style={{
+            gridColumn: "1 / 8",
+            display: "grid",
+            gridTemplateColumns: "repeat(7, 1fr)",
+            padding: "8px 20px 0px 18px",
+            borderTop: "2px solid #E0E0E0",
+            marginBottom: "20px",
+          }}>
+            {days.map((item, index) => {
+              const event = item.isCurrentMonth ? getEventForDate(item.day) : null;
+              const isSelected = item.isCurrentMonth && item.day === selectedDay;
+
+              return (
+                <div
+                  key={index}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "8px 4px",
+                  }}
+                >
+                  <div 
+                    onClick={() => item.isCurrentMonth && setSelectedDay(item.day)}
+                    style={{
+                      width: "32px",
+                      height: "32px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: "50%",
+                      backgroundColor: isSelected ? "#2453C3" : "transparent",
+                      cursor: item.isCurrentMonth ? "pointer" : "default",
+                    }}
+                  >
                     <span style={{
                       fontSize: "12px",
-                      fontWeight: isToday ? 600 : 400,
-                      color: isToday ? "#0f6cbd" : "#242424",
+                      fontWeight: isSelected ? 600 : 400,
+                      color: isSelected ? "#ffffff" : (item.isCurrentMonth ? "#344051" : "#808080"),
                       fontFamily: "'Inter', sans-serif",
                     }}>
-                      {day}
+                      {item.day}
                     </span>
-                    {event && (
-                      <div style={{
-                        fontSize: "8px",
-                        color: "#616161",
-                        backgroundColor: "#f3f4f6",
-                        padding: "2px 4px",
-                        borderRadius: "2px",
-                        marginTop: "2px",
-                        textAlign: "center",
-                        maxWidth: "100%",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                      title={event.title}
-                      >
-                        {event.title}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            );
-          })}
+                  </div>
+                  {item.isCurrentMonth && event && (
+                    <div style={{
+                      width: "4px",
+                      height: "4px",
+                      borderRadius: "50%",
+                      backgroundColor: isSelected ? "#2453C3" : "#0f6cbd",
+                      marginTop: "2px"
+                    }} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </Card>
   );
 };
-

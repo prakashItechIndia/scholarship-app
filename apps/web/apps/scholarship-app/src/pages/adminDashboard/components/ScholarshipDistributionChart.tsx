@@ -14,13 +14,17 @@ export const ScholarshipDistributionChart: React.FC<ScholarshipDistributionChart
   selectedPeriod = "Monthly",
   onPeriodChange,
 }) => {
-  const maxValue = Math.max(
-    ...data.map((d) => d.meritExcellence + d.stemInnovation + d.concessions + d.sports)
-  );
-  const chartHeight = 200;
-  const chartWidth = 700;
-  const barWidth = 60;
-  const barGap = 20;
+  const chartHeight = 300;
+  const chartWidth = 800;
+  const paddingLeft = 100;
+  const paddingRight = 20;
+  const paddingTop = 20;
+  const paddingBottom = 40;
+  
+  const groupGap = 40;
+  const barWidth = 14;
+  const barGap = 6;
+  const groupWidth = (barWidth * 4) + (barGap * 4);
 
   const periodOptions = [
     { value: "Monthly", label: "Monthly" },
@@ -29,29 +33,38 @@ export const ScholarshipDistributionChart: React.FC<ScholarshipDistributionChart
   ];
 
   const colors = {
-    meritExcellence: "#3b82f6",
-    stemInnovation: "#f59e0b",
-    concessions: "#10b981",
-    sports: "#8b5cf6",
+    meritExcellence: "#7086FD",
+    stemInnovation: "#6FD195",
+    achievement: "#FFAE4C",
+    sports: "#07DBFA",
+  };
+
+  const getY = (value: number) => {
+    return chartHeight - (value / 100) * chartHeight + paddingTop;
+  };
+
+  const getGroupX = (index: number) => {
+    return paddingLeft + index * (groupWidth + groupGap);
   };
 
   return (
     <Card variant="elevated" style={{
       border: "1px solid #e0e0e0",
       backgroundColor: "#ffffff",
-      borderRadius: "8px",
+      borderRadius: "12px",
       padding: "24px",
+      height: "100%",
     }}>
       <div style={{
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: "24px",
+        marginBottom: "32px",
       }}>
         <div>
           <h3 style={{
-            fontSize: "18px",
-            lineHeight: "24px",
+            fontSize: "16px",
+            lineHeight: "22px",
             fontWeight: 600,
             color: "#242424",
             marginBottom: "4px",
@@ -60,15 +73,16 @@ export const ScholarshipDistributionChart: React.FC<ScholarshipDistributionChart
             Scholarship Program Distribution
           </h3>
           <p style={{
-            fontSize: "14px",
-            lineHeight: "20px",
+            fontSize: "12px",
+            lineHeight: "16px",
             color: "#616161",
             fontFamily: "'Inter', sans-serif",
+            fontWeight: 400,
           }}>
             Analysis and manage Program Wise Scholarship Distribution.
           </p>
         </div>
-        <div style={{ width: "120px" }}>
+        <div>
           <Select
             placeholder="Select Period"
             options={periodOptions}
@@ -78,74 +92,91 @@ export const ScholarshipDistributionChart: React.FC<ScholarshipDistributionChart
         </div>
       </div>
 
-      <div style={{
-        width: "100%",
-        overflowX: "auto",
-      }}>
-        <svg
-          width={chartWidth}
-          height={chartHeight + 60}
-          style={{
-            minWidth: "100%",
-          }}
-        >
-          {/* Y-axis labels */}
-          {[0, 25, 50, 75, 100].map((value) => (
-            <g key={value}>
-              <text
-                x="0"
-                y={chartHeight - (value / 100) * chartHeight + 5}
-                fontSize="12"
-                fill="#616161"
-                fontFamily="'Inter', sans-serif"
-              >
-                {value}
-              </text>
-              <line
-                x1="30"
-                y1={chartHeight - (value / 100) * chartHeight}
-                x2={chartWidth}
-                y2={chartHeight - (value / 100) * chartHeight}
-                stroke="#e0e0e0"
-                strokeWidth="1"
-                strokeDasharray="2,2"
-              />
-            </g>
+      <div style={{ width: "100%", overflowX: "auto" }}>
+        <svg width={chartWidth} height={chartHeight + paddingTop + paddingBottom} style={{ overflow: "visible" }}>
+          {/* Horizontal Grid Lines */}
+          {[0, 20, 40, 60, 80, 100].map((val) => {
+            const y = getY(val);
+            return (
+              <g key={val}>
+                <text
+                  x="35"
+                  y={y + 5}
+                  fontSize="13"
+                  fill="#616161"
+                  fontFamily="'Inter', sans-serif"
+                >
+                  {val}
+                </text>
+                <line
+                  x1={paddingLeft-20}
+                  y1={y}
+                  x2={chartWidth - paddingRight+133}
+                  y2={y}
+                  stroke={val === 0 ? "#9ca3af" : "#e5e7eb"}
+                  strokeWidth="1"
+                  strokeDasharray={val === 0 ? "0" : "3,3"}
+                />
+              </g>
+            );
+          })}
+
+          {/* Reference Line at 50 */}
+          {/* Vertical Grid Lines */}
+          {data.map((_, i) => (
+            <line
+              key={`v-${i}`}
+              x1={getGroupX(i) - (groupGap / 2)}
+              y1={paddingTop}
+              x2={getGroupX(i) - (groupGap / 2)}
+              y2={chartHeight + paddingTop}
+              stroke="#e5e7eb"
+              strokeWidth="1"
+              strokeDasharray="3,3"
+            />
           ))}
+          <line
+            x1={getGroupX(data.length - 1) + groupWidth + (groupGap / 3)}
+            y1={paddingTop}
+            x2={getGroupX(data.length - 1) + groupWidth + (groupGap / 3)}
+            y2={chartHeight + paddingTop}
+            stroke="#e5e7eb"
+            strokeWidth="1"
+            strokeDasharray="3,3"
+          />
 
-          {/* Stacked bars */}
+          {/* Grouped bars */}
           {data.map((item, index) => {
-            const x = 40 + index * (barWidth + barGap);
-            let currentY = chartHeight;
-
-            const segments = [
-              { value: item.meritExcellence, color: colors.meritExcellence, label: "Merit Excellence" },
-              { value: item.stemInnovation, color: colors.stemInnovation, label: "STEM Innovation" },
-              { value: item.concessions, color: colors.concessions, label: "Concessions" },
-              { value: item.sports, color: colors.sports, label: "Sports" },
+            const groupX = getGroupX(index);
+            
+            const bars = [
+              { value: item.meritExcellence, color: colors.meritExcellence },
+              { value: item.stemInnovation, color: colors.stemInnovation },
+              { value: item.achievement, color: colors.achievement },
+              { value: item.sports, color: colors.sports },
             ];
 
             return (
               <g key={index}>
-                {segments.map((segment, segIndex) => {
-                  const segmentHeight = (segment.value / 100) * chartHeight;
-                  currentY -= segmentHeight;
+                {bars.map((bar, barIndex) => {
+                  const barX = groupX + barIndex * (barWidth + barGap);
+                  const barHeight = (bar.value / 100) * chartHeight;
                   return (
                     <rect
-                      key={segIndex}
-                      x={x}
-                      y={currentY}
+                      key={barIndex}
+                      x={barX}
+                      y={getY(bar.value)}
                       width={barWidth}
-                      height={segmentHeight}
-                      fill={segment.color}
-                      rx="4"
+                      height={barHeight}
+                      fill={bar.color}
                     />
                   );
                 })}
+                {/* Month Label */}
                 <text
-                  x={x + barWidth / 2}
-                  y={chartHeight + 20}
-                  fontSize="10"
+                  x={groupX + groupWidth / 2}
+                  y={chartHeight + paddingTop + 25}
+                  fontSize="13"
                   fill="#616161"
                   fontFamily="'Inter', sans-serif"
                   textAnchor="middle"
@@ -156,41 +187,41 @@ export const ScholarshipDistributionChart: React.FC<ScholarshipDistributionChart
             );
           })}
         </svg>
+      </div>
 
-        {/* Legend */}
-        <div style={{
-          display: "flex",
-          gap: "24px",
-          marginTop: "16px",
-          justifyContent: "center",
-          flexWrap: "wrap",
-        }}>
-          {Object.entries(colors).map(([key, color]) => (
-            <div key={key} style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}>
-              <div style={{
-                width: "16px",
-                height: "16px",
-                backgroundColor: color,
-                borderRadius: "4px",
-              }} />
-              <span style={{
-                fontSize: "12px",
-                color: "#616161",
-                fontFamily: "'Inter', sans-serif",
-              }}>
-                {key === "meritExcellence" ? "Merit Excellence" :
-                 key === "stemInnovation" ? "STEM Innovation" :
-                 key === "concessions" ? "Concessions" : "Sports"}
-              </span>
-            </div>
-          ))}
+      {/* Legend */}
+      <div style={{
+        display: "flex",
+        gap: "24px",
+        marginTop: "32px",
+        justifyContent: "center",
+        flexWrap: "wrap",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div style={{ width: "8px", height: "8px", backgroundColor: colors.meritExcellence }} />
+          <span style={{ fontSize: "13px", color: "#000000B2", fontFamily: "'Inter', sans-serif" }}>
+            Merit Excellence
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div style={{ width: "8px", height: "8px", backgroundColor: colors.stemInnovation }} />
+          <span style={{ fontSize: "13px", color: "#000000B2", fontFamily: "'Inter', sans-serif" }}>
+            STEM Innovation
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div style={{ width: "8px", height: "8px", backgroundColor: colors.achievement }} />
+          <span style={{ fontSize: "13px", color: "#000000B2", fontFamily: "'Inter', sans-serif" }}>
+            Achievement
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div style={{ width: "8px", height: "8px", backgroundColor: colors.sports }} />
+          <span style={{ fontSize: "13px", color: "#000000B2", fontFamily: "'Inter', sans-serif" }}>
+            Sports
+          </span>
         </div>
       </div>
     </Card>
   );
 };
-
