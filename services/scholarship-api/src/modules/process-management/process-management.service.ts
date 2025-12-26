@@ -196,6 +196,7 @@ export class ProcessManagementService {
           P.Status,
           P.Scholarship_No,
           P.Update_Date,
+          P.Scholar_Reject,
           P.Scholarship_Approved_Amount,
           P.Scholarship_Suggest_Amount,
           P.Data_Date,
@@ -714,7 +715,7 @@ export class ProcessManagementService {
         FROM t_Registration R
         JOIN t_Registration_Process P ON P.Application_Id = R.Application_Id
         JOIN T_Scholarship_Year SY ON R.Scholarship_Year_Id = SY.ScholarshipYear_Id
-        WHERE 1=1
+        WHERE P.IsUpload_Status = '0' AND P.IsVerify = '0'
       `;
 
       const queryParams: Record<string, unknown> = {};

@@ -31,9 +31,9 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
           padding: 0,
         },
         fieldGroup: {
-          height: "45px",
-          minHeight: "45px",
-          maxHeight: "45px",
+          height: tokens.formFieldHeight,
+          minHeight: tokens.formFieldMinHeight,
+          maxHeight: tokens.formFieldMaxHeight,
           borderRadius: tokens.borderRadiusLarge,
           backgroundColor,
           border: `1px solid ${borderColor}`,
@@ -49,10 +49,10 @@ const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
           border: `1px solid ${borderColor}`, // Keep same border on hover
         },
         field: {
-          height: "45px",
-          minHeight: "45px",
-          maxHeight: "45px",
-          lineHeight: "45px",
+          height: tokens.formFieldHeight,
+          minHeight: tokens.formFieldMinHeight,
+          maxHeight: tokens.formFieldMaxHeight,
+          lineHeight: tokens.formFieldHeight,
           fontSize: tokens.fontSizeBase300,
           color: textColor,
           margin: 0,

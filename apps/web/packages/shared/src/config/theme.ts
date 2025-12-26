@@ -100,6 +100,11 @@ export interface ThemeTokens {
   shadow4: string;
   shadow8: string;
   shadow16: string;
+
+  // Form Field Heights (Centralized - change here to update all form fields)
+  formFieldHeight: string;
+  formFieldMinHeight: string;
+  formFieldMaxHeight: string;
 }
 
 // Light theme tokens
@@ -190,6 +195,11 @@ export const lightTheme: ThemeTokens = {
   shadow4: "0 0 2px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.14)",
   shadow8: "0 0 2px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.14)",
   shadow16: "0 0 2px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.14)",
+
+  // Form Field Heights (Centralized - change here to update all form fields)
+  formFieldHeight: "40px",
+  formFieldMinHeight: "40px",
+  formFieldMaxHeight: "40px",
 };
 
 // Dark theme tokens
@@ -235,6 +245,11 @@ export const darkTheme: ThemeTokens = {
   shadow4: "0 0 2px rgba(0,0,0,0.48), 0 2px 4px rgba(0,0,0,0.40)",
   shadow8: "0 0 2px rgba(0,0,0,0.48), 0 4px 8px rgba(0,0,0,0.40)",
   shadow16: "0 0 2px rgba(0,0,0,0.48), 0 8px 16px rgba(0,0,0,0.40)",
+
+  // Form Field Heights (Centralized - change here to update all form fields)
+  formFieldHeight: "40px",
+  formFieldMinHeight: "40px",
+  formFieldMaxHeight: "40px",
 };
 
 export type ThemeMode = 'light' | 'dark';
