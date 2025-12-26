@@ -355,14 +355,12 @@ const EducationMedicalDetails = () => {
 
     // Education field options
     const institutionTypeOptions = [
-        { value: '', label: '--Select--' },
         { value: 'Government', label: 'Government' },
         { value: 'Government Aided', label: 'Government Aided' },
         { value: 'Private', label: 'Private' },
     ];
 
     const classStudyingOptions = [
-        { value: '', label: '--Select--' },
         { value: 'Pre-KG', label: 'Pre-KG' },
         { value: 'LKG', label: 'LKG' },
         { value: 'UKG', label: 'UKG' },
@@ -382,7 +380,6 @@ const EducationMedicalDetails = () => {
     ];
 
     const boardOptions = [
-        { value: '', label: '--Select--' },
         { value: 'State Board (TN State)', label: 'State Board (TN State)' },
         { value: 'Central Board(CBSE)', label: 'Central Board(CBSE)' },
         { value: 'Matriculation', label: 'Matriculation' },
@@ -391,7 +388,6 @@ const EducationMedicalDetails = () => {
     ];
 
     const courseOptions = [
-        { value: '', label: '--Select--' },
         { value: 'Arts and Science', label: 'Arts and Science' },
         { value: 'Engineering', label: 'Engineering' },
         { value: 'Management', label: 'Management' },
@@ -403,13 +399,11 @@ const EducationMedicalDetails = () => {
     ];
 
     const degreeTypeOptions = [
-        { value: '', label: '--Select--' },
         { value: 'UG', label: 'UG' },
         { value: 'PG', label: 'PG' },
     ];
 
     const currentYearOptions = [
-        { value: '', label: '--Select--' },
         { value: '1st Year', label: '1st Year' },
         { value: '2nd Year', label: '2nd Year' },
         { value: '3rd Year', label: '3rd Year' },
@@ -418,7 +412,6 @@ const EducationMedicalDetails = () => {
     ];
 
     const currentSemesterOptions = [
-        { value: '', label: '--Select--' },
         { value: '1st Semester', label: '1st Semester' },
         { value: '2nd Semester', label: '2nd Semester' },
         { value: '3rd Semester', label: '3rd Semester' },
@@ -827,6 +820,9 @@ const EducationMedicalDetails = () => {
                                 required={false}
                                 placeholder="Enter specialization"
                             />
+                            
+                            {/* Spacing after Specialization field */}
+                            <div style={{ marginBottom: '24px' }}></div>
                         </>
                     )}
                 </Stack>

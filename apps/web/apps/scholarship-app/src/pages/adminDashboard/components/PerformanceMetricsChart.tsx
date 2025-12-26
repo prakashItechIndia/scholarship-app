@@ -17,58 +17,35 @@ export const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = (
     {
       label: "Average Processing Time",
       value: "8 days",
-      percentage: 65,
-      color: "#3b82f6",
+      percentage: 90,
+      color: "#3B82F6",
     },
     {
       label: "Student Retention Rate",
       value: "94.5%",
-      percentage: 95,
-      color: "#f59e0b",
+      percentage: 87,
+      color: "#F59E0B",
     },
     {
       label: "Satisfaction Score",
       value: "4.7/5.0",
-      percentage: 94,
-      color: "#10b981",
+      percentage: 83,
+      color: "#14B8A6",
     },
     {
       label: "Budget Utilization",
       value: "73%",
-      percentage: 73,
-      color: "#8b5cf6",
+      percentage: 79,
+      color: "#A855F7",
     },
   ],
 }) => {
-  const centerX = 120;
-  const centerY = 120;
-  const maxRadius = 100;
-  const ringWidth = 20;
-
-  const renderRing = (radius: number, percentage: number, color: string, index: number) => {
-    const circumference = 2 * Math.PI * radius;
-    const strokeDasharray = circumference;
-    const strokeDashoffset = circumference - (percentage / 100) * circumference;
-    const rotation = -90; // Start from top
-
-    return (
-      <circle
-        key={index}
-        cx={centerX}
-        cy={centerY}
-        r={radius}
-        fill="none"
-        stroke={color}
-        strokeWidth={ringWidth}
-        strokeDasharray={strokeDasharray}
-        strokeDashoffset={strokeDashoffset}
-        transform={`rotate(${rotation} ${centerX} ${centerY})`}
-        style={{
-          transition: "stroke-dashoffset 0.5s ease",
-        }}
-      />
-    );
-  };
+  const size = 390;
+  const centerX = size / 2 - 10;
+  const centerY = size / 2 + 20;
+  const ringWidth = 16;
+  const gap = 16;
+  const startRadius = 60;
 
   return (
     <Card variant="elevated" style={{
@@ -76,13 +53,14 @@ export const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = (
       backgroundColor: "#ffffff",
       borderRadius: "8px",
       padding: "24px",
+      display: "flex",
+      flexDirection: "column",
+      height: "100%",
     }}>
-      <div style={{
-        marginBottom: "24px",
-      }}>
+      <div style={{ marginBottom: "12px" }}>
         <h3 style={{
-          fontSize: "18px",
-          lineHeight: "24px",
+          fontSize: "16px",
+          lineHeight: "22px",
           fontWeight: 600,
           color: "#242424",
           marginBottom: "4px",
@@ -91,75 +69,91 @@ export const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = (
           Performance Metrics
         </h3>
         <p style={{
-          fontSize: "14px",
-          lineHeight: "20px",
+          fontSize: "12px",
+          lineHeight: "16px",
           color: "#616161",
           fontFamily: "'Inter', sans-serif",
+          fontWeight: 400,
         }}>
           Key performance Indicators for scholarship programs.
         </p>
       </div>
 
       <div style={{
+        flex: 1,
         display: "flex",
         flexDirection: "column",
+        justifyContent: "center",
         alignItems: "center",
-        gap: "24px",
+        position: "relative",
+        gap: "32px",
       }}>
-        {/* Concentric Rings Chart */}
-        <div style={{ position: "relative" }}>
-          <svg width="240" height="240">
-            {/* Background circles */}
-            {metrics.map((_, index) => {
-              const radius = maxRadius - (metrics.length - index - 1) * (ringWidth + 5);
-              return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          {metrics.map((metric, index) => {
+            const radius = startRadius + (metrics.length - 1 - index) * (ringWidth + gap);
+            const circumference = 2 * Math.PI * radius;
+            
+            // The design shows rings that are almost full circles.
+            // Gap is at the top.
+            const totalTrackAngle = 320; // degrees
+            const trackLength = (totalTrackAngle / 360) * circumference;
+            
+            // Progress is a percentage of the visible track (0-100)
+            const progressLength = (Math.min(100, Math.max(0, metric.percentage)) / 100) * trackLength;
+            
+            // Start rotation: Top (-90deg)
+            const startRotation = -90;
+
+            // Label position: In the gap at the top.
+            const labelX = centerX+50;
+            const labelY = centerY - radius;
+
+            return (
+              <g key={index}>
+                {/* Progress ring - Growing counter-clockwise */}
                 <circle
-                  key={`bg-${index}`}
                   cx={centerX}
                   cy={centerY}
                   r={radius}
                   fill="none"
-                  stroke="#e0e0e0"
+                  stroke={metric.color}
                   strokeWidth={ringWidth}
+                  strokeDasharray={`${progressLength} ${circumference}`}
+                  // strokeLinecap="round"
+                  // Flip horizontally to make it grow counter-clockwise from the top
+                  transform={`translate(${centerX * 2}, 0) scale(-1, 1) rotate(${startRotation} ${centerX} ${centerY})`}
+                  style={{
+                    transition: "stroke-dasharray 0.5s ease",
+                  }}
                 />
-              );
-            })}
-            {/* Filled rings */}
-            {metrics.map((metric, index) => {
-              const radius = maxRadius - (metrics.length - index - 1) * (ringWidth + 5);
-              return renderRing(radius, metric.percentage, metric.color, index);
-            })}
-            {/* Center text */}
-            <text
-              x={centerX}
-              y={centerY - 5}
-              fontSize="14"
-              fontWeight={600}
-              fill="#242424"
-              fontFamily="'Inter', sans-serif"
-              textAnchor="middle"
-            >
-              {metrics[0]?.value}
-            </text>
-            <text
-              x={centerX}
-              y={centerY + 12}
-              fontSize="12"
-              fill="#616161"
-              fontFamily="'Inter', sans-serif"
-              textAnchor="middle"
-            >
-              {metrics[0]?.label.includes('Processing Time') ? 'Avg. Processing Time' : metrics[0]?.label}
-            </text>
-          </svg>
-        </div>
+                {/* Value Label */}
+                <text
+                  x={labelX}
+                  y={labelY}
+                  fontSize="12"
+                  fontWeight={500}
+                  fill="#242424"
+                  fontFamily="'Inter', sans-serif"
+                  textAnchor="middle"
+                  alignmentBaseline="middle"
+                >
+                  {metric.value}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
 
         {/* Legend */}
         <div style={{
           display: "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
-          gap: "12px",
+          gridTemplateColumns: "repeat(2, auto)",
+          justifyContent: "center",
+          columnGap: "48px",
+          rowGap: "12px",
           width: "100%",
+          marginTop: "12px",
+           marginLeft:"52px"
         }}>
           {metrics.map((metric, index) => (
             <div
@@ -168,33 +162,31 @@ export const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = (
                 display: "flex",
                 alignItems: "center",
                 gap: "8px",
+                
               }}
             >
               <div style={{
-                width: "12px",
-                height: "12px",
+                width: "10px",
+                height: "10px",
                 borderRadius: "50%",
                 backgroundColor: metric.color,
               }} />
               <div style={{
                 display: "flex",
-                flexDirection: "column",
+                justifyContent: "space-between",
+                width: "180px",
+                gap: "12px",
               }}>
                 <span style={{
                   fontSize: "12px",
-                  fontWeight: 500,
-                  color: "#242424",
+                  fontWeight: 400,
+                  color: "#424242",
                   fontFamily: "'Inter', sans-serif",
+                  whiteSpace: "nowrap",
                 }}>
                   {metric.label}
                 </span>
-                <span style={{
-                  fontSize: "12px",
-                  color: "#616161",
-                  fontFamily: "'Inter', sans-serif",
-                }}>
-                  {metric.value}
-                </span>
+                
               </div>
             </div>
           ))}
@@ -203,4 +195,8 @@ export const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = (
     </Card>
   );
 };
+
+
+
+
 

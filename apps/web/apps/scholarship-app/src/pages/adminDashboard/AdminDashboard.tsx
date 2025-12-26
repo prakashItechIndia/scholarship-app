@@ -1,11 +1,12 @@
 import * as React from "react";
-import { Select, PageActionButtons, CardSkeleton, TableSkeleton, Card, Skeleton } from "@shared/components";
+import { Select, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, PageActionButtons, CardSkeleton, TableSkeleton, Card, Skeleton } from "@shared/components";
 import {
+  ArrowDownload24Regular,
+  ChevronDown24Regular,
   DocumentBulletList24Regular,
   DocumentCheckmark24Regular,
   DocumentTableSearch24Regular,
 } from "@fluentui/react-icons";
-import { ExportButton } from "@/components/common";
 import {
   People20Regular,
 } from "@fluentui/react-icons";
@@ -18,6 +19,7 @@ import { FundSpendingChart } from "./components/FundSpendingChart";
 import { ScholarshipDistributionChart } from "./components/ScholarshipDistributionChart";
 import { ScheduleCalendar } from "./components/ScheduleCalendar";
 import { RecentApplicationsTable } from "./components/RecentApplicationsTable";
+import { Separator } from "./components/Separator";
 import { dashboard, reports } from "@/services/scholarship.service";
 import { useToast } from "@/components/ui/toast";
 import { exportDashboardToExcel, exportDashboardToWord } from "@/utils/exportUtils";
@@ -27,13 +29,14 @@ import { mockCalendarEvents } from "./constants";
 const AdminDashboard: React.FC = () => {
   const { error: showError } = useToast();
   const [selectedAcademicYear, setSelectedAcademicYear] = React.useState("");
-  const [selectedMonth, setSelectedMonth] = React.useState<string>("September 2024");
-  const [selectedPeriod, setSelectedPeriod] = React.useState("Monthly");
+  const [selectedMonth, setSelectedMonth] = React.useState<Date>(new Date(2024, 8, 1)); // September 2024
+  const [selectedPeriod, setSelectedPeriod] = React.useState<string>("Monthly");
   const [selectedStatusMonth, setSelectedStatusMonth] = React.useState<string>("October 2025");
   const [selectedYear, setSelectedYear] = React.useState<string>("2024 - 2025");
   
   // Get user name from localStorage
   const [userName, setUserName] = React.useState<string>("User");
+  const currentYear = new Date().getFullYear();
 
   // State for dashboard data
   const [financialData, setFinancialData] = React.useState<FinancialSummary>({
@@ -75,6 +78,7 @@ const AdminDashboard: React.FC = () => {
     action: string;
     timestamp: string;
     color: string;
+    border: string;
   }[]>([]);
 
   // Performance Metrics data
@@ -199,7 +203,7 @@ const AdminDashboard: React.FC = () => {
         setApplicationActivityData(mappedActivity);
 
         // Map program distribution data (group by month and scholarship type)
-        const distributionMap = new Map<string, { month: string; meritExcellence: number; stemInnovation: number; concessions: number; sports: number }>();
+        const distributionMap = new Map<string, { month: string; meritExcellence: number; stemInnovation: number; achievement: number; sports: number }>();
         distribution.forEach((item: any) => {
           const month = item.Month || item.month || "";
           const scholarshipFor = item.Scholarship_For || item.scholarshipFor || "";
@@ -210,7 +214,7 @@ const AdminDashboard: React.FC = () => {
               month,
               meritExcellence: 0,
               stemInnovation: 0,
-              concessions: 0,
+              achievement: 0,
               sports: 0,
             });
           }
@@ -220,8 +224,8 @@ const AdminDashboard: React.FC = () => {
             entry.meritExcellence += amount;
           } else if (scholarshipFor === "College" || scholarshipFor === "STEM Innovation") {
             entry.stemInnovation += amount;
-          } else if (scholarshipFor === "Research" || scholarshipFor === "Concessions") {
-            entry.concessions += amount;
+          } else if (scholarshipFor === "Research" || scholarshipFor === "Concessions" || scholarshipFor === "Achievement") {
+            entry.achievement += amount;
           } else if (scholarshipFor === "Medical" || scholarshipFor === "Sports") {
             entry.sports += amount;
           }
@@ -241,23 +245,29 @@ const AdminDashboard: React.FC = () => {
         const mappedActivities = activities.map((act: any) => {
           const userName = act.User_Name || act.ApplicantName || 'Unknown';
           let action = act.ProcessUndergone || act.Action || 'Activity';
-          let color = '#3b82f6'; // Default blue
+          let color = '#EFF6FF'; // Default blue background
+          let border = '1px solid #BFDBFE'; // Default blue border
           
-          // Determine action and color based on process
+          // Determine action, color, and border based on process
           if (action.includes('Submitted') || action.includes('Registered')) {
-            color = '#10b981'; // Green
+            color = '#E0F9E7'; // Green background
+            border = '1px solid #58DB95'; // Green border
             action = `Submitted Application${act.Scholarship_No ? ` - Scholarship ${act.Scholarship_No}` : ''}`;
           } else if (action.includes('Updated') || action.includes('Profile')) {
-            color = '#f59e0b'; // Orange
+            color = '#FDEEE4'; // Orange background
+            border = '1px solid #F58969'; // Orange border
             action = 'Updated Profile';
           } else if (action.includes('Uploaded') || action.includes('Document')) {
-            color = '#eab308'; // Yellow
+            color = '#FFF8E5'; // Yellow background
+            border = '1px solid #FECE79'; // Yellow border
             action = 'Uploaded Document';
           } else if (action.includes('Approved')) {
-            color = '#3b82f6'; // Blue
+            color = '#EFF6FF'; // Blue background
+            border = '1px solid #BFDBFE'; // Blue border
             action = `Application Approved${act.Scholarship_No ? ` - Scholarship ${act.Scholarship_No}` : ''}`;
           } else if (action.includes('Registered') || action.includes('Account')) {
-            color = '#8b5cf6'; // Purple
+            color = '#FAF5FF'; // Purple background
+            border = '1px solid #E9D5FF'; // Purple border
             action = 'Registered Account';
           }
 
@@ -292,6 +302,7 @@ const AdminDashboard: React.FC = () => {
             action,
             timestamp,
             color,
+            border,
           };
         });
         setRecentActivities(mappedActivities);
@@ -348,31 +359,38 @@ const AdminDashboard: React.FC = () => {
     void fetchDashboardData();
   }, [selectedAcademicYear, selectedStatusMonth, selectedYear, showError]);
 
-  const handleExport = async (format: "excel" | "word" | "pdf" | "csv") => {
+  const handleExportExcel = async () => {
     try {
       const selectedYearLabel = academicYearOptions.find(
         (opt) => opt.value === selectedAcademicYear,
       )?.label || selectedAcademicYear;
 
-      if (format === "excel") {
-        await exportDashboardToExcel(
-          financialData,
-          applicationMetrics,
-          recentApplications,
-          selectedYearLabel,
-          userName,
-        );
-      } else if (format === "word") {
-        await exportDashboardToWord(
-          financialData,
-          applicationMetrics,
-          recentApplications,
-          selectedYearLabel,
-          userName,
-        );
-      } else {
-        console.warn(`Export format ${format} not yet implemented`);
-      }
+      await exportDashboardToExcel(
+        financialData,
+        applicationMetrics,
+        recentApplications,
+        selectedYearLabel,
+        userName,
+      );
+    } catch (error) {
+      console.error("Error exporting dashboard:", error);
+      showError("Error", "Failed to export dashboard. Please try again.");
+    }
+  };
+
+  const handleExportWord = async () => {
+    try {
+      const selectedYearLabel = academicYearOptions.find(
+        (opt) => opt.value === selectedAcademicYear,
+      )?.label || selectedAcademicYear;
+
+      await exportDashboardToWord(
+        financialData,
+        applicationMetrics,
+        recentApplications,
+        selectedYearLabel,
+        userName,
+      );
     } catch (error) {
       console.error("Error exporting dashboard:", error);
       showError("Error", "Failed to export dashboard. Please try again.");
@@ -380,7 +398,7 @@ const AdminDashboard: React.FC = () => {
   };
 
   // Indian Rupee symbol function
-  const getIndianRupeeIcon = (color = "#2453C3") => (
+  const getIndianRupeeIcon = (color: string = "#2453C3") => (
     <span style={{
       fontSize: "28px",
       // fontWeight: 700,
@@ -429,7 +447,7 @@ const AdminDashboard: React.FC = () => {
                 fontFamily: "'Inter', sans-serif",
                 margin: 0,
               }}>
-                An initiative of Shri. Leo Mutha Scholarship Trust. View your LMS performance metrics below.
+                Welcome back to the Leo Muthu Scholarship Portal. View your {currentYear} performance metrics below.
               </p>
             </div>
           }
@@ -442,19 +460,44 @@ const AdminDashboard: React.FC = () => {
           <div style={{ width: "140px",marginRight: "120px" }}>
             <Select
               placeholder="Academic Year"
-              options={academicYearOptions}
-              selectedKey={selectedAcademicYear}
+              options={academicYearOptions.length > 0 ? academicYearOptions : [{ value: "2025", label: "2025" }]}
+              selectedKey={selectedAcademicYear || "2025"}
               onValueChange={(value) => setSelectedAcademicYear(value)}
             />
           </div>
-          <ExportButton
-            options={[
-              { format: "excel", label: "Export to Excel" },
-              { format: "word", label: "Export to Word" },
-            ]}
-            onExport={handleExport}
-            size="medium"
-          />
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <button
+                style={{
+                  backgroundColor: "#0f6cbd",
+                  color: "#ffffff",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  fontFamily: "'Inter', sans-serif",
+                  height: "43px",
+                }}
+              >
+                <ArrowDownload24Regular style={{ width: "16px", height: "16px",color:"#FFFFFF"}} />
+                Export
+                <ChevronDown24Regular style={{ width: "16px", height: "16px" ,color:"#FFFFFF"}} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={handleExportExcel}>
+                Export to Excel
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportWord}>
+                Export to Word
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </PageActionButtons>
       </div>
@@ -485,53 +528,65 @@ const AdminDashboard: React.FC = () => {
             <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ backgroundColor: "#FFEFEE", height: "100px" }} />
           </div>
         ) : (
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gap: "16px",
-            width: "100%",
-          }}>
-            <UnifiedCard
-              icon={getIndianRupeeIcon("#2453C3")}
-              value={financialData.totalAmountSpentThisYear}
-              label="Total Amount Spent This Year"
-              showCurrency={true}
-              iconBgColor="#FFFFFF"
-              color="#EFF6FF"
-            />
-            <UnifiedCard
-              icon={getIndianRupeeIcon("#2453C3")}
-              value={financialData.amountSpentForSchoolStudents}
-              label="Amount Spent for School Students"
-              showCurrency={true}
-              iconBgColor="#FFFFFF"
-              color="#F0FDF4"
-            />
-            <UnifiedCard
-              icon={getIndianRupeeIcon("#2453C3")}
-              value={financialData.amountSpentForCollegeStudents}
-              label="Amount Spent for College Students"
-              showCurrency={true}
-              iconBgColor="#FFFFFF"
-              color="#FAF5FF"
-            />
-            <UnifiedCard
-              icon={getIndianRupeeIcon("#2453C3")}
-              value={financialData.amountSpentForResearchScholars}
-              label="Amount Spent for Research Scholars"
-              showCurrency={true}
-              iconBgColor="#FFFFFF"
-              color="#FFFBEB"
-            />
-            <UnifiedCard
-              icon={getIndianRupeeIcon("#2453C3")}
-              value={financialData.amountSpentForMedicalAssistance}
-              label="Amount Spent for Medical Assistance"
-              showCurrency={true}
-              iconBgColor="#FFFFFF"
-              color="#FFEFEE"
-            />
-          </div>
+          <>
+            {/* First row - 4 cards */}
+            <div style={{
+              display: "flex",
+              alignItems: "stretch",
+              gap: "15px",
+              marginBottom: "16px",
+            }}>
+              <UnifiedCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.totalAmountSpentThisYear}
+                label="Total Amount Spent This Year"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#EFF6FF"
+              />
+              <Separator height="auto" />
+              <UnifiedCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.amountSpentForSchoolStudents}
+                label="Amount Spent for School Students"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#F0FDF4"
+              />
+              <Separator height="auto" />
+              <UnifiedCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.amountSpentForCollegeStudents}
+                label="Amount Spent for College Students"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#FAF5FF"
+              />
+              <Separator height="auto" />
+              <UnifiedCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.amountSpentForResearchScholars}
+                label="Amount Spent for Research Scholars"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#FFFBEB"
+              />
+            </div>
+            {/* Second row - 5th card */}
+            <div style={{
+              display: "flex",
+              gap: "16px",
+            }}>
+              <UnifiedCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.amountSpentForMedicalAssistance}
+                label="Amount Spent for Medical Assistance"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#FFEFEE"
+              />
+            </div>
+          </>
         )}
       </div>
 
@@ -561,10 +616,8 @@ const AdminDashboard: React.FC = () => {
           </div>
         ) : (
           <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+            display: "flex",
             gap: "16px",
-            width: "100%",
           }}>
             <UnifiedCard
               icon={<People20Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
@@ -572,42 +625,47 @@ const AdminDashboard: React.FC = () => {
               label="Total Applications"
               iconBgColor="#FFFFFF"
             />
+            <Separator height="auto" />
             <UnifiedCard
               icon={<DocumentBulletList24Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
               value={applicationMetrics.submitted}
               label="Submitted"
               iconBgColor="#FFFFFF"
             />
+            <Separator height="auto" />
             <UnifiedCard
               icon={<DocumentCheckmark24Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
               value={applicationMetrics.approved}
               label="Approved"
               iconBgColor="#FFFFFF"
             />
+            <Separator height="auto" />
             <UnifiedCard
               icon={<DocumentTableSearch24Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
               value={applicationMetrics.underReview}
-              label="Funded (Inactive)"
+              label="Under Review"
               iconBgColor="#FFFFFF"
             />
           </div>
         )}
       </div>
-
       {/* Application Activity Chart - Full Width */}
       {loading ? (
         <div style={{ marginBottom: "32px" }}>
           <CardSkeleton variant="elevated" showIcon={false} showHeader={true} contentSections={0} style={{ height: "400px" }} />
         </div>
       ) : (
-        <div style={{ marginBottom: "32px" }}>
+        <div style={{
+          marginBottom: "30px",
+        }}>
           <ApplicationActivityChart
-            data={applicationActivityData}
-            selectedMonth={selectedMonth}
-            onMonthChange={setSelectedMonth}
-          />
+          data={applicationActivityData}
+          selectedDate={selectedMonth}
+          onDateChange={(date) => date && setSelectedMonth(date)}
+        />
         </div>
       )}
+     
 
       {/* Application Status and Recent Activity Row - 2 Columns */}
       {loading ? (
@@ -635,9 +693,7 @@ const AdminDashboard: React.FC = () => {
           />
 
           {/* Recent Activity Widget */}
-          <RecentActivityWidget 
-            activities={recentActivities}
-          />
+          <RecentActivityWidget activities={recentActivities} />
         </div>
       )}
 
@@ -655,32 +711,41 @@ const AdminDashboard: React.FC = () => {
           <CardSkeleton variant="elevated" showIcon={false} showHeader={true} contentSections={0} style={{ height: "400px" }} />
         </div>
       ) : (
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "24px",
-          marginBottom: "32px",
-        }}>
-          {/* Top Row - Left: Performance Metrics */}
-          <PerformanceMetricsChart metrics={performanceMetrics} />
+        <>
+          {/* Performance Metrics, Fund Spending, and Scholarship Distribution - 3 Columns */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "24px",
+            marginBottom: "32px",
+          }}>
+            {/* Performance Metrics Chart */}
+            <PerformanceMetricsChart metrics={performanceMetrics} />
 
-          {/* Top Row - Right: Fund Spending */}
-          <FundSpendingChart
-            data={fundSpendingData}
-            selectedYear={selectedYear}
-            onYearChange={setSelectedYear}
-          />
+            {/* Fund Spending Chart */}
+            <FundSpendingChart
+              data={fundSpendingData}
+              selectedYear={selectedYear}
+              onYearChange={setSelectedYear}
+            />
+          </div>
 
-          {/* Bottom Row - Left: Scholarship Distribution */}
-          <ScholarshipDistributionChart
-            data={programDistributionData}
-            selectedPeriod={selectedPeriod}
-            onPeriodChange={setSelectedPeriod}
-          />
-
-          {/* Bottom Row - Right: Schedule Calendar */}
-          <ScheduleCalendar events={calendarEvents} />
-        </div>
+          {/* Schedule Calendar - Full Width or Right Aligned */}
+          {/* Scholarship Distribution and Schedule Calendar Row */}
+          <div style={{ 
+            display: "grid",
+            gridTemplateColumns: "1fr 550px",
+            gap: "24px",
+            marginBottom: "32px" 
+          }}>
+            <ScholarshipDistributionChart
+              data={programDistributionData}
+              selectedPeriod={selectedPeriod}
+              onPeriodChange={setSelectedPeriod}
+            />
+            <ScheduleCalendar events={calendarEvents} />
+          </div>
+        </>
       )}
 
       {/* Recent Applications Table */}
@@ -707,7 +772,7 @@ const AdminDashboard: React.FC = () => {
           </div>
         </Card>
       ) : (
-        <RecentApplicationsTable data={recentApplications} />
+        <RecentApplicationsTable data={recentApplications.length > 0 ? recentApplications : []} />
       )}
     </div>
   );

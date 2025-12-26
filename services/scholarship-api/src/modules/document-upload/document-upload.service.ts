@@ -1,6 +1,10 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 import { DatabaseService } from '../../database/database.service';
 import { FileStorageService, DocumentType } from '../file-storage/file-storage.service';
+import type { EnvVars } from '../../config/env.validation';
 
 interface DocumentUploadData {
   applicationId: string;
@@ -44,6 +48,7 @@ export class DocumentUploadService {
   constructor(
     private readonly db: DatabaseService,
     private readonly fileStorage: FileStorageService,
+    private readonly configService: ConfigService<EnvVars, true>,
   ) {}
 
   /**
@@ -373,20 +378,53 @@ export class DocumentUploadService {
         result = await this.db.query(query, { applicationId });
       }
 
+      // Get base URL for constructing full document URLs
+      // Use SSO_API_URL from config, or construct from request if available
+      const apiBaseUrl = this.configService.get('SSO_API_URL', { infer: true }) || 'http://localhost:3000';
+      // Remove /api suffix if present to get server base URL
+      const serverBaseUrl = apiBaseUrl.replace(/\/api\/?$/, '');
+
       // Map results to match frontend expectations
       // Generate Document_Id as sequential number since table doesn't have it
       // Set Uploaded_Date and Uploaded_By as null since table doesn't have these columns
       const mappedResults = (result.recordset || []).map((row: Record<string, unknown>, index: number) => {
         const rowRecord = row as Record<string, unknown>;
         // Handle both column name formats (DocumentType vs Document_Type)
-        const documentType = rowRecord.DocumentType || rowRecord.Document_Type || '';
-        const documentPath = rowRecord.DocumentPath || rowRecord.Document_Path || '';
+        const documentType = (rowRecord.DocumentType || rowRecord.Document_Type || '') as string;
+        const documentPath = (rowRecord.DocumentPath || rowRecord.Document_Path || '') as string;
+        
+        // Construct full URL for the document
+        // Document paths are stored as relative paths like /ScholerShipData/... or /Photos/...
+        // Files are served from /uploads prefix, so we need to prepend /uploads
+        let documentUrl = '';
+        if (documentPath && typeof documentPath === 'string') {
+          if (documentPath.startsWith('http://') || documentPath.startsWith('https://')) {
+            // Already a full URL
+            documentUrl = documentPath;
+          } else if (documentPath.startsWith('/uploads/')) {
+            // Path already includes /uploads prefix
+            documentUrl = `${serverBaseUrl}${documentPath}`;
+          } else if (documentPath.startsWith('/')) {
+            // Absolute path starting with / (e.g., /ScholerShipData/... or /Photos/...)
+            // Files are stored in uploads directory, so prepend /uploads
+            documentUrl = `${serverBaseUrl}/uploads${documentPath}`;
+          } else {
+            // Relative path - assume it's relative to uploads directory
+            // Remove 'uploads/' prefix if already present
+            const cleanPath = documentPath.replace(/^uploads\//, '');
+            documentUrl = `${serverBaseUrl}/uploads/${cleanPath}`;
+          }
+        }
+        
+        // Log for debugging
+        this.logger.debug(`Document URL constructed: ${documentUrl} from path: ${documentPath}`);
         
         return {
           Document_Id: index + 1, // Generate sequential ID since table doesn't have Document_Id
           Application_Id: rowRecord.Application_Id || applicationId,
           Document_Type: documentType,
-          Document_Path: documentPath,
+          Document_Path: documentPath, // Keep original path for reference
+          Document_URL: documentUrl, // Full URL for frontend to use directly
           Uploaded_Date: null, // Table doesn't have this column - set to null
           Uploaded_By: null, // Table doesn't have this column - set to null
           Is_Verified: rowRecord.Is_Verified || 0,
@@ -400,6 +438,117 @@ export class DocumentUploadService {
         throw new BadRequestException(`Failed to fetch documents: ${error.message}`);
       }
       throw new BadRequestException('Failed to fetch documents');
+    }
+  }
+
+  /**
+   * Get document file buffer for viewing/downloading
+   * Reads the file from the file system based on the document path stored in database
+   */
+  async getDocumentFile(
+    applicationId: string,
+    documentType: string,
+  ): Promise<{ buffer: Buffer; contentType: string; filename: string }> {
+    try {
+      // Get document path from database
+      let query = `
+        SELECT DocumentPath
+        FROM t_esch_ApplicantDocuments
+        WHERE Application_Id = @applicationId AND DocumentType = @documentType
+      `;
+
+      let result = await this.db.query(query, { applicationId, documentType });
+
+      // If no results from t_esch_ApplicantDocuments, try t_Registration_Documents as fallback
+      if (!result.recordset || result.recordset.length === 0) {
+        query = `
+          SELECT Document_Path as DocumentPath
+          FROM t_Registration_Documents
+          WHERE Application_Id = @applicationId AND Document_Type = @documentType
+        `;
+        result = await this.db.query(query, { applicationId, documentType });
+      }
+
+      if (!result.recordset || result.recordset.length === 0) {
+        throw new BadRequestException(
+          `Document not found: ${documentType} for application ${applicationId}`,
+        );
+      }
+
+      const row = result.recordset[0] as Record<string, unknown>;
+      const documentPath = (row.DocumentPath || row.Document_Path) as string;
+      if (!documentPath || typeof documentPath !== 'string') {
+        throw new BadRequestException(
+          `Document path not found for ${documentType} in application ${applicationId}`,
+        );
+      }
+
+      // Get upload base path
+      const uploadBasePath =
+        process.env.UPLOAD_BASE_PATH || join(process.cwd(), 'uploads');
+
+      // Construct full file path
+      // Document paths are stored as /ScholerShipData/... or /Photos/...
+      // Files are physically stored in uploads/ScholerShipData/... or uploads/Photos/...
+      let fullFilePath: string;
+      if (documentPath.startsWith('/')) {
+        // Remove leading slash and prepend upload base path
+        fullFilePath = join(uploadBasePath, documentPath.substring(1));
+      } else {
+        // Relative path, prepend upload base path
+        fullFilePath = join(uploadBasePath, documentPath);
+      }
+
+      // Check if file exists
+      if (!existsSync(fullFilePath)) {
+        this.logger.error(`File not found: ${fullFilePath}`);
+        throw new BadRequestException(
+          `Document file not found: ${documentType} for application ${applicationId}`,
+        );
+      }
+
+      // Read file buffer
+      const buffer = readFileSync(fullFilePath);
+
+      // Determine content type from file extension
+      const fileExtension = fullFilePath.toLowerCase().split('.').pop() || '';
+      let contentType = 'application/octet-stream';
+      if (fileExtension === 'pdf') {
+        contentType = 'application/pdf';
+      } else if (['jpg', 'jpeg'].includes(fileExtension)) {
+        contentType = 'image/jpeg';
+      } else if (fileExtension === 'png') {
+        contentType = 'image/png';
+      } else if (fileExtension === 'gif') {
+        contentType = 'image/gif';
+      } else if (fileExtension === 'doc') {
+        contentType = 'application/msword';
+      } else if (fileExtension === 'docx') {
+        contentType =
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      }
+
+      // Extract filename from path
+      const filename = fullFilePath.split(/[/\\]/).pop() || `${documentType}.${fileExtension}`;
+
+      this.logger.log(
+        `Serving document: ${documentType} for application ${applicationId} (${filename})`,
+      );
+
+      return {
+        buffer,
+        contentType,
+        filename,
+      };
+    } catch (error) {
+      this.logger.error('Error getting document file', error);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      if (error instanceof Error) {
+        throw new BadRequestException(`Failed to get document file: ${error.message}`);
+      }
+      throw new BadRequestException('Failed to get document file');
     }
   }
 

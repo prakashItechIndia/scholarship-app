@@ -1,10 +1,13 @@
 import { z } from 'zod';
 import { Stack } from '@fluentui/react';
+import { Controller } from 'react-hook-form';
 import { useRegistrationForm } from '../hooks/useRegistrationForm';
 import { StepLayout } from '../components/StepLayout';
 import { getStringValue } from '../utils/registrationHelpers';
 import { STACK_TOKENS } from '../utils/registrationConstants';
-import { FormRowContainer, FormRow, InputField, SelectField } from '../components';
+import { FormRowContainer, FormRow, SelectField } from '../components';
+import { FormField } from '../components/FormField';
+import { Input } from '@shared/components';
 import { useRegistration } from '@/contexts/RegistrationContext';
 import { useEffect, useState } from 'react';
 import { scholarshipApplication, dropdownOptions } from '@/services/scholarship.service';
@@ -53,10 +56,11 @@ function verhoeffCheck(aadhaar: string): boolean {
     ];
     
     let c = 0;
-    const myArray = aadhaar.split('').reverse();
-    
-    for (let i = 0; i < myArray.length; i++) {
-        c = d[c][p[((i + 1) % 8)][parseInt(myArray[i], 10)]];
+    const digits = aadhaar.split('').reverse().map(Number);
+
+    for (let i = 0; i < digits.length; i++) {
+        c = d[c][p[i % 8][digits[i]]];
+
     }
     
     return c === 0;
@@ -67,11 +71,12 @@ function verhoeffCheck(aadhaar: string): boolean {
 const identitySchema = z
     .object({
         applicantType: z.string().min(1, 'Please select an applicant category'),
+        // Aadhaar Number: Must contain numeric characters only
         aadhaarId: z
             .string()
             .min(12, 'AADHAAR ID must be exactly 12 digits')
             .max(12, 'AADHAAR ID must be exactly 12 digits')
-            .regex(/^\d+$/, 'AADHAAR ID must contain only digits')
+            .regex(/^\d+$/, 'AADHAAR ID must contain only numeric characters')
             .refine(
                 (val) => {
                     // BRD Section 6.2.2: First digit check - Cannot start with 0 or 1
@@ -95,13 +100,14 @@ const identitySchema = z
             ),
         // PAN is optional - only validate format if provided
         // Sample PAN ID for testing: ABCDE1234F
+        // PAN Number: Must follow the format 5 letters + 4 numbers + 1 letter; input is case-insensitive but will be stored in uppercase
         panId: z.string().optional(),
     })
     .refine(
         (data) => {
             if (!data.panId || data.panId.trim() === '') return true; // Optional, empty is valid
-            const trimmed = data.panId.trim();
-            return trimmed.length === 10 && /^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$/.test(trimmed);
+            const trimmed = data.panId.trim().toUpperCase();
+            return trimmed.length === 10 && /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(trimmed);
         },
         {
             message: 'PAN ID format is invalid (e.g., ABCDE1234F). Format: 5 letters + 4 numbers + 1 letter',
@@ -129,7 +135,6 @@ const IdentityDetails = () => {
                 console.error('Error loading applicant categories:', err);
                 // Fallback to default options
                 setApplicantOptions([
-                    { value: '', label: '--Select Applicant Category--' },
                     { value: 'School', label: 'I am a School Student seeking Scholarship' },
                     { value: 'College', label: 'I am a College Student seeking Scholarship' },
                     { value: 'Research', label: 'I am a Research Scholar seeking Scholarship' },
@@ -217,24 +222,50 @@ const IdentityDetails = () => {
                         {/* IDs Row (Side by Side) */}
                     <FormRowContainer>
                         <FormRow>
-                            <InputField
-                                    name="aadhaarId"
-                                    control={control}
-                                errors={errors}
-                                label="AADHAAR Number"
-                                required
-                                                placeholder="Enter 12 digit AADHAAR number"
-                                            />
+                            <Controller
+                                name="aadhaarId"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField label="AADHAR ID (Candidate)" required error={errors.aadhaarId?.message as string}>
+                                        <Input
+                                            {...field}
+                                            placeholder="Enter 12 digit AADHAAR number"
+                                            errorMessage={errors.aadhaarId?.message as string}
+                                            className="!border-b-0"
+                                            onChange={(_e: React.ChangeEvent<HTMLInputElement>, value?: string) => {
+                                                // Aadhaar Number: Must contain numeric characters only
+                                                const digitsOnly = (value ?? '').replace(/\D/g, '');
+                                                if (digitsOnly.length <= 12) {
+                                                    field.onChange(digitsOnly);
+                                                }
+                                            }}
+                                        />
+                                    </FormField>
+                                )}
+                            />
                         </FormRow>
                         <FormRow>
-                            <InputField
-                                    name="panId"
-                                    control={control}
-                                errors={errors}
-                                label="PAN Number"
-                                required={false}
-                                placeholder="Enter PAN number (Optional)"
-                                            />
+                            <Controller
+                                name="panId"
+                                control={control}
+                                render={({ field }) => (
+                                    <FormField label="PAN ID (Candidate)" required={false} error={errors.panId?.message as string}>
+                                        <Input
+                                            {...field}
+                                            placeholder="Enter PAN number (Optional)"
+                                            errorMessage={errors.panId?.message as string}
+                                            className="!border-b-0"
+                                            onChange={(_e: React.ChangeEvent<HTMLInputElement>, value?: string) => {
+                                                // PAN Number: Must follow the format 5 letters + 4 numbers + 1 letter; input is case-insensitive but will be stored in uppercase
+                                                const upperValue = (value ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+                                                if (upperValue.length <= 10) {
+                                                    field.onChange(upperValue);
+                                                }
+                                            }}
+                                        />
+                                    </FormField>
+                                )}
+                            />
                         </FormRow>
                     </FormRowContainer>
                     </Stack>

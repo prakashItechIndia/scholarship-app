@@ -10,6 +10,7 @@ import {
     Dismiss24Regular,
     CheckmarkCircle24Regular
 } from "@fluentui/react-icons";
+import { Spinner, SpinnerSize } from "@fluentui/react";
 import { ApplicationData } from "../types";
 import { processManagement } from "../../../services/scholarship.service";
 import { useToast } from "@/components/ui/toast";
@@ -536,9 +537,16 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
                             appearance="primary"
                             onClick={handleSubmit}
                             disabled={loading || !paymentMode}
-                            style={{ backgroundColor: "#0F6CBD", color: "white", minWidth: "80px" }}
+                            style={{ backgroundColor: "#0F6CBD", color: "white", minWidth: "80px", display: "flex", alignItems: "center", gap: "8px" }}
                         >
-                            {loading ? "Submitting..." : "Submit"}
+                            {loading ? (
+                                <>
+                                    <Spinner size={SpinnerSize.small} styles={{ circle: { borderTopColor: "#FFFFFF", borderBottomColor: "#FFFFFF", borderLeftColor: "#FFFFFF", borderRightColor: "#FFFFFF" } }} />
+                                    <span>Submitting...</span>
+                                </>
+                            ) : (
+                                "Submit"
+                            )}
                         </Button>
                     </div>
 

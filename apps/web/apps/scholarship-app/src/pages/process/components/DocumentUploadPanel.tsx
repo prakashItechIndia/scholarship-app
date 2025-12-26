@@ -12,6 +12,7 @@ import {
 } from "@fluentui/react-icons";
 import { ApplicationData } from "../types";
 import { documentUpload } from "../../../services/scholarship.service";
+import { apiClient } from "../../../shared/api-client";
 import { useToast } from "@/components/ui/toast";
 
 interface DocumentUploadPanelProps {
@@ -46,6 +47,8 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
     const [uploadingDocId, setUploadingDocId] = React.useState<string | null>(null);
     const [deleteData, setDeleteData] = React.useState<{ isOpen: boolean; docId: string; docName: string; documentId?: number } | null>(null);
     const [previewData, setPreviewData] = React.useState<{ isOpen: boolean; url: string; name: string; type?: string } | null>(null);
+    const [previewLoading, setPreviewLoading] = React.useState(false);
+    const [previewError, setPreviewError] = React.useState<string | null>(null);
 
     // Fetch documents and document types when panel opens
     React.useEffect(() => {
@@ -80,6 +83,7 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
             const uploadedDocs = (docs as {
                 Document_Type?: string;
                 Document_Path?: string;
+                Document_URL?: string; // Full URL from backend
                 Uploaded_Date?: string | null;
                 Document_Id?: number;
                 Application_Id?: string;
@@ -95,7 +99,7 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                     }).replace(/\//g, "-")
                     : undefined, // Table doesn't have Uploaded_Date column
                 status: "Uploaded" as const,
-                url: doc.Document_Path ?? undefined,
+                url: doc.Document_URL ?? doc.Document_Path ?? undefined, // Use full URL from backend if available
                 documentPath: doc.Document_Path,
             }));
             
@@ -201,22 +205,80 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
         }
     };
 
-    const handleView = (doc: DocumentRow) => {
-        if (doc.url || doc.documentPath) {
-            // Construct full URL if it's a relative path
-            const documentUrl = doc.url ?? doc.documentPath ?? '';
-            const fullUrl = documentUrl.startsWith('http') 
-                ? documentUrl 
-                : `${window.location.origin}${documentUrl.startsWith('/') ? '' : '/'}${documentUrl}`;
+    const handleView = async (doc: DocumentRow) => {
+        console.log('handleView called with:', { doc, applicationNo: data?.applicationNo });
+        
+        if (!data?.applicationNo || !doc.name) {
+            console.error('Missing data:', { applicationNo: data?.applicationNo, docName: doc.name });
+            showError('View Failed', 'Missing application number or document name.');
+            return;
+        }
+        
+        try {
+            setPreviewLoading(true);
+            setPreviewError(null);
+            
+            console.log('Getting document view URL for:', { applicationNo: data.applicationNo, documentType: doc.name });
+            
+            // Fetch the file as a blob using apiClient (includes auth headers)
+            const viewUrl = `/document-upload/view/${encodeURIComponent(data.applicationNo)}/${encodeURIComponent(doc.name)}`;
+            
+            console.log('Fetching document from:', viewUrl);
+            
+            // Use apiClient to fetch with authentication
+            const response = await apiClient.get(viewUrl, {
+                responseType: 'blob', // Important: request as blob
+            });
+            
+            console.log('Document response received:', { status: response.status, contentType: response.headers['content-type'] });
+            
+            // Create blob URL from response data
+            const contentType = (response.headers['content-type'] as string) || 'application/octet-stream';
+            const blob = new Blob([response.data as BlobPart], { type: contentType });
+            const blobUrl = URL.createObjectURL(blob);
+            
+            console.log('Document loaded, blob URL created:', blobUrl);
+            
+            // Determine file type from response headers or document name
+            let fileType = 'image/jpeg'; // default
+            if (typeof contentType === 'string') {
+                if (contentType.includes('pdf')) {
+                    fileType = 'application/pdf';
+                } else if (contentType.includes('jpeg') || contentType.includes('jpg')) {
+                    fileType = 'image/jpeg';
+                } else if (contentType.includes('png')) {
+                    fileType = 'image/png';
+                }
+            }
+            
+            // Fallback to checking document name if content type doesn't help
+            if (fileType === 'image/jpeg') {
+                const fileExtension = doc.name.toLowerCase().split('.').pop() || '';
+                if (fileExtension === 'pdf' || doc.name.toLowerCase().includes('pdf')) {
+                    fileType = 'application/pdf';
+                } else if (['jpg', 'jpeg'].includes(fileExtension)) {
+                    fileType = 'image/jpeg';
+                } else if (fileExtension === 'png') {
+                    fileType = 'image/png';
+                }
+            }
+            
+            console.log('Setting preview data:', { url: blobUrl, name: doc.name, type: fileType });
             
             setPreviewData({
                 isOpen: true,
-                url: fullUrl,
+                url: blobUrl, // Use blob URL
                 name: doc.name,
-                type: doc.fileType ?? (documentUrl.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg')
+                type: fileType
             });
-        } else {
-            showError('View Failed', 'No document URL found.');
+            
+            setPreviewLoading(false);
+        } catch (err: unknown) {
+            console.error('Error in handleView:', err);
+            const errorMessage = err instanceof Error ? err.message : 'Failed to load document';
+            setPreviewError(errorMessage);
+            showError('View Failed', errorMessage);
+            setPreviewLoading(false);
         }
     };
 
@@ -230,7 +292,7 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
     };
 
     const confirmDelete = async () => {
-        if (!deleteData || !deleteData.documentId || !data?.applicationNo) {
+        if (!deleteData?.documentId || !data?.applicationNo) {
             setDeleteData(null);
             return;
         }
@@ -271,15 +333,24 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
     };
 
     // Helper to render preview content
-    const renderPreviewContent = (url: string, type?: string) => {
-        const isPdf = type?.includes("pdf") || url.endsWith(".pdf");
+    const renderPreviewContent = (url: string, type?: string, name?: string) => {
+        const isPdf = type?.includes("pdf") || url.toLowerCase().endsWith(".pdf");
 
         if (isPdf) {
             return (
                 <iframe
-                    src={`${url}#toolbar=0&navpanes=0`}
+                    src={`${url}#toolbar=1&navpanes=1&scrollbar=1`}
                     style={{ width: "100%", height: "100%", border: "none" }}
-                    title="Document Preview"
+                    title={`Document Preview: ${name || 'Document'}`}
+                    onLoad={() => {
+                        setPreviewLoading(false);
+                        setPreviewError(null);
+                    }}
+                    onError={() => {
+                        setPreviewLoading(false);
+                        setPreviewError('Failed to load PDF document. Please check the file URL.');
+                        showError('Preview Failed', 'Failed to load PDF document. Please check the file URL.');
+                    }}
                 />
             );
         } else {
@@ -287,13 +358,23 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
             return (
                 <img
                     src={url}
-                    alt="Preview"
+                    alt={`Preview: ${name || 'Document'}`}
                     style={{
                         maxWidth: "100%",
                         maxHeight: "100%",
                         objectFit: "contain",
                         display: "block",
                         margin: "0 auto"
+                    }}
+                    onLoad={() => {
+                        setPreviewLoading(false);
+                        setPreviewError(null);
+                    }}
+                    onError={(e) => {
+                        console.error('Image load error:', url);
+                        setPreviewLoading(false);
+                        setPreviewError('Failed to load image. Please check the file URL.');
+                        showError('Preview Failed', 'Failed to load image. Please check the file URL.');
                     }}
                 />
             );
@@ -450,7 +531,9 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                                                     appearance="subtle"
                                                     icon={<EyeRegular />}
                                                     style={{ padding: "4px", minWidth: "28px", border: "1px solid #d1d1d1" }}
-                                                    onClick={() => handleView(doc)}
+                                                    onClick={() => {
+                                                        void handleView(doc);
+                                                    }}
                                                 />
                                                 <Button
                                                     appearance="subtle"
@@ -589,7 +672,11 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                         alignItems: "center",
                         zIndex: 1200,
                     }}
-                    onClick={() => setPreviewData(null)} // Close on backdrop click
+                    onClick={() => {
+                        setPreviewData(null);
+                        setPreviewError(null);
+                        setPreviewLoading(false);
+                    }} // Close on backdrop click
                 >
                     <div
                         style={{
@@ -605,7 +692,16 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                         onClick={(e) => e.stopPropagation()} // Prevent close on content click
                     >
                         <button
-                            onClick={() => setPreviewData(null)}
+                            onClick={() => {
+                                // Clean up blob URL if it exists
+                                const url = previewData?.url;
+                                if (url && typeof url === 'string' && url.startsWith('blob:')) {
+                                    URL.revokeObjectURL(url);
+                                }
+                                setPreviewData(null);
+                                setPreviewError(null);
+                                setPreviewLoading(false);
+                            }}
                             style={{
                                 position: "absolute",
                                 top: "-40px",
@@ -626,9 +722,87 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                             height: "100%",
                             display: "flex",
                             alignItems: "center",
-                            justifyContent: "center"
+                            justifyContent: "center",
+                            position: "relative"
                         }}>
-                            {renderPreviewContent(previewData.url, previewData.type)}
+                            {previewLoading && (
+                                <div style={{
+                                    position: "absolute",
+                                    top: "50%",
+                                    left: "50%",
+                                    transform: "translate(-50%, -50%)",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    gap: "12px",
+                                    zIndex: 10
+                                }}>
+                                    <div style={{
+                                        width: "40px",
+                                        height: "40px",
+                                        border: "4px solid #e0e0e0",
+                                        borderTop: "4px solid #0f6cbd",
+                                        borderRadius: "50%",
+                                        animation: "spin 1s linear infinite"
+                                    }} />
+                                    <span style={{ color: "#616161", fontSize: "14px" }}>Loading document...</span>
+                                </div>
+                            )}
+                            {previewError ? (
+                                <div style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    gap: "12px",
+                                    color: "#c50f1f",
+                                    fontSize: "14px",
+                                    padding: "24px"
+                                }}>
+                                    <span>{previewError}</span>
+                                    <Button
+                                        appearance="outline"
+                                        onClick={() => {
+                                            // Clean up blob URL if it exists
+                                            const url = previewData?.url;
+                                            if (url && typeof url === 'string' && url.startsWith('blob:')) {
+                                                URL.revokeObjectURL(url);
+                                            }
+                                            setPreviewData(null);
+                                            setPreviewError(null);
+                                            setPreviewLoading(false);
+                                        }}
+                                    >
+                                        Close
+                                    </Button>
+                                </div>
+                            ) : previewData.url ? (
+                                <div style={{ width: "100%", height: "100%", opacity: previewLoading ? 0.3 : 1 }}>
+                                    {renderPreviewContent(previewData.url, previewData.type, previewData.name)}
+                                </div>
+                            ) : (
+                                <div style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    gap: "12px",
+                                    color: "#616161",
+                                    fontSize: "14px"
+                                }}>
+                                    <span>No document URL available</span>
+                                    <Button
+                                        appearance="outline"
+                                        onClick={() => {
+                                            setPreviewData(null);
+                                            setPreviewError(null);
+                                            setPreviewLoading(false);
+                                        }}
+                                    >
+                                        Close
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -51,8 +51,13 @@ const personalSchema = z.object({
     }, {
         message: 'Applicant must be at least 15 years old',
     }),
-    email: z.string().email('Invalid email').min(1, 'Email is required'),
-    mobile: z.string().length(10, 'Mobile number must be exactly 10 digits').regex(/^\d+$/, 'Mobile number must contain only digits'),
+    // Email: Must be in a valid email format (e.g., yourdomain@gmail.com)
+    email: z.string().min(1, 'Email is required').email('Email must be in a valid email format (e.g., yourdomain@gmail.com)'),
+    // Phone Number: Must contain exactly 10 digits and allow numeric characters only
+    mobile: z.string()
+        .min(1, 'Mobile number is required')
+        .length(10, 'Mobile number must be exactly 10 digits')
+        .regex(/^\d+$/, 'Mobile number must contain only digits'),
     addressLine1: z.string().min(1, 'Address Line 1 required'),
     addressLine2: z.string().optional(), // Optional field
     city: z.string().min(1, 'City required'),
@@ -72,7 +77,6 @@ const YES_NO_OPTIONS: IChoiceGroupOption[] = [
 const GENDER_OPTIONS: IChoiceGroupOption[] = [
     { key: 'male', text: 'Male' },
     { key: 'female', text: 'Female' },
-    { key: 'other', text: 'Other' },
 ];
 
 // Options will be loaded from API
@@ -168,17 +172,23 @@ const PersonalDetails = () => {
                 try {
                     const states = await dropdownOptions.getStates(selectedCountry);
                     setStateOptions(states);
-                    // Reset state and district when country changes
-                    updateFormData({ state: '', district: '' });
+                    // Only reset dependent fields if country actually changed
+                    const currentCountry = formData.country;
+                    if (selectedCountry !== currentCountry) {
+                        setValue('state', '');
+                        setValue('district', '');
+                        setDistrictOptions([]);
+                    }
                 } catch (error) {
                     console.error('Error loading states:', error);
                 }
             } else {
                 setStateOptions([]);
+                setDistrictOptions([]);
             }
         };
         void loadStates();
-    }, [selectedCountry, updateFormData]);
+    }, [selectedCountry, setValue, formData.country]);
 
     // Load districts when state changes
     useEffect(() => {
@@ -187,8 +197,11 @@ const PersonalDetails = () => {
                 try {
                     const districts = await dropdownOptions.getDistricts(selectedState);
                     setDistrictOptions(districts);
-                    // Reset district when state changes
-                    updateFormData({ district: '' });
+                    // Only reset district if state actually changed
+                    const currentState = formData.state;
+                    if (selectedState !== currentState) {
+                        setValue('district', '');
+                    }
                 } catch (error) {
                     console.error('Error loading districts:', error);
                 }
@@ -197,7 +210,7 @@ const PersonalDetails = () => {
             }
         };
         void loadDistricts();
-    }, [selectedState, updateFormData]);
+    }, [selectedState, setValue, formData.state]);
 
     // Load existing photo if available
     useEffect(() => {
@@ -381,7 +394,8 @@ const PersonalDetails = () => {
                                     control={control}
                                     errors={errors}
                                     label="Caste"
-                                    placeholder="Enter your caste (Optional)"
+                                    required
+                                    placeholder="Enter your caste"
                                 />
                             </FormRow>
                             <FormRow>
@@ -417,13 +431,25 @@ const PersonalDetails = () => {
                                 />
                             </FormRow>
                             <FormRow>
-                                <InputField
+                                <Controller
                                     name="mobile"
                                     control={control}
-                                    errors={errors}
-                                    label="Mobile Number"
-                                    required
-                                    placeholder="Enter mobile number"
+                                    render={({ field }) => (
+                                        <FormField label="Mobile Number" required error={errors.mobile?.message as string}>
+                                            <Input
+                                                {...field}
+                                                placeholder="Enter mobile number"
+                                                errorMessage={errors.mobile?.message as string}
+                                                onChange={(_e: React.ChangeEvent<HTMLInputElement>, value?: string) => {
+                                                    // Only allow digits
+                                                    const digitsOnly = (value ?? '').replace(/\D/g, '');
+                                                    if (digitsOnly.length <= 10) {
+                                                        field.onChange(digitsOnly);
+                                                    }
+                                                }}
+                                            />
+                                        </FormField>
+                                    )}
                                 />
                             </FormRow>
                         </FormRowContainer>
@@ -453,34 +479,19 @@ const PersonalDetails = () => {
                             </FormRow>
                         </FormRowContainer>
 
-                        {/* Row 5: City & District */}
+                        {/* Row 5: Country & State */}
                         <FormRowContainer>
                             <FormRow>
-                                <InputField
-                                    name="city"
-                                    control={control}
-                                    errors={errors}
-                                    label="City"
-                                    required
-                                    placeholder="Enter city"
-                                />
-                            </FormRow>
-                            <FormRow>
                                 <SelectField
-                                    name="district"
+                                    name="country"
                                     control={control}
                                     errors={errors}
-                                    label="District"
+                                    label="Country"
                                     required
-                                    options={districtOptions}
+                                    options={countryOptions}
                                     placeholder="Select"
                                 />
                             </FormRow>
-                        </FormRowContainer>
-
-
-                        {/* Row 6: State & Pincode */}
-                        <FormRowContainer>
                             <FormRow>
                                 <SelectField
                                     name="state"
@@ -492,28 +503,42 @@ const PersonalDetails = () => {
                                     placeholder="Select"
                                 />
                             </FormRow>
+                        </FormRowContainer>
+
+                        {/* Row 6: District & City */}
+                        <FormRowContainer>
                             <FormRow>
-                                <InputField
-                                    name="pincode"
+                                <SelectField
+                                    name="district"
                                     control={control}
                                     errors={errors}
-                                    label="Pincode"
+                                    label="District"
                                     required
-                                    placeholder="Enter pincode"
+                                    options={districtOptions}
+                                    placeholder="Select"
+                                />
+                            </FormRow>
+                            <FormRow>
+                                <InputField
+                                    name="city"
+                                    control={control}
+                                    errors={errors}
+                                    label="City"
+                                    required
+                                    placeholder="Enter city"
                                 />
                             </FormRow>
                         </FormRowContainer>
 
-                        {/* Country */}
+                        {/* Row 7: Pincode */}
                         <div className="w-full md:w-[calc(50%-12px)]">
-                            <SelectField
-                                name="country"
+                            <InputField
+                                name="pincode"
                                 control={control}
                                 errors={errors}
-                                label="Country"
+                                label="Pincode"
                                 required
-                                options={countryOptions}
-                                placeholder="Select"
+                                placeholder="Enter pincode"
                             />
                         </div>
                         <div className="h-5"></div>

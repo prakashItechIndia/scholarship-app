@@ -424,6 +424,7 @@ export const documentUpload = {
         Application_Id: string;
         Document_Type: string;
         Document_Path: string;
+        Document_URL?: string; // Full URL from backend
         Uploaded_Date: string;
         Uploaded_By?: number;
       }[]
@@ -458,6 +459,16 @@ export const documentUpload = {
       },
     });
     return response.data;
+  },
+
+  /**
+   * Get document file URL for viewing
+   * Returns a blob URL that can be used in iframe or img src
+   */
+  getDocumentViewUrl: async (applicationId: string, documentType: string): Promise<string> => {
+    // Return the API endpoint URL - the browser will fetch it as a blob
+    const apiBaseUrl = import.meta.env.VITE_SSO_API_URL || 'http://localhost:3000/api';
+    return `${apiBaseUrl}/document-upload/view/${encodeURIComponent(applicationId)}/${encodeURIComponent(documentType)}`;
   },
 };
 
@@ -1119,41 +1130,44 @@ export const reports = {
   },
 
   /**
-   * Export report to PDF
+   * Export report to PDF, Excel, CSV, or Word
+   * Uses backend export endpoint that supports up to 100,000 records
    */
-  exportToPdf: async (reportType: 'categories' | 'scholarship-issued', filters: any) => {
-    const endpoint = reportType === 'categories' ? '/reports/categories' : '/reports/scholarship-issued';
+  exportReport: async (
+    reportType: 'categories' | 'scholarship-issued' | 'approved-form',
+    format: 'pdf' | 'excel' | 'csv' | 'word',
+    filters: any
+  ) => {
     const params = new URLSearchParams();
     Object.keys(filters).forEach((key) => {
       if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
         params.append(key, filters[key].toString());
       }
     });
-    params.append('format', 'pdf');
 
-    const response = await apiClient.get(`${endpoint}?${params.toString()}`, {
-      responseType: 'blob',
-    });
+    const response = await apiClient.get(
+      `/reports/export/${reportType}/${format}?${params.toString()}`,
+      {
+        responseType: 'blob',
+      }
+    );
     return response.data;
   },
 
   /**
+   * @deprecated Use exportReport instead
+   * Export report to PDF
+   */
+  exportToPdf: async (reportType: 'categories' | 'scholarship-issued', filters: any) => {
+    return reports.exportReport(reportType, 'pdf', filters);
+  },
+
+  /**
+   * @deprecated Use exportReport instead
    * Export report to Excel
    */
   exportToExcel: async (reportType: 'categories' | 'scholarship-issued', filters: any) => {
-    const endpoint = reportType === 'categories' ? '/reports/categories' : '/reports/scholarship-issued';
-    const params = new URLSearchParams();
-    Object.keys(filters).forEach((key) => {
-      if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
-        params.append(key, filters[key].toString());
-      }
-    });
-    params.append('format', 'excel');
-
-    const response = await apiClient.get(`${endpoint}?${params.toString()}`, {
-      responseType: 'blob',
-    });
-    return response.data;
+    return reports.exportReport(reportType, 'excel', filters);
   },
 };
 

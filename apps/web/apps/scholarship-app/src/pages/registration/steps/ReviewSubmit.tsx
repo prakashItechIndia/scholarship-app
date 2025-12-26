@@ -132,8 +132,11 @@ const ReviewSubmit = () => {
 
     // Helper to render value or placeholder
     const displayValue = (val: string | number | Date | File[] | undefined | null): string => {
-        if (!val) return '-';
-        if (typeof val === 'string') return val;
+        if (val === undefined || val === null || val === '') return '-';
+        if (typeof val === 'string') {
+            const trimmed = val.trim();
+            return trimmed === '' ? '-' : trimmed;
+        }
         if (typeof val === 'number') return val.toString();
         if (val instanceof Date) return val.toLocaleDateString('en-GB');
         if (Array.isArray(val)) return val.length > 0 ? `${val.length} item(s)` : '-';
@@ -432,7 +435,7 @@ const ReviewSubmit = () => {
                                     text="Edit"
                                     onRenderIcon={() => <PencilIcon width={12} height={12} />}
                                     styles={editButtonStyles}
-                                    onClick={() => prevStep()}
+                                    onClick={() => setStep(1)}
                                 />
                             </div>
                             <Stack tokens={sectionTokens}>
@@ -450,7 +453,7 @@ const ReviewSubmit = () => {
                                     text="Edit"
                                     onRenderIcon={() => <PencilIcon width={12} height={12} />}
                                     styles={editButtonStyles}
-                                    onClick={() => prevStep()}
+                                    onClick={() => setStep(2)}
                                 />
                             </div>
                             <Stack tokens={sectionTokens}>
@@ -528,6 +531,82 @@ const ReviewSubmit = () => {
                             </Stack>
                         </Stack>
 
+                        {/* Education / Medical Details */}
+                        <Stack tokens={sectionTokens}>
+                            <div className={sectionHeaderStyles}>
+                                {(() => {
+                                    const applicantType = formData.applicantType?.toLowerCase() || '';
+                                    return applicantType === 'medical' ? 'Medical Details' : 'Education Details';
+                                })()}
+                                <DefaultButton
+                                    text="Edit"
+                                    onRenderIcon={() => <PencilIcon width={12} height={12} />}
+                                    styles={editButtonStyles}
+                                    onClick={() => setStep(4)}
+                                />
+                            </div>
+                            <Stack tokens={sectionTokens}>
+                                {(() => {
+                                    const applicantType = formData.applicantType?.toLowerCase() || '';
+                                    const isMedical = applicantType === 'medical';
+                                    const isSchool = applicantType === 'school';
+                                    const isCollege = applicantType === 'college';
+                                    
+                                    if (isMedical) {
+                                        return (
+                                            <>
+                                                {renderRow('ABHA ID', formData.abhaId)}
+                                                {renderRow('Reason for medical assistance', formData.medicalReason)}
+                                                {renderRow('Last date for amount to be received', formatDate(formData.lastDateForAmount))}
+                                                {renderRow('Medical Documents', formData.medicalDocuments)}
+                                            </>
+                                        );
+                                    } else if (isSchool) {
+                                        return (
+                                            <>
+                                                {renderRow('Type of Institution', formData.typeOfInstitution)}
+                                                {renderRow('Name of Institution', formData.institutionName)}
+                                                {renderRow('Class Studying', formData.classStudying)}
+                                                {renderRow('Board of Studying', formData.boardOfStudying)}
+                                            </>
+                                        );
+                                    } else if (isCollege) {
+                                        return (
+                                            <>
+                                                {renderRow('Type of Institution', formData.typeOfInstitution)}
+                                                {renderRow('Name of Institution', formData.institutionName)}
+                                                {renderRow('University', formData.university)}
+                                                {renderRow('Course of Studying', formData.courceOfStudying)}
+                                                {renderRow('Degree Type', formData.degreeType)}
+                                                {renderRow('Degree', formData.degree)}
+                                                {renderRow('Other Degree', formData.otherDegree)}
+                                                {renderRow('Current Year', formData.currentYear)}
+                                                {renderRow('Current Semester', formData.currentSemester)}
+                                            </>
+                                        );
+                                    } else {
+                                        // Research/Other Education
+                                        return (
+                                            <>
+                                                {renderRow('Type of Institution', formData.typeOfInstitution)}
+                                                {renderRow('Name of Institution', formData.institutionName)}
+                                                {renderRow('University', formData.university)}
+                                                {renderRow('Class Studying', formData.classStudying)}
+                                                {renderRow('Board of Studying', formData.boardOfStudying)}
+                                                {renderRow('Course of Studying', formData.courceOfStudying)}
+                                                {renderRow('Degree Type', formData.degreeType)}
+                                                {renderRow('Degree', formData.degree)}
+                                                {renderRow('Other Degree', formData.otherDegree)}
+                                                {renderRow('Current Year', formData.currentYear)}
+                                                {renderRow('Current Semester', formData.currentSemester)}
+                                                {renderRow('Specialization', formData.specialization)}
+                                            </>
+                                        );
+                                    }
+                                })()}
+                            </Stack>
+                        </Stack>
+
                         {/* Bank Details */}
                         <Stack tokens={sectionTokens}>
                             <div className={sectionHeaderStyles}>
@@ -536,7 +615,7 @@ const ReviewSubmit = () => {
                                     text="Edit"
                                     onRenderIcon={() => <PencilIcon width={12} height={12} />}
                                     styles={editButtonStyles}
-                                    onClick={() => setStep(4)}
+                                    onClick={() => setStep(5)}
                                 />
                             </div>
                             <Stack tokens={sectionTokens}>
@@ -558,7 +637,7 @@ const ReviewSubmit = () => {
                                     text="Edit"
                                     onRenderIcon={() => <PencilIcon width={12} height={12} />}
                                     styles={editButtonStyles}
-                                    onClick={() => setStep(5)}
+                                    onClick={() => setStep(6)}
                                 />
                             </div>
                             <Stack tokens={sectionTokens}>

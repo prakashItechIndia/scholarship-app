@@ -21,7 +21,7 @@ const EmailVerificationPage = lazy(() => import('../pages/auth/EmailVerification
 const ProcessPage = lazy(() => import('../pages/process'));
 
 const UserDashboardPage = lazy(() => import('../pages/userDashboard'));
-const AdminDashboardPage = lazy(() => import('../pages/adminDashboard/AdminDashboard'));
+const AdminDashboardPage = lazy(() => import('../pages/adminDashboard/AdminDashboard.tsx'));
 const ReportsPage = lazy(() => import('../pages/reports'));
 const RoleManagementPage = lazy(() => import('../pages/roleManagement'));
 const RoleFormPage = lazy(() => import('../pages/roleManagement/components/RoleForm'));

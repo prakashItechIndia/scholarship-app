@@ -25,40 +25,54 @@ export interface ScholarshipReportData {
   status: string;
 }
 
+// Categories Wise Report filters
 export interface CategoriesReportFilters {
   academicYear?: number;
-  mainCategory?: string;
-  status?: string;
-  fromDate?: Date | null;
-  toDate?: Date | null;
-  amount?: string;
+  appliedDate?: Date | null;
   gender?: string;
-  issuedTo?: string;
-  sairamCategory?: string;
-  institutionName?: string;
-  parentOffice?: string;
-  favourCategory?: string;
-  favourGroup?: string;
-  keyword?: string;
+  status?: string;
+  keywordSearch?: string;
 }
 
+// Report of Scholarship Issued filters
 export interface ScholarshipIssuedReportFilters {
-  fromDate?: Date | null;
-  toDate?: Date | null;
-  institutionId?: number;
-  strInstitution?: string;
-  chequeInFavorType?: string;
+  academicYear?: number;
+  issuedBy?: string;
+  issuedDate?: Date | null;
+  issuedType?: string;
+  keywordSearch?: string;
+  // Internal fields for API
   intIssuedBy?: number;
   strIssuedBy?: string;
 }
 
-export interface ReportFilters extends CategoriesReportFilters, ScholarshipIssuedReportFilters {
-  // Legacy fields for backward compatibility
-  appliedDate?: Date | null;
+// Approved Form filters
+export interface ApprovedFormFilters {
+  academicYear?: number;
+  applicationNo?: string;
+  studentId?: string;
+  status?: string;
+  mobileNumber?: string;
   keywordSearch?: string;
+}
+
+// Unified ReportFilters interface
+export interface ReportFilters {
+  // Categories Wise Report
+  academicYear?: number;
+  appliedDate?: Date | null;
+  gender?: string;
+  status?: string;
+  keywordSearch?: string;
+  
+  // Report of Scholarship Issued
   issuedBy?: string;
   issuedDate?: Date | null;
   issuedType?: string;
+  intIssuedBy?: number;
+  strIssuedBy?: string;
+  
+  // Approved Form
   applicationNo?: string;
   studentId?: string;
   mobileNumber?: string;

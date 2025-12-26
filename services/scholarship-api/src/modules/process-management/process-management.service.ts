@@ -11,6 +11,8 @@ interface ProcessQueryParams {
   tab?: string; // overview, documents, verify, suggest, approve, issue-amount
   page?: number;
   pageSize?: number;
+  sortField?: string; // Field to sort by (e.g., 'Application_Id', 'Applicant_Name', 'Class_Studying', 'Status')
+  sortOrder?: 'asc' | 'desc'; // Sort order
 }
 
 interface VerifyApplicationData {
@@ -80,6 +82,44 @@ function mapBooleanFields(rows: Record<string, unknown>[]): Record<string, unkno
   });
 }
 
+/**
+ * Helper function to build safe ORDER BY clause
+ * Maps frontend field names to database column names
+ */
+function buildOrderByClause(sortField?: string, sortOrder?: 'asc' | 'desc'): string {
+  // Default sorting
+  if (!sortField) {
+    return 'ORDER BY R.Application_Id DESC';
+  }
+
+  // Map frontend field names to database column names
+  const fieldMapping: Record<string, string> = {
+    'Application_Id': 'R.Application_Id',
+    'Applicant_Name': 'R.Applicant_Name',
+    'Class_Studying': 'R.Class_Studying',
+    'Institution_Name': 'R.Institution_Name',
+    'Father_AnnualIncome': 'R.Father_AnnualIncome',
+    'Mobile_Number': 'R.Mobile_Number',
+    'Father_Occupation': 'R.Father_Occupation',
+    'Status': 'P.Status',
+    'Scholarship_No': 'P.Scholarship_No',
+    'Scholarship_Id': 'P.Scholarship_Id',
+    'Prepared_By': 'UP.User_Name',
+    'Verified_By': 'UV.User_Name',
+    'Suggested_By': 'US.User_Name',
+  };
+
+  // Get the database column name, default to Application_Id if not found
+  const dbColumn = fieldMapping[sortField] || 'R.Application_Id';
+  
+  // Validate sort order - default to DESC if not provided (matches default behavior)
+  // This ensures first click applies sorting correctly
+  const order = sortOrder === 'asc' ? 'ASC' : 'DESC';
+
+  return `ORDER BY ${dbColumn} ${order}`;
+}
+
+
 @Injectable()
 export class ProcessManagementService {
   private readonly logger = new Logger(ProcessManagementService.name);
@@ -99,6 +139,8 @@ export class ProcessManagementService {
         fromDate = '',
         toDate = '',
         academicYearId = 0,
+        sortField,
+        sortOrder,
       } = params;
 
       let query = `
@@ -201,29 +243,38 @@ export class ProcessManagementService {
         queryParams.academicYearId = academicYearId;
       }
 
-      // Apply filters based on mainCategory
-      if (mainCategory === 'Application No' && key) {
-        query += ' AND R.Application_Id LIKE @key';
-        queryParams.key = `%${key}%`;
-      } else if (mainCategory === 'Student Id' && key) {
-        query += ' AND R.Student_ID LIKE @key';
-        queryParams.key = `%${key}%`;
-      } else if (mainCategory === 'Aadhaar ID' && key) {
-        query += ' AND R.Aadhaar_ID LIKE @key';
-        queryParams.key = `%${key}%`;
-      } else if (mainCategory === 'Name' && key) {
-        query += ' AND R.Applicant_Name LIKE @key';
-        queryParams.key = `%${key}%`;
-      } else if (mainCategory === 'Mobile No' && key) {
-        query += ' AND R.Mobile_Number LIKE @key';
-        queryParams.key = `%${key}%`;
-      } else if (mainCategory === 'Scholarship No' && key) {
-        query += ' AND P.Scholarship_No LIKE @key';
-        queryParams.key = `%${key}%`;
-      } else if (mainCategory === 'Status' && selectedStatusText) {
+      // Apply filters based on mainCategory - support all required search fields
+      const normalizedCategory = mainCategory?.trim().toLowerCase().replace(/\s+/g, '') || '';
+      if (normalizedCategory && key) {
+        if (normalizedCategory === 'applicationno' || normalizedCategory === 'applicationnumber') {
+          query += ' AND R.Application_Id LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'name' || normalizedCategory === 'studentname') {
+          query += ' AND R.Applicant_Name LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'mobileno' || normalizedCategory === 'mobilenumber') {
+          query += ' AND R.Mobile_Number LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'classstudying' || normalizedCategory === 'class/standard' || normalizedCategory === 'classstandard') {
+          query += ' AND R.Class_Studying LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'status') {
+          query += ' AND P.Status LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'studentid' || normalizedCategory === 'studentID') {
+          query += ' AND R.Student_ID LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'aadhaarid' || normalizedCategory === 'aadhaarID') {
+          query += ' AND R.Aadhaar_ID LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'scholarshipno' || normalizedCategory === 'scholarshipnumber') {
+          query += ' AND P.Scholarship_No LIKE @key';
+          queryParams.key = `%${key}%`;
+        }
+      } else if (normalizedCategory === 'status' && selectedStatusText) {
         query += ' AND P.Status = @selectedStatusText';
         queryParams.selectedStatusText = selectedStatusText;
-      } else if (mainCategory === 'Action Date' && fromDate && toDate && selectedStatusText) {
+      } else if (normalizedCategory === 'actiondate' && fromDate && toDate && selectedStatusText) {
         if (selectedStatusText === 'Registered') {
           query += ' AND P.Data_Date >= @fromDate AND P.Data_Date <= @toDate AND P.Status = @selectedStatusText';
         } else if (selectedStatusText === 'Approved') {
@@ -245,8 +296,8 @@ export class ProcessManagementService {
       const countResult = await this.db.query(countQuery, queryParams);
       const total = (countResult.recordset?.[0] as { total?: number })?.total || 0;
 
-      // Apply ORDER BY and pagination
-      query += ' ORDER BY R.Application_Id, statuspriority ASC';
+      // Apply dynamic ORDER BY based on sortField and sortOrder
+      query += ' ' + buildOrderByClause(sortField, sortOrder);
       
       // Validate and sanitize pagination parameters
       const page = Math.max(1, Math.floor(Number(params.page) || 1));
@@ -280,6 +331,8 @@ export class ProcessManagementService {
         mainCategory = '',
         key = '',
         academicYearId = 0,
+        sortField,
+        sortOrder,
       } = params;
 
       let query = `
@@ -309,15 +362,31 @@ export class ProcessManagementService {
         queryParams.academicYearId = academicYearId;
       }
 
-      if (mainCategory === 'Application No' && key) {
-        query += ' AND R.Application_Id LIKE @key';
-        queryParams.key = `%${key}%`;
-      } else if (mainCategory === 'Name' && key) {
-        query += ' AND R.Applicant_Name LIKE @key';
-        queryParams.key = `%${key}%`;
-      } else if (mainCategory === 'Mobile No' && key) {
-        query += ' AND R.Mobile_Number LIKE @key';
-        queryParams.key = `%${key}%`;
+      // Apply search filters - support all required fields
+      const normalizedCategory = mainCategory.trim();
+      if (normalizedCategory && key) {
+        if (normalizedCategory === 'Application No' || normalizedCategory === 'Application Number') {
+          query += ' AND R.Application_Id LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'Name' || normalizedCategory === 'Student Name') {
+          query += ' AND R.Applicant_Name LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'Mobile No' || normalizedCategory === 'Mobile Number') {
+          query += ' AND R.Mobile_Number LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'Class Studying' || normalizedCategory === 'Class / Standard' || normalizedCategory === 'Class/Standard') {
+          query += ' AND R.Class_Studying LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'Status') {
+          query += ' AND P.Status LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'Student Id' || normalizedCategory === 'Student ID') {
+          query += ' AND R.Student_ID LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'Aadhaar ID') {
+          query += ' AND R.Aadhaar_ID LIKE @key';
+          queryParams.key = `%${key}%`;
+        }
       }
 
       // Get total count before adding ORDER BY
@@ -325,8 +394,8 @@ export class ProcessManagementService {
       const countResult = await this.db.query(countQuery, queryParams);
       const total = (countResult.recordset?.[0] as { total?: number })?.total || 0;
 
-      // Apply ORDER BY and pagination
-      query += ' ORDER BY R.Application_Id DESC';
+      // Apply dynamic ORDER BY based on sortField and sortOrder
+      query += ' ' + buildOrderByClause(sortField, sortOrder);
       
       // Validate and sanitize pagination parameters
       const page = Math.max(1, Math.floor(Number(params.page) || 1));
@@ -360,6 +429,8 @@ export class ProcessManagementService {
         mainCategory = '',
         key = '',
         academicYearId = 0,
+        sortField,
+        sortOrder,
       } = params;
 
       let query = `
@@ -456,20 +527,28 @@ export class ProcessManagementService {
         queryParams.academicYearId = academicYearId;
       }
 
-      if (key) {
-        if (mainCategory === 'Application No') {
+      // Apply search filters - support all required fields
+      const normalizedCategory = mainCategory.trim();
+      if (normalizedCategory && key) {
+        if (normalizedCategory === 'Application No' || normalizedCategory === 'Application Number') {
           query += ' AND R.Application_Id LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Name') {
+        } else if (normalizedCategory === 'Name' || normalizedCategory === 'Student Name') {
           query += ' AND R.Applicant_Name LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Mobile No') {
+        } else if (normalizedCategory === 'Mobile No' || normalizedCategory === 'Mobile Number') {
           query += ' AND R.Mobile_Number LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Student Id') {
+        } else if (normalizedCategory === 'Class Studying' || normalizedCategory === 'Class / Standard' || normalizedCategory === 'Class/Standard') {
+          query += ' AND R.Class_Studying LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'Status') {
+          query += ' AND P.Status LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'Student Id' || normalizedCategory === 'Student ID') {
           query += ' AND R.Student_ID LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Aadhaar ID') {
+        } else if (normalizedCategory === 'Aadhaar ID') {
           query += ' AND R.Aadhaar_ID LIKE @key';
           queryParams.key = `%${key}%`;
         }
@@ -480,8 +559,8 @@ export class ProcessManagementService {
       const countResult = await this.db.query(countQuery, queryParams);
       const total = (countResult.recordset?.[0] as { total?: number })?.total || 0;
 
-      // Apply ORDER BY and pagination
-      query += ' ORDER BY R.Application_Id DESC';
+      // Apply dynamic ORDER BY based on sortField and sortOrder
+      query += ' ' + buildOrderByClause(sortField, sortOrder);
       
       // Validate and sanitize pagination parameters
       const page = Math.max(1, Math.floor(Number(params.page) || 1));
@@ -521,6 +600,8 @@ export class ProcessManagementService {
         mainCategory = '',
         key = '',
         academicYearId = 0,
+        sortField,
+        sortOrder,
       } = params;
 
       let query = `
@@ -636,27 +717,34 @@ export class ProcessManagementService {
         queryParams.academicYearId = academicYearId;
       }
 
-      // Apply filters based on mainCategory
-      if (key) {
-        if (mainCategory === 'Application No') {
+      // Apply search filters - support all required fields
+      const normalizedCategory = mainCategory?.trim().toLowerCase().replace(/\s+/g, '') || '';
+      if (normalizedCategory && key) {
+        if (normalizedCategory === 'applicationno' || normalizedCategory === 'applicationnumber') {
           query += ' AND R.Application_Id LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Name') {
+        } else if (normalizedCategory === 'name' || normalizedCategory === 'studentname') {
           query += ' AND R.Applicant_Name LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Mobile No') {
+        } else if (normalizedCategory === 'mobileno' || normalizedCategory === 'mobilenumber') {
           query += ' AND R.Mobile_Number LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Scholarship No') {
-          query += ' AND P.Scholarship_No LIKE @key';
+        } else if (normalizedCategory === 'classstudying' || normalizedCategory === 'class/standard' || normalizedCategory === 'classstandard') {
+          query += ' AND R.Class_Studying LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Student Id') {
+        } else if (normalizedCategory === 'status') {
+          query += ' AND P.Status LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'studentid' || normalizedCategory === 'studentID') {
           query += ' AND R.Student_ID LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Aadhaar ID') {
+        } else if (normalizedCategory === 'aadhaarid' || normalizedCategory === 'aadhaarID') {
           query += ' AND R.Aadhaar_ID LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Cheque No') {
+        } else if (normalizedCategory === 'scholarshipno' || normalizedCategory === 'scholarshipnumber') {
+          query += ' AND P.Scholarship_No LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'Cheque No') {
           query += ' AND P.DDCheque_No LIKE @key';
           queryParams.key = `%${key}%`;
         }
@@ -667,8 +755,8 @@ export class ProcessManagementService {
       const countResult = await this.db.query(countQuery, queryParams);
       const total = (countResult.recordset?.[0] as { total?: number })?.total || 0;
 
-      // Apply ORDER BY and pagination
-      query += ' ORDER BY R.Application_Id ASC';
+      // Apply dynamic ORDER BY based on sortField and sortOrder
+      query += ' ' + buildOrderByClause(sortField, sortOrder);
       const page = params.page || 1;
       const pageSize = params.pageSize || 10;
       const offset = (page - 1) * pageSize;
@@ -722,12 +810,15 @@ export class ProcessManagementService {
         mainCategory = '',
         key = '',
         academicYearId = 0,
+        sortField,
+        sortOrder,
       } = params;
 
       let query = `
         SELECT
           R.Application_Id,
           R.Applicant_Name,
+          R.Father_Name,
           R.Class_Studying,
           R.Institution_Name,
           R.Father_AnnualIncome,
@@ -751,28 +842,35 @@ export class ProcessManagementService {
         queryParams.academicYearId = academicYearId;
       }
 
-      // Apply filters based on mainCategory
-      if (key) {
-        if (mainCategory === 'Application No') {
+      // Apply search filters - support all required fields
+      const normalizedCategory = mainCategory?.trim().toLowerCase().replace(/\s+/g, '') || '';
+      if (normalizedCategory && key) {
+        if (normalizedCategory === 'applicationno' || normalizedCategory === 'applicationnumber') {
           query += ' AND R.Application_Id LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Name') {
+        } else if (normalizedCategory === 'name' || normalizedCategory === 'studentname') {
           query += ' AND R.Applicant_Name LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Mobile No') {
+        } else if (normalizedCategory === 'mobileno' || normalizedCategory === 'mobilenumber') {
           query += ' AND R.Mobile_Number LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Cheque No') {
-          query += ' AND P.DDCheque_No LIKE @key';
+        } else if (normalizedCategory === 'classstudying' || normalizedCategory === 'class/standard' || normalizedCategory === 'classstandard') {
+          query += ' AND R.Class_Studying LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Student Id') {
+        } else if (normalizedCategory === 'status') {
+          query += ' AND P.Status LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'studentid' || normalizedCategory === 'studentID') {
           query += ' AND R.Student_ID LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Aadhaar ID') {
+        } else if (normalizedCategory === 'aadhaarid' || normalizedCategory === 'aadhaarID') {
           query += ' AND R.Aadhaar_ID LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Scholarship No') {
+        } else if (normalizedCategory === 'scholarshipno' || normalizedCategory === 'scholarshipnumber') {
           query += ' AND P.Scholarship_No LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'Cheque No') {
+          query += ' AND P.DDCheque_No LIKE @key';
           queryParams.key = `%${key}%`;
         }
       }
@@ -782,8 +880,8 @@ export class ProcessManagementService {
       const countResult = await this.db.query(countQuery, queryParams);
       const total = (countResult.recordset?.[0] as { total?: number })?.total || 0;
 
-      // Apply ORDER BY and pagination
-      query += ' ORDER BY R.Application_Id DESC';
+      // Apply dynamic ORDER BY based on sortField and sortOrder
+      query += ' ' + buildOrderByClause(sortField, sortOrder);
       
       // Validate and sanitize pagination parameters
       const page = Math.max(1, Math.floor(Number(params.page) || 1));
@@ -817,6 +915,8 @@ export class ProcessManagementService {
         mainCategory = '',
         key = '',
         academicYearId = 0,
+        sortField,
+        sortOrder,
       } = params;
 
       let query = `
@@ -892,20 +992,34 @@ export class ProcessManagementService {
         queryParams.academicYearId = academicYearId;
       }
 
-      if (key) {
-        if (mainCategory === 'Application No') {
+      // Apply search filters - support all required fields
+      const normalizedCategory = mainCategory?.trim().toLowerCase().replace(/\s+/g, '') || '';
+      if (normalizedCategory && key) {
+        if (normalizedCategory === 'applicationno' || normalizedCategory === 'applicationnumber') {
           query += ' AND R.Application_Id LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Name') {
+        } else if (normalizedCategory === 'name' || normalizedCategory === 'studentname') {
           query += ' AND R.Applicant_Name LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Mobile No') {
+        } else if (normalizedCategory === 'mobileno' || normalizedCategory === 'mobilenumber') {
           query += ' AND R.Mobile_Number LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Scholarship No') {
+        } else if (normalizedCategory === 'classstudying' || normalizedCategory === 'class/standard' || normalizedCategory === 'classstandard') {
+          query += ' AND R.Class_Studying LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'status') {
+          query += ' AND P.Status LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'studentid' || normalizedCategory === 'studentID') {
+          query += ' AND R.Student_ID LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'aadhaarid' || normalizedCategory === 'aadhaarID') {
+          query += ' AND R.Aadhaar_ID LIKE @key';
+          queryParams.key = `%${key}%`;
+        } else if (normalizedCategory === 'scholarshipno' || normalizedCategory === 'scholarshipnumber') {
           query += ' AND P.Scholarship_No LIKE @key';
           queryParams.key = `%${key}%`;
-        } else if (mainCategory === 'Cheque No') {
+        } else if (normalizedCategory === 'Cheque No') {
           query += ' AND P.DDCheque_No LIKE @key';
           queryParams.key = `%${key}%`;
         }
@@ -916,8 +1030,8 @@ export class ProcessManagementService {
       const countResult = await this.db.query(countQuery, queryParams);
       const total = (countResult.recordset?.[0] as { total?: number })?.total || 0;
 
-      // Apply ORDER BY and pagination
-      query += ' ORDER BY R.Application_Id DESC';
+      // Apply dynamic ORDER BY based on sortField and sortOrder
+      query += ' ' + buildOrderByClause(sortField, sortOrder);
       
       // Validate and sanitize pagination parameters
       const page = Math.max(1, Math.floor(Number(params.page) || 1));
@@ -1202,7 +1316,8 @@ export class ProcessManagementService {
 
       // Query from TBL_HISTORY table (matching old application structure)
       // TBL_HISTORY columns: ID, Application_Id, Process, Action, Data_Date, User_ID
-      // Display: S.No, Action (from Process), Process Undergone (from Action), Handled by (from User_ID/User_Name), Date
+      // Display: S.No, Action (from Process), Process Undergone (from Action), Handled by (from User_ID/User_Name/Role_Name), Date
+      // For Suggest 2 process, show Role_Name (e.g., CEO) instead of User_Name if role exists
       let historyQuery = `
         SELECT
           H.ID,
@@ -1211,9 +1326,15 @@ export class ProcessManagementService {
           H.Action as ProcessUndergone,
           H.User_ID,
           FORMAT(H.Data_Date, 'dd/MM/yyyy hh:mm tt') as Date,
-          COALESCE(U.User_Name, H.User_ID) as HandledBy
+          CASE 
+            WHEN H.Process LIKE '%Suggest 2%' OR H.Process LIKE '%Suggest2%' THEN
+              COALESCE(R.Role_Name, U.User_Name, H.User_ID)
+            ELSE
+              COALESCE(U.User_Name, H.User_ID)
+          END as HandledBy
         FROM TBL_HISTORY H
         LEFT JOIN TBL_USERMASTER U ON H.User_ID = U.User_ID
+        LEFT JOIN T_ROLES R ON U.Role_Id = R.Id
         WHERE H.Application_Id = @applicationId
         ORDER BY H.Data_Date ASC, H.ID ASC
       `;
@@ -1285,7 +1406,7 @@ export class ProcessManagementService {
       // First, get the current application details to find Aadhaar and Pan
       const currentAppQuery = `
         SELECT 
-          R.Aadhaar_Number,
+          R.Aadhaar_ID,
           R.Pan_ID,
           R.Applicant_Name
         FROM t_Registration R
@@ -1294,7 +1415,7 @@ export class ProcessManagementService {
 
       const currentAppResult = await this.db.query(currentAppQuery, { applicationId });
       const currentApp = currentAppResult.recordset?.[0] as {
-        Aadhaar_Number?: string;
+        Aadhaar_ID?: string;
         Pan_ID?: string;
         Applicant_Name?: string;
       };
@@ -1303,7 +1424,7 @@ export class ProcessManagementService {
         throw new BadRequestException('Application not found');
       }
 
-      const aadhaarId = currentApp.Aadhaar_Number || '0';
+      const aadhaarId = currentApp.Aadhaar_ID || '0';
       const panId = currentApp.Pan_ID || '0';
 
       // Get issued amount details using stored procedure (matching old app)
@@ -1336,9 +1457,10 @@ export class ProcessManagementService {
         .filter((row: { ScholarshipYear_Code?: string }) => row.ScholarshipYear_Code !== 'Total')
         .map((row: { ScholarshipYear_Code?: string; Application_Id?: string }) => {
           const year = row.ScholarshipYear_Code || '';
-          const appId = row.Application_Id || '';
+          const appId = (row.Application_Id || '').trim();
+          // Only add parentheses if application ID exists
           // Format: "2018 ( AF1810636 ), 2019 ( AF1910749 )"
-          return `${year} ( ${appId} )`;
+          return appId ? `${year} ( ${appId} )` : year;
         })
         .join(', ') || 'No previous applications';
 
@@ -1350,10 +1472,18 @@ export class ProcessManagementService {
           ScholarshipYear_Code?: string;
           Scholarship_No?: string;
           Scholarship_Issued_Amount?: number;
-        }) => ({
-          year: `${row.ScholarshipYear_Code || ''} ( ${row.Scholarship_No || ''} )`,
-          amount: String(row.Scholarship_Issued_Amount || '0'),
-        }));
+        }) => {
+          const year = row.ScholarshipYear_Code || '';
+          const scholarshipNo = row.Scholarship_No?.trim() || '';
+          // Only add parentheses if scholarship number exists
+          const yearFormatted = scholarshipNo 
+            ? `${year} ( ${scholarshipNo} )`
+            : year;
+          return {
+            year: yearFormatted,
+            amount: String(row.Scholarship_Issued_Amount || '0'),
+          };
+        });
 
       return {
         applicationNo: applicationId,

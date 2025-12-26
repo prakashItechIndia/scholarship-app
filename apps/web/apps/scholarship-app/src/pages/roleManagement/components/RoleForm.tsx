@@ -7,6 +7,7 @@ import {
   PageActionButtons,
   DataTable,
 } from "@shared/components";
+import { Spinner, SpinnerSize } from "@fluentui/react";
 import { Role, RoleFormData, RolePermission } from "../types";
 import { defaultPermissions } from "../constants";
 import { RoleDetailsForm } from "./RoleDetailsForm";
@@ -769,9 +770,19 @@ const RoleForm: React.FC = () => {
               backgroundColor: "#2453C3",
               color: "#ffffff",
               minWidth: "100px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
             }}
           >
-            {loading ? "Saving..." : (isEditMode ? "Update" : "Save")}
+            {loading ? (
+              <>
+                <Spinner size={SpinnerSize.small} styles={{ circle: { borderTopColor: "#FFFFFF", borderBottomColor: "#FFFFFF", borderLeftColor: "#FFFFFF", borderRightColor: "#FFFFFF" } }} />
+                <span>Saving...</span>
+              </>
+            ) : (
+              isEditMode ? "Update" : "Save"
+            )}
           </Button>
         </div>
       </Card>

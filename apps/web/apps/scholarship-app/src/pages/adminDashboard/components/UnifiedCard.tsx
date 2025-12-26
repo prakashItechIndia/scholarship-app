@@ -36,14 +36,16 @@ export const UnifiedCard: React.FC<UnifiedCardProps> = ({
     <Card 
       variant="elevated" 
       style={{
-        border: "1px solid #e0e0e0",
+        // border: "1px solid #e0e0e0",
         backgroundColor: color ?? "#ffffff",
         borderRadius: "8px",
         padding: "10px 10px 20px 20px",
         height: "100%",
         minHeight: "100px",
-        width: "100%",
-        boxShadow: "none",
+        minWidth: "430px",
+        // gap: "16px",
+        boxShadow: "0px 2px 4px 0px #00000024",
+        margin:"2px",
       }}
     >
       <div style={{

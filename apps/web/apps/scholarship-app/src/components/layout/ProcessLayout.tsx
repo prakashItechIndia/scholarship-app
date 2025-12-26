@@ -183,12 +183,14 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
     left: <NavbarLogo />,
     right: (
       <div className="flex items-center gap-6">
-        <div
-          onClick={() => console.log("Search clicked")}
-          aria-label="Search"
-        >
-          <SearchRegular className="w-5 h-5 text-gray-600" />
-        </div>
+        {!hideSidebar && (
+          <div
+            onClick={() => console.log("Search clicked")}
+            aria-label="Search"
+          >
+            <SearchRegular className="w-5 h-5 text-gray-600" />
+          </div>
+        )}
         <div
           onClick={() => console.log("Notifications clicked")}
         >
@@ -274,7 +276,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
             style={{
               display: "flex",
               justifyContent: "flex-end",
-              gap: 0,
+              gap: "12px",
               padding: 0,
             }}
           >

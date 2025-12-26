@@ -6,18 +6,7 @@ import {
   academicYearOptions,
   genderOptions,
   statusOptions,
-  mainCategoryOptions,
-  amountOptions,
-  issuedToOptions,
-  sairamCategoryOptions,
-  collegeOptions,
-  schoolOptions,
-  polytechnicOptions,
-  medicalOptions,
-  favourCategoryOptions,
-  favourGroupOptions,
-  scholarshipIssuedMainCategoryOptions,
-  chequeInFavorTypeOptions,
+  issuedTypeOptions,
 } from "../constants";
 import { reports } from "../../../services/scholarship.service";
 
@@ -74,65 +63,10 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
     onFilterUpdate(key, value);
   };
 
-  // Determine which filters to show based on Main Category
-  const showDateFilters =
-    filters.mainCategory === "Applied Date" ||
-    filters.mainCategory === "Processed Date";
-  const showAmountFilter = filters.mainCategory === "Amount";
-  const showGenderFilter = filters.mainCategory === "Gender";
-  const showIssuedToFilter = filters.mainCategory === "Issued to";
-  const showStatusFilter = filters.mainCategory === "Status";
-  const showSairamGroupFilter = filters.mainCategory === "Sairam Group";
-  const showParentOfficeFilter = filters.mainCategory === "Parent Office";
-  const showFavourTypeFilter = filters.mainCategory === "Favour Type";
-
-  // For Sairam Group, show institution dropdown based on selected category
-  const showInstitutionFilter =
-    showSairamGroupFilter && filters.sairamCategory !== "All";
-  const institutionOptions =
-    filters.sairamCategory === "College"
-      ? collegeOptions
-      : filters.sairamCategory === "School"
-      ? schoolOptions
-      : filters.sairamCategory === "Polytechnic"
-      ? polytechnicOptions
-      : filters.sairamCategory === "Medical"
-      ? medicalOptions
-      : [];
-
-  // For Favour Type, show Sairam Group filters if Favour Group is "Sairam Group"
-  const showFavourSairamGroup =
-    showFavourTypeFilter && filters.favourGroup === "Sairam Group";
-
-  // For Scholarship Issued Report
-  const showIssuedDateFilters =
-    activeTab === "scholarship-issued" &&
-    filters.mainCategory === "Issued Date";
-  const showIssuedByFilter =
-    activeTab === "scholarship-issued" &&
-    filters.mainCategory === "Issued By";
-  const showChequeInFavorType =
-    activeTab === "scholarship-issued" &&
-    filters.mainCategory !== "" &&
-    filters.mainCategory !== "--Select--";
-  const showIssuedInstitutionFilter =
-    showChequeInFavorType &&
-    filters.chequeInFavorType !== "All" &&
-    filters.chequeInFavorType !== "Individual";
-
   const isApplyDisabled = React.useMemo(() => {
-    if (activeTab === "categories-wise") {
-      return !filters.academicYear || !filters.mainCategory || filters.mainCategory === "";
-    }
-    if (activeTab === "scholarship-issued") {
-      return !filters.mainCategory || filters.mainCategory === "";
-    }
-    if (activeTab === "approved-form") {
-      // For approved form, at least one filter should be selected
-      return !filters.academicYear && !filters.applicationNo && !filters.studentId && !filters.status && !filters.mobileNumber;
-    }
+    // Apply button is always enabled - filters are optional
     return false;
-  }, [filters, activeTab]);
+  }, []);
 
   const onFormatDate = (date?: Date): string => {
     if (!date) return "";
@@ -205,611 +139,210 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
         minWidth: 0, // Allow flex item to shrink
       }}
       >
-        {/* Academic Year - For Categories Report */}
-        {activeTab === "categories-wise" && (
-        <div>
-            <label
-              style={{
-            fontSize: "14px",
-            lineHeight: "20px",
-            fontWeight: 500,
-            color: "#242424",
-            marginBottom: "8px",
-            display: "block",
-            fontFamily: "'Inter', sans-serif",
-              }}
-            >
-            Academic Year
-          </label>
-          <Select
-            placeholder="Select Academic Year"
-              options={academicYears.length > 0 ? academicYears : academicYearOptions}
-              selectedKey={filters.academicYear?.toString()}
-              onValueChange={(value) =>
-                handleFilterChange("academicYear", value ? Number(value) : undefined)
-              }
-          />
-        </div>
-        )}
-
-        {/* Main Category */}
-        {activeTab !== "approved-form" && (
-            <div>
-            <label
-              style={{
-                fontSize: "14px",
-                lineHeight: "20px",
-                fontWeight: 500,
-                color: "#242424",
-                marginBottom: "8px",
-                display: "block",
-                fontFamily: "'Inter', sans-serif",
-              }}
-            >
-              Main Category
-            </label>
-            <Select
-              placeholder="--Select--"
-              options={
-                activeTab === "categories-wise"
-                  ? mainCategoryOptions
-                  : scholarshipIssuedMainCategoryOptions
-              }
-              selectedKey={filters.mainCategory || ""}
-              onValueChange={(value) => {
-                const previousMainCategory = filters.mainCategory;
-                handleFilterChange("mainCategory", value);
-                // Only reset filters that are no longer relevant to the new main category
-                // Preserve filters that are still valid
-                if (previousMainCategory !== value) {
-                  if (activeTab === "categories-wise") {
-                    // Clear filters that are specific to the previous main category
-                    // Only clear if the new main category doesn't use them
-                    if (previousMainCategory === "Applied Date" || previousMainCategory === "Processed Date") {
-                      if (value !== "Applied Date" && value !== "Processed Date") {
-                        handleFilterChange("fromDate", null);
-                        handleFilterChange("toDate", null);
-                      }
-                    }
-                    if (previousMainCategory === "Amount" && value !== "Amount") {
-                      handleFilterChange("amount", undefined);
-                    }
-                    if (previousMainCategory === "Gender" && value !== "Gender") {
-                      handleFilterChange("gender", undefined);
-                    }
-                    if (previousMainCategory === "Issued to" && value !== "Issued to") {
-                      handleFilterChange("issuedTo", undefined);
-                    }
-                    if (previousMainCategory === "Status" && value !== "Status") {
-                      handleFilterChange("status", undefined);
-                    }
-                    if (previousMainCategory === "Sairam Group" && value !== "Sairam Group") {
-                      handleFilterChange("sairamCategory", undefined);
-                      handleFilterChange("institutionName", undefined);
-                    }
-                    if (previousMainCategory === "Parent Office" && value !== "Parent Office") {
-                      handleFilterChange("parentOffice", undefined);
-                    }
-                    if (previousMainCategory === "Favour Type" && value !== "Favour Type") {
-                      handleFilterChange("favourCategory", undefined);
-                      handleFilterChange("favourGroup", undefined);
-                      handleFilterChange("sairamCategory", undefined);
-                      handleFilterChange("institutionName", undefined);
-                    }
-                  } else if (activeTab === "scholarship-issued") {
-                    // For scholarship-issued tab, clear dependent filters when main category changes
-                    if (previousMainCategory === "Issued Date" && value !== "Issued Date") {
-                      handleFilterChange("fromDate", null);
-                      handleFilterChange("toDate", null);
-                    }
-                    if (previousMainCategory === "Issued By" && value !== "Issued By") {
-                      handleFilterChange("intIssuedBy", undefined);
-                      handleFilterChange("strIssuedBy", undefined);
-                    }
-                    // Always clear chequeInFavorType and related filters when main category changes
-                    // (unless it's the same category)
-                    if (previousMainCategory !== value) {
-                      handleFilterChange("chequeInFavorType", undefined);
-                      handleFilterChange("institutionId", undefined);
-                      handleFilterChange("strInstitution", undefined);
-                    }
-                  }
-                }
-              }}
-            />
-          </div>
-        )}
-
-        {/* Categories Report Filters */}
+        {/* Categories Wise Report Filters */}
         {activeTab === "categories-wise" && (
           <>
-            {/* Date Filters */}
-            {showDateFilters && (
-              <>
-                <div>
-                  <label
-                    style={{
-                      fontSize: "14px",
-                      lineHeight: "20px",
-                      fontWeight: 500,
-                      color: "#242424",
-                      marginBottom: "8px",
-                      display: "block",
-                    }}
-                  >
-                    From Date
+            {/* Academic Year */}
+            <div>
+              <label
+                style={{
+                  fontSize: "14px",
+                  lineHeight: "20px",
+                  fontWeight: 500,
+                  color: "#242424",
+                  marginBottom: "8px",
+                  display: "block",
+                  fontFamily: "'Inter', sans-serif",
+                }}
+              >
+                Academic Year
+              </label>
+              <Select
+                placeholder="Select Academic Year"
+                options={academicYears.length > 0 ? academicYears : academicYearOptions}
+                selectedKey={filters.academicYear?.toString()}
+                onValueChange={(value) =>
+                  handleFilterChange("academicYear", value ? Number(value) : undefined)
+                }
+              />
+            </div>
+
+            {/* Applied Date */}
+            <div>
+              <label
+                style={{
+                  fontSize: "14px",
+                  lineHeight: "20px",
+                  fontWeight: 500,
+                  color: "#242424",
+                  marginBottom: "8px",
+                  display: "block",
+                }}
+              >
+                Applied Date
               </label>
               <DatePicker
-                    value={filters.fromDate || undefined}
-                    onSelectDate={(date) => handleFilterChange("fromDate", date)}
+                value={filters.appliedDate || undefined}
+                onSelectDate={(date) => handleFilterChange("appliedDate", date)}
                 formatDate={onFormatDate}
                 textField={{
-                      placeholder: "DD/MM/YYYY",
+                  placeholder: "DD/MM/YYYY",
                 } as any}
               />
             </div>
+
+            {/* Gender */}
             <div>
-                  <label
-                    style={{
-                      fontSize: "14px",
-                      lineHeight: "20px",
-                      fontWeight: 500,
-                      color: "#242424",
-                      marginBottom: "8px",
-                      display: "block",
-                    }}
-                  >
-                    To Date
-                  </label>
-                  <DatePicker
-                    value={filters.toDate || undefined}
-                    onSelectDate={(date) => handleFilterChange("toDate", date)}
-                    formatDate={onFormatDate}
-                    textField={{
-                      placeholder: "DD/MM/YYYY",
-                    } as any}
-                  />
-                </div>
-              </>
-            )}
-
-            {/* Amount Filter */}
-            {showAmountFilter && (
-              <div>
-                <label
-                  style={{
-                    fontSize: "14px",
-                    lineHeight: "20px",
-                    fontWeight: 500,
-                    color: "#242424",
-                    marginBottom: "8px",
-                    display: "block",
-                  }}
-                >
-                  Amount
-                </label>
-                <Select
-                  placeholder="--Select--"
-                  options={amountOptions}
-                  selectedKey={filters.amount || ""}
-                  onValueChange={(value) => handleFilterChange("amount", value)}
-                />
-              </div>
-            )}
-
-            {/* Gender Filter */}
-            {showGenderFilter && (
-              <div>
-                <label
-                  style={{
-                fontSize: "14px",
-                lineHeight: "20px",
-                fontWeight: 500,
-                color: "#242424",
-                marginBottom: "8px",
-                display: "block",
-                  }}
-                >
+              <label
+                style={{
+                  fontSize: "14px",
+                  lineHeight: "20px",
+                  fontWeight: 500,
+                  color: "#242424",
+                  marginBottom: "8px",
+                  display: "block",
+                }}
+              >
                 Gender
               </label>
               <Select
-                  placeholder="--Select--"
+                placeholder="--Select--"
                 options={genderOptions}
-                  selectedKey={filters.gender || ""}
+                selectedKey={filters.gender || ""}
                 onValueChange={(value) => handleFilterChange("gender", value)}
               />
             </div>
-            )}
 
-            {/* Issued To Filter */}
-            {showIssuedToFilter && (
-              <div>
-                <label
-                  style={{
-                    fontSize: "14px",
-                    lineHeight: "20px",
-                    fontWeight: 500,
-                    color: "#242424",
-                    marginBottom: "8px",
-                    display: "block",
-                  }}
-                >
-                  Issued To
-                </label>
-                <Select
-                  placeholder="--Select--"
-                  options={issuedToOptions}
-                  selectedKey={filters.issuedTo || ""}
-                  onValueChange={(value) => handleFilterChange("issuedTo", value)}
-                />
-              </div>
-            )}
-
-            {/* Status Filter */}
-            {showStatusFilter && (
+            {/* Status */}
             <div>
-                <label
-                  style={{
-                fontSize: "14px",
-                lineHeight: "20px",
-                fontWeight: 500,
-                color: "#242424",
-                marginBottom: "8px",
-                display: "block",
-                  }}
-                >
+              <label
+                style={{
+                  fontSize: "14px",
+                  lineHeight: "20px",
+                  fontWeight: 500,
+                  color: "#242424",
+                  marginBottom: "8px",
+                  display: "block",
+                }}
+              >
                 Status
               </label>
               <Select
-                  placeholder="--Select--"
+                placeholder="--Select--"
                 options={statusOptions}
-                  selectedKey={filters.status || ""}
+                selectedKey={filters.status || ""}
                 onValueChange={(value) => handleFilterChange("status", value)}
               />
             </div>
-            )}
-
-            {/* Sairam Group Filter */}
-            {showSairamGroupFilter && (
-              <>
-                <div>
-                  <label
-                    style={{
-                      fontSize: "14px",
-                      lineHeight: "20px",
-                      fontWeight: 500,
-                      color: "#242424",
-                      marginBottom: "8px",
-                      display: "block",
-                    }}
-                  >
-                    Sairam Category
-                  </label>
-                  <Select
-                    placeholder="All"
-                    options={sairamCategoryOptions}
-                    selectedKey={filters.sairamCategory || "All"}
-                    onValueChange={(value) => {
-                      handleFilterChange("sairamCategory", value);
-                      handleFilterChange("institutionName", undefined);
-                    }}
-                  />
-                </div>
-                {showInstitutionFilter && (
-                  <div>
-                    <label
-                      style={{
-                        fontSize: "14px",
-                        lineHeight: "20px",
-                        fontWeight: 500,
-                        color: "#242424",
-                        marginBottom: "8px",
-                        display: "block",
-                      }}
-                    >
-                      Institution Name
-                    </label>
-                    <Select
-                      placeholder="All"
-                      options={institutionOptions}
-                      selectedKey={filters.institutionName || "All"}
-                      onValueChange={(value) =>
-                        handleFilterChange("institutionName", value)
-                      }
-                    />
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Parent Office Filter */}
-            {showParentOfficeFilter && (
-              <div>
-                <label
-                  style={{
-                    fontSize: "14px",
-                    lineHeight: "20px",
-                    fontWeight: 500,
-                    color: "#242424",
-                    marginBottom: "8px",
-                    display: "block",
-                  }}
-                >
-                  Parent Office
-                </label>
-                <Input
-                  placeholder="Enter Parent Office"
-                  value={filters.parentOffice || ""}
-                  onChange={(e) => handleFilterChange("parentOffice", e.target.value)}
-                />
-              </div>
-            )}
-
-            {/* Favour Type Filters */}
-            {showFavourTypeFilter && (
-              <>
-                <div>
-                  <label
-                    style={{
-                      fontSize: "14px",
-                      lineHeight: "20px",
-                      fontWeight: 500,
-                      color: "#242424",
-                      marginBottom: "8px",
-                      display: "block",
-                    }}
-                  >
-                    Favour Category
-                  </label>
-                  <Select
-                    placeholder="All"
-                    options={favourCategoryOptions}
-                    selectedKey={filters.favourCategory || "All"}
-                    onValueChange={(value) => handleFilterChange("favourCategory", value)}
-                  />
-                </div>
-                <div>
-                  <label
-                    style={{
-                      fontSize: "14px",
-                      lineHeight: "20px",
-                      fontWeight: 500,
-                      color: "#242424",
-                      marginBottom: "8px",
-                      display: "block",
-                    }}
-                  >
-                    Favour Group
-                  </label>
-                  <Select
-                    placeholder="All"
-                    options={favourGroupOptions}
-                    selectedKey={filters.favourGroup || "All"}
-                    onValueChange={(value) => {
-                      handleFilterChange("favourGroup", value);
-                      if (value !== "Sairam Group") {
-                        handleFilterChange("sairamCategory", undefined);
-                        handleFilterChange("institutionName", undefined);
-                      }
-                    }}
-                  />
-                </div>
-                {showFavourSairamGroup && (
-                  <>
-                    <div>
-                      <label
-                        style={{
-                          fontSize: "14px",
-                          lineHeight: "20px",
-                          fontWeight: 500,
-                          color: "#242424",
-                          marginBottom: "8px",
-                          display: "block",
-                        }}
-                      >
-                        Sairam Category
-                      </label>
-                      <Select
-                        placeholder="All"
-                        options={sairamCategoryOptions}
-                        selectedKey={filters.sairamCategory || "All"}
-                        onValueChange={(value) => {
-                          handleFilterChange("sairamCategory", value);
-                          handleFilterChange("institutionName", undefined);
-                        }}
-                      />
-                    </div>
-                    {showInstitutionFilter && (
-                      <div>
-                        <label
-                          style={{
-                            fontSize: "14px",
-                            lineHeight: "20px",
-                            fontWeight: 500,
-                            color: "#242424",
-                            marginBottom: "8px",
-                            display: "block",
-                          }}
-                        >
-                          Institution Name
-                        </label>
-                        <Select
-                          placeholder="All"
-                          options={institutionOptions}
-                          selectedKey={filters.institutionName || "All"}
-                          onValueChange={(value) =>
-                            handleFilterChange("institutionName", value)
-                          }
-                        />
-                      </div>
-                    )}
-                  </>
-                )}
-              </>
-            )}
           </>
         )}
 
-        {/* Scholarship Issued Report Filters */}
+        {/* Report of Scholarship Issued Filters */}
         {activeTab === "scholarship-issued" && (
           <>
-            {/* Issued By Filter */}
-            {showIssuedByFilter && (
+            {/* Academic Year */}
             <div>
-                <label
-                  style={{
-                fontSize: "14px",
-                lineHeight: "20px",
-                fontWeight: 500,
-                color: "#242424",
-                marginBottom: "8px",
-                display: "block",
-                  }}
-                >
-                Issued By
+              <label
+                style={{
+                  fontSize: "14px",
+                  lineHeight: "20px",
+                  fontWeight: 500,
+                  color: "#242424",
+                  marginBottom: "8px",
+                  display: "block",
+                  fontFamily: "'Inter', sans-serif",
+                }}
+              >
+                Academic Year
               </label>
-                <Select
-                  placeholder="All"
-                  options={[
-                    { value: "All", label: "All" },
-                    ...chequeIssuedByOptions,
-                  ]}
-                  selectedKey={filters.strIssuedBy || "All"}
-                  onValueChange={(value) => {
-                    if (value === "All") {
-                      handleFilterChange("strIssuedBy", "All");
-                      handleFilterChange("intIssuedBy", undefined);
-                    } else {
-                      handleFilterChange("strIssuedBy", undefined);
-                      handleFilterChange("intIssuedBy", value ? Number(value) : undefined);
-                    }
-                  }}
+              <Select
+                placeholder="Select Academic Year"
+                options={academicYears.length > 0 ? academicYears : academicYearOptions}
+                selectedKey={filters.academicYear?.toString()}
+                onValueChange={(value) =>
+                  handleFilterChange("academicYear", value ? Number(value) : undefined)
+                }
               />
             </div>
-            )}
 
-            {/* Date Filters for Issued Date */}
-            {showIssuedDateFilters && (
-              <>
+            {/* Issued By */}
             <div>
-                  <label
-                    style={{
-                fontSize: "14px",
-                lineHeight: "20px",
-                fontWeight: 500,
-                color: "#242424",
-                marginBottom: "8px",
-                display: "block",
-                    }}
-                  >
-                    From Date
+              <label
+                style={{
+                  fontSize: "14px",
+                  lineHeight: "20px",
+                  fontWeight: 500,
+                  color: "#242424",
+                  marginBottom: "8px",
+                  display: "block",
+                }}
+              >
+                Issued By
+              </label>
+              <Select
+                placeholder="--Select--"
+                options={chequeIssuedByOptions}
+                selectedKey={filters.strIssuedBy || filters.intIssuedBy?.toString() || ""}
+                onValueChange={(value) => {
+                  if (!value || value === "") {
+                    handleFilterChange("strIssuedBy", undefined);
+                    handleFilterChange("intIssuedBy", undefined);
+                    handleFilterChange("issuedBy", undefined);
+                  } else {
+                    const selectedOption = chequeIssuedByOptions.find(opt => opt.value === value);
+                    handleFilterChange("strIssuedBy", selectedOption?.label);
+                    handleFilterChange("intIssuedBy", value ? Number(value) : undefined);
+                    handleFilterChange("issuedBy", selectedOption?.label);
+                  }
+                }}
+              />
+            </div>
+
+            {/* Issued Date */}
+            <div>
+              <label
+                style={{
+                  fontSize: "14px",
+                  lineHeight: "20px",
+                  fontWeight: 500,
+                  color: "#242424",
+                  marginBottom: "8px",
+                  display: "block",
+                }}
+              >
+                Issued Date
               </label>
               <DatePicker
-                    value={filters.fromDate || undefined}
-                    onSelectDate={(date) => handleFilterChange("fromDate", date)}
+                value={filters.issuedDate || undefined}
+                onSelectDate={(date) => handleFilterChange("issuedDate", date)}
                 formatDate={onFormatDate}
                 textField={{
-                      placeholder: "DD/MM/YYYY",
+                  placeholder: "DD/MM/YYYY",
                 } as any}
               />
             </div>
+
+            {/* Issued Type */}
             <div>
-                  <label
-                    style={{
-                      fontSize: "14px",
-                      lineHeight: "20px",
-                      fontWeight: 500,
-                      color: "#242424",
-                      marginBottom: "8px",
-                      display: "block",
-                    }}
-                  >
-                    To Date
-                  </label>
-                  <DatePicker
-                    value={filters.toDate || undefined}
-                    onSelectDate={(date) => handleFilterChange("toDate", date)}
-                    formatDate={onFormatDate}
-                    textField={{
-                      placeholder: "DD/MM/YYYY",
-                    } as any}
-                  />
-                </div>
-              </>
-            )}
-
-            {/* Cheque In Favor Type */}
-            {showChequeInFavorType && (
-              <div>
-                <label
-                  style={{
-                    fontSize: "14px",
-                    lineHeight: "20px",
-                    fontWeight: 500,
-                    color: "#242424",
-                    marginBottom: "8px",
-                    display: "block",
-                  }}
-                >
-                  Type
-                </label>
-                <Select
-                  placeholder="All"
-                  options={chequeInFavorTypeOptions}
-                  selectedKey={filters.chequeInFavorType || "All"}
-                  onValueChange={(value) => {
-                    handleFilterChange("chequeInFavorType", value);
-                    if (value === "All" || value === "Individual") {
-                      handleFilterChange("institutionId", undefined);
-                      handleFilterChange("strInstitution", undefined);
-                    }
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Issued Institution Filter */}
-            {showIssuedInstitutionFilter && (
-              <div>
-                <label
-                  style={{
-                fontSize: "14px",
-                lineHeight: "20px",
-                fontWeight: 500,
-                color: "#242424",
-                marginBottom: "8px",
-                display: "block",
-                  }}
-                >
-                  In Favor of
+              <label
+                style={{
+                  fontSize: "14px",
+                  lineHeight: "20px",
+                  fontWeight: 500,
+                  color: "#242424",
+                  marginBottom: "8px",
+                  display: "block",
+                }}
+              >
+                Issued Type
               </label>
               <Select
-                  placeholder="--Select--"
-                  options={[
-                    { value: "All", label: "All" },
-                    { value: "Other", label: "Other" },
-                    ...chequeIssuedByOptions,
-                  ]}
-                  selectedKey={
-                    filters.strInstitution ||
-                    filters.institutionId?.toString() ||
-                    ""
-                  }
-                  onValueChange={(value) => {
-                    if (value === "All") {
-                      handleFilterChange("strInstitution", "All");
-                      handleFilterChange("institutionId", undefined);
-                    } else if (value === "Other") {
-                      handleFilterChange("strInstitution", "Other");
-                      handleFilterChange("institutionId", undefined);
-                    } else {
-                      handleFilterChange("strInstitution", undefined);
-                      handleFilterChange("institutionId", value ? Number(value) : undefined);
-                    }
-                  }}
+                placeholder="--Select--"
+                options={issuedTypeOptions}
+                selectedKey={filters.issuedType || ""}
+                onValueChange={(value) => handleFilterChange("issuedType", value)}
               />
             </div>
-            )}
           </>
         )}
 
@@ -853,7 +386,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
                   display: "block",
                 }}
               >
-                Application No
+                Application No.
               </label>
               <Input
                 placeholder="Enter Application No"
@@ -958,9 +491,8 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
             <input
               type="text"
               placeholder="Search"
-              value={filters.keyword || filters.keywordSearch || ""}
+              value={filters.keywordSearch || ""}
               onChange={(e) => {
-                handleFilterChange("keyword", e.target.value);
                 handleFilterChange("keywordSearch", e.target.value);
               }}
               style={{

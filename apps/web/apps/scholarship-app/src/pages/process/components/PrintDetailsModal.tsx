@@ -20,20 +20,40 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
     onOpenChange,
     data,
 }) => {
-    // Mock data filling if specific fields aren't in ApplicationData types yet
+    // Get data from ApplicationData - using API fields
+    const chequeDate = (data as Record<string, unknown>)?.Scholarship_Issued_Date 
+      ? String((data as Record<string, unknown>).Scholarship_Issued_Date) 
+      : (data as Record<string, unknown>)?.Donated_Date 
+        ? String((data as Record<string, unknown>).Donated_Date)
+        : "--";
+    
+    const chequeAmount = (data as Record<string, unknown>)?.Scholarship_Issued_Amount 
+      ? String((data as Record<string, unknown>).Scholarship_Issued_Amount) 
+      : data?.approvedAmount 
+        ? String(data.approvedAmount)
+        : "--";
+    
+    const scholarshipIssueNumber = data?.scholarshipNumber && data.scholarshipNumber !== '-' 
+      ? data.scholarshipNumber 
+      : "--";
+    
+    const chequeInFavor = (data as Record<string, unknown>)?.DDCheque_In_Favor 
+      ? String((data as Record<string, unknown>).DDCheque_In_Favor) 
+      : data?.studentName || "--";
+
     const details = [
-        { id: 1, label: "Application Number", value: data?.applicationNo || "AF2510001" },
-        { id: 2, label: "Name", value: data?.studentName || "Malathi R" },
-        { id: 3, label: "Cheque in favour of", value: data?.studentName || "Malathi R" }, // Assuming same as student name
-        { id: 4, label: "Cheque Date", value: "24/07/2025" }, // Mock
-        { id: 5, label: "Cheque Amount", value: String(data?.amount || "200000") },
-        { id: 6, label: "Scholarship Issue Number", value: "25LMSS1007" }, // Mock
+        { id: 1, label: "Application Number", value: data?.applicationNo || "--" },
+        { id: 2, label: "Name", value: data?.studentName || "--" },
+        { id: 3, label: "Cheque in favour of", value: chequeInFavor },
+        { id: 4, label: "Cheque Date", value: chequeDate },
+        { id: 5, label: "Cheque Amount", value: chequeAmount },
+        { id: 6, label: "Scholarship Issue Number", value: scholarshipIssueNumber },
     ];
 
     const approvalDetails = [
-        { id: 1, label: "Prepared By", value: "Administrator" },
-        { id: 2, label: "Verified By", value: "Deepak" },
-        { id: 3, label: "Suggested By", value: "Balaji" },
+        { id: 1, label: "Prepared By", value: data?.preparedBy && data.preparedBy !== '-' ? data.preparedBy : "--" },
+        { id: 2, label: "Verified By", value: data?.verifiedBy && data.verifiedBy !== '-' ? data.verifiedBy : "--" },
+        { id: 3, label: "Suggested By", value: data?.suggestedBy && data.suggestedBy !== '-' ? data.suggestedBy : "--" },
         { id: 4, label: "Authorized By", value: "--" },
         { id: 5, label: "Passed By", value: "--" },
         { id: 6, label: "Trustee", value: "--" },

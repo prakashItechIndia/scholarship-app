@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Modal, Button } from "@shared/components";
 import { Dismiss24Regular, CheckmarkCircle24Regular } from "@fluentui/react-icons";
+import { Spinner, SpinnerSize } from "@fluentui/react";
 import { ApplicationData } from "../types";
 import { processManagement } from "../../../services/scholarship.service";
 import { useToast } from "@/components/ui/toast";
@@ -9,7 +10,7 @@ interface ApproveModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     data?: ApplicationData | null;
-    onApproveSuccess?: () => void;
+    onApproveSuccess?: (applicationNo?: string) => void;
 }
 
 const ApproveModal: React.FC<ApproveModalProps> = ({
@@ -353,9 +354,16 @@ const ApproveModal: React.FC<ApproveModalProps> = ({
                             appearance="primary"
                             onClick={handleSubmit}
                             disabled={loading || !approvedAmount}
-                            style={{ backgroundColor: "#0F6CBD", color: "white", minWidth: "100px" }}
+                            style={{ backgroundColor: "#0F6CBD", color: "white", minWidth: "100px", display: "flex", alignItems: "center", gap: "8px" }}
                         >
-                            Approve
+                            {loading ? (
+                                <>
+                                    <Spinner size={SpinnerSize.small} styles={{ circle: { borderTopColor: "#FFFFFF", borderBottomColor: "#FFFFFF", borderLeftColor: "#FFFFFF", borderRightColor: "#FFFFFF" } }} />
+                                    <span>Approving...</span>
+                                </>
+                            ) : (
+                                "Approve"
+                            )}
                         </Button>
                     </div>
 

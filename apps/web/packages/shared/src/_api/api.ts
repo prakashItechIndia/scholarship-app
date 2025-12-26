@@ -2134,6 +2134,44 @@ export const DocumentUploadApiAxiosParamCreator = function (configuration?: Conf
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary View/download document file
+         * @param {string} applicationId 
+         * @param {string} documentType 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerViewDocument: async (applicationId: string, documentType: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'applicationId' is not null or undefined
+            assertParamExists('documentUploadControllerViewDocument', 'applicationId', applicationId)
+            // verify required parameter 'documentType' is not null or undefined
+            assertParamExists('documentUploadControllerViewDocument', 'documentType', documentType)
+            const localVarPath = `/document-upload/view/{applicationId}/{documentType}`
+                .replace(`{${"applicationId"}}`, encodeURIComponent(String(applicationId)))
+                .replace(`{${"documentType"}}`, encodeURIComponent(String(documentType)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -2241,6 +2279,18 @@ export const DocumentUploadApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerUploadPhoto(photo, applicationId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * 
+         * @summary View/download document file
+         * @param {string} applicationId 
+         * @param {string} documentType 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async documentUploadControllerViewDocument(applicationId: string, documentType: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerViewDocument(applicationId, documentType, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -2339,6 +2389,17 @@ export const DocumentUploadApiFactory = function (configuration?: Configuration,
          */
         documentUploadControllerUploadPhoto(photo?: any, applicationId?: string, options?: any): AxiosPromise<void> {
             return localVarFp.documentUploadControllerUploadPhoto(photo, applicationId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary View/download document file
+         * @param {string} applicationId 
+         * @param {string} documentType 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerViewDocument(applicationId: string, documentType: string, options?: any): AxiosPromise<any> {
+            return localVarFp.documentUploadControllerViewDocument(applicationId, documentType, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2453,6 +2514,19 @@ export class DocumentUploadApi extends BaseAPI {
      */
     public documentUploadControllerUploadPhoto(photo?: any, applicationId?: string, options?: any) {
         return DocumentUploadApiFp(this.configuration).documentUploadControllerUploadPhoto(photo, applicationId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary View/download document file
+     * @param {string} applicationId 
+     * @param {string} documentType 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentUploadApi
+     */
+    public documentUploadControllerViewDocument(applicationId: string, documentType: string, options?: any) {
+        return DocumentUploadApiFp(this.configuration).documentUploadControllerViewDocument(applicationId, documentType, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -3458,10 +3532,12 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processManagementControllerGetApproveApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options: any = {}): Promise<RequestArgs> => {
+        processManagementControllerGetApproveApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/process-management/applications/approve`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3494,6 +3570,14 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
                 localVarQueryParameter['pageSize'] = pageSize;
             }
 
+            if (sortField !== undefined) {
+                localVarQueryParameter['sortField'] = sortField;
+            }
+
+            if (sortOrder !== undefined) {
+                localVarQueryParameter['sortOrder'] = sortOrder;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -3513,10 +3597,12 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processManagementControllerGetDocumentsApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options: any = {}): Promise<RequestArgs> => {
+        processManagementControllerGetDocumentsApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/process-management/applications/documents`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3549,6 +3635,14 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
                 localVarQueryParameter['pageSize'] = pageSize;
             }
 
+            if (sortField !== undefined) {
+                localVarQueryParameter['sortField'] = sortField;
+            }
+
+            if (sortOrder !== undefined) {
+                localVarQueryParameter['sortOrder'] = sortOrder;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -3568,10 +3662,12 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processManagementControllerGetIssueAmountApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options: any = {}): Promise<RequestArgs> => {
+        processManagementControllerGetIssueAmountApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/process-management/applications/issue-amount`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3604,6 +3700,14 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
                 localVarQueryParameter['pageSize'] = pageSize;
             }
 
+            if (sortField !== undefined) {
+                localVarQueryParameter['sortField'] = sortField;
+            }
+
+            if (sortOrder !== undefined) {
+                localVarQueryParameter['sortOrder'] = sortOrder;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -3626,10 +3730,12 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processManagementControllerGetOverviewApplications: async (mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, options: any = {}): Promise<RequestArgs> => {
+        processManagementControllerGetOverviewApplications: async (mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/process-management/applications/overview`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3672,6 +3778,14 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
 
             if (pageSize !== undefined) {
                 localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+            if (sortField !== undefined) {
+                localVarQueryParameter['sortField'] = sortField;
+            }
+
+            if (sortOrder !== undefined) {
+                localVarQueryParameter['sortOrder'] = sortOrder;
             }
 
 
@@ -3727,10 +3841,12 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processManagementControllerGetSuggestApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options: any = {}): Promise<RequestArgs> => {
+        processManagementControllerGetSuggestApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/process-management/applications/suggest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3763,6 +3879,14 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
                 localVarQueryParameter['pageSize'] = pageSize;
             }
 
+            if (sortField !== undefined) {
+                localVarQueryParameter['sortField'] = sortField;
+            }
+
+            if (sortOrder !== undefined) {
+                localVarQueryParameter['sortOrder'] = sortOrder;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -3782,10 +3906,12 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processManagementControllerGetVerifyApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options: any = {}): Promise<RequestArgs> => {
+        processManagementControllerGetVerifyApplications: async (mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/process-management/applications/verify`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3816,6 +3942,14 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
 
             if (pageSize !== undefined) {
                 localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+            if (sortField !== undefined) {
+                localVarQueryParameter['sortField'] = sortField;
+            }
+
+            if (sortOrder !== undefined) {
+                localVarQueryParameter['sortOrder'] = sortOrder;
             }
 
 
@@ -3961,11 +4095,13 @@ export const ProcessManagementApiFp = function(configuration?: Configuration) {
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async processManagementControllerGetApproveApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetApproveApplications(mainCategory, key, academicYearId, page, pageSize, options);
+        async processManagementControllerGetApproveApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetApproveApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3976,11 +4112,13 @@ export const ProcessManagementApiFp = function(configuration?: Configuration) {
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async processManagementControllerGetDocumentsApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetDocumentsApplications(mainCategory, key, academicYearId, page, pageSize, options);
+        async processManagementControllerGetDocumentsApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetDocumentsApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -3991,11 +4129,13 @@ export const ProcessManagementApiFp = function(configuration?: Configuration) {
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async processManagementControllerGetIssueAmountApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetIssueAmountApplications(mainCategory, key, academicYearId, page, pageSize, options);
+        async processManagementControllerGetIssueAmountApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetIssueAmountApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4009,11 +4149,13 @@ export const ProcessManagementApiFp = function(configuration?: Configuration) {
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async processManagementControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, academicYearId, page, pageSize, options);
+        async processManagementControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, academicYearId, page, pageSize, sortField, sortOrder, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4035,11 +4177,13 @@ export const ProcessManagementApiFp = function(configuration?: Configuration) {
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async processManagementControllerGetSuggestApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetSuggestApplications(mainCategory, key, academicYearId, page, pageSize, options);
+        async processManagementControllerGetSuggestApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetSuggestApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4050,11 +4194,13 @@ export const ProcessManagementApiFp = function(configuration?: Configuration) {
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async processManagementControllerGetVerifyApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetVerifyApplications(mainCategory, key, academicYearId, page, pageSize, options);
+        async processManagementControllerGetVerifyApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetVerifyApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4127,11 +4273,13 @@ export const ProcessManagementApiFactory = function (configuration?: Configurati
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processManagementControllerGetApproveApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
-            return localVarFp.processManagementControllerGetApproveApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(axios, basePath));
+        processManagementControllerGetApproveApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetApproveApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4141,11 +4289,13 @@ export const ProcessManagementApiFactory = function (configuration?: Configurati
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processManagementControllerGetDocumentsApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
-            return localVarFp.processManagementControllerGetDocumentsApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(axios, basePath));
+        processManagementControllerGetDocumentsApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetDocumentsApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4155,11 +4305,13 @@ export const ProcessManagementApiFactory = function (configuration?: Configurati
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processManagementControllerGetIssueAmountApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
-            return localVarFp.processManagementControllerGetIssueAmountApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(axios, basePath));
+        processManagementControllerGetIssueAmountApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetIssueAmountApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4172,11 +4324,13 @@ export const ProcessManagementApiFactory = function (configuration?: Configurati
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processManagementControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
-            return localVarFp.processManagementControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, academicYearId, page, pageSize, options).then((request) => request(axios, basePath));
+        processManagementControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, academicYearId, page, pageSize, sortField, sortOrder, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4196,11 +4350,13 @@ export const ProcessManagementApiFactory = function (configuration?: Configurati
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processManagementControllerGetSuggestApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
-            return localVarFp.processManagementControllerGetSuggestApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(axios, basePath));
+        processManagementControllerGetSuggestApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetSuggestApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4210,11 +4366,13 @@ export const ProcessManagementApiFactory = function (configuration?: Configurati
          * @param {number} [academicYearId] 
          * @param {number} [page] 
          * @param {number} [pageSize] 
+         * @param {string} [sortField] 
+         * @param {'asc' | 'desc'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processManagementControllerGetVerifyApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any): AxiosPromise<void> {
-            return localVarFp.processManagementControllerGetVerifyApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(axios, basePath));
+        processManagementControllerGetVerifyApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetVerifyApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4287,12 +4445,14 @@ export class ProcessManagementApi extends BaseAPI {
      * @param {number} [academicYearId] 
      * @param {number} [page] 
      * @param {number} [pageSize] 
+     * @param {string} [sortField] 
+     * @param {'asc' | 'desc'} [sortOrder] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProcessManagementApi
      */
-    public processManagementControllerGetApproveApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any) {
-        return ProcessManagementApiFp(this.configuration).processManagementControllerGetApproveApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    public processManagementControllerGetApproveApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetApproveApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4303,12 +4463,14 @@ export class ProcessManagementApi extends BaseAPI {
      * @param {number} [academicYearId] 
      * @param {number} [page] 
      * @param {number} [pageSize] 
+     * @param {string} [sortField] 
+     * @param {'asc' | 'desc'} [sortOrder] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProcessManagementApi
      */
-    public processManagementControllerGetDocumentsApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any) {
-        return ProcessManagementApiFp(this.configuration).processManagementControllerGetDocumentsApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    public processManagementControllerGetDocumentsApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetDocumentsApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4319,12 +4481,14 @@ export class ProcessManagementApi extends BaseAPI {
      * @param {number} [academicYearId] 
      * @param {number} [page] 
      * @param {number} [pageSize] 
+     * @param {string} [sortField] 
+     * @param {'asc' | 'desc'} [sortOrder] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProcessManagementApi
      */
-    public processManagementControllerGetIssueAmountApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any) {
-        return ProcessManagementApiFp(this.configuration).processManagementControllerGetIssueAmountApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    public processManagementControllerGetIssueAmountApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetIssueAmountApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4338,12 +4502,14 @@ export class ProcessManagementApi extends BaseAPI {
      * @param {number} [academicYearId] 
      * @param {number} [page] 
      * @param {number} [pageSize] 
+     * @param {string} [sortField] 
+     * @param {'asc' | 'desc'} [sortOrder] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProcessManagementApi
      */
-    public processManagementControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any) {
-        return ProcessManagementApiFp(this.configuration).processManagementControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, academicYearId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    public processManagementControllerGetOverviewApplications(mainCategory?: string, key?: string, selectedStatusText?: string, fromDate?: string, toDate?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetOverviewApplications(mainCategory, key, selectedStatusText, fromDate, toDate, academicYearId, page, pageSize, sortField, sortOrder, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4366,12 +4532,14 @@ export class ProcessManagementApi extends BaseAPI {
      * @param {number} [academicYearId] 
      * @param {number} [page] 
      * @param {number} [pageSize] 
+     * @param {string} [sortField] 
+     * @param {'asc' | 'desc'} [sortOrder] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProcessManagementApi
      */
-    public processManagementControllerGetSuggestApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any) {
-        return ProcessManagementApiFp(this.configuration).processManagementControllerGetSuggestApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    public processManagementControllerGetSuggestApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetSuggestApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4382,12 +4550,14 @@ export class ProcessManagementApi extends BaseAPI {
      * @param {number} [academicYearId] 
      * @param {number} [page] 
      * @param {number} [pageSize] 
+     * @param {string} [sortField] 
+     * @param {'asc' | 'desc'} [sortOrder] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProcessManagementApi
      */
-    public processManagementControllerGetVerifyApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, options?: any) {
-        return ProcessManagementApiFp(this.configuration).processManagementControllerGetVerifyApplications(mainCategory, key, academicYearId, page, pageSize, options).then((request) => request(this.axios, this.basePath));
+    public processManagementControllerGetVerifyApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetVerifyApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4433,6 +4603,104 @@ export const ReportsApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
+         * @summary Export report to PDF, Excel, CSV, or Word
+         * @param {string} reportType 
+         * @param {string} format 
+         * @param {number} [academicYear] 
+         * @param {string} [appliedDate] 
+         * @param {string} [gender] 
+         * @param {string} [status] 
+         * @param {string} [keyword] 
+         * @param {string} [issuedDate] 
+         * @param {string} [issuedType] 
+         * @param {number} [intIssuedBy] 
+         * @param {string} [strIssuedBy] 
+         * @param {string} [applicationNo] 
+         * @param {string} [studentId] 
+         * @param {string} [mobileNumber] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportsControllerExportReport: async (reportType: string, format: string, academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, issuedDate?: string, issuedType?: string, intIssuedBy?: number, strIssuedBy?: string, applicationNo?: string, studentId?: string, mobileNumber?: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'reportType' is not null or undefined
+            assertParamExists('reportsControllerExportReport', 'reportType', reportType)
+            // verify required parameter 'format' is not null or undefined
+            assertParamExists('reportsControllerExportReport', 'format', format)
+            const localVarPath = `/reports/export/{reportType}/{format}`
+                .replace(`{${"reportType"}}`, encodeURIComponent(String(reportType)))
+                .replace(`{${"format"}}`, encodeURIComponent(String(format)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (academicYear !== undefined) {
+                localVarQueryParameter['academicYear'] = academicYear;
+            }
+
+            if (appliedDate !== undefined) {
+                localVarQueryParameter['appliedDate'] = appliedDate;
+            }
+
+            if (gender !== undefined) {
+                localVarQueryParameter['gender'] = gender;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (issuedDate !== undefined) {
+                localVarQueryParameter['issuedDate'] = issuedDate;
+            }
+
+            if (issuedType !== undefined) {
+                localVarQueryParameter['issuedType'] = issuedType;
+            }
+
+            if (intIssuedBy !== undefined) {
+                localVarQueryParameter['intIssuedBy'] = intIssuedBy;
+            }
+
+            if (strIssuedBy !== undefined) {
+                localVarQueryParameter['strIssuedBy'] = strIssuedBy;
+            }
+
+            if (applicationNo !== undefined) {
+                localVarQueryParameter['applicationNo'] = applicationNo;
+            }
+
+            if (studentId !== undefined) {
+                localVarQueryParameter['studentId'] = studentId;
+            }
+
+            if (mobileNumber !== undefined) {
+                localVarQueryParameter['mobileNumber'] = mobileNumber;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get all academic years
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4463,7 +4731,7 @@ export const ReportsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Get approval form data
+         * @summary Get approval form data for a specific application
          * @param {string} applicationId 
          * @param {number} scholarshipId 
          * @param {*} [options] Override http request option.
@@ -4501,25 +4769,76 @@ export const ReportsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Get categories wise report
+         * @summary Get approved form report
          * @param {number} [academicYear] 
-         * @param {string} [mainCategory] 
+         * @param {string} [applicationNo] 
+         * @param {string} [studentId] 
          * @param {string} [status] 
-         * @param {string} [fromDate] 
-         * @param {string} [toDate] 
-         * @param {string} [amount] 
-         * @param {string} [gender] 
-         * @param {string} [issuedTo] 
-         * @param {string} [sairamCategory] 
-         * @param {string} [institutionName] 
-         * @param {string} [parentOffice] 
-         * @param {string} [favourCategory] 
-         * @param {string} [favourGroup] 
+         * @param {string} [mobileNumber] 
          * @param {string} [keyword] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        reportsControllerGetCategoriesWiseReport: async (academicYear?: number, mainCategory?: string, status?: string, fromDate?: string, toDate?: string, amount?: string, gender?: string, issuedTo?: string, sairamCategory?: string, institutionName?: string, parentOffice?: string, favourCategory?: string, favourGroup?: string, keyword?: string, options: any = {}): Promise<RequestArgs> => {
+        reportsControllerGetApprovedFormReport: async (academicYear?: number, applicationNo?: string, studentId?: string, status?: string, mobileNumber?: string, keyword?: string, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/reports/approved-form`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (academicYear !== undefined) {
+                localVarQueryParameter['academicYear'] = academicYear;
+            }
+
+            if (applicationNo !== undefined) {
+                localVarQueryParameter['applicationNo'] = applicationNo;
+            }
+
+            if (studentId !== undefined) {
+                localVarQueryParameter['studentId'] = studentId;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (mobileNumber !== undefined) {
+                localVarQueryParameter['mobileNumber'] = mobileNumber;
+            }
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get categories wise report
+         * @param {number} [academicYear] 
+         * @param {string} [appliedDate] 
+         * @param {string} [gender] 
+         * @param {string} [status] 
+         * @param {string} [keyword] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportsControllerGetCategoriesWiseReport: async (academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/reports/categories`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4536,52 +4855,16 @@ export const ReportsApiAxiosParamCreator = function (configuration?: Configurati
                 localVarQueryParameter['academicYear'] = academicYear;
             }
 
-            if (mainCategory !== undefined) {
-                localVarQueryParameter['mainCategory'] = mainCategory;
-            }
-
-            if (status !== undefined) {
-                localVarQueryParameter['status'] = status;
-            }
-
-            if (fromDate !== undefined) {
-                localVarQueryParameter['fromDate'] = fromDate;
-            }
-
-            if (toDate !== undefined) {
-                localVarQueryParameter['toDate'] = toDate;
-            }
-
-            if (amount !== undefined) {
-                localVarQueryParameter['amount'] = amount;
+            if (appliedDate !== undefined) {
+                localVarQueryParameter['appliedDate'] = appliedDate;
             }
 
             if (gender !== undefined) {
                 localVarQueryParameter['gender'] = gender;
             }
 
-            if (issuedTo !== undefined) {
-                localVarQueryParameter['issuedTo'] = issuedTo;
-            }
-
-            if (sairamCategory !== undefined) {
-                localVarQueryParameter['sairamCategory'] = sairamCategory;
-            }
-
-            if (institutionName !== undefined) {
-                localVarQueryParameter['institutionName'] = institutionName;
-            }
-
-            if (parentOffice !== undefined) {
-                localVarQueryParameter['parentOffice'] = parentOffice;
-            }
-
-            if (favourCategory !== undefined) {
-                localVarQueryParameter['favourCategory'] = favourCategory;
-            }
-
-            if (favourGroup !== undefined) {
-                localVarQueryParameter['favourGroup'] = favourGroup;
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
             }
 
             if (keyword !== undefined) {
@@ -4632,17 +4915,16 @@ export const ReportsApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Get scholarship issued report
-         * @param {string} [fromDate] 
-         * @param {string} [toDate] 
-         * @param {number} [institutionId] 
-         * @param {string} [strInstitution] 
-         * @param {string} [chequeInFavorType] 
+         * @param {number} [academicYear] 
+         * @param {string} [issuedDate] 
+         * @param {string} [issuedType] 
+         * @param {string} [keyword] 
          * @param {number} [intIssuedBy] 
          * @param {string} [strIssuedBy] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        reportsControllerGetScholarshipIssuedReport: async (fromDate?: string, toDate?: string, institutionId?: number, strInstitution?: string, chequeInFavorType?: string, intIssuedBy?: number, strIssuedBy?: string, options: any = {}): Promise<RequestArgs> => {
+        reportsControllerGetScholarshipIssuedReport: async (academicYear?: number, issuedDate?: string, issuedType?: string, keyword?: string, intIssuedBy?: number, strIssuedBy?: string, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/reports/scholarship-issued`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4655,24 +4937,20 @@ export const ReportsApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-            if (fromDate !== undefined) {
-                localVarQueryParameter['fromDate'] = fromDate;
+            if (academicYear !== undefined) {
+                localVarQueryParameter['academicYear'] = academicYear;
             }
 
-            if (toDate !== undefined) {
-                localVarQueryParameter['toDate'] = toDate;
+            if (issuedDate !== undefined) {
+                localVarQueryParameter['issuedDate'] = issuedDate;
             }
 
-            if (institutionId !== undefined) {
-                localVarQueryParameter['institutionId'] = institutionId;
+            if (issuedType !== undefined) {
+                localVarQueryParameter['issuedType'] = issuedType;
             }
 
-            if (strInstitution !== undefined) {
-                localVarQueryParameter['strInstitution'] = strInstitution;
-            }
-
-            if (chequeInFavorType !== undefined) {
-                localVarQueryParameter['chequeInFavorType'] = chequeInFavorType;
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
             }
 
             if (intIssuedBy !== undefined) {
@@ -4706,6 +4984,30 @@ export const ReportsApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary Export report to PDF, Excel, CSV, or Word
+         * @param {string} reportType 
+         * @param {string} format 
+         * @param {number} [academicYear] 
+         * @param {string} [appliedDate] 
+         * @param {string} [gender] 
+         * @param {string} [status] 
+         * @param {string} [keyword] 
+         * @param {string} [issuedDate] 
+         * @param {string} [issuedType] 
+         * @param {number} [intIssuedBy] 
+         * @param {string} [strIssuedBy] 
+         * @param {string} [applicationNo] 
+         * @param {string} [studentId] 
+         * @param {string} [mobileNumber] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async reportsControllerExportReport(reportType: string, format: string, academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, issuedDate?: string, issuedType?: string, intIssuedBy?: number, strIssuedBy?: string, applicationNo?: string, studentId?: string, mobileNumber?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerExportReport(reportType, format, academicYear, appliedDate, gender, status, keyword, issuedDate, issuedType, intIssuedBy, strIssuedBy, applicationNo, studentId, mobileNumber, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get all academic years
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4716,7 +5018,7 @@ export const ReportsApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Get approval form data
+         * @summary Get approval form data for a specific application
          * @param {string} applicationId 
          * @param {number} scholarshipId 
          * @param {*} [options] Override http request option.
@@ -4728,26 +5030,33 @@ export const ReportsApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Get categories wise report
+         * @summary Get approved form report
          * @param {number} [academicYear] 
-         * @param {string} [mainCategory] 
+         * @param {string} [applicationNo] 
+         * @param {string} [studentId] 
          * @param {string} [status] 
-         * @param {string} [fromDate] 
-         * @param {string} [toDate] 
-         * @param {string} [amount] 
-         * @param {string} [gender] 
-         * @param {string} [issuedTo] 
-         * @param {string} [sairamCategory] 
-         * @param {string} [institutionName] 
-         * @param {string} [parentOffice] 
-         * @param {string} [favourCategory] 
-         * @param {string} [favourGroup] 
+         * @param {string} [mobileNumber] 
          * @param {string} [keyword] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async reportsControllerGetCategoriesWiseReport(academicYear?: number, mainCategory?: string, status?: string, fromDate?: string, toDate?: string, amount?: string, gender?: string, issuedTo?: string, sairamCategory?: string, institutionName?: string, parentOffice?: string, favourCategory?: string, favourGroup?: string, keyword?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerGetCategoriesWiseReport(academicYear, mainCategory, status, fromDate, toDate, amount, gender, issuedTo, sairamCategory, institutionName, parentOffice, favourCategory, favourGroup, keyword, options);
+        async reportsControllerGetApprovedFormReport(academicYear?: number, applicationNo?: string, studentId?: string, status?: string, mobileNumber?: string, keyword?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerGetApprovedFormReport(academicYear, applicationNo, studentId, status, mobileNumber, keyword, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get categories wise report
+         * @param {number} [academicYear] 
+         * @param {string} [appliedDate] 
+         * @param {string} [gender] 
+         * @param {string} [status] 
+         * @param {string} [keyword] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async reportsControllerGetCategoriesWiseReport(academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerGetCategoriesWiseReport(academicYear, appliedDate, gender, status, keyword, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4763,18 +5072,17 @@ export const ReportsApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Get scholarship issued report
-         * @param {string} [fromDate] 
-         * @param {string} [toDate] 
-         * @param {number} [institutionId] 
-         * @param {string} [strInstitution] 
-         * @param {string} [chequeInFavorType] 
+         * @param {number} [academicYear] 
+         * @param {string} [issuedDate] 
+         * @param {string} [issuedType] 
+         * @param {string} [keyword] 
          * @param {number} [intIssuedBy] 
          * @param {string} [strIssuedBy] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async reportsControllerGetScholarshipIssuedReport(fromDate?: string, toDate?: string, institutionId?: number, strInstitution?: string, chequeInFavorType?: string, intIssuedBy?: number, strIssuedBy?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerGetScholarshipIssuedReport(fromDate, toDate, institutionId, strInstitution, chequeInFavorType, intIssuedBy, strIssuedBy, options);
+        async reportsControllerGetScholarshipIssuedReport(academicYear?: number, issuedDate?: string, issuedType?: string, keyword?: string, intIssuedBy?: number, strIssuedBy?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.reportsControllerGetScholarshipIssuedReport(academicYear, issuedDate, issuedType, keyword, intIssuedBy, strIssuedBy, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -4789,6 +5097,29 @@ export const ReportsApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
+         * @summary Export report to PDF, Excel, CSV, or Word
+         * @param {string} reportType 
+         * @param {string} format 
+         * @param {number} [academicYear] 
+         * @param {string} [appliedDate] 
+         * @param {string} [gender] 
+         * @param {string} [status] 
+         * @param {string} [keyword] 
+         * @param {string} [issuedDate] 
+         * @param {string} [issuedType] 
+         * @param {number} [intIssuedBy] 
+         * @param {string} [strIssuedBy] 
+         * @param {string} [applicationNo] 
+         * @param {string} [studentId] 
+         * @param {string} [mobileNumber] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportsControllerExportReport(reportType: string, format: string, academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, issuedDate?: string, issuedType?: string, intIssuedBy?: number, strIssuedBy?: string, applicationNo?: string, studentId?: string, mobileNumber?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.reportsControllerExportReport(reportType, format, academicYear, appliedDate, gender, status, keyword, issuedDate, issuedType, intIssuedBy, strIssuedBy, applicationNo, studentId, mobileNumber, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get all academic years
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4798,7 +5129,7 @@ export const ReportsApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary Get approval form data
+         * @summary Get approval form data for a specific application
          * @param {string} applicationId 
          * @param {number} scholarshipId 
          * @param {*} [options] Override http request option.
@@ -4809,26 +5140,32 @@ export const ReportsApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary Get categories wise report
+         * @summary Get approved form report
          * @param {number} [academicYear] 
-         * @param {string} [mainCategory] 
+         * @param {string} [applicationNo] 
+         * @param {string} [studentId] 
          * @param {string} [status] 
-         * @param {string} [fromDate] 
-         * @param {string} [toDate] 
-         * @param {string} [amount] 
-         * @param {string} [gender] 
-         * @param {string} [issuedTo] 
-         * @param {string} [sairamCategory] 
-         * @param {string} [institutionName] 
-         * @param {string} [parentOffice] 
-         * @param {string} [favourCategory] 
-         * @param {string} [favourGroup] 
+         * @param {string} [mobileNumber] 
          * @param {string} [keyword] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        reportsControllerGetCategoriesWiseReport(academicYear?: number, mainCategory?: string, status?: string, fromDate?: string, toDate?: string, amount?: string, gender?: string, issuedTo?: string, sairamCategory?: string, institutionName?: string, parentOffice?: string, favourCategory?: string, favourGroup?: string, keyword?: string, options?: any): AxiosPromise<void> {
-            return localVarFp.reportsControllerGetCategoriesWiseReport(academicYear, mainCategory, status, fromDate, toDate, amount, gender, issuedTo, sairamCategory, institutionName, parentOffice, favourCategory, favourGroup, keyword, options).then((request) => request(axios, basePath));
+        reportsControllerGetApprovedFormReport(academicYear?: number, applicationNo?: string, studentId?: string, status?: string, mobileNumber?: string, keyword?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.reportsControllerGetApprovedFormReport(academicYear, applicationNo, studentId, status, mobileNumber, keyword, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get categories wise report
+         * @param {number} [academicYear] 
+         * @param {string} [appliedDate] 
+         * @param {string} [gender] 
+         * @param {string} [status] 
+         * @param {string} [keyword] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        reportsControllerGetCategoriesWiseReport(academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.reportsControllerGetCategoriesWiseReport(academicYear, appliedDate, gender, status, keyword, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4842,18 +5179,17 @@ export const ReportsApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Get scholarship issued report
-         * @param {string} [fromDate] 
-         * @param {string} [toDate] 
-         * @param {number} [institutionId] 
-         * @param {string} [strInstitution] 
-         * @param {string} [chequeInFavorType] 
+         * @param {number} [academicYear] 
+         * @param {string} [issuedDate] 
+         * @param {string} [issuedType] 
+         * @param {string} [keyword] 
          * @param {number} [intIssuedBy] 
          * @param {string} [strIssuedBy] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        reportsControllerGetScholarshipIssuedReport(fromDate?: string, toDate?: string, institutionId?: number, strInstitution?: string, chequeInFavorType?: string, intIssuedBy?: number, strIssuedBy?: string, options?: any): AxiosPromise<void> {
-            return localVarFp.reportsControllerGetScholarshipIssuedReport(fromDate, toDate, institutionId, strInstitution, chequeInFavorType, intIssuedBy, strIssuedBy, options).then((request) => request(axios, basePath));
+        reportsControllerGetScholarshipIssuedReport(academicYear?: number, issuedDate?: string, issuedType?: string, keyword?: string, intIssuedBy?: number, strIssuedBy?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.reportsControllerGetScholarshipIssuedReport(academicYear, issuedDate, issuedType, keyword, intIssuedBy, strIssuedBy, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -4867,6 +5203,31 @@ export const ReportsApiFactory = function (configuration?: Configuration, basePa
 export class ReportsApi extends BaseAPI {
     /**
      * 
+     * @summary Export report to PDF, Excel, CSV, or Word
+     * @param {string} reportType 
+     * @param {string} format 
+     * @param {number} [academicYear] 
+     * @param {string} [appliedDate] 
+     * @param {string} [gender] 
+     * @param {string} [status] 
+     * @param {string} [keyword] 
+     * @param {string} [issuedDate] 
+     * @param {string} [issuedType] 
+     * @param {number} [intIssuedBy] 
+     * @param {string} [strIssuedBy] 
+     * @param {string} [applicationNo] 
+     * @param {string} [studentId] 
+     * @param {string} [mobileNumber] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ReportsApi
+     */
+    public reportsControllerExportReport(reportType: string, format: string, academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, issuedDate?: string, issuedType?: string, intIssuedBy?: number, strIssuedBy?: string, applicationNo?: string, studentId?: string, mobileNumber?: string, options?: any) {
+        return ReportsApiFp(this.configuration).reportsControllerExportReport(reportType, format, academicYear, appliedDate, gender, status, keyword, issuedDate, issuedType, intIssuedBy, strIssuedBy, applicationNo, studentId, mobileNumber, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Get all academic years
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -4878,7 +5239,7 @@ export class ReportsApi extends BaseAPI {
 
     /**
      * 
-     * @summary Get approval form data
+     * @summary Get approval form data for a specific application
      * @param {string} applicationId 
      * @param {number} scholarshipId 
      * @param {*} [options] Override http request option.
@@ -4891,27 +5252,35 @@ export class ReportsApi extends BaseAPI {
 
     /**
      * 
-     * @summary Get categories wise report
+     * @summary Get approved form report
      * @param {number} [academicYear] 
-     * @param {string} [mainCategory] 
+     * @param {string} [applicationNo] 
+     * @param {string} [studentId] 
      * @param {string} [status] 
-     * @param {string} [fromDate] 
-     * @param {string} [toDate] 
-     * @param {string} [amount] 
-     * @param {string} [gender] 
-     * @param {string} [issuedTo] 
-     * @param {string} [sairamCategory] 
-     * @param {string} [institutionName] 
-     * @param {string} [parentOffice] 
-     * @param {string} [favourCategory] 
-     * @param {string} [favourGroup] 
+     * @param {string} [mobileNumber] 
      * @param {string} [keyword] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ReportsApi
      */
-    public reportsControllerGetCategoriesWiseReport(academicYear?: number, mainCategory?: string, status?: string, fromDate?: string, toDate?: string, amount?: string, gender?: string, issuedTo?: string, sairamCategory?: string, institutionName?: string, parentOffice?: string, favourCategory?: string, favourGroup?: string, keyword?: string, options?: any) {
-        return ReportsApiFp(this.configuration).reportsControllerGetCategoriesWiseReport(academicYear, mainCategory, status, fromDate, toDate, amount, gender, issuedTo, sairamCategory, institutionName, parentOffice, favourCategory, favourGroup, keyword, options).then((request) => request(this.axios, this.basePath));
+    public reportsControllerGetApprovedFormReport(academicYear?: number, applicationNo?: string, studentId?: string, status?: string, mobileNumber?: string, keyword?: string, options?: any) {
+        return ReportsApiFp(this.configuration).reportsControllerGetApprovedFormReport(academicYear, applicationNo, studentId, status, mobileNumber, keyword, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get categories wise report
+     * @param {number} [academicYear] 
+     * @param {string} [appliedDate] 
+     * @param {string} [gender] 
+     * @param {string} [status] 
+     * @param {string} [keyword] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ReportsApi
+     */
+    public reportsControllerGetCategoriesWiseReport(academicYear?: number, appliedDate?: string, gender?: string, status?: string, keyword?: string, options?: any) {
+        return ReportsApiFp(this.configuration).reportsControllerGetCategoriesWiseReport(academicYear, appliedDate, gender, status, keyword, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4928,19 +5297,18 @@ export class ReportsApi extends BaseAPI {
     /**
      * 
      * @summary Get scholarship issued report
-     * @param {string} [fromDate] 
-     * @param {string} [toDate] 
-     * @param {number} [institutionId] 
-     * @param {string} [strInstitution] 
-     * @param {string} [chequeInFavorType] 
+     * @param {number} [academicYear] 
+     * @param {string} [issuedDate] 
+     * @param {string} [issuedType] 
+     * @param {string} [keyword] 
      * @param {number} [intIssuedBy] 
      * @param {string} [strIssuedBy] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ReportsApi
      */
-    public reportsControllerGetScholarshipIssuedReport(fromDate?: string, toDate?: string, institutionId?: number, strInstitution?: string, chequeInFavorType?: string, intIssuedBy?: number, strIssuedBy?: string, options?: any) {
-        return ReportsApiFp(this.configuration).reportsControllerGetScholarshipIssuedReport(fromDate, toDate, institutionId, strInstitution, chequeInFavorType, intIssuedBy, strIssuedBy, options).then((request) => request(this.axios, this.basePath));
+    public reportsControllerGetScholarshipIssuedReport(academicYear?: number, issuedDate?: string, issuedType?: string, keyword?: string, intIssuedBy?: number, strIssuedBy?: string, options?: any) {
+        return ReportsApiFp(this.configuration).reportsControllerGetScholarshipIssuedReport(academicYear, issuedDate, issuedType, keyword, intIssuedBy, strIssuedBy, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

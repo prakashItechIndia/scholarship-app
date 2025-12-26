@@ -9,6 +9,7 @@ import {
   ArrowDownload24Regular,
   ChevronDown24Regular,
 } from "@fluentui/react-icons";
+import { Spinner, SpinnerSize } from "@fluentui/react";
 
 export type ExportFormat = "excel" | "word" | "pdf" | "csv";
 
@@ -43,6 +44,10 @@ export interface ExportButtonProps {
    * Disable the button
    */
   disabled?: boolean;
+  /**
+   * Show loading state with spinner
+   */
+  loading?: boolean;
 }
 
 const defaultOptions: ExportOption[] = [
@@ -78,21 +83,24 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
   buttonStyle,
   size = "medium",
   disabled = false,
+  loading = false,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const sizeConfig = sizeStyles[size];
+  const isDisabled = disabled || loading;
 
   const handleExport = (format: ExportFormat) => {
+    if (loading) return; // Prevent action during loading
     onExport(format);
     setIsOpen(false);
   };
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+    <DropdownMenu open={isOpen && !loading} onOpenChange={(open) => !loading && setIsOpen(open)}>
       <DropdownMenuTrigger>
         <button
-          disabled={disabled}
+          disabled={isDisabled}
           style={{
             backgroundColor: "#0f6cbd",
             color: "#ffffff",
@@ -102,45 +110,66 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
             padding: sizeConfig.padding,
             borderRadius: "6px",
             border: "none",
-            cursor: disabled ? "not-allowed" : "pointer",
+            cursor: isDisabled ? "not-allowed" : "pointer",
             fontSize: sizeConfig.fontSize,
             fontWeight: 500,
             fontFamily: "'Inter', sans-serif",
             height: sizeConfig.height,
-            opacity: disabled ? 0.6 : 1,
+            opacity: isDisabled ? 0.6 : 1,
             ...buttonStyle,
           }}
         >
-          <ArrowDownload24Regular
-            style={{
-              width: sizeConfig.iconSize,
-              height: sizeConfig.iconSize,
-              color: "#FFFFFF",
-            }}
-          />
-          {buttonText}
-          <ChevronDown24Regular
-            style={{
-              width: sizeConfig.iconSize,
-              height: sizeConfig.iconSize,
-              color: "#FFFFFF",
-            }}
-          />
+          {loading ? (
+            <>
+              <Spinner
+                size={SpinnerSize.small}
+                styles={{
+                  circle: {
+                    borderTopColor: "#FFFFFF",
+                    borderBottomColor: "#FFFFFF",
+                    borderLeftColor: "#FFFFFF",
+                    borderRightColor: "#FFFFFF",
+                  },
+                }}
+              />
+              <span>Exporting...</span>
+            </>
+          ) : (
+            <>
+              <ArrowDownload24Regular
+                style={{
+                  width: sizeConfig.iconSize,
+                  height: sizeConfig.iconSize,
+                  color: "#FFFFFF",
+                }}
+              />
+              {buttonText}
+              <ChevronDown24Regular
+                style={{
+                  width: sizeConfig.iconSize,
+                  height: sizeConfig.iconSize,
+                  color: "#FFFFFF",
+                }}
+              />
+            </>
+          )}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        {options.map((option) => (
-          <DropdownMenuItem
-            key={option.format}
-            onClick={() => handleExport(option.format)}
-          >
-            {option.icon && (
-              <span style={{ marginRight: "8px" }}>{option.icon}</span>
-            )}
-            {option.label}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
+      {!loading && (
+        <DropdownMenuContent>
+          {options.map((option) => (
+            <DropdownMenuItem
+              key={option.format}
+              onClick={() => handleExport(option.format)}
+            >
+              {option.icon && (
+                <span style={{ marginRight: "8px" }}>{option.icon}</span>
+              )}
+              {option.label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      )}
     </DropdownMenu>
   );
 };

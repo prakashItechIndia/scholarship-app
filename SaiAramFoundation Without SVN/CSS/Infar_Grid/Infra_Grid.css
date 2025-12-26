@@ -1,0 +1,55 @@
+﻿
+      TBODY > TR > TD.cssRegistered
+        {
+            
+            background-color: #006DCC;
+            color:White;
+        }        
+       
+      TBODY > TR > TD.cssAllocated
+        {
+            
+            background-color: #49AFCD;
+            color:White;
+        }     
+         TBODY > TR > TD.cssCancelled
+        {
+            
+            background-color: #999999;
+            color:White;
+        }         
+        
+      TBODY > TR > TD.cssSelected
+        {
+            
+            background-color: #5BB75B;
+            color:White;
+        }        
+      TBODY > TR > TD.cssRejected
+        {
+            
+            background-color: #B94A48;
+            color:White;
+        }        
+      TBODY > TR > TD.cssWaiting
+        {
+            
+             background-color: #F89406;
+             color:White;
+           
+        }        
+      TBODY > TR > TD.cssEnquired
+        {
+            
+            background-color: BlueViolet;
+            color:White;
+           
+        }       
+        .hideMyColumn
+{
+display:none;
+}
+      
+        
+  
+        #divPrint table tr td{font-size:15px;} 

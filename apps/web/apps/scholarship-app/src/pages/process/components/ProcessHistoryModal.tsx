@@ -30,6 +30,16 @@ interface HistoryItem {
     date: string;
 }
 
+// Helper function to strip HTML tags
+const stripHtmlTags = (html: string): string => {
+    if (!html) return '';
+    // Create a temporary div element
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    // Get text content and remove extra whitespace
+    return tmp.textContent || tmp.innerText || '';
+};
+
 const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
     open,
     onOpenChange,
@@ -78,11 +88,39 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
             name: "S.No.", 
             minWidth: 60, 
             maxWidth: 60, 
-            onRender: (item: HistoryItem, index: number) => (currentPage - 1) * pageSize + index + 1 
+            onRender: (item?: HistoryItem, index?: number) => {
+              const idx = index ?? 0;
+              return (currentPage - 1) * pageSize + idx + 1;
+            }
         },
-        { key: "action", name: "Action", minWidth: 150, onRender: (item: HistoryItem) => item.action },
-        { key: "processUndergone", name: "Process Undergone", minWidth: 250, onRender: (item: HistoryItem) => item.processUndergone },
-        { key: "handledBy", name: "Handled by", minWidth: 120, onRender: (item: HistoryItem) => item.handledBy },
+        { 
+            key: "action", 
+            name: "Action", 
+            minWidth: 150, 
+            // For Completed and Registered status: show processUndergone data in Action column
+            // Remove HTML tags from the text
+            onRender: (item: HistoryItem) => {
+              const text = item.processUndergone || item.action || '';
+              return stripHtmlTags(text);
+            }
+        },
+        { 
+            key: "processUndergone", 
+            name: "Process Undergone", 
+            minWidth: 250, 
+            // For Completed and Registered status: show action data in Process Undergone column
+            // Remove HTML tags from the text
+            onRender: (item: HistoryItem) => {
+              const text = item.action || item.processUndergone || '';
+              return stripHtmlTags(text);
+            }
+        },
+        { 
+            key: "handledBy", 
+            name: "Handled by", 
+            minWidth: 120, 
+            onRender: (item: HistoryItem) => item.handledBy || ''
+        },
         { key: "date", name: "Date", minWidth: 150, onRender: (item: HistoryItem) => item.date },
     ];
 
@@ -124,8 +162,8 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
                 head: [["S.No.", "Action", "Process Undergone", "Handled by", "Date"]],
                 body: allHistoryData?.map((item: HistoryItem, index: number) => [
                     index + 1,
-                    item.action || '',
-                    item.processUndergone || '',
+                    stripHtmlTags(item.processUndergone || item.action || ''), // Action column shows processUndergone data
+                    stripHtmlTags(item.action || item.processUndergone || ''), // Process Undergone column shows action data
                     item.handledBy || '',
                     item.date || '',
                 ]),
@@ -258,15 +296,19 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
                             </tr>
                         </thead>
                         <tbody>
-                            ${allHistoryData?.map((item: HistoryItem, index: number) => `
+                            ${allHistoryData?.map((item: HistoryItem, index: number) => {
+                                const actionText = stripHtmlTags(item.processUndergone || item.action || '');
+                                const processText = stripHtmlTags(item.action || item.processUndergone || '');
+                                return `
                                 <tr>
-                                    <td>${index + 1}</td>
-                                    <td>${item.action || ''}</td>
-                                    <td>${item.processUndergone || ''}</td>
-                                    <td>${item.handledBy || ''}</td>
-                                    <td>${item.date || ''}</td>
+                                <td>${index + 1}</td>
+                                <td>${actionText}</td>
+                                <td>${processText}</td>
+                                <td>${item.handledBy || ''}</td>
+                                <td>${item.date || ''}</td>
                                 </tr>
-                            `).join('')}
+                            `;
+                            }).join('')}
                         </tbody>
                     </table>
                     <div class="footer">

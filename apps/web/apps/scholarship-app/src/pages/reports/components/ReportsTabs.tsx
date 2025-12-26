@@ -17,6 +17,7 @@ interface ReportsTabsProps {
   onTabChange: (tab: ReportTab) => void;
   onExport: (format: ExportFormat) => void;
   showActions?: boolean;
+  exportLoading?: boolean;
 }
 
 const tabLabels = [
@@ -25,7 +26,7 @@ const tabLabels = [
   { value: "approved-form" as ReportTab, label: "Approved Form" },
 ];
 
-const ReportsTabs: React.FC<ReportsTabsProps> = ({ activeTab, onTabChange, onExport, showActions = false }) => {
+const ReportsTabs: React.FC<ReportsTabsProps> = ({ activeTab, onTabChange, onExport, showActions = false, exportLoading = false }) => {
   const [moreMenuOpen, setMoreMenuOpen] = React.useState(false);
 
   return (
@@ -81,6 +82,7 @@ const ReportsTabs: React.FC<ReportsTabsProps> = ({ activeTab, onTabChange, onExp
               ]}
               onExport={onExport}
               size="small"
+              loading={exportLoading}
             />
 
             <DropdownMenu open={moreMenuOpen} onOpenChange={setMoreMenuOpen}>

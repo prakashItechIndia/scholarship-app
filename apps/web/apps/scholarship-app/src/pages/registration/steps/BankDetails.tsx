@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import { z } from 'zod';
+import { Controller } from 'react-hook-form';
 import { useRegistrationForm } from '../hooks/useRegistrationForm';
 import { dropdownOptions } from '@/services/scholarship.service';
 import { StepLayout } from '../components/StepLayout';
 import { getStringValue } from '../utils/registrationHelpers';
 import { InputField, IfscCodeField, SelectField } from '../components';
+import { FormField } from '../components/FormField';
+import { Input } from '@shared/components';
 
 // --- Constants ---
 const SCHOLARSHIP_MIN_AMOUNT = 1000;
 const SCHOLARSHIP_MAX_AMOUNT = 500000;
 
 const SCHOLARSHIP_SEEKING_OPTIONS = [
-    { value: '', label: '--Select Purpose--' },
     { value: 'tuition', label: 'Tuition' },
     { value: 'books', label: 'Books' },
     { value: 'hostel', label: 'Hostel' },
@@ -35,10 +37,11 @@ const bankSchema = z.object({
         .string()
         .min(1, 'Account Name is required')
         .regex(/^[A-Za-z\s]+$/, 'Account Name must contain only alphabets and spaces'),
+    // Account Number: Must be between 8 and 18 digits and contain numeric characters only
     bankAccountNumber: z
         .string()
         .min(1, 'Account Number is required')
-        .regex(/^\d+$/, 'Account Number must contain only digits')
+        .regex(/^\d+$/, 'Account Number must contain only numeric characters')
         .min(8, 'Account Number must be at least 8 digits')
         .max(18, 'Account Number must not exceed 18 digits'),
     bankName: z.string().min(1, 'Bank Name is required'),
@@ -57,6 +60,7 @@ const bankSchema = z.object({
             }
         ),
     bankScholarshipSeekingFor: z.string().min(1, 'Scholarship Seeking For is required'),
+    // IFSC Code: Must be exactly 11 characters long and follow the format 4 letters + 0 + 6 alphanumeric characters (e.g., SBIN0001234)
     bankIfscCode: z
         .string()
         .min(1, 'IFSC Code is required')
@@ -115,13 +119,25 @@ const BankDetails = () => {
                         />
                     </div>
                     <div className="col-span-1 w-full">
-                        <InputField
+                        <Controller
                             name="bankAccountNumber"
                             control={control}
-                            errors={errors}
-                            label="Account Number"
-                            required
-                            placeholder="Enter account number (8-18 digits)"
+                            render={({ field }) => (
+                                <FormField label="Account Number" required error={errors.bankAccountNumber?.message as string}>
+                                    <Input
+                                        {...field}
+                                        placeholder="Enter account number (8-18 digits)"
+                                        errorMessage={errors.bankAccountNumber?.message as string}
+                                        onChange={(_e: React.ChangeEvent<HTMLInputElement>, value?: string) => {
+                                            // Account Number: Must be between 8 and 18 digits and contain numeric characters only
+                                            const digitsOnly = (value ?? '').replace(/\D/g, '');
+                                            if (digitsOnly.length <= 18) {
+                                                field.onChange(digitsOnly);
+                                            }
+                                        }}
+                                    />
+                                </FormField>
+                            )}
                         />
                     </div>
 

@@ -37,12 +37,13 @@ export class DropdownOptionsService {
   constructor(private readonly db: DatabaseService) {}
 
   /**
-   * Get all countries
+   * Get all countries from T_Country table
    */
   async getCountries(): Promise<DropdownOption[]> {
     try {
-      // Try different possible table names
+      // Try different possible table names (new table first, then fallback to old)
       const possibleTableNames = [
+        'T_Country',
         'tbl_country_list',
         'TBL_COUNTRY_LIST',
         'tbl_Country_List',
@@ -50,14 +51,28 @@ export class DropdownOptionsService {
 
       let result: { recordset: unknown[] } | undefined;
       let query: string;
+      let isNewTable = false;
 
       for (const tableName of possibleTableNames) {
         try {
-          query = `
-            SELECT Country_name as label, Country_ID as value
-            FROM ${tableName}
-            ORDER BY Country_name
-          `;
+          // Check if it's the new T_Country table or old table
+          if (tableName === 'T_Country') {
+            isNewTable = true;
+            query = `
+              SELECT Country_Name as label, Id as value, Country_Code
+              FROM T_Country
+              WHERE Is_Deleted = 0 OR Is_Deleted IS NULL
+              ORDER BY Country_Name
+            `;
+          } else {
+            // Old table structure
+            isNewTable = false;
+            query = `
+              SELECT Country_name as label, Country_ID as value, Country_Code
+              FROM ${tableName}
+              ORDER BY Country_name
+            `;
+          }
 
           result = (await this.db.execute('sp_ExecuteSql', {
             Statement: query,
@@ -80,25 +95,48 @@ export class DropdownOptionsService {
       }
 
       const options: DropdownOption[] = [
-        { value: '', label: '--Select Country--' },
       ];
 
       if (result.recordset && result.recordset.length > 0) {
-        for (const row of result.recordset) {
+        // Filter by India: for new table check Country_Name or Country_Code, for old table check Country_Code
+        const data = result.recordset.filter((row) => {
           const rowRecord = row as Record<string, unknown>;
-          options.push({
-            value: String(
-              getCaseInsensitiveValue(rowRecord, 'Country_ID') ||
-                getCaseInsensitiveValue(rowRecord, 'value') ||
-                '',
-            ),
-            label: String(
-              getCaseInsensitiveValue(rowRecord, 'Country_name') ||
-                getCaseInsensitiveValue(rowRecord, 'COUNTRY_NAME') ||
-                getCaseInsensitiveValue(rowRecord, 'label') ||
-                '',
-            ),
-          });
+          if (isNewTable) {
+            const countryName =
+              getCaseInsensitiveValue<string>(rowRecord, 'Country_Name') || '';
+            const countryCode =
+              getCaseInsensitiveValue<string>(rowRecord, 'Country_Code') || '';
+            return (
+              countryName.toLowerCase() === 'india' || countryCode === 'IN'
+            );
+          } else {
+            const countryCode =
+              getCaseInsensitiveValue<string>(rowRecord, 'Country_Code') || '';
+            return countryCode === 'IN';
+          }
+        });
+
+        for (const row of data) {
+          const rowRecord = row as Record<string, unknown>;
+          // Try new table structure first (Id, Country_Name), then old structure
+          const value =
+            getCaseInsensitiveValue<string>(rowRecord, 'Id') ||
+            getCaseInsensitiveValue<string>(rowRecord, 'Country_ID') ||
+            getCaseInsensitiveValue<string>(rowRecord, 'value') ||
+            '';
+          const label =
+            getCaseInsensitiveValue<string>(rowRecord, 'Country_Name') ||
+            getCaseInsensitiveValue<string>(rowRecord, 'Country_name') ||
+            getCaseInsensitiveValue<string>(rowRecord, 'COUNTRY_NAME') ||
+            getCaseInsensitiveValue<string>(rowRecord, 'label') ||
+            '';
+
+          if (value && label) {
+            options.push({
+              value: String(value),
+              label: String(label),
+            });
+          }
         }
       }
 
@@ -112,24 +150,27 @@ export class DropdownOptionsService {
 
   /**
    * Fallback countries list
+   * Note: Based on T_Country table structure, Id is int (1, 3, 4, etc.)
+   * India has Id = 1 in the database
    */
   private getCountriesFallback(): DropdownOption[] {
     return [
-      { value: '', label: '--Select Country--' },
-      { value: 'IN', label: 'India' },
-      { value: 'US', label: 'United States' },
-      { value: 'UK', label: 'United Kingdom' },
-      // Add more common countries as needed
+      { value: '1', label: 'India' }, // India has Id = 1 in T_Country table
+      { value: '3', label: 'Albania' },
+      { value: '4', label: 'Algeria' },
+      // Add more countries as needed
+      // Note: These IDs must match what's stored in the T_Country.Id column
     ];
   }
 
   /**
-   * Get states by country ID
+   * Get states by country ID from T_State table
    */
   async getStates(countryId?: string): Promise<DropdownOption[]> {
     try {
-      // Try different possible table names
+      // Try different possible table names (new table first, then fallback to old)
       const possibleTableNames = [
+        'T_State',
         'tbl_state_list',
         'TBL_STATE_LIST',
         'tbl_State_List',
@@ -140,19 +181,36 @@ export class DropdownOptionsService {
 
       for (const tableName of possibleTableNames) {
         try {
-          query = `
-            SELECT State_name as label, State_ID as value
-            FROM ${tableName}
-          `;
+          // Check if it's the new T_State table or old table
+          if (tableName === 'T_State') {
+            query = `
+              SELECT State_Name as label, Id as value
+              FROM T_State
+              WHERE (Is_Deleted = 0 OR Is_Deleted IS NULL)
+            `;
+          } else {
+            // Old table structure
+            query = `
+              SELECT State_name as label, State_ID as value
+              FROM ${tableName}
+            `;
+          }
 
           const params: Record<string, unknown> = {};
 
           if (countryId) {
-            query += ` WHERE Country_ID = @countryId`;
+            if (tableName === 'T_State') {
+              query += ` AND Country_Id = @countryId`;
+            } else {
+              query += ` WHERE Country_ID = @countryId`;
+            }
             params.countryId = countryId;
+          } else if (tableName !== 'T_State') {
+            // For old tables, add WHERE if countryId is not provided
+            query += ` WHERE 1=1`;
           }
 
-          query += ` ORDER BY State_name`;
+          query += ` ORDER BY State_Name, State_name`;
 
           result = (await this.db.execute('sp_ExecuteSql', {
             Statement: query,
@@ -176,24 +234,30 @@ export class DropdownOptionsService {
       }
 
       const options: DropdownOption[] = [
-        { value: '', label: '--Select State--' },
       ];
 
       if (result.recordset && result.recordset.length > 0) {
         for (const row of result.recordset) {
           const rowRecord = row as Record<string, unknown>;
-          options.push({
-            value: String(
-              getCaseInsensitiveValue(rowRecord, 'State_ID') ||
-                getCaseInsensitiveValue(rowRecord, 'value') ||
-                '',
-            ),
-            label: String(
-              getCaseInsensitiveValue(rowRecord, 'State_name') ||
-                getCaseInsensitiveValue(rowRecord, 'label') ||
-                '',
-            ),
-          });
+          // Try new table structure first (Id, State_Name), then old structure
+          const value =
+            getCaseInsensitiveValue<string>(rowRecord, 'Id') ||
+            getCaseInsensitiveValue<string>(rowRecord, 'State_ID') ||
+            getCaseInsensitiveValue<string>(rowRecord, 'value') ||
+            '';
+          const label =
+            getCaseInsensitiveValue<string>(rowRecord, 'State_Name') ||
+            getCaseInsensitiveValue<string>(rowRecord, 'State_name') ||
+            getCaseInsensitiveValue<string>(rowRecord, 'STATE_NAME') ||
+            getCaseInsensitiveValue<string>(rowRecord, 'label') ||
+            '';
+
+          if (value && label) {
+            options.push({
+              value: String(value),
+              label: String(label),
+            });
+          }
         }
       }
 
@@ -210,7 +274,6 @@ export class DropdownOptionsService {
    */
   private getStatesFallback(): DropdownOption[] {
     return [
-      { value: '', label: '--Select State--' },
       { value: 'TN', label: 'Tamil Nadu' },
       { value: 'KA', label: 'Karnataka' },
       { value: 'AP', label: 'Andhra Pradesh' },
@@ -278,7 +341,6 @@ export class DropdownOptionsService {
       }
 
       const options: DropdownOption[] = [
-        { value: '', label: '--Select District--' },
       ];
 
       if (result.recordset && result.recordset.length > 0) {
@@ -312,7 +374,6 @@ export class DropdownOptionsService {
    */
   private getDistrictsFallback(): DropdownOption[] {
     return [
-      { value: '', label: '--Select District--' },
       { value: 'CH', label: 'Chennai' },
       { value: 'KP', label: 'Kancheepuram' },
       { value: 'TV', label: 'Tiruvallur' },
@@ -322,13 +383,11 @@ export class DropdownOptionsService {
       // Add more districts as needed
     ];
   }
-
   /**
    * Get communities (hardcoded based on old system)
    */
   getCommunities(): Promise<DropdownOption[]> {
     return Promise.resolve([
-      { value: '', label: '--Select Community--' },
       { value: 'OC', label: 'OC' },
       { value: 'BC', label: 'BC' },
       { value: 'BCM', label: 'BCM' },
@@ -365,7 +424,6 @@ export class DropdownOptionsService {
       });
 
       const options: DropdownOption[] = [
-        { value: '', label: '--Select Caste--' },
       ];
 
       if (result.recordset && result.recordset.length > 0) {
@@ -390,7 +448,7 @@ export class DropdownOptionsService {
     } catch {
       // If table doesn't exist, return empty options
       this.logger.warn('Caste table may not exist, returning empty options');
-      return [{ value: '', label: '--Select Caste--' }];
+      return [];
     }
   }
 
@@ -410,7 +468,6 @@ export class DropdownOptionsService {
       });
 
       const options: DropdownOption[] = [
-        { value: '', label: '--Select Occupation--' },
       ];
 
       if (result.recordset && result.recordset.length > 0) {
@@ -452,7 +509,6 @@ export class DropdownOptionsService {
         'Occupation table may not exist, using fallback options',
       );
       return [
-        { value: '', label: '--Select Occupation--' },
         { value: 'government', label: 'Government Service' },
         { value: 'private', label: 'Private Sector' },
         { value: 'business', label: 'Business / Self Employed' },
@@ -474,7 +530,6 @@ export class DropdownOptionsService {
   getAnnualIncomeRanges(): Promise<DropdownOption[]> {
     // Based on common income ranges, can be moved to database if needed
     return Promise.resolve([
-      { value: '', label: '--Select Annual Income--' },
       { value: '0', label: 'No Income' },
       { value: '50000', label: 'Up to 50,000' },
       { value: '100000', label: '50,000 - 1,00,000' },
@@ -508,7 +563,6 @@ export class DropdownOptionsService {
       });
 
       const options: DropdownOption[] = [
-        { value: '', label: '--Select Bank--' },
       ];
 
       if (result.recordset && result.recordset.length > 0) {
@@ -545,7 +599,6 @@ export class DropdownOptionsService {
     } catch {
       this.logger.warn('Bank table may not exist, using fallback options');
       return [
-        { value: '', label: '--Select Bank--' },
         { value: 'sbi', label: 'State Bank of India' },
         { value: 'hdfc', label: 'HDFC Bank' },
         { value: 'icici', label: 'ICICI Bank' },
@@ -583,7 +636,6 @@ export class DropdownOptionsService {
       });
 
       const options: DropdownOption[] = [
-        { value: '', label: '--Select Branch--' },
       ];
 
       if (result.recordset && result.recordset.length > 0) {
@@ -609,7 +661,7 @@ export class DropdownOptionsService {
       this.logger.warn(
         'Bank branch table may not exist, returning empty options',
       );
-      return [{ value: '', label: '--Select Branch--' }];
+      return [];
     }
   }
 
@@ -620,7 +672,6 @@ export class DropdownOptionsService {
     // Based on the old system: School, College, Research
     // Can be moved to database if needed
     return Promise.resolve([
-      { value: '', label: '--Select Applicant Category--' },
       {
         value: 'Research',
         label: 'I am a Research Scholar seeking Scholarship',

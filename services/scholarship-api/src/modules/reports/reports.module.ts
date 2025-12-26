@@ -10,4 +10,3 @@ import { DatabaseModule } from '../../database';
   exports: [ReportsService],
 })
 export class ReportsModule {}
-

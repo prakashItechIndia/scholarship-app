@@ -28,11 +28,17 @@ const schema = z
       .refine((val) => val.length <= 16, {
         message: 'Password cannot exceed 16 characters',
       })
-      .refine((val) => /[a-zA-Z]/.test(val), {
-        message: 'Password must contain at least one letter (a-z, A-Z)',
+      .refine((val) => /[A-Z]/.test(val), {
+        message: 'Password must contain at least one uppercase letter (A-Z)',
+      })
+      .refine((val) => /[a-z]/.test(val), {
+        message: 'Password must contain at least one lowercase letter (a-z)',
       })
       .refine((val) => /[0-9]/.test(val), {
-        message: 'Password must contain at least one number (0-9)',
+        message: 'Password must contain at least one digit (0-9)',
+      })
+      .refine((val) => /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(val), {
+        message: 'Password must contain at least one special character',
       }),
     confirmPassword: z.string().default(''),
   })
@@ -171,7 +177,7 @@ const CreatePasswordPage = () => {
       />
       <AuthWrapper
         title="Create Your Password"
-        subtitle="Create a secure password (8-16 characters) with at least one letter (a-z, A-Z) and one number (0-9). Special characters are allowed but not required."
+        subtitle="Create a secure password (8-16 characters) with at least one uppercase letter, one lowercase letter, one digit (0-9), and one special character."
       >
         <Form {...form}>
           <form

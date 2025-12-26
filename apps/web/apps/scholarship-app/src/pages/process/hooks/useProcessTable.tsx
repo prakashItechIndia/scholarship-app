@@ -33,6 +33,10 @@ interface UseProcessTableProps {
   sortField?: SortField;
   sortOrder?: SortOrder;
   onSort?: (field: string) => void;
+  selectedRows?: Set<string>;
+  onRowSelect?: (item: ApplicationData, selected: boolean) => void;
+  onSelectAll?: (selected: boolean) => void;
+  data?: ApplicationData[];
 }
 
 export const useProcessTable = ({
@@ -51,6 +55,10 @@ export const useProcessTable = ({
   sortField,
   sortOrder,
   onSort,
+  selectedRows = new Set(),
+  onRowSelect,
+  onSelectAll,
+  data = [],
 }: UseProcessTableProps) => {
   const getColumnsForTab = React.useCallback((tab: string) => {
     const baseColumns = [
@@ -61,20 +69,45 @@ export const useProcessTable = ({
         minWidth: 48,
         maxWidth: 48,
         isSortable: false,
-        onRenderHeader: () => (
+        onRenderHeader: () => {
+          const allSelected = data.length > 0 && selectedRows.size === data.length;
+          const someSelected = selectedRows.size > 0 && selectedRows.size < data.length;
+          return (
+            <input
+              type="checkbox"
+              checked={allSelected}
+              ref={(input) => {
+                if (input) {
+                  input.indeterminate = someSelected;
+                }
+              }}
+              onChange={(e) => {
+                e.stopPropagation();
+                if (onSelectAll) {
+                  onSelectAll(e.target.checked);
+                }
+              }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                width: "16px",
+                height: "16px",
+                cursor: "pointer",
+                accentColor: "#0f6cbd",
+              }}
+            />
+          );
+        },
+        onRender: (item: ApplicationData) => (
           <input
             type="checkbox"
-            style={{
-              width: "16px",
-              height: "16px",
-              cursor: "pointer",
-              accentColor: "#0f6cbd",
+            checked={selectedRows.has(item.applicationNo)}
+            onChange={(e) => {
+              e.stopPropagation();
+              if (onRowSelect) {
+                onRowSelect(item, e.target.checked);
+              }
             }}
-          />
-        ),
-        onRender: () => (
-          <input
-            type="checkbox"
+            onClick={(e) => e.stopPropagation()}
             style={{
               width: "16px",
               height: "16px",
@@ -142,7 +175,7 @@ export const useProcessTable = ({
       const menuItemScholarshipHistory = (
         <DropdownMenuItem
           icon={<HatGraduationRegular style={{ width: "16px", height: "16px" }} />}
-          label="Scholarship History"
+          label="View Document"
           onClick={() => handleViewScholarshipHistory && handleViewScholarshipHistory(item)}
           style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
         />
@@ -173,9 +206,11 @@ export const useProcessTable = ({
         }
         // "Documents Submitted" or "Pending" will fall through to PDF viewer
       } else if (activeTab === "suggest") {
-        // User said: "sugges 1 and suggest 2 should have View hisgtory,scholrship hstory,view documets"
-        // User also said statuses are "Verified" and "Completed" in suggest page.
-        if (status === "Verified" || status === "Completed") {
+        // For Process = "Suggest1" or "Suggest2", show View History, Scholarship History, View Document
+        const processLabel = item.processActionLabel || "";
+        if (processLabel === "Suggest 1" || processLabel === "Suggest1" || processLabel === "Suggest 2" || processLabel === "Suggest2") {
+          menuItems = [menuItemViewHistory, menuItemScholarshipHistory, menuItemViewDocuments];
+        } else if (status === "Verified" || status === "Completed") {
           menuItems = [menuItemViewHistory, menuItemScholarshipHistory, menuItemViewDocuments];
         }
       } else if (activeTab === "approve") {
@@ -697,10 +732,30 @@ export const useProcessTable = ({
 
       case "documents":
         // BRD Section 7.3.4.2: Documents Sub-Module Table Columns
-        // Required columns: Class Studying, Institution Name, Father Annual Income, 
+        // Required columns: Application Number, Student Name, Class Studying, Institution Name, Father Annual Income, 
         // Mobile Number, Father Occupation, Scholarship, Status, Action
         return [
           ...baseColumns, // Checkbox (BRD allows checkbox for bulk operations)
+          {
+            key: "applicationNo",
+            name: "Application No.",
+            fieldName: "applicationNo",
+            minWidth: 160,
+            isResizable: true,
+            isSortable: true,
+            onRenderHeader: () => createSortableHeader("Application No.", "Application_Id"),
+            onRender: renderApplicationNo,
+          },
+          {
+            key: "studentName",
+            name: "Student Name",
+            fieldName: "studentName",
+            minWidth: 180,
+            isResizable: true,
+            isSortable: true,
+            onRenderHeader: () => createSortableHeader("Student Name", "Applicant_Name"),
+            onRender: (item: ApplicationData) => renderText(item.studentName, item),
+          },
           {
             key: "classStudying",
             name: "Class Studying",
@@ -990,6 +1045,10 @@ export const useProcessTable = ({
     sortField,
     sortOrder,
     onSort,
+    selectedRows,
+    onRowSelect,
+    onSelectAll,
+    data,
   ]);
 
   const columns = React.useMemo(

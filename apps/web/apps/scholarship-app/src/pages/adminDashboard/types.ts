@@ -22,7 +22,7 @@ export interface ScholarshipDistributionData {
   month: string;
   meritExcellence: number;
   stemInnovation: number;
-  concessions: number;
+  achievement: number;
   sports: number;
 }
 

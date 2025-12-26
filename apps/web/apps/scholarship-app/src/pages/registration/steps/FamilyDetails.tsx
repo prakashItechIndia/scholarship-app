@@ -12,26 +12,91 @@ const familySchema = z.object({
     fullName: z.string().min(1, 'Applicant Name is required'),
     studentId: z.string().optional(),
 
-    // Father
-    fatherName: z.string().min(1, 'Father Name is required'),
-    fatherOccupation: z.string().min(1, 'Occupation is required'),
+    // Father - Optional if Guardian is provided
+    fatherName: z.string().optional(),
+    fatherOccupation: z.string().optional(),
     fatherDesignation: z.string().optional(),
     fatherOrganization: z.string().optional(),
-    fatherIncome: z.string().min(1, 'Annual Income is required'),
+    fatherIncome: z.string().optional(),
 
-    // Mother
-    motherName: z.string().min(1, 'Mother Name is required'),
-    motherOccupation: z.string().min(1, 'Occupation is required'),
+    // Mother - Optional if Guardian is provided
+    motherName: z.string().optional(),
+    motherOccupation: z.string().optional(),
     motherDesignation: z.string().optional(),
     motherOrganization: z.string().optional(),
-    motherIncome: z.string().min(1, 'Annual Income is required'),
+    motherIncome: z.string().optional(),
 
-    // Guardian (Optional initially, or enforce if selected?) - Making optional for now as not everyone has one
+    // Guardian - Optional, but if provided, Father/Mother become optional
     guardianName: z.string().optional(),
     guardianOccupation: z.string().optional(),
     guardianDesignation: z.string().optional(),
     guardianOrganization: z.string().optional(),
     guardianIncome: z.string().optional(),
+}).superRefine((data, ctx) => {
+    // If Guardian is provided, Father/Mother are optional
+    const hasGuardian = data.guardianName && data.guardianName.trim() !== '';
+    
+    if (!hasGuardian) {
+        // If no Guardian, Father and Mother are required
+        if (!data.fatherName || data.fatherName.trim() === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Father Name is required when Guardian is not provided',
+                path: ['fatherName'],
+            });
+        }
+        if (!data.fatherOccupation || data.fatherOccupation.trim() === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Father Occupation is required when Guardian is not provided',
+                path: ['fatherOccupation'],
+            });
+        }
+        if (!data.fatherIncome || data.fatherIncome.trim() === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Father Annual Income is required when Guardian is not provided',
+                path: ['fatherIncome'],
+            });
+        }
+        if (!data.motherName || data.motherName.trim() === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Mother Name is required when Guardian is not provided',
+                path: ['motherName'],
+            });
+        }
+        if (!data.motherOccupation || data.motherOccupation.trim() === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Mother Occupation is required when Guardian is not provided',
+                path: ['motherOccupation'],
+            });
+        }
+        if (!data.motherIncome || data.motherIncome.trim() === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Mother Annual Income is required when Guardian is not provided',
+                path: ['motherIncome'],
+            });
+        }
+    } else {
+        // If Guardian is provided, Guardian details should be complete
+        if (!data.guardianOccupation || data.guardianOccupation.trim() === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Guardian Occupation is required',
+                path: ['guardianOccupation'],
+            });
+        }
+        if (!data.guardianIncome || data.guardianIncome.trim() === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Guardian Annual Income is required',
+                path: ['guardianIncome'],
+            });
+        }
+    }
 });
 
 
@@ -131,7 +196,6 @@ const FamilyDetails = () => {
                             control={control}
                             errors={errors}
                             label="Name"
-                            required
                             placeholder="Enter father name"
                         />
                     </div>
@@ -141,7 +205,6 @@ const FamilyDetails = () => {
                             control={control}
                             errors={errors}
                             label="Occupation"
-                            required
                             options={occupationOptions}
                             placeholder="Select"
                         />
@@ -170,7 +233,6 @@ const FamilyDetails = () => {
                             control={control}
                             errors={errors}
                             label="Annual Income"
-                            required
                             options={incomeOptions}
                             placeholder="Select"
                         />
@@ -186,7 +248,6 @@ const FamilyDetails = () => {
                             control={control}
                             errors={errors}
                             label="Name"
-                            required
                             placeholder="Enter mother name"
                         />
                     </div>
@@ -196,7 +257,6 @@ const FamilyDetails = () => {
                             control={control}
                             errors={errors}
                             label="Occupation"
-                            required
                             options={occupationOptions}
                             placeholder="Select"
                         />
@@ -225,7 +285,6 @@ const FamilyDetails = () => {
                             control={control}
                             errors={errors}
                             label="Annual Income"
-                            required
                             options={incomeOptions}
                             placeholder="Select"
                         />

@@ -165,7 +165,6 @@ export const issuedTypeOptions = [
 
 // Main Category options for Categories Report
 export const mainCategoryOptions = [
-  { value: "", label: "--Select--" },
   { value: "Applied Date", label: "Applied Date" },
   { value: "Amount", label: "Amount" },
   { value: "Gender", label: "Gender" },
@@ -179,7 +178,6 @@ export const mainCategoryOptions = [
 
 // Amount options
 export const amountOptions = [
-  { value: "", label: "--Select--" },
   { value: "Below 5000", label: "Below 5000" },
   { value: "5000-10000", label: "5000-10000" },
   { value: "10000-20000", label: "10000-20000" },
@@ -189,7 +187,6 @@ export const amountOptions = [
 
 // Issued To options
 export const issuedToOptions = [
-  { value: "", label: "--Select--" },
   { value: "All", label: "All" },
   { value: "College", label: "College" },
   { value: "Research", label: "Research" },
@@ -257,7 +254,6 @@ export const favourGroupOptions = [
 
 // Main Category options for Scholarship Issued Report
 export const scholarshipIssuedMainCategoryOptions = [
-  { value: "", label: "--Select--" },
   { value: "Issued By", label: "Issued By" },
   { value: "Issued Date", label: "Issued Date" },
 ];

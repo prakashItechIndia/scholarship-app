@@ -28,6 +28,8 @@ export class ProcessManagementController {
   @ApiQuery({ name: 'academicYearId', required: false, type: Number })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'pageSize', required: false, type: Number })
+  @ApiQuery({ name: 'sortField', required: false })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['asc', 'desc'] })
   async getOverviewApplications(
     @Query('mainCategory') mainCategory?: string,
     @Query('key') key?: string,
@@ -38,6 +40,8 @@ export class ProcessManagementController {
     academicYearId?: number,
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('sortField') sortField?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
     return this.processService.getOverviewApplications({
       mainCategory,
@@ -49,6 +53,8 @@ export class ProcessManagementController {
       tab: 'overview',
       page,
       pageSize,
+      sortField,
+      sortOrder,
     });
   }
 
@@ -60,6 +66,8 @@ export class ProcessManagementController {
   @ApiQuery({ name: 'academicYearId', required: false, type: Number })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'pageSize', required: false, type: Number })
+  @ApiQuery({ name: 'sortField', required: false })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['asc', 'desc'] })
   async getDocumentsApplications(
     @Query('mainCategory') mainCategory?: string,
     @Query('key') key?: string,
@@ -67,6 +75,8 @@ export class ProcessManagementController {
     academicYearId?: number,
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('sortField') sortField?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
     return this.processService.getDocumentsApplications({
       mainCategory,
@@ -75,6 +85,8 @@ export class ProcessManagementController {
       tab: 'documents',
       page,
       pageSize,
+      sortField,
+      sortOrder,
     });
   }
 
@@ -86,6 +98,8 @@ export class ProcessManagementController {
   @ApiQuery({ name: 'academicYearId', required: false, type: Number })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'pageSize', required: false, type: Number })
+  @ApiQuery({ name: 'sortField', required: false })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['asc', 'desc'] })
   async getVerifyApplications(
     @Query('mainCategory') mainCategory?: string,
     @Query('key') key?: string,
@@ -93,6 +107,8 @@ export class ProcessManagementController {
     academicYearId?: number,
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('sortField') sortField?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
     return this.processService.getVerifyApplications({
       mainCategory,
@@ -101,6 +117,8 @@ export class ProcessManagementController {
       tab: 'verify',
       page,
       pageSize,
+      sortField,
+      sortOrder,
     });
   }
 
@@ -112,6 +130,8 @@ export class ProcessManagementController {
   @ApiQuery({ name: 'academicYearId', required: false, type: Number })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'pageSize', required: false, type: Number })
+  @ApiQuery({ name: 'sortField', required: false })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['asc', 'desc'] })
   async getSuggestApplications(
     @Query('mainCategory') mainCategory?: string,
     @Query('key') key?: string,
@@ -119,6 +139,8 @@ export class ProcessManagementController {
     academicYearId?: number,
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('sortField') sortField?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
     return this.processService.getSuggestApplications({
       mainCategory,
@@ -127,6 +149,8 @@ export class ProcessManagementController {
       tab: 'suggest',
       page,
       pageSize,
+      sortField,
+      sortOrder,
     });
   }
 
@@ -138,6 +162,8 @@ export class ProcessManagementController {
   @ApiQuery({ name: 'academicYearId', required: false, type: Number })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'pageSize', required: false, type: Number })
+  @ApiQuery({ name: 'sortField', required: false })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['asc', 'desc'] })
   async getApproveApplications(
     @Query('mainCategory') mainCategory?: string,
     @Query('key') key?: string,
@@ -145,6 +171,8 @@ export class ProcessManagementController {
     academicYearId?: number,
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('sortField') sortField?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
     return this.processService.getApproveApplications({
       mainCategory,
@@ -153,6 +181,8 @@ export class ProcessManagementController {
       tab: 'approve',
       page,
       pageSize,
+      sortField,
+      sortOrder,
     });
   }
 
@@ -164,6 +194,8 @@ export class ProcessManagementController {
   @ApiQuery({ name: 'academicYearId', required: false, type: Number })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'pageSize', required: false, type: Number })
+  @ApiQuery({ name: 'sortField', required: false })
+  @ApiQuery({ name: 'sortOrder', required: false, enum: ['asc', 'desc'] })
   async getIssueAmountApplications(
     @Query('mainCategory') mainCategory?: string,
     @Query('key') key?: string,
@@ -171,6 +203,8 @@ export class ProcessManagementController {
     academicYearId?: number,
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('sortField') sortField?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
   ) {
     return this.processService.getIssueAmountApplications({
       mainCategory,
@@ -179,6 +213,8 @@ export class ProcessManagementController {
       tab: 'issue-amount',
       page,
       pageSize,
+      sortField,
+      sortOrder,
     });
   }
 

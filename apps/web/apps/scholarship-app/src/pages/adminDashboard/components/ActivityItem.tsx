@@ -1,10 +1,12 @@
 import * as React from "react";
+import { VectorIcon } from "@shared/components";
 
 interface ActivityItemProps {
   name: string;
   action: string;
   timestamp: string;
   color: string;
+  border:string
 }
 
 export const ActivityItem: React.FC<ActivityItemProps> = ({
@@ -12,10 +14,8 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
   action,
   timestamp,
   color,
+  border
 }) => {
-  // Get first letter of name for avatar
-  const firstLetter = name.charAt(0).toUpperCase();
-
   return (
     <div
       style={{
@@ -23,27 +23,30 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
         alignItems: "center",
         gap: "12px",
         padding: "12px",
-        backgroundColor: `${color}15`,
-        borderRadius: "8px",
+        backgroundColor: `${color}`,
+        borderRadius: "4px",
+        border:border,
+        height:"80px"
       }}
     >
       <div
         style={{
-          width: "40px",
-          height: "40px",
-          borderRadius: "50%",
-          backgroundColor: color,
+          width: "32px",
+          height: "32px",
+          borderRadius: "20%",
+          backgroundColor: "#FFFFFF",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           flexShrink: 0,
-          color: "#ffffff",
-          fontSize: "16px",
-          fontWeight: 600,
-          fontFamily: "'Inter', sans-serif",
+          // boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
         }}
       >
-        {firstLetter}
+        <VectorIcon
+          width="18px"
+          height="18px"
+          fill="#242424"
+        />
       </div>
       <div
         style={{
@@ -61,16 +64,35 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
             fontFamily: "'Inter', sans-serif",
           }}
         >
-          {name}: {action}
+          {name}
         </div>
         <div
           style={{
-            fontSize: "12px",
-            color: "#616161",
-            fontFamily: "'Inter', sans-serif",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "8px",
           }}
         >
-          {timestamp}
+          <div
+            style={{
+              fontSize: "12px",
+              color: "#616161",
+              fontFamily: "'Inter', sans-serif",
+            }}
+          >
+            {action}
+          </div>
+          <div
+            style={{
+              fontSize: "11px",
+              color: "#9ca3af",
+              fontFamily: "'Inter', sans-serif",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {timestamp}
+          </div>
         </div>
       </div>
     </div>

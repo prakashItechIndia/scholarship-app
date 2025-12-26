@@ -6,7 +6,6 @@ import {
   Card,
 } from "@shared/components";
 import { ScholarshipReportData, ReportFilters, ReportTab } from "./types";
-import { mockScholarshipData } from "./constants";
 import ReportsTabs from "./components/ReportsTabs";
 import ReportsFilters from "./components/ReportsFilters";
 import EmptyState from "./components/EmptyState";
@@ -14,6 +13,7 @@ import { useReportsTable } from "./hooks/useReportsTable";
 import PrintDetailsModal from "../process/components/PrintDetailsModal";
 import { reports } from "../../services/scholarship.service";
 import { useToast } from "@/components/ui/toast";
+import { useActionLoading } from "@/hooks";
 
 const ReportsPage: React.FC = () => {
   const { success, error: showError } = useToast();
@@ -27,6 +27,12 @@ const ReportsPage: React.FC = () => {
     gender: undefined,
     status: undefined,
     keywordSearch: "",
+    issuedBy: undefined,
+    issuedDate: null,
+    issuedType: undefined,
+    applicationNo: "",
+    studentId: "",
+    mobileNumber: "",
   });
   const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set());
   const [hasAppliedFilters, setHasAppliedFilters] = React.useState(false);
@@ -34,6 +40,9 @@ const ReportsPage: React.FC = () => {
   const [reportData, setReportData] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  
+  // Loading state for export action
+  const { loading: exportLoading, execute: executeExport } = useActionLoading();
 
   // Print Modal State
   const [printModalOpen, setPrintModalOpen] = React.useState(false);
@@ -67,72 +76,37 @@ const ReportsPage: React.FC = () => {
       let data: any[] = [];
 
       if (activeTab === "categories-wise") {
-        const apiFilters: any = {
-          academicYear: filters.academicYear ? Number(filters.academicYear) : undefined,
-          mainCategory: filters.mainCategory,
-          status: filters.status,
-          fromDate: formatDateForAPI(filters.fromDate),
-          toDate: formatDateForAPI(filters.toDate),
-          amount: filters.amount,
-          gender: filters.gender,
-          issuedTo: filters.issuedTo,
-          sairamCategory: filters.sairamCategory,
-          institutionName: filters.institutionName,
-          parentOffice: filters.parentOffice,
-          favourCategory: filters.favourCategory,
-          favourGroup: filters.favourGroup,
-          keyword: filters.keyword || filters.keywordSearch,
+        // Categories Wise Report filters: Academic Year, Applied Date, Gender, Status, Keyword Search
+        const apiFilters: Record<string, unknown> = {
+          ...(filters.academicYear && { academicYear: filters.academicYear }),
+          ...(filters.appliedDate && { appliedDate: formatDateForAPI(filters.appliedDate) }),
+          ...(filters.gender && { gender: filters.gender }),
+          ...(filters.status && { status: filters.status }),
+          ...(filters.keywordSearch && { keyword: filters.keywordSearch }),
         };
-
-        // Remove undefined values
-        Object.keys(apiFilters).forEach(key => {
-          if (apiFilters[key] === undefined || apiFilters[key] === null || apiFilters[key] === '') {
-            delete apiFilters[key];
-          }
-        });
 
         data = await reports.getCategoriesWiseReport(apiFilters);
       } else if (activeTab === "scholarship-issued") {
-        // For scholarship issued report, follow old app logic:
-        // - Convert dates from DD/MM/YYYY format (frontend) to MM/DD/YYYY (stored procedure expects this)
-        // - Always pass all parameters (even if null/empty) - stored procedure handles null values
-        // - If date is not provided, pass null (backend will handle it)
-        const apiFilters: any = {
-          fromDate: formatDateForAPI(filters.fromDate) || null, // Convert to DD/MM/YYYY or null
-          toDate: formatDateForAPI(filters.toDate) || null, // Convert to DD/MM/YYYY or null
-          institutionId: filters.institutionId || null,
-          strInstitution: filters.strInstitution || null,
-          chequeInFavorType: filters.chequeInFavorType || null,
-          intIssuedBy: filters.intIssuedBy || null,
-          strIssuedBy: filters.strIssuedBy || null,
+        // Report of Scholarship Issued filters: Academic Year, Issued By, Issued Date, Issued Type, Keyword Search
+        const apiFilters: Record<string, unknown> = {
+          ...(filters.academicYear && { academicYear: filters.academicYear }),
+          ...(filters.issuedDate && { issuedDate: formatDateForAPI(filters.issuedDate) }),
+          ...(filters.issuedType && { issuedType: filters.issuedType }),
+          ...(filters.keywordSearch && { keyword: filters.keywordSearch }),
+          // Use internal fields for API
+          ...(filters.intIssuedBy !== undefined && { intIssuedBy: filters.intIssuedBy }),
+          ...(filters.strIssuedBy && { strIssuedBy: filters.strIssuedBy }),
         };
-
-        // Don't remove null/empty values - stored procedure expects all parameters
-        // Just remove undefined values
-        Object.keys(apiFilters).forEach(key => {
-          if (apiFilters[key] === undefined) {
-            delete apiFilters[key];
-          }
-        });
 
         data = await reports.getScholarshipIssuedReport(apiFilters);
       } else if (activeTab === "approved-form") {
-        // For approved form, use the categories report with status = "Approved"
-        // The backend will normalize the status to handle case-insensitive comparison
-        // Note: USP_GetReportApproved_Waiting_Status doesn't support keyword filtering
-        // If keyword is provided, we'll need to filter client-side after fetching
-        const apiFilters: any = {
-          academicYear: filters.academicYear ? Number(filters.academicYear) : undefined,
-          status: filters.status || "Approved", // Default to "Approved" if not specified
-          // Don't pass keyword to the stored procedure - it doesn't support it
+        // Approved Form filters: Academic Year, Application No., Student ID, Status, Mobile No., Keyword Search
+        // Note: Some filters may need client-side filtering as the API might not support all fields
+        const apiFilters: Record<string, unknown> = {
+          ...(filters.academicYear && { academicYear: filters.academicYear }),
+          ...(filters.status && { status: filters.status }),
+          // Application No, Student ID, Mobile No may need client-side filtering
         };
-
-        // Remove undefined values
-        Object.keys(apiFilters).forEach(key => {
-          if (apiFilters[key] === undefined || apiFilters[key] === null || apiFilters[key] === '') {
-            delete apiFilters[key];
-          }
-        });
 
         data = await reports.getCategoriesWiseReport(apiFilters);
       }
@@ -171,8 +145,18 @@ const ReportsPage: React.FC = () => {
     // Apply keyword search on client side if needed
     let data = [...reportData];
 
+    // Apply client-side keyword search filtering for all tabs
+    if (filters.keywordSearch) {
+      const searchTerm = filters.keywordSearch.toLowerCase();
+      data = data.filter((item) =>
+        Object.values(item).some((value) =>
+          String(value).toLowerCase().includes(searchTerm)
+        )
+      );
+    }
+
     // For Approved Form tab, apply client-side filtering for applicationNo, studentId, mobileNumber
-    // since USP_GetReportApproved_Waiting_Status doesn't support keyword filtering
+    // since the API might not support all these fields directly
     if (activeTab === "approved-form") {
       if (filters.applicationNo) {
         const searchTerm = filters.applicationNo.toLowerCase();
@@ -195,26 +179,10 @@ const ReportsPage: React.FC = () => {
           return mobile.includes(searchTerm);
         });
       }
-      // Also apply general keyword search if provided
-      if (filters.keyword || filters.keywordSearch) {
-        const searchTerm = (filters.keyword || filters.keywordSearch || "").toLowerCase();
-        data = data.filter((item) =>
-          Object.values(item).some((value) =>
-            String(value).toLowerCase().includes(searchTerm)
-          )
-        );
-      }
-    } else if (filters.keyword || filters.keywordSearch) {
-      const searchTerm = (filters.keyword || filters.keywordSearch || "").toLowerCase();
-      data = data.filter((item) =>
-        Object.values(item).some((value) =>
-          String(value).toLowerCase().includes(searchTerm)
-        )
-      );
     }
 
     return data;
-  }, [reportData, activeTab, filters.applicationNo, filters.studentId, filters.mobileNumber, filters.keyword, filters.keywordSearch, hasAppliedFilters, loading]);
+  }, [reportData, activeTab, filters.applicationNo, filters.studentId, filters.mobileNumber, filters.keywordSearch, hasAppliedFilters, loading]);
 
   // Helper to get application number from any data type
   const getApplicationNo = (item: any): string => {
@@ -307,9 +275,11 @@ const ReportsPage: React.FC = () => {
       gender: undefined,
       status: undefined,
       keywordSearch: "",
-      issuedBy: "",
+      issuedBy: undefined,
       issuedDate: null,
       issuedType: undefined,
+      intIssuedBy: undefined,
+      strIssuedBy: undefined,
       applicationNo: "",
       studentId: "",
       mobileNumber: "",
@@ -320,81 +290,81 @@ const ReportsPage: React.FC = () => {
   }, []);
 
   const handleExport = React.useCallback(async (format: "excel" | "pdf" | "csv" | "word") => {
-    try {
-      setLoading(true);
-      setError(null);
+    await executeExport(async () => {
+      try {
+        setError(null);
 
-      let blob: Blob;
-      let filename: string;
+      let blob: Blob | null = null;
+      let filename = "";
 
-      if (format === "csv") {
-        // CSV export - convert data to CSV format (client-side)
+      // Prepare filters for export
+      let exportFilters: Record<string, unknown> = {};
+      let reportType: 'categories' | 'scholarship-issued' | 'approved-form';
+
+      if (activeTab === "categories-wise") {
+        reportType = "categories";
+        exportFilters = {
+          ...(filters.academicYear && { academicYear: filters.academicYear }),
+          ...(filters.appliedDate && { appliedDate: formatDateForAPI(filters.appliedDate) }),
+          ...(filters.gender && { gender: filters.gender }),
+          ...(filters.status && { status: filters.status }),
+          ...(filters.keywordSearch && { keyword: filters.keywordSearch }),
+        };
+      } else if (activeTab === "scholarship-issued") {
+        reportType = "scholarship-issued";
+        exportFilters = {
+          ...(filters.academicYear && { academicYear: filters.academicYear }),
+          ...(filters.issuedDate && { issuedDate: formatDateForAPI(filters.issuedDate) }),
+          ...(filters.issuedType && { issuedType: filters.issuedType }),
+          ...(filters.keywordSearch && { keyword: filters.keywordSearch }),
+          ...(filters.intIssuedBy !== undefined && { intIssuedBy: filters.intIssuedBy }),
+          ...(filters.strIssuedBy && { strIssuedBy: filters.strIssuedBy }),
+        };
+      } else {
+        reportType = "approved-form";
+        exportFilters = {
+          ...(filters.academicYear && { academicYear: filters.academicYear }),
+          ...(filters.applicationNo && { applicationNo: filters.applicationNo }),
+          ...(filters.studentId && { studentId: filters.studentId }),
+          ...(filters.status && { status: filters.status }),
+          ...(filters.mobileNumber && { mobileNumber: filters.mobileNumber }),
+          ...(filters.keywordSearch && { keyword: filters.keywordSearch }),
+        };
+      }
+
+      // Determine filename based on format
+      const reportName = reportType === "categories" 
+        ? "ScholarshipCategorieswiseReport"
+        : reportType === "scholarship-issued"
+        ? "ScholarshipIssuedReport"
+        : "ApprovedFormReport";
+
+      // Use backend export endpoint for all formats (supports up to 100,000 records)
+      try {
+        blob = await reports.exportReport(reportType, format, exportFilters);
+        
+        if (format === "pdf") {
+          filename = `${reportName}.pdf`;
+        } else if (format === "excel") {
+          filename = `${reportName}.xlsx`;
+        } else if (format === "csv") {
+          filename = `${reportName}.csv`;
+        } else if (format === "word") {
+          filename = `${reportName}.docx`;
+        } else {
+          filename = `${reportName}.${format}`;
+        }
+      } catch (exportError: unknown) {
+        // Fallback to client-side CSV if backend fails
+        console.warn("Backend export failed, using client-side CSV export:", exportError);
         const csvContent = convertToCSV(filteredData);
         blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        filename = `ScholarshipReport_${new Date().toISOString().split('T')[0]}.csv`;
-      } else {
-        // Prepare filters for export
-        let exportFilters: any = {};
+        filename = `${reportName}_${new Date().toISOString().split('T')[0]}.csv`;
+        format = "csv"; // Update format for success message
+      }
 
-        if (activeTab === "categories-wise") {
-          exportFilters = {
-            academicYear: filters.academicYear ? Number(filters.academicYear) : undefined,
-            mainCategory: filters.mainCategory,
-            status: filters.status,
-            fromDate: formatDateForAPI(filters.fromDate),
-            toDate: formatDateForAPI(filters.toDate),
-            amount: filters.amount,
-            gender: filters.gender,
-            issuedTo: filters.issuedTo,
-            sairamCategory: filters.sairamCategory,
-            institutionName: filters.institutionName,
-            parentOffice: filters.parentOffice,
-            favourCategory: filters.favourCategory,
-            favourGroup: filters.favourGroup,
-            keyword: filters.keyword || filters.keywordSearch,
-          };
-        } else if (activeTab === "scholarship-issued") {
-          exportFilters = {
-            fromDate: formatDateForAPI(filters.fromDate),
-            toDate: formatDateForAPI(filters.toDate),
-            institutionId: filters.institutionId,
-            strInstitution: filters.strInstitution,
-            chequeInFavorType: filters.chequeInFavorType,
-            intIssuedBy: filters.intIssuedBy,
-            strIssuedBy: filters.strIssuedBy,
-    };
-        }
-
-        // Remove undefined values
-        Object.keys(exportFilters).forEach(key => {
-          if (exportFilters[key] === undefined || exportFilters[key] === null || exportFilters[key] === '') {
-            delete exportFilters[key];
-          }
-        });
-
-        // Try to export from backend, fallback to client-side if not available
-        try {
-          if (format === "excel") {
-            blob = await reports.exportToExcel(activeTab === "categories-wise" ? "categories" : "scholarship-issued", exportFilters);
-            filename = `ScholarshipCategorieswiseReport.xls`;
-          } else {
-            blob = await reports.exportToPdf(activeTab === "categories-wise" ? "categories" : "scholarship-issued", exportFilters);
-            filename = `ScholarshipCategorieswiseReport.pdf`;
-          }
-        } catch (exportError: any) {
-          // If backend export fails, use client-side export for Excel/PDF
-          console.warn("Backend export not available, using client-side export:", exportError);
-    if (format === "excel") {
-            const csvContent = convertToCSV(filteredData);
-            blob = new Blob([csvContent], { type: "application/vnd.ms-excel" });
-            filename = `ScholarshipReport_${new Date().toISOString().split('T')[0]}.xls`;
-          } else {
-            // For PDF, we'd need a library like jsPDF, for now export as CSV
-            const csvContent = convertToCSV(filteredData);
-            blob = new Blob([csvContent], { type: "text/plain" });
-            filename = `ScholarshipReport_${new Date().toISOString().split('T')[0]}.txt`;
-          }
-        }
+      if (!blob || !filename) {
+        throw new Error("Failed to generate export file");
       }
 
       // Download the file
@@ -406,16 +376,16 @@ const ReportsPage: React.FC = () => {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      success('Export Successful', `Report exported as ${filename} successfully`);
-    } catch (err: any) {
-      console.error("Error exporting report:", err);
-      const errorMessage = err?.response?.data?.message || "Failed to export report";
-      setError(errorMessage);
-      showError('Export Failed', errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [filteredData, filters, activeTab]);
+        success('Export Successful', `Report exported as ${filename} successfully`);
+      } catch (err: unknown) {
+        console.error("Error exporting report:", err);
+        const errorMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to export report";
+        setError(errorMessage);
+        showError('Export Failed', errorMessage);
+        throw err; // Re-throw to let useActionLoading handle the error state
+      }
+    });
+  }, [filteredData, filters, activeTab, success, showError, executeExport]);
 
   // Helper function to convert data to CSV
   const convertToCSV = (data: any[]): string => {
@@ -436,6 +406,7 @@ const ReportsPage: React.FC = () => {
 
     return csvRows.join("\n");
   };
+
 
   // Handle individual filter updates
   const handleFilterUpdate = React.useCallback((key: keyof ReportFilters, value: any) => {
@@ -496,6 +467,7 @@ const ReportsPage: React.FC = () => {
             onTabChange={handleTabChange}
             onExport={handleExport}
             showActions={hasAppliedFilters && filteredData.length > 0}
+            exportLoading={exportLoading}
           />
         </div>
 

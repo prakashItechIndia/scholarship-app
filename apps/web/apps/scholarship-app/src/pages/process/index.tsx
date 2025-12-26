@@ -15,6 +15,8 @@ import {
   ChevronDownRegular,
   SearchRegular,
   FilterRegular,
+  ArrowDownloadRegular,
+  DocumentRegular as DocumentIcon,
 } from "@fluentui/react-icons";
 import PDFViewerModal from "../../components/PDFViewerModal";
 import ViewDocumentsDrawer from "../../components/ViewDocumentsDrawer";
@@ -69,6 +71,7 @@ const ProcessPage: React.FC = () => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10); // Default 10 records per page (BRD requirement)
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [searchCategory, setSearchCategory] = React.useState("Application No"); // Default search category
   const [sortField, setSortField] = React.useState<SortField>("Application_Id"); // Default sort by Application No (BRD OVW-001)
   const [sortOrder, setSortOrder] = React.useState<SortOrder>("desc"); // Default descending (BRD OVW-001)
   const [loading, setLoading] = React.useState(false);
@@ -114,9 +117,20 @@ const ProcessPage: React.FC = () => {
   const [academicYearId, setAcademicYearId] = React.useState<number | undefined>();
   const [academicYears, setAcademicYears] = React.useState<{ ScholarshipYear_Id?: string | number; ScholarshipYear_Code?: string; [key: string]: unknown }[]>([]);
   const [loadingAcademicYears, setLoadingAcademicYears] = React.useState(false);
+  const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set());
 
   // Helper function to map API response to ApplicationData
   const mapApiResponseToApplicationData = (apiData: Record<string, unknown>): ApplicationData => {
+    // For verify tab, change "Verify" status to "Document Submitted"
+    let status = String(apiData.Status || '');
+    if (activeTab === 'verify' && status === 'Verify') {
+      status = 'Documents Submitted';
+    }
+    // For suggest tab, change "Registered" status to "Verified"
+    if (activeTab === 'suggest' && status === 'Registered') {
+      status = 'Verified';
+    }
+    
     return {
       applicationNo: String(apiData.Application_Id || ''),
       studentName: String(apiData.Applicant_Name || ''),
@@ -126,7 +140,7 @@ const ProcessPage: React.FC = () => {
       mobileNumber: String(apiData.Mobile_Number || ''),
       fatherOccupation: String(apiData.Father_Occupation || ''),
       scholarshipNumber: String(apiData.Scholarship_No || '-'),
-      status: String(apiData.Status || ''),
+      status: status,
       scholarship: String(apiData.Scholarship_Id || ''),
       preparedBy: String(apiData.Prepared_By || '-'),
       verifiedBy: String(apiData.Verified_By || '-'),
@@ -189,7 +203,7 @@ const ProcessPage: React.FC = () => {
 
         // Add search filters if provided
         if (searchQuery) {
-          params.mainCategory = 'Name';
+          params.mainCategory = searchCategory;
           params.key = searchQuery;
         }
 
@@ -324,7 +338,7 @@ const ProcessPage: React.FC = () => {
   // Reset to page 1 when tab changes, search query changes, academic year changes, or pageSize changes
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [activeTab, searchQuery, academicYearId, pageSize]);
+  }, [activeTab, searchQuery, searchCategory, academicYearId, pageSize]);
 
   // Reset sort to default (Application No descending) when tab changes (BRD OVW-001)
   React.useEffect(() => {
@@ -457,7 +471,7 @@ const ProcessPage: React.FC = () => {
 
         // Add search filters if provided
         if (searchQuery) {
-          params.mainCategory = 'Name';
+          params.mainCategory = searchCategory;
           params.key = searchQuery;
         }
 
@@ -567,7 +581,7 @@ const ProcessPage: React.FC = () => {
       }
     };
     void fetchApplications();
-  }, [activeTab, searchQuery, academicYearId, currentPage, pageSize, sortField, sortOrder, showError]);
+  }, [activeTab, searchQuery, searchCategory, academicYearId, currentPage, pageSize, sortField, sortOrder, showError]);
 
   // Handle viewing a specific document from the drawer - opens in new tab
   const handleViewSpecificDocument = React.useCallback((doc: { url: string; name: string }) => {
@@ -591,13 +605,37 @@ const ProcessPage: React.FC = () => {
       // Toggle sort order if same field
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
-      // Set new sort field with default descending order
+      // Set new sort field - start with descending to match default behavior
+      // This ensures first click applies sorting without incorrect icon behavior
       setSortField(field);
       setSortOrder('desc');
     }
     // Reset to page 1 when sort changes
     setCurrentPage(1);
   }, [sortField, sortOrder]);
+
+  // Handle row selection
+  const handleRowSelect = React.useCallback((item: ApplicationData, selected: boolean) => {
+    setSelectedRows((prev) => {
+      const newSet = new Set(prev);
+      if (selected) {
+        newSet.add(item.applicationNo);
+      } else {
+        newSet.delete(item.applicationNo);
+      }
+      return newSet;
+    });
+  }, []);
+
+  // Handle select all
+  const handleSelectAll = React.useCallback((selected: boolean) => {
+    if (selected) {
+      const allIds = applications.map(app => app.applicationNo);
+      setSelectedRows(new Set(allIds));
+    } else {
+      setSelectedRows(new Set());
+    }
+  }, [applications]);
 
   // Get table columns using custom hook
   const { columns } = useProcessTable({
@@ -616,6 +654,10 @@ const ProcessPage: React.FC = () => {
     sortField,
     sortOrder,
     onSort: handleSort,
+    selectedRows,
+    onRowSelect: handleRowSelect,
+    onSelectAll: handleSelectAll,
+    data: applications,
   });
 
   // Data is already paginated from the server
@@ -828,40 +870,171 @@ const ProcessPage: React.FC = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => console.log("Application No clicked")}>
+                <DropdownMenuItem 
+                  onClick={() => setSearchCategory("Application No")}
+                  style={{
+                    fontWeight: searchCategory === "Application No" ? "bold" : "normal",
+                    color: searchCategory === "Application No" ? "#242424" : "#616161",
+                  }}
+                >
                   Application No
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => console.log("Aadhaar ID clicked")}>
+                <DropdownMenuItem 
+                  onClick={() => setSearchCategory("Aadhaar ID")}
+                  style={{
+                    fontWeight: searchCategory === "Aadhaar ID" ? "bold" : "normal",
+                    color: searchCategory === "Aadhaar ID" ? "#242424" : "#616161",
+                  }}
+                >
                   Aadhaar ID
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => console.log("Mobile No clicked")}>
+                <DropdownMenuItem 
+                  onClick={() => setSearchCategory("Mobile No")}
+                  style={{
+                    fontWeight: searchCategory === "Mobile No" ? "bold" : "normal",
+                    color: searchCategory === "Mobile No" ? "#242424" : "#616161",
+                  }}
+                >
                   Mobile No
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => console.log("Name clicked")}>
+                <DropdownMenuItem 
+                  onClick={() => setSearchCategory("Name")}
+                  style={{
+                    fontWeight: searchCategory === "Name" ? "bold" : "normal",
+                    color: searchCategory === "Name" ? "#242424" : "#616161",
+                  }}
+                >
                   Name
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => console.log("Student ID clicked")}>
+                <DropdownMenuItem 
+                  onClick={() => setSearchCategory("Student Id")}
+                  style={{
+                    fontWeight: searchCategory === "Student Id" ? "bold" : "normal",
+                    color: searchCategory === "Student Id" ? "#242424" : "#616161",
+                  }}
+                >
                   Student ID
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setSearchCategory("Status")}
+                  style={{
+                    fontWeight: searchCategory === "Status" ? "bold" : "normal",
+                    color: searchCategory === "Status" ? "#242424" : "#616161",
+                  }}
+                >
+                  Status
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setSearchCategory("Class Studying")}
+                  style={{
+                    fontWeight: searchCategory === "Class Studying" ? "bold" : "normal",
+                    color: searchCategory === "Class Studying" ? "#242424" : "#616161",
+                  }}
+                >
+                  Class / Standard
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button
-              appearance="outline"
-              onClick={() => console.log("More options clicked")}
-              aria-label="More options"
-              style={{
-                width: "32px",
-                minWidth: "32px",
-                maxWidth: "32px",
-                height: "32px",
-                padding: 0,
-                borderColor: "#d1d5db",
-                backgroundColor: "#fff",
-              }}
-            >
-              <MoreVerticalRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button
+                  appearance="outline"
+                  aria-label="Download"
+                  style={{
+                    width: "32px",
+                    minWidth: "32px",
+                    maxWidth: "32px",
+                    height: "32px",
+                    padding: 0,
+                    borderColor: "#d1d5db",
+                    backgroundColor: "#fff",
+                  }}
+                >
+                  <ArrowDownloadRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem 
+                  onClick={async () => {
+                    // Export to Excel
+                    try {
+                      // For now, we'll create a simple CSV export
+                      // In production, this should call an API endpoint
+                      const headers = columns.filter(col => col.key !== 'checkbox' && col.key !== 'actions').map(col => col.name || col.key);
+                      const rows = applications.map(app => 
+                        columns
+                          .filter(col => col.key !== 'checkbox' && col.key !== 'actions')
+                          .map(col => {
+                            const value = (app as Record<string, unknown>)[col.key];
+                            return value ? String(value) : '';
+                          })
+                      );
+                      
+                      const csvContent = [
+                        headers.join(','),
+                        ...rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(','))
+                      ].join('\n');
+                      
+                      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                      const link = document.createElement('a');
+                      link.href = URL.createObjectURL(blob);
+                      link.download = `process_export_${new Date().toISOString().split('T')[0]}.csv`;
+                      link.click();
+                      URL.revokeObjectURL(link.href);
+                      success('Export Successful', 'Data exported to Excel successfully');
+                    } catch (err) {
+                      showError('Export Failed', err instanceof Error ? err.message : 'Failed to export data');
+                    }
+                  }}
+                  style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <DocumentIcon style={{ width: "16px", height: "16px" }} />
+                    Excel
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={async () => {
+                    // Export to Word
+                    try {
+                      // For now, we'll create a simple text export
+                      // In production, this should call an API endpoint to generate Word document
+                      const headers = columns.filter(col => col.key !== 'checkbox' && col.key !== 'actions').map(col => col.name || col.key);
+                      const rows = applications.map(app => 
+                        columns
+                          .filter(col => col.key !== 'checkbox' && col.key !== 'actions')
+                          .map(col => {
+                            const value = (app as Record<string, unknown>)[col.key];
+                            return value ? String(value) : '';
+                          })
+                      );
+                      
+                      let wordContent = headers.join('\t') + '\n';
+                      rows.forEach(row => {
+                        wordContent += row.join('\t') + '\n';
+                      });
+                      
+                      const blob = new Blob([wordContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                      const link = document.createElement('a');
+                      link.href = URL.createObjectURL(blob);
+                      link.download = `process_export_${new Date().toISOString().split('T')[0]}.doc`;
+                      link.click();
+                      URL.revokeObjectURL(link.href);
+                      success('Export Successful', 'Data exported to Word successfully');
+                    } catch (err) {
+                      showError('Export Failed', err instanceof Error ? err.message : 'Failed to export data');
+                    }
+                  }}
+                  style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <DocumentIcon style={{ width: "16px", height: "16px" }} />
+                    Word
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Query,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Get, Query, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { DropdownOptionsService } from './dropdown-options.service';
 
@@ -141,4 +135,3 @@ export class DropdownOptionsController {
     return this.dropdownService.getDegrees(course, degreeType);
   }
 }
-

@@ -8,6 +8,7 @@ import {
   Label,
   PageActionButtons,
 } from "@shared/components";
+import { Spinner, SpinnerSize } from "@fluentui/react";
 
 
 // ProfileAvatar component - SVG as React component
@@ -605,9 +606,19 @@ const UserForm: React.FC = () => {
               backgroundColor: "#0f6cbd",
               color: "#ffffff",
               minWidth: "100px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
             }}
           >
-            {loading ? "Saving..." : (isEditMode ? "Update" : "Save")}
+            {loading ? (
+              <>
+                <Spinner size={SpinnerSize.small} styles={{ circle: { borderTopColor: "#FFFFFF", borderBottomColor: "#FFFFFF", borderLeftColor: "#FFFFFF", borderRightColor: "#FFFFFF" } }} />
+                <span>Saving...</span>
+              </>
+            ) : (
+              isEditMode ? "Update" : "Save"
+            )}
           </Button>
         </div>
       </Card>

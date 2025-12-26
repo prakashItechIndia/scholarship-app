@@ -32,6 +32,9 @@ const STEPS: Step[] = [
   { id: 7, title: 'Review & Submit', key: 'review' },
 ];
 
+// Total steps to display in step indicator (6 steps excluding Review & Submit from count)
+const TOTAL_STEPS = 6;
+
 // --- Styles ---
 
 const headerStyles: IStackStyles = {
@@ -308,7 +311,7 @@ const RegistrationContent = () => {
                     />
                   </svg>
                   <div className="absolute text-gray-800 font-semibold text-[13px]" style={{ lineHeight: '20px' }}>
-                    {completedSteps.length}/{STEPS.length}
+                    {completedSteps.length}/{TOTAL_STEPS}
                   </div>
                 </div>
               </Stack>
@@ -333,7 +336,7 @@ const RegistrationContent = () => {
             <Stack grow className="overflow-y-auto py-10 px-10">
               <Stack style={{ marginBottom: 8 }}>
                 <Text className="text-[#2453C3] text-[10px] uppercase tracking-wider mb-0" style={{ lineHeight: '12px', letterSpacing: '0.05em' }}>
-                  STEP {currentStep}/{STEPS.length}
+                  STEP {currentStep}/{TOTAL_STEPS}
                 </Text>
               </Stack>
 

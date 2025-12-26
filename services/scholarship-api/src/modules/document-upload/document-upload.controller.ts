@@ -6,6 +6,7 @@ import {
   Body,
   Param,
   Query,
+  Res,
   HttpCode,
   HttpStatus,
   UseInterceptors,
@@ -16,6 +17,7 @@ import {
   FileTypeValidator,
   BadRequestException,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { DocumentUploadService } from './document-upload.service';
@@ -270,6 +272,46 @@ export class DocumentUploadController {
     return {
       documentTypes: this.documentService.getStandardDocumentTypes(),
     };
+  }
+
+  @Get('view/:applicationId/:documentType')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'View/download document file' })
+  @ApiResponse({
+    status: 200,
+    description: 'Document file retrieved successfully',
+    content: {
+      'application/pdf': { schema: { type: 'string', format: 'binary' } },
+      'image/jpeg': { schema: { type: 'string', format: 'binary' } },
+      'image/png': { schema: { type: 'string', format: 'binary' } },
+      'application/octet-stream': { schema: { type: 'string', format: 'binary' } },
+    },
+  })
+  async viewDocument(
+    @Res() res: Response,
+    @Param('applicationId') applicationId: string,
+    @Param('documentType') documentType: string,
+  ) {
+    try {
+      const { buffer, contentType, filename } =
+        await this.documentService.getDocumentFile(applicationId, documentType);
+
+      // Set headers for file download/view
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+      res.setHeader('Content-Length', buffer.length.toString());
+      res.setHeader('Cache-Control', 'private, max-age=3600'); // Cache for 1 hour
+
+      // Send file buffer
+      res.send(buffer);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException(
+        `Failed to retrieve document: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
   }
 }
 

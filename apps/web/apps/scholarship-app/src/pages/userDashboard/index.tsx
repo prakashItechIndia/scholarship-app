@@ -117,7 +117,7 @@ const ApplicationCard: React.FC<{
   };
 
   const handleReopen = () => {
-    // Continue Draft: For 'Registered' status applications, resume from where left off
+    // Reopen Application: For 'Registered' status applications, resume from where left off
     if (data.status === "Registered" && onContinueDraft) {
       onContinueDraft(data);
     }
@@ -125,7 +125,7 @@ const ApplicationCard: React.FC<{
   };
 
   const handlePrint = () => {
-    // Download Receipt: For submitted applications
+    // Print Documents: For submitted applications
     if (onDownloadReceipt) {
       onDownloadReceipt(data);
     }
@@ -293,7 +293,7 @@ const ApplicationCard: React.FC<{
                       }}
                     >
                       <ReopenIcon width={16} height={16} />
-                      <span style={{ whiteSpace: "nowrap" }}>Continue Draft</span>
+                      <span style={{ whiteSpace: "nowrap" }}>Reopen Application</span>
                     </button>
                   )}
                   {(data.status === "Completed" || data.status === "Approved" || data.status === "In Progress") && (
@@ -327,7 +327,7 @@ const ApplicationCard: React.FC<{
                       }}
                     >
                       <PrintIcon width={16} height={16} />
-                      <span>Download Receipt</span>
+                      <span>Print Documents</span>
                     </button>
                   )}
                 </div>
@@ -487,7 +487,22 @@ const UserDashboard: React.FC = () => {
               studied: app.Institution_Name || app.institutionName || '',
               fatherName: app.Father_Name || app.Guardian_Name || '',
               applied: app.Data_Date 
-                ? new Date(app.Data_Date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                ? (() => {
+                    try {
+                      const date = new Date(app.Data_Date);
+                      if (isNaN(date.getTime())) {
+                        // If date is invalid, try parsing as string
+                        const dateStr = String(app.Data_Date);
+                        const parsed = new Date(dateStr);
+                        return isNaN(parsed.getTime()) 
+                          ? new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                          : parsed.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                      }
+                      return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    } catch {
+                      return new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    }
+                  })()
                 : new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }),
               scholarshipNumber: app.Scholarship_No || app.scholarshipNumber || '',
               mobileNo: app.Mobile_Number || app.mobileNumber || '',
@@ -635,6 +650,7 @@ const UserDashboard: React.FC = () => {
                 borderRadius: "8px",
                 cursor: "pointer",
                 marginRight: "0",
+                marginLeft: "24px",
               }}
               onClick={() => navigate("/registration")}
             >
