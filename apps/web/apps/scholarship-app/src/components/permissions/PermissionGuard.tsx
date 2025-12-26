@@ -29,6 +29,25 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
 }) => {
   const { hasPermission, hasAnyPermission, loading } = usePermissions();
 
+  // Check if user is Administrator - they have full access
+  const isAdministrator = React.useMemo(() => {
+    try {
+      const authData = localStorage.getItem('scholarship_auth');
+      if (authData) {
+        const parsed = JSON.parse(authData);
+        return parsed?.user?.userType === 'Administrator';
+      }
+    } catch {
+      // Ignore errors
+    }
+    return false;
+  }, []);
+
+  // Administrators have full access - skip permission checks
+  if (isAdministrator) {
+    return <>{children}</>;
+  }
+
   if (loading) {
     return <div>Loading permissions...</div>;
   }

@@ -6,6 +6,10 @@ export interface Screen {
   screenName: string;
   url: string;
   isActive: boolean;
+  canCreate?: boolean;
+  canView?: boolean;
+  canUpdate?: boolean;
+  canDelete?: boolean;
 }
 
 export interface UserPermission {
@@ -19,6 +23,7 @@ interface PermissionContextType {
   permissions: UserPermission | null;
   loading: boolean;
   hasPermission: (screenUrl: string) => boolean;
+  hasActionPermission: (screenUrl: string, action: 'create' | 'view' | 'update' | 'delete') => boolean;
   hasAnyPermission: (screenUrls: string[]) => boolean;
   refreshPermissions: () => Promise<void>;
 }
@@ -67,9 +72,49 @@ export const PermissionProvider = ({
     const normalizedTarget = normalizeUrl(screenUrl);
 
     return permissions.screens.some(
-      (screen) => normalizeUrl(screen.url) === normalizedTarget || 
-                  normalizedTarget.startsWith(normalizeUrl(screen.url))
+      (screen) => {
+        const normalizedScreenUrl = normalizeUrl(screen.url);
+        return normalizedScreenUrl === normalizedTarget || 
+               normalizedTarget.startsWith(normalizedScreenUrl);
+      }
     );
+  };
+
+  const hasActionPermission = (
+    screenUrl: string,
+    action: 'create' | 'view' | 'update' | 'delete'
+  ): boolean => {
+    if (!permissions || !permissions.screens) {
+      return false;
+    }
+
+    // Normalize URLs for comparison
+    const normalizeUrl = (url: string) => url.replace(/^\/+|\/+$/g, '').toLowerCase();
+    const normalizedTarget = normalizeUrl(screenUrl);
+
+    return permissions.screens.some((screen) => {
+      const normalizedScreenUrl = normalizeUrl(screen.url);
+      const urlMatches = normalizedScreenUrl === normalizedTarget || 
+                         normalizedTarget.startsWith(normalizedScreenUrl);
+      
+      if (!urlMatches) {
+        return false;
+      }
+
+      // Check action-level permission
+      switch (action) {
+        case 'create':
+          return screen.canCreate === true;
+        case 'view':
+          return screen.canView === true;
+        case 'update':
+          return screen.canUpdate === true;
+        case 'delete':
+          return screen.canDelete === true;
+        default:
+          return false;
+      }
+    });
   };
 
   const hasAnyPermission = (screenUrls: string[]): boolean => {
@@ -86,6 +131,7 @@ export const PermissionProvider = ({
         permissions,
         loading,
         hasPermission,
+        hasActionPermission,
         hasAnyPermission,
         refreshPermissions,
       }}

@@ -20,6 +20,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { handleAuthRedirect } from '../../utils/redirect';
 import { generateOrganizationSchema } from '../../utils/schema';
 import adminLoginBanner from '@shared/assets/icons/adminLogin.png';
+import { isScholarshipLoggedIn, getScholarshipUserType, getLandingPage } from '../../utils/routeProtection';
 
 const loginSchema = z.object({
   username: z
@@ -96,19 +97,31 @@ const AdminSignInPage = () => {
     }
   }, [isLogout, searchParams, setSearchParams, checkAuthStatus]);
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (check both AuthContext and scholarship auth)
   useEffect(() => {
     const checkAuth = async () => {
-      if (isLogout || !isAuthenticated) return;
+      if (isLogout) return;
 
-      const isValid = await secureTokenStorage.hasValidToken();
-      if (isValid) {
-        const token = await secureTokenStorage.getAccessToken();
-        handleAuthRedirect(redirectUrl ?? null, productCode ?? null, token ?? undefined);
+      // Check scholarship auth first (for admin users)
+      const scholarshipLoggedIn = isScholarshipLoggedIn();
+      if (scholarshipLoggedIn) {
+        const userType = getScholarshipUserType();
+        const landingPage = getLandingPage(userType);
+        void navigate(landingPage);
+        return;
+      }
+
+      // Check AuthContext (for other auth methods)
+      if (isAuthenticated) {
+        const isValid = await secureTokenStorage.hasValidToken();
+        if (isValid) {
+          const token = await secureTokenStorage.getAccessToken();
+          handleAuthRedirect(redirectUrl ?? null, productCode ?? null, token ?? undefined);
+        }
       }
     };
     void checkAuth();
-  }, [isAuthenticated, redirectUrl, productCode, isLogout]);
+  }, [isAuthenticated, redirectUrl, productCode, isLogout, navigate]);
 
 
   const onLoginSubmit = async (values: LoginFormData) => {
@@ -123,12 +136,19 @@ const AdminSignInPage = () => {
       const loginResponse = await scholarshipAuth.login(values.username, values.password);
       
       // Create session token for admin users
-      const responseData = (loginResponse as unknown) as { userId?: number; userName?: string; roleId?: number; [key: string]: unknown };
+      const responseData = (loginResponse as unknown) as { 
+        userId?: number; 
+        userName?: string; 
+        roleId?: number; 
+        userType?: string;
+        [key: string]: unknown 
+      };
       const sessionToken = btoa(JSON.stringify({
         username: values.username,
         userId: responseData.userId ?? null,
         userName: responseData.userName ?? values.username,
         roleId: responseData.roleId ?? null,
+        userType: responseData.userType ?? null, // Include userType in session token
         timestamp: Date.now(),
         expiresAt: Date.now() + (30 * 60 * 1000), // 30 minutes session timeout per BRD
         isAdmin: true, // Mark as admin user
@@ -144,17 +164,37 @@ const AdminSignInPage = () => {
         isAdmin: true, // Mark as admin user
       }));
       
-      // Redirect to admin dashboard after successful login
-      // Role_Id 1 or 7 → AdminPanelApprove (approve page) - can be handled within dashboard
-      // Other roles → AdminPanelHome (home/dashboard)
-      const roleId = responseData.roleId ?? 0;
-      if (roleId === 1 || roleId === 7) {
-        success('Successfully Logged In', 'Redirecting to approval panel...');
-        setTimeout(() => void navigate('/admin-dashboard'), 300);
+      // Redirect based on userType after successful login
+      const userType = responseData.userType ?? '';
+      let redirectPath = '/home'; // Default redirect
+      let redirectMessage = 'Redirecting to dashboard...';
+      
+      if (userType === 'Administrator') {
+        // Administrator sees all menus (Home, Process, Roles, Users, Reports)
+        redirectPath = '/home';
+        redirectMessage = 'Redirecting to dashboard...';
+      } else if (userType === 'Manager') {
+        // Manager sees only Process and Reports
+        redirectPath = '/process';
+        redirectMessage = 'Redirecting to process...';
+      } else if (userType === 'Standard User') {
+        // Standard User sees only Process
+        redirectPath = '/process';
+        redirectMessage = 'Redirecting to process...';
       } else {
-        success('Successfully Logged In', 'Redirecting to dashboard...');
-        setTimeout(() => void navigate('/admin-dashboard'), 300);
+        // Fallback: Use roleId-based redirect for backward compatibility
+        const roleId = responseData.roleId ?? 0;
+        if (roleId === 1 || roleId === 7) {
+          redirectPath = '/admin-dashboard';
+          redirectMessage = 'Redirecting to approval panel...';
+        } else {
+          redirectPath = '/home';
+          redirectMessage = 'Redirecting to dashboard...';
+        }
       }
+      
+      success('Successfully Logged In', redirectMessage);
+      setTimeout(() => void navigate(redirectPath), 300);
     } catch (err: unknown) {
       // Handle specific error cases per BRD Section 5.4.3
       let errorMessage = 'Invalid credentials. Please try again.';

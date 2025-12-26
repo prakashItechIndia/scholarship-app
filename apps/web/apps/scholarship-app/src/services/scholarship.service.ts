@@ -719,14 +719,37 @@ export const roleManagement = {
   },
 
   /**
-   * Update permissions for a role
+   * Update permissions for a role with action-level permissions
    */
-  updateRolePermissions: async (roleId: number, screenIds: number[]) => {
+  updateRolePermissions: async (
+    roleId: number,
+    permissions: Array<{
+      screenId: number;
+      canCreate: boolean;
+      canView: boolean;
+      canUpdate: boolean;
+      canDelete: boolean;
+    }>,
+  ) => {
     const response = await apiClient.put(
       `/role-management/role/${roleId}/permissions`,
-      { screenIds },
+      { permissions },
     );
     return response.data;
+  },
+
+  /**
+   * Check if user has permission for a specific action on a screen
+   */
+  hasActionPermission: async (
+    userId: number,
+    screenUrl: string,
+    action: 'create' | 'view' | 'update' | 'delete',
+  ) => {
+    const response = await apiClient.get(
+      `/role-management/user/${userId}/has-action-permission?screenUrl=${encodeURIComponent(screenUrl)}&action=${action}`,
+    );
+    return response.data.hasPermission;
   },
 };
 

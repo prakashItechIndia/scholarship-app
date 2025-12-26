@@ -72,7 +72,7 @@ export const RoleDetailsForm: React.FC<RoleDetailsFormProps> = ({
         <Select
           placeholder="Select"
           options={userTypeOptions}
-          selectedKey={formData.userType}
+          selectedKey={formData.userType || undefined}
           onValueChange={(value) => {
             onInputChange("userType", value);
             if (errors.userType) {
@@ -82,6 +82,7 @@ export const RoleDetailsForm: React.FC<RoleDetailsFormProps> = ({
           errorMessage={errors.userType}
           style={{width: "100%", height: "32px"}}
         />
+      
       </div>
 
       <div>

@@ -5649,6 +5649,54 @@ export const RoleManagementApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * 
+         * @summary Check if user has permission for a specific action on a screen
+         * @param {number} userId 
+         * @param {string} screenUrl 
+         * @param {string} action 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerHasActionPermission: async (userId: number, screenUrl: string, action: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('roleManagementControllerHasActionPermission', 'userId', userId)
+            // verify required parameter 'screenUrl' is not null or undefined
+            assertParamExists('roleManagementControllerHasActionPermission', 'screenUrl', screenUrl)
+            // verify required parameter 'action' is not null or undefined
+            assertParamExists('roleManagementControllerHasActionPermission', 'action', action)
+            const localVarPath = `/role-management/user/{userId}/has-action-permission`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (screenUrl !== undefined) {
+                localVarQueryParameter['screenUrl'] = screenUrl;
+            }
+
+            if (action !== undefined) {
+                localVarQueryParameter['action'] = action;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Check if user has permission to access a screen
          * @param {number} userId 
          * @param {string} screenUrl 
@@ -5724,7 +5772,7 @@ export const RoleManagementApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * 
-         * @summary Update permissions for a role
+         * @summary Update permissions for a role with action-level permissions
          * @param {number} roleId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -5875,6 +5923,19 @@ export const RoleManagementApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Check if user has permission for a specific action on a screen
+         * @param {number} userId 
+         * @param {string} screenUrl 
+         * @param {string} action 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerHasActionPermission(userId: number, screenUrl: string, action: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerHasActionPermission(userId, screenUrl, action, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Check if user has permission to access a screen
          * @param {number} userId 
          * @param {string} screenUrl 
@@ -5898,7 +5959,7 @@ export const RoleManagementApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Update permissions for a role
+         * @summary Update permissions for a role with action-level permissions
          * @param {number} roleId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -6016,6 +6077,18 @@ export const RoleManagementApiFactory = function (configuration?: Configuration,
         },
         /**
          * 
+         * @summary Check if user has permission for a specific action on a screen
+         * @param {number} userId 
+         * @param {string} screenUrl 
+         * @param {string} action 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerHasActionPermission(userId: number, screenUrl: string, action: string, options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerHasActionPermission(userId, screenUrl, action, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Check if user has permission to access a screen
          * @param {number} userId 
          * @param {string} screenUrl 
@@ -6037,7 +6110,7 @@ export const RoleManagementApiFactory = function (configuration?: Configuration,
         },
         /**
          * 
-         * @summary Update permissions for a role
+         * @summary Update permissions for a role with action-level permissions
          * @param {number} roleId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -6174,6 +6247,20 @@ export class RoleManagementApi extends BaseAPI {
 
     /**
      * 
+     * @summary Check if user has permission for a specific action on a screen
+     * @param {number} userId 
+     * @param {string} screenUrl 
+     * @param {string} action 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerHasActionPermission(userId: number, screenUrl: string, action: string, options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerHasActionPermission(userId, screenUrl, action, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Check if user has permission to access a screen
      * @param {number} userId 
      * @param {string} screenUrl 
@@ -6199,7 +6286,7 @@ export class RoleManagementApi extends BaseAPI {
 
     /**
      * 
-     * @summary Update permissions for a role
+     * @summary Update permissions for a role with action-level permissions
      * @param {number} roleId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

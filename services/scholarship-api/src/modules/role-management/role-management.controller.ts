@@ -10,13 +10,21 @@ import {
   HttpStatus,
   ParseIntPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { RoleManagementService } from './role-management.service';
 import { RolePermissionsService } from './role-permissions.service';
+import { ScholarshipSessionGuard } from '../scholarship-auth/guards/scholarship-session.guard';
+import { 
+  ScholarshipUserTypeGuard, 
+  RequireUserTypes 
+} from '../scholarship-auth/guards/scholarship-user-type.guard';
 
 @ApiTags('Role Management')
 @Controller('role-management')
+@UseGuards(ScholarshipSessionGuard)
+@ApiBearerAuth('ScholarshipSession')
 export class RoleManagementController {
   constructor(
     private readonly roleService: RoleManagementService,
@@ -71,6 +79,8 @@ export class RoleManagementController {
 
   @Post('role')
   @HttpCode(HttpStatus.CREATED)
+  @UseGuards(ScholarshipUserTypeGuard)
+  @RequireUserTypes('Administrator')
   @ApiOperation({ summary: 'Create new role' })
   @ApiResponse({
     status: 201,
@@ -84,6 +94,8 @@ export class RoleManagementController {
 
   @Put('role/:roleId')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(ScholarshipUserTypeGuard)
+  @RequireUserTypes('Administrator')
   @ApiOperation({ summary: 'Update role' })
   @ApiResponse({
     status: 200,
@@ -101,6 +113,8 @@ export class RoleManagementController {
 
   @Delete('role/:roleId')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(ScholarshipUserTypeGuard)
+  @RequireUserTypes('Administrator')
   @ApiOperation({ summary: 'Delete role' })
   @ApiResponse({
     status: 200,
@@ -175,20 +189,50 @@ export class RoleManagementController {
 
   @Put('role/:roleId/permissions')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Update permissions for a role' })
+  @UseGuards(ScholarshipUserTypeGuard)
+  @RequireUserTypes('Administrator')
+  @ApiOperation({ summary: 'Update permissions for a role with action-level permissions' })
   @ApiResponse({
     status: 200,
     description: 'Role permissions updated successfully',
   })
   async updateRolePermissions(
     @Param('roleId', ParseIntPipe) roleId: number,
-    @Body() body: { screenIds: number[] },
+    @Body() body: {
+      permissions: Array<{
+        screenId: number;
+        canCreate: boolean;
+        canView: boolean;
+        canUpdate: boolean;
+        canDelete: boolean;
+      }>;
+    },
   ) {
     await this.permissionsService.updateRolePermissions(
       roleId,
-      body.screenIds,
+      body.permissions,
     );
     return { message: 'Role permissions updated successfully' };
+  }
+
+  @Get('user/:userId/has-action-permission')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Check if user has permission for a specific action on a screen' })
+  @ApiResponse({
+    status: 200,
+    description: 'Action permission check result',
+  })
+  async hasActionPermission(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query('screenUrl') screenUrl: string,
+    @Query('action') action: 'create' | 'view' | 'update' | 'delete',
+  ) {
+    const hasPermission = await this.permissionsService.hasActionPermission(
+      userId,
+      screenUrl,
+      action,
+    );
+    return { hasPermission };
   }
 }
 

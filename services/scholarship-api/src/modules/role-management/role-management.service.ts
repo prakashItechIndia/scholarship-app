@@ -24,6 +24,7 @@ export class RoleManagementService {
         SELECT
           Id,
           Role_Name,
+          User_Type,
           Is_Active,
           CASE Is_Active
             WHEN 0 THEN 'Inactive'
@@ -40,7 +41,7 @@ export class RoleManagementService {
         return {
           id: getCaseInsensitiveValue<string>(rowRecord, 'Id') || '',
           roleName: getCaseInsensitiveValue<string>(rowRecord, 'Role_Name') || '',
-          userType: '', // User_Type column doesn't exist in T_ROLES table
+          userType: getCaseInsensitiveValue<string>(rowRecord, 'User_Type') || '',
           status: getCaseInsensitiveValue<string>(rowRecord, 'Status') || 'Inactive',
           isActive: getCaseInsensitiveValue<number>(rowRecord, 'Is_Active') || 0,
         };
@@ -62,6 +63,7 @@ export class RoleManagementService {
         SELECT
           Id,
           Role_Name,
+          User_Type,
           Is_Active
         FROM T_ROLES
         WHERE Id = @roleId
@@ -77,7 +79,7 @@ export class RoleManagementService {
       return {
         id: getCaseInsensitiveValue<string>(row, 'Id') || '',
         roleName: getCaseInsensitiveValue<string>(row, 'Role_Name') || '',
-        userType: '', // User_Type column doesn't exist in T_ROLES table
+        userType: getCaseInsensitiveValue<string>(row, 'User_Type') || '',
         isActive: getCaseInsensitiveValue<number>(row, 'Is_Active') || 0,
       };
     } catch (error) {
@@ -145,15 +147,15 @@ export class RoleManagementService {
         throw new BadRequestException('Role name must be unique. This role name already exists.');
       }
 
-      // Insert role
-      // Note: User_Type column doesn't exist in T_ROLES table, so it's not included in the INSERT
+      // Insert role with User_Type
       const query = `
-        INSERT INTO T_ROLES (Role_Name, Is_Active, Created_Date, Created_By)
-        VALUES (@roleName, @isActive, GETDATE(), 'System')
+        INSERT INTO T_ROLES (Role_Name, User_Type, Is_Active)
+        VALUES (@roleName, @userType, @isActive)
       `;
 
       await this.db.query(query, {
         roleName: roleData.roleName,
+        userType: roleData.userType || null,
         isActive: roleData.isActive,
       });
 
@@ -181,21 +183,20 @@ export class RoleManagementService {
         throw new BadRequestException('Role name must be unique. This role name already exists.');
       }
 
-      // Update role
-      // Note: User_Type column doesn't exist in T_ROLES table, so it's not included in the UPDATE
+      // Update role with User_Type
       const query = `
         UPDATE T_ROLES
         SET
           Role_Name = @roleName,
-          Is_Active = @isActive,
-          Modified_Date = GETDATE(),
-          Modified_By = 'System'
+          User_Type = @userType,
+          Is_Active = @isActive
         WHERE Id = @roleId
       `;
 
       await this.db.query(query, {
         roleId,
         roleName: roleData.roleName,
+        userType: roleData.userType || null,
         isActive: roleData.isActive,
       });
 

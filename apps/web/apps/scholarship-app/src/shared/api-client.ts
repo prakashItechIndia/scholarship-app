@@ -16,20 +16,39 @@ export const apiClient = axios.create({
 // Add request interceptor to include auth token
 apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    // Use secure token storage for encrypted tokens
-    try {
-      const { secureTokenStorage } = await import(
-        '@shared/utils/secureTokenStorage'
-      );
-      const token = await secureTokenStorage.getAccessToken();
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+    // Check if this is a scholarship endpoint (role-management, user-management, scholarship-auth)
+    const isScholarshipEndpoint = 
+      config.url?.includes('/role-management') ||
+      config.url?.includes('/user-management') ||
+      config.url?.includes('/scholarship-auth');
+    
+    if (isScholarshipEndpoint) {
+      // For scholarship endpoints, use scholarship session token
+      const adminSessionToken = sessionStorage.getItem('scholarship_admin_session_token');
+      const sessionToken = sessionStorage.getItem('scholarship_session_token') || 
+                          localStorage.getItem('scholarship_session_token');
+      
+      if (adminSessionToken) {
+        config.headers.Authorization = `Bearer ${adminSessionToken}`;
+      } else if (sessionToken) {
+        config.headers.Authorization = `Bearer ${sessionToken}`;
       }
-    } catch {
-      // Fallback to localStorage if secure storage fails
-      const token = localStorage.getItem('icaptur_access_token');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      // For other endpoints, use JWT token from secure storage
+      try {
+        const { secureTokenStorage } = await import(
+          '@shared/utils/secureTokenStorage'
+        );
+        const token = await secureTokenStorage.getAccessToken();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch {
+        // Fallback to localStorage if secure storage fails
+        const token = localStorage.getItem('icaptur_access_token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
       }
     }
     return config;

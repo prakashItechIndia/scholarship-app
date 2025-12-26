@@ -41,5 +41,5 @@ firebase-adminsdk-*.json
 !**/yarn.lock
 
 # Upload directories (user-uploaded files)
-**/uploads/
-**/ScholerShipData/
+# **/uploads/
+# **/ScholerShipData/

@@ -5,6 +5,7 @@ import { AuthenticatedRedirect } from '../components/auth/AuthenticatedRedirect'
 import { ErrorBoundary } from '../components/common/ErrorBoundary';
 import { LoadingScreen } from '../components/layout/LoadingScreen';
 import { ProcessLayout } from '../components/layout/ProcessLayout';
+import { RouteGuard } from '../components/routing/RouteGuard';
 
 // Lazy load pages with code splitting
 const SignInPage = lazy(() => import('../pages/auth/SignIn.tsx'));
@@ -36,266 +37,314 @@ export const Router = () => {
         <Route
           path="/user-login"
           element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <SignInPage />
-              </ErrorBoundary>
-            </Suspense>
+            <RouteGuard path="/user-login">
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <SignInPage />
+                </ErrorBoundary>
+              </Suspense>
+            </RouteGuard>
           }
         />
         <Route
           path="/admin-login"
           element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <AdminSignInPage />
-              </ErrorBoundary>
-            </Suspense>
+            <RouteGuard path="/admin-login">
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <AdminSignInPage />
+                </ErrorBoundary>
+              </Suspense>
+            </RouteGuard>
           }
         />
         <Route
           path="/create-password"
           element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <CreatePasswordPage />
-              </ErrorBoundary>
-            </Suspense>
+            <RouteGuard path="/create-password">
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <CreatePasswordPage />
+                </ErrorBoundary>
+              </Suspense>
+            </RouteGuard>
           }
         />
         <Route
           path="/registration"
           element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <RegistrationPage />
-              </ErrorBoundary>
-            </Suspense>
+            <RouteGuard path="/registration">
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <RegistrationPage />
+                </ErrorBoundary>
+              </Suspense>
+            </RouteGuard>
           }
         />
         <Route
           path="/forgot-password"
           element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <ForgotPasswordPage />
-              </ErrorBoundary>
-            </Suspense>
+            <RouteGuard path="/forgot-password">
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <ForgotPasswordPage />
+                </ErrorBoundary>
+              </Suspense>
+            </RouteGuard>
           }
         />
         <Route
           path="/reset-password"
           element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <ResetPasswordPage />
-              </ErrorBoundary>
-            </Suspense>
+            <RouteGuard path="/reset-password">
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <ResetPasswordPage />
+                </ErrorBoundary>
+              </Suspense>
+            </RouteGuard>
           }
         />
         <Route
           path="/change-password"
           element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <ChangePasswordPage />
-              </ErrorBoundary>
-            </Suspense>
+            <RouteGuard path="/change-password">
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <ChangePasswordPage />
+                </ErrorBoundary>
+              </Suspense>
+            </RouteGuard>
           }
         />
         <Route
           path="/mfa/verify"
           element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <MfaVerifyPage />
-              </ErrorBoundary>
-            </Suspense>
+            <RouteGuard path="/mfa/verify">
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <MfaVerifyPage />
+                </ErrorBoundary>
+              </Suspense>
+            </RouteGuard>
           }
         />
         <Route
           path="/mfa-verify"
           element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <MfaVerifyPage />
-              </ErrorBoundary>
-            </Suspense>
+            <RouteGuard path="/mfa-verify">
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <MfaVerifyPage />
+                </ErrorBoundary>
+              </Suspense>
+            </RouteGuard>
           }
         />
 
         <Route
           path="/verification"
           element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <VerificationPage />
-              </ErrorBoundary>
-            </Suspense>
+            <RouteGuard path="/verification">
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <VerificationPage />
+                </ErrorBoundary>
+              </Suspense>
+            </RouteGuard>
           }
         />
         <Route
           path="/set-password"
           element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <SetPasswordPage />
-              </ErrorBoundary>
-            </Suspense>
+            <RouteGuard path="/set-password">
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <SetPasswordPage />
+                </ErrorBoundary>
+              </Suspense>
+            </RouteGuard>
           }
         />
         <Route
           path="/email-verification"
           element={
-            <Suspense fallback={<LoadingScreen message="Loading..." />}>
-              <ErrorBoundary>
-                <EmailVerificationPage />
-              </ErrorBoundary>
-            </Suspense>
+            <RouteGuard path="/email-verification">
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <EmailVerificationPage />
+                </ErrorBoundary>
+              </Suspense>
+            </RouteGuard>
           }
         />
         <Route
           path="/process"
           element={
-            <ProcessLayout>
-              <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                <ErrorBoundary>
-                  <ProcessPage />
-                </ErrorBoundary>
-              </Suspense>
-            </ProcessLayout>
+            <RouteGuard path="/process">
+              <ProcessLayout>
+                <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                  <ErrorBoundary>
+                    <ProcessPage />
+                  </ErrorBoundary>
+                </Suspense>
+              </ProcessLayout>
+            </RouteGuard>
           }
         />
         <Route
           path="/reports"
           element={
-            <ProcessLayout>
-              <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                <ErrorBoundary>
-                  <ReportsPage />
-                </ErrorBoundary>
-              </Suspense>
-            </ProcessLayout>
+            <RouteGuard path="/reports">
+              <ProcessLayout>
+                <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                  <ErrorBoundary>
+                    <ReportsPage />
+                  </ErrorBoundary>
+                </Suspense>
+              </ProcessLayout>
+            </RouteGuard>
           }
         />
         <Route
           path="/role-management"
           element={
-            <ProcessLayout>
-              <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                <ErrorBoundary>
-                  <RoleManagementPage />
-                </ErrorBoundary>
-              </Suspense>
-            </ProcessLayout>
+            <RouteGuard path="/role-management">
+              <ProcessLayout>
+                <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                  <ErrorBoundary>
+                    <RoleManagementPage />
+                  </ErrorBoundary>
+                </Suspense>
+              </ProcessLayout>
+            </RouteGuard>
           }
         />
         <Route
           path="/role-management/add"
           element={
-            <ProcessLayout>
-              <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                <ErrorBoundary>
-                  <RoleFormPage />
-                </ErrorBoundary>
-              </Suspense>
-            </ProcessLayout>
+            <RouteGuard path="/role-management/add">
+              <ProcessLayout>
+                <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                  <ErrorBoundary>
+                    <RoleFormPage />
+                  </ErrorBoundary>
+                </Suspense>
+              </ProcessLayout>
+            </RouteGuard>
           }
         />
         <Route
           path="/role-management/edit/:id"
           element={
-            <ProcessLayout>
-              <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                <ErrorBoundary>
-                  <RoleFormPage />
-                </ErrorBoundary>
-              </Suspense>
-            </ProcessLayout>
+            <RouteGuard path="/role-management/edit/:id">
+              <ProcessLayout>
+                <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                  <ErrorBoundary>
+                    <RoleFormPage />
+                  </ErrorBoundary>
+                </Suspense>
+              </ProcessLayout>
+            </RouteGuard>
           }
         />
         <Route
           path="/user-management"
           element={
-            <ProcessLayout>
-              <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                <ErrorBoundary>
-                  <UserManagementPage />
-                </ErrorBoundary>
-              </Suspense>
-            </ProcessLayout>
+            <RouteGuard path="/user-management">
+              <ProcessLayout>
+                <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                  <ErrorBoundary>
+                    <UserManagementPage />
+                  </ErrorBoundary>
+                </Suspense>
+              </ProcessLayout>
+            </RouteGuard>
           }
         />
         <Route
           path="/user-management/add"
           element={
-            <ProcessLayout>
-              <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                <ErrorBoundary>
-                  <UserFormPage />
-                </ErrorBoundary>
-              </Suspense>
-            </ProcessLayout>
+            <RouteGuard path="/user-management/add">
+              <ProcessLayout>
+                <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                  <ErrorBoundary>
+                    <UserFormPage />
+                  </ErrorBoundary>
+                </Suspense>
+              </ProcessLayout>
+            </RouteGuard>
           }
         />
         <Route
           path="/user-management/edit/:id"
           element={
-            <ProcessLayout>
-              <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                <ErrorBoundary>
-                  <UserFormPage />
-                </ErrorBoundary>
-              </Suspense>
-            </ProcessLayout>
+            <RouteGuard path="/user-management/edit/:id">
+              <ProcessLayout>
+                <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                  <ErrorBoundary>
+                    <UserFormPage />
+                  </ErrorBoundary>
+                </Suspense>
+              </ProcessLayout>
+            </RouteGuard>
           }
         />
         <Route
           path="/scholarship-change-password"
           element={
-            <ProcessLayout>
-              <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                <ErrorBoundary>
-                  <ScholarshipChangePasswordPage />
-                </ErrorBoundary>
-              </Suspense>
-            </ProcessLayout>
+            <RouteGuard path="/scholarship-change-password">
+              <ProcessLayout>
+                <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                  <ErrorBoundary>
+                    <ScholarshipChangePasswordPage />
+                  </ErrorBoundary>
+                </Suspense>
+              </ProcessLayout>
+            </RouteGuard>
           }
         />
         <Route
           path="/user-dashboard"
           element={
-            <ProcessLayout hideSidebar={true}>
-              <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                <ErrorBoundary>
-                  <UserDashboardPage />
-                </ErrorBoundary>
-              </Suspense>
-            </ProcessLayout>
+            <RouteGuard path="/user-dashboard">
+              <ProcessLayout hideSidebar={true}>
+                <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                  <ErrorBoundary>
+                    <UserDashboardPage />
+                  </ErrorBoundary>
+                </Suspense>
+              </ProcessLayout>
+            </RouteGuard>
           }
         />
         <Route
           path="/admin-dashboard"
           element={
-            <ProcessLayout>
-              <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                <ErrorBoundary>
-                  <AdminDashboardPage />
-                </ErrorBoundary>
-              </Suspense>
-            </ProcessLayout>
+            <RouteGuard path="/admin-dashboard">
+              <ProcessLayout>
+                <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                  <ErrorBoundary>
+                    <AdminDashboardPage />
+                  </ErrorBoundary>
+                </Suspense>
+              </ProcessLayout>
+            </RouteGuard>
           }
         />
         <Route
           path="/home"
           element={
-            <ProcessLayout>
-              <Suspense fallback={<LoadingScreen message="Loading..." />}>
-                <ErrorBoundary>
-                  <AdminDashboardPage />
-                </ErrorBoundary>
-              </Suspense>
-            </ProcessLayout>
+            <RouteGuard path="/home">
+              <ProcessLayout>
+                <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                  <ErrorBoundary>
+                    <AdminDashboardPage />
+                  </ErrorBoundary>
+                </Suspense>
+              </ProcessLayout>
+            </RouteGuard>
           }
         />
         {/* Redirect authenticated users to registration */}

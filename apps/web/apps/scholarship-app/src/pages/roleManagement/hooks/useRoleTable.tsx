@@ -89,8 +89,6 @@ export const useRoleTable = ({
               icon={<PersonDeleteRegular style={{ width: "16px", height: "16px" }} />}
               label="Delete Role"
               onClick={() => handleDeleteRole(item, handleDelete)}
-              // style={{ color: "#c50f1f" }}
-              // className="hover:text-red-700"
             />
           </DropdownMenuContent>
         </DropdownMenu>

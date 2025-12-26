@@ -8,12 +8,20 @@ import {
   Param,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { UserManagementService } from './user-management.service';
+import { ScholarshipSessionGuard } from '../scholarship-auth/guards/scholarship-session.guard';
+import { 
+  ScholarshipUserTypeGuard, 
+  RequireUserTypes 
+} from '../scholarship-auth/guards/scholarship-user-type.guard';
 
 @ApiTags('User Management')
 @Controller('user-management')
+@UseGuards(ScholarshipSessionGuard)
+@ApiBearerAuth('ScholarshipSession')
 export class UserManagementController {
   constructor(private readonly userService: UserManagementService) {}
 
@@ -64,6 +72,8 @@ export class UserManagementController {
 
   @Post('user')
   @HttpCode(HttpStatus.CREATED)
+  @UseGuards(ScholarshipUserTypeGuard)
+  @RequireUserTypes('Administrator')
   @ApiOperation({ summary: 'Create new user' })
   @ApiResponse({
     status: 201,
@@ -77,6 +87,8 @@ export class UserManagementController {
 
   @Put('user')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(ScholarshipUserTypeGuard)
+  @RequireUserTypes('Administrator')
   @ApiOperation({ summary: 'Update user' })
   @ApiResponse({
     status: 200,
@@ -90,6 +102,8 @@ export class UserManagementController {
 
   @Delete('user/:userId')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(ScholarshipUserTypeGuard)
+  @RequireUserTypes('Administrator')
   @ApiOperation({ summary: 'Delete user' })
   @ApiResponse({
     status: 200,

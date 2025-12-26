@@ -7,6 +7,7 @@ import { Stack, MessageBar, MessageBarType } from '@fluentui/react';
 import { secureTokenStorage } from '@shared/utils/secureTokenStorage';
 import { preserveQueryParams, handleAuthRedirect } from '../../utils/redirect';
 import { useAuth } from '../../contexts/AuthContext';
+import { isScholarshipLoggedIn } from '../../utils/routeProtection';
 import { SEO } from '../../components/seo/SEO';
 import { generateOrganizationSchema } from '../../utils/schema';
 import { Form } from '@shared/components';
@@ -126,19 +127,41 @@ const SignInPage = () => {
     }
   }, [isLogout, searchParams, setSearchParams, checkAuthStatus]);
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (check both AuthContext and scholarship auth)
   useEffect(() => {
     const checkAuth = async () => {
-      if (isLogout || !isAuthenticated) return;
+      if (isLogout) return;
 
-      const isValid = await secureTokenStorage.hasValidToken();
-      if (isValid) {
-        const token = await secureTokenStorage.getAccessToken();
-        handleAuthRedirect(redirectUrl ?? null, productCode ?? null, token ?? undefined);
+      // Check scholarship auth first (for student/admin users)
+      const scholarshipLoggedIn = isScholarshipLoggedIn();
+      if (scholarshipLoggedIn) {
+        // Redirect to user dashboard or registration based on status
+        const authData = localStorage.getItem('scholarship_auth');
+        if (authData) {
+          try {
+            const parsed = JSON.parse(authData);
+            // Check if user has completed registration
+            if (parsed?.user?.userId) {
+              void navigate('/user-dashboard');
+              return;
+            }
+          } catch {
+            // Invalid auth data
+          }
+        }
+      }
+
+      // Check AuthContext (for other auth methods)
+      if (isAuthenticated) {
+        const isValid = await secureTokenStorage.hasValidToken();
+        if (isValid) {
+          const token = await secureTokenStorage.getAccessToken();
+          handleAuthRedirect(redirectUrl ?? null, productCode ?? null, token ?? undefined);
+        }
       }
     };
     void checkAuth();
-  }, [isAuthenticated, redirectUrl, productCode, isLogout]);
+  }, [isAuthenticated, redirectUrl, productCode, isLogout, navigate]);
 
 
   const verifyEmail = (email: string, mode: 'login' | 'check') => {

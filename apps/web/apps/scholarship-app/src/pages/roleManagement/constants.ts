@@ -67,7 +67,7 @@ export const mockRoles: Role[] = [
 export const userTypeOptions = [
   { value: "Administrator", label: "Administrator" },
   { value: "Manager", label: "Manager" },
-  { value: "User", label: "User" },
+  { value: "Standard User", label: "Standard User" },
 ];
 
 export const defaultPermissions: RolePermission[] = MODULE_NAMES.map((module) => ({

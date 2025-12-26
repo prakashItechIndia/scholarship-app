@@ -233,12 +233,32 @@ export class ScholarshipAuthService {
       this.logger.warn('Could not verify Student role, allowing login to proceed', error);
     }
 
+    // Fetch User_Type from T_ROLES table if not provided by stored procedure
+    let userType = user.userType;
+    if (!userType || userType === '') {
+      try {
+        const roleQuery = `
+          SELECT User_Type
+          FROM T_ROLES
+          WHERE Id = @roleId
+        `;
+        const roleResult = await this.db.query<{ User_Type: string }>(roleQuery, {
+          roleId: user.roleId,
+        });
+        if (roleResult.recordset && roleResult.recordset.length > 0) {
+          userType = getCaseInsensitiveValue<string>(roleResult.recordset[0], 'User_Type') || '';
+        }
+      } catch (error) {
+        this.logger.warn('Failed to fetch User_Type from T_ROLES', error);
+      }
+    }
+
     // Return user info (without password)
     return {
       userId: user.id,
       userName: user.userName,
       roleId: user.roleId,
-      userType: user.userType,
+      userType: userType,
       passwordChange: user.passwordChange,
     };
   }

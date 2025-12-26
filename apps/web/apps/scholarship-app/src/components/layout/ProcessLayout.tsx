@@ -18,7 +18,6 @@ import { NavbarLogo } from "../common";
 import { ChangePasswordModal } from "@/components/common/ChangePasswordModal";
 import { ProfilePopover } from "../common/ProfilePopover";
 import { PageLayout, SideNavConfig } from "./PageLayout";
-import { usePermissions } from "../../contexts/PermissionContext";
 
 interface ProcessLayoutProps {
   children: React.ReactNode;
@@ -74,9 +73,6 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
   const userName = userData?.user?.userName || userData?.email || 'User';
   const userRole = userData?.user?.userType || 'User';
 
-  // Get permissions
-  const { hasPermission } = usePermissions();
-
   // Define all menu items with their screen URLs
   const allMenuItems = [
       {
@@ -121,12 +117,64 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
       },
     ];
 
-  // Filter menu items based on permissions
-  // If no permissions loaded yet, show all items (will be filtered once permissions load)
+  // Filter menu items based on userType
   const filteredMenuItems = allMenuItems.filter(item => {
-    // If permissions are not loaded, show item (will be hidden once permissions load)
-    // Otherwise, check if user has permission for this screen
-    // return hasPermission(item.screenUrl);
+    const userType = userRole; // userRole is already userType from userData
+    
+    // Administrator: Show all menus
+    if (userType === 'Administrator') {
+      return true;
+    }
+    
+    // Manager: Show only Process and Reports
+    if (userType === 'Manager') {
+      return item.label === 'Process' || item.label === 'Reports';
+    }
+    
+    // Standard User: Show only Process
+    if (userType === 'Standard User') {
+      return item.label === 'Process';
+    }
+    
+    // Default: Show all (for backward compatibility)
+    return true;
+  });
+
+  // Filter footer items based on userType
+  const allFooterItems = [
+    {
+      icon: <QuestionCircleRegular className="w-5 h-5" />,
+      label: "Help",
+      active: location.pathname === "/help",
+      onClick: () => { void navigate("/help"); },
+    },
+    {
+      icon: (
+        <ProfilePopover
+          userName={userName}
+          userRole={userRole}
+          open={settingsPopoverOpen}
+          onOpenChange={setSettingsPopoverOpen}
+          onLogout={() => setLogoutModalOpen(true)}
+          onChangePassword={() => setChangePasswordModalOpen(true)}
+        >
+          <SettingsRegular className="w-5 h-5" />
+        </ProfilePopover>
+      ),
+      label: "Settings",
+      active: location.pathname === "/settings",
+      onClick: () => { setSettingsPopoverOpen(true); },
+    },
+  ];
+
+  // Filter footer items: Manager should not see Help and Settings
+  const filteredFooterItems = allFooterItems.filter(() => {
+    const userType = userRole;
+    // Manager: Hide Help and Settings
+    if (userType === 'Manager') {
+      return false;
+    }
+    // Administrator and Standard User: Show Help and Settings
     return true;
   });
 
@@ -134,31 +182,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
     // logo,
     expanded: false,
     items: filteredMenuItems,
-    footerItems: [
-      {
-        icon: <QuestionCircleRegular className="w-5 h-5" />,
-        label: "Help",
-        active: location.pathname === "/help",
-        onClick: () => { void navigate("/help"); },
-      },
-      {
-        icon: (
-          <ProfilePopover
-            userName={userName}
-            userRole={userRole}
-            open={settingsPopoverOpen}
-            onOpenChange={setSettingsPopoverOpen}
-            onLogout={() => setLogoutModalOpen(true)}
-            onChangePassword={() => setChangePasswordModalOpen(true)}
-          >
-            <SettingsRegular className="w-5 h-5" />
-          </ProfilePopover>
-        ),
-        label: "Settings",
-        active: location.pathname === "/settings",
-        onClick: () => { setSettingsPopoverOpen(true); },
-      },
-    ],
+    footerItems: filteredFooterItems,
   };
 
   // Handle logout (following old app pattern - clear session and redirect to login)

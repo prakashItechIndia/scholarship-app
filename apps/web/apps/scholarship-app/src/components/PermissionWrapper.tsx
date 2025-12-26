@@ -19,8 +19,9 @@ export const PermissionWrapper: React.FC<PermissionWrapperProps> = ({ children }
         if (authData) {
           const parsed = JSON.parse(authData);
           // Try different possible user ID fields from scholarship auth
-          const id = parsed?.user?.id || 
-                     parsed?.user?.userId || 
+          // The login response structure: { user: { userId, userName, roleId, userType } }
+          const id = parsed?.user?.userId || 
+                     parsed?.user?.id || 
                      parsed?.user?.ID ||
                      parsed?.userId || 
                      parsed?.id ||
@@ -29,7 +30,27 @@ export const PermissionWrapper: React.FC<PermissionWrapperProps> = ({ children }
             const numId = typeof id === 'string' ? parseInt(id, 10) : id;
             if (!isNaN(numId) && numId > 0) {
               setUserId(numId);
+              return; // Found userId, no need to check session token
             }
+          }
+        }
+        
+        // Fallback: Try to get userId from session token
+        const sessionToken = sessionStorage.getItem('scholarship_admin_session_token') ||
+                            sessionStorage.getItem('scholarship_session_token') ||
+                            localStorage.getItem('scholarship_session_token');
+        if (sessionToken) {
+          try {
+            const sessionData = JSON.parse(atob(sessionToken));
+            const sessionUserId = sessionData?.userId;
+            if (sessionUserId) {
+              const numId = typeof sessionUserId === 'string' ? parseInt(sessionUserId, 10) : sessionUserId;
+              if (!isNaN(numId) && numId > 0) {
+                setUserId(numId);
+              }
+            }
+          } catch {
+            // Invalid session token, ignore
           }
         }
       } catch (error) {

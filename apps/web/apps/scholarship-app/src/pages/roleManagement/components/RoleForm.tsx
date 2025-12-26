@@ -1,19 +1,19 @@
-import * as React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useToast } from "@/components/ui/toast";
+import { Spinner, SpinnerSize } from "@fluentui/react";
 import {
   Button,
   Card,
+  DataTable,
   Label,
   PageActionButtons,
-  DataTable,
 } from "@shared/components";
-import { Spinner, SpinnerSize } from "@fluentui/react";
-import { Role, RoleFormData, RolePermission } from "../types";
-import { defaultPermissions } from "../constants";
-import { RoleDetailsForm } from "./RoleDetailsForm";
-import { RoleScreenPermissions } from "./RoleScreenPermissions";
+import * as React from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { roleManagement } from "../../../services/scholarship.service";
-import { useToast } from "@/components/ui/toast";
+import { defaultPermissions, userTypeOptions } from "../constants";
+import { RoleFormData, RolePermission } from "../types";
+import { RoleDetailsForm } from "./RoleDetailsForm";
+import { getScreenIdsForModule } from "../screenMapping";
 
 // ProfileAvatar component - SVG as React component
 const ProfileAvatar = ({ width = 80, height = 80, className = '' }: { width?: number; height?: number; className?: string }) => {
@@ -34,8 +34,10 @@ const ProfileAvatar = ({ width = 80, height = 80, className = '' }: { width?: nu
 const RoleForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
+  const [searchParams] = useSearchParams();
   const { success, error: showError } = useToast();
   const isEditMode = !!id;
+  const isDuplicateMode = searchParams.get('duplicate') === 'true';
   const [loading, setLoading] = React.useState(false);
   
   const [formData, setFormData] = React.useState<RoleFormData>({
@@ -44,7 +46,9 @@ const RoleForm: React.FC = () => {
     status: "Active",
     permissions: [...defaultPermissions],
   });
-  const [selectedScreenIds, setSelectedScreenIds] = React.useState<number[]>([]);
+  // Note: selectedScreenIds is no longer used - we now use action-level permissions
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_selectedScreenIds, _setSelectedScreenIds] = React.useState<number[]>([]);
   // Note: profilePhoto is stored for potential file upload functionality
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_profilePhoto, setProfilePhoto] = React.useState<File | null>(null);
@@ -57,23 +61,146 @@ const RoleForm: React.FC = () => {
     permissions?: string;
   }>({});
 
-  // Load role data if editing
+  // Load role data if editing or duplicating
   React.useEffect(() => {
     const loadRole = async () => {
+      // Handle duplicate mode - load from sessionStorage
+      if (isDuplicateMode) {
+        try {
+          const duplicateRoleStr = sessionStorage.getItem("duplicateRole");
+          if (duplicateRoleStr) {
+            const duplicateRole = JSON.parse(duplicateRoleStr);
+            const roleId = parseInt(duplicateRole.id, 10);
+            
+            // Load role with permissions
+            const roleWithPermissions = await roleManagement.getRoleWithPermissions(roleId);
+            
+            // Map screen permissions back to module permissions
+            const modulePermissions = [...defaultPermissions];
+            const screenPermissions = (roleWithPermissions.permissions || []) as {
+              screenId: number;
+              canCreate: boolean;
+              canView: boolean;
+              canUpdate: boolean;
+              canDelete: boolean;
+            }[];
+            
+            // For each module, check if any of its screens have permissions
+            modulePermissions.forEach((modulePerm) => {
+              const screenIds = getScreenIdsForModule(modulePerm.moduleName);
+              if (screenIds.length > 0) {
+                const moduleScreenPerms = screenPermissions.filter((sp: {
+                  screenId: number;
+                  canCreate: boolean;
+                  canView: boolean;
+                  canUpdate: boolean;
+                  canDelete: boolean;
+                }) => 
+                  screenIds.includes(sp.screenId)
+                );
+                
+                if (moduleScreenPerms.length > 0) {
+                  modulePerm.create = moduleScreenPerms.some((sp: {
+                    canCreate: boolean;
+                  }) => sp.canCreate);
+                  modulePerm.view = moduleScreenPerms.some((sp: {
+                    canView: boolean;
+                  }) => sp.canView);
+                  modulePerm.update = moduleScreenPerms.some((sp: {
+                    canUpdate: boolean;
+                  }) => sp.canUpdate);
+                  modulePerm.delete = moduleScreenPerms.some((sp: {
+                    canDelete: boolean;
+                  }) => sp.canDelete);
+                }
+              }
+            });
+            
+            setFormData({
+              roleName: `${duplicateRole.roleName} (Copy)`,
+              userType: duplicateRole.userType || "",
+              status: "Active",
+              permissions: modulePermissions,
+            });
+            
+            // Clear sessionStorage
+            sessionStorage.removeItem("duplicateRole");
+          }
+        } catch (err) {
+          showError('Failed to Load Duplicate Role', err instanceof Error ? err.message : 'Failed to load duplicate role data');
+        }
+        return;
+      }
+      
+      // Handle edit mode
       if (isEditMode && id) {
         try {
           setLoading(true);
           const roleId = parseInt(id, 10);
           const roleData = await roleManagement.getRoleById(roleId);
-          // Load role with permissions to get screen IDs
+          // Load role with permissions to get screen permissions with actions
           const roleWithPermissions = await roleManagement.getRoleWithPermissions(roleId);
-          const screenIds = roleWithPermissions.permissions.map(p => p.screenId);
-          setSelectedScreenIds(screenIds);
+          
+          // Map screen permissions back to module permissions
+          const modulePermissions = [...defaultPermissions];
+          const screenPermissions = (roleWithPermissions.permissions || []) as {
+            screenId: number;
+            canCreate: boolean;
+            canView: boolean;
+            canUpdate: boolean;
+            canDelete: boolean;
+          }[];
+          
+          // For each module, check if any of its screens have permissions
+          modulePermissions.forEach((modulePerm) => {
+            const screenIds = getScreenIdsForModule(modulePerm.moduleName);
+            if (screenIds.length > 0) {
+              // Find permissions for screens in this module
+              const moduleScreenPerms = screenPermissions.filter((sp: {
+                screenId: number;
+                canCreate: boolean;
+                canView: boolean;
+                canUpdate: boolean;
+                canDelete: boolean;
+              }) => 
+                screenIds.includes(sp.screenId)
+              );
+              
+              if (moduleScreenPerms.length > 0) {
+                // If any screen has a permission, enable it for the module
+                // Use OR logic: if any screen allows it, module allows it
+                modulePerm.create = moduleScreenPerms.some((sp: {
+                  canCreate: boolean;
+                }) => sp.canCreate);
+                modulePerm.view = moduleScreenPerms.some((sp: {
+                  canView: boolean;
+                }) => sp.canView);
+                modulePerm.update = moduleScreenPerms.some((sp: {
+                  canUpdate: boolean;
+                }) => sp.canUpdate);
+                modulePerm.delete = moduleScreenPerms.some((sp: {
+                  canDelete: boolean;
+                }) => sp.canDelete);
+              }
+            }
+          });
+          
+          // Ensure userType matches one of the valid options
+          const validUserTypes = userTypeOptions.map(opt => opt.value);
+          // Handle both boolean and number for isActive
+          const isActiveValue = typeof roleData.isActive === 'boolean' 
+            ? (roleData.isActive ? 1 : 0)
+            : (roleData.isActive || 0);
+          
+          const userTypeValue = roleData.userType 
+            ? (validUserTypes.includes(roleData.userType) ? roleData.userType : "")
+            : "";
+          
           setFormData({
             roleName: roleData.roleName || "",
-            userType: roleData.userType || "",
-            status: roleData.isActive === 1 ? "Active" : "Inactive",
-            permissions: [...defaultPermissions], // Keep for backward compatibility
+            userType: userTypeValue,
+            status: isActiveValue === 1 ? "Active" : "Inactive",
+            permissions: modulePermissions,
           });
         } catch (err) {
           showError('Failed to Load Role', err instanceof Error ? err.message : 'Failed to fetch role data');
@@ -83,7 +210,7 @@ const RoleForm: React.FC = () => {
       }
     };
     void loadRole();
-  }, [id, isEditMode, showError]);
+  }, [id, isEditMode, isDuplicateMode, showError]);
 
   const handleInputChange = (field: keyof RoleFormData, value: any) => {
     setFormData((prev) => ({
@@ -208,9 +335,12 @@ const RoleForm: React.FC = () => {
       }
     }
 
-    // ROL-002: At least one screen permission shall be enabled for a valid role
-    if (selectedScreenIds.length === 0) {
-      newErrors.permissions = "At least one screen permission must be selected for the role.";
+    // ROL-002: At least one permission shall be enabled for a valid role
+    const hasAnyPermission = formData.permissions.some(
+      perm => perm.create || perm.view || perm.update || perm.delete
+    );
+    if (!hasAnyPermission) {
+      newErrors.permissions = "At least one permission must be enabled for the role.";
     }
 
     setErrors(newErrors);
@@ -228,21 +358,71 @@ const RoleForm: React.FC = () => {
         isActive: formData.status === "Active" ? 1 : 0,
       };
 
+      // Convert module permissions to screen permissions with actions
+      const screenPermissions: {
+        screenId: number;
+        canCreate: boolean;
+        canView: boolean;
+        canUpdate: boolean;
+        canDelete: boolean;
+      }[] = [];
+      
+      // For each module permission, create screen permissions
+      formData.permissions.forEach(modulePerm => {
+        const screenIds = getScreenIdsForModule(modulePerm.moduleName);
+        
+        // If no screen mapping, skip (e.g., Menu)
+        if (screenIds.length === 0) {
+          return;
+        }
+
+        // Create permission entry for each screen in the module
+        screenIds.forEach(screenId => {
+          // Check if permission already exists for this screen
+          const existingIndex = screenPermissions.findIndex(sp => sp.screenId === screenId);
+          
+          if (existingIndex >= 0) {
+            // Merge permissions (OR logic: if module allows, screen allows)
+            screenPermissions[existingIndex] = {
+              screenId,
+              canCreate: screenPermissions[existingIndex].canCreate || modulePerm.create,
+              canView: screenPermissions[existingIndex].canView || modulePerm.view,
+              canUpdate: screenPermissions[existingIndex].canUpdate || modulePerm.update,
+              canDelete: screenPermissions[existingIndex].canDelete || modulePerm.delete,
+            };
+          } else {
+            // Create new permission entry
+            screenPermissions.push({
+              screenId,
+              canCreate: modulePerm.create,
+              canView: modulePerm.view,
+              canUpdate: modulePerm.update,
+              canDelete: modulePerm.delete,
+            });
+          }
+        });
+      });
+
+      // Filter out permissions where all actions are false
+      const validPermissions = screenPermissions.filter(
+        perm => perm.canCreate || perm.canView || perm.canUpdate || perm.canDelete
+      );
+
       if (isEditMode && id) {
         const roleId = parseInt(id, 10);
         await roleManagement.updateRole(roleId, roleData);
-        // Update screen permissions
-        await roleManagement.updateRolePermissions(roleId, selectedScreenIds);
+        // Update screen permissions with actions
+        await roleManagement.updateRolePermissions(roleId, validPermissions);
         success('Success', 'Role updated successfully');
       } else {
         // Create role first, then get the ID to assign permissions
-        const createResult = await roleManagement.createRole(roleData);
+        await roleManagement.createRole(roleData);
         // Get the newly created role ID - we need to fetch it by name
         const allRoles = await roleManagement.getAllRoles();
-        const newRole = allRoles.find(r => r.roleName === roleData.roleName);
-        if (newRole && newRole.id) {
+        const newRole = allRoles.find((r: { roleName: string }) => r.roleName === roleData.roleName);
+        if (newRole?.id) {
           const newRoleId = typeof newRole.id === 'string' ? parseInt(newRole.id, 10) : newRole.id;
-          await roleManagement.updateRolePermissions(newRoleId, selectedScreenIds);
+          await roleManagement.updateRolePermissions(newRoleId, validPermissions);
         }
         success('Success', 'Role created successfully');
       }
@@ -280,11 +460,11 @@ const RoleForm: React.FC = () => {
     {
       key: "select",
       name: "",
-      width: 150,
-      minWidth: 150,
-      maxWidth: 150,
+      width: 50,
+      minWidth: 50,
+      maxWidth: 50,
       cellPaddingLeft: "20px",
-      cellPaddingRight: "0px",
+      cellPaddingRight: "8px",
       onRenderHeader: () => (
         <div style={{ 
           textAlign: "left",
@@ -334,8 +514,20 @@ const RoleForm: React.FC = () => {
       key: "menu",
       name: "Menu",
       width: "auto",
-      cellPaddingLeft: "2px",
+      minWidth: 200,
+      cellPaddingLeft: "8px",
       cellPaddingRight: "16px",
+      onRenderHeader: () => (
+        <div style={{
+          fontSize: "13px",
+          lineHeight: "20px",
+          fontWeight: 600,
+          color: "#424242",
+          fontFamily: "'Inter', sans-serif",
+        }}>
+          Menu
+        </div>
+      ),
       onRender: (item: RolePermission) => (
         <span style={{
           fontSize: "13px",
@@ -350,11 +542,11 @@ const RoleForm: React.FC = () => {
     {
       key: "create",
       name: "Create",
-      width: 150,
-      minWidth: 150,
-      maxWidth: 150,
-      cellPaddingLeft: 4,
-      cellPaddingRight: 150,
+      width: 120,
+      minWidth: 120,
+      maxWidth: 120,
+      cellPaddingLeft: "8px",
+      cellPaddingRight: "8px",
       onRenderHeader: () => (
         <div style={{ 
           textAlign: "center",
@@ -390,11 +582,11 @@ const RoleForm: React.FC = () => {
     {
       key: "update",
       name: "Update",
-      width: 150,
-      minWidth: 150,
-      maxWidth: 150,
-      cellPaddingLeft: 4,
-      cellPaddingRight: 150 ,
+      width: 120,
+      minWidth: 120,
+      maxWidth: 120,
+      cellPaddingLeft: "8px",
+      cellPaddingRight: "8px",
       onRenderHeader: () => (
         <div style={{ 
           textAlign: "center",
@@ -430,11 +622,11 @@ const RoleForm: React.FC = () => {
     {
       key: "view",
       name: "View",
-      width: 150,
-      minWidth: 150,
-      maxWidth: 150,
-      cellPaddingLeft: 4,
-      cellPaddingRight: 150,
+      width: 120,
+      minWidth: 120,
+      maxWidth: 120,
+      cellPaddingLeft: "8px",
+      cellPaddingRight: "8px",
       onRenderHeader: () => (
         <div style={{ 
           textAlign: "center",
@@ -470,11 +662,11 @@ const RoleForm: React.FC = () => {
     {
       key: "delete",
       name: "Delete",
-      width: 150,
-      minWidth: 150,
-      maxWidth: 150,
-      cellPaddingLeft: 4,
-      cellPaddingRight: 150,
+      width: 120,
+      minWidth: 120,
+      maxWidth: 120,
+      cellPaddingLeft: "8px",
+      cellPaddingRight: "8px",
       onRenderHeader: () => (
         <div style={{ 
           textAlign: "center",
@@ -713,29 +905,20 @@ const RoleForm: React.FC = () => {
                 fontFamily: "'Inter', sans-serif",
                 margin: 0,
               }}>
-                Screen Permissions
+                Permissions
               </h3>
-              {errors.permissions && (
-                <span style={{
-                  fontSize: "12px",
-                  lineHeight: "16px",
-                  color: "#dc2626",
-                  fontFamily: "'Inter', sans-serif",
-                  marginLeft: "12px",
-                }}>
-                  {errors.permissions}
-                </span>
-              )}
             </div>
-            <RoleScreenPermissions
-              roleId={isEditMode && id ? parseInt(id, 10) : undefined}
-              selectedScreenIds={selectedScreenIds}
-              onScreenSelectionChange={setSelectedScreenIds}
-              errors={errors}
-          />
+            <div style={{
+              border: "1px solid #e0e0e0",
+              borderRadius: "4px",
+            }}>
+              <DataTable
+                data={formData.permissions}
+                columns={permissionsColumns}
+              />
+            </div>
           </div>
         </div>
-
         {/* Footer Buttons */}
         <div style={{
           display: "flex",

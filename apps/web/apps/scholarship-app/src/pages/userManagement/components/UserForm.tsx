@@ -436,7 +436,6 @@ const UserForm: React.FC = () => {
               value={formData.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
               errorMessage={errors.name}
-              // style={{ height: "32px" }}
             />
           </div>
 
@@ -478,7 +477,6 @@ const UserForm: React.FC = () => {
               value={formData.emailId}
               onChange={(e) => handleInputChange("emailId", e.target.value)}
               errorMessage={errors.emailId}
-              // style={{ height: "32px" }}
             />
           </div>
 

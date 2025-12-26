@@ -1,10 +1,10 @@
 import * as React from "react";
-import { Dropdown, Option, DropdownProps } from "@fluentui/react-components";
+import { Combobox, Option, ComboboxProps } from "@fluentui/react-components";
 import { cn } from "../lib/utils";
 import { useDarkMode } from "../hooks/useDarkMode";
 import { getThemeTokens } from "../config/theme";
 
-export interface SelectProps extends Omit<DropdownProps, "onChange" | "value"> {
+export interface SelectProps extends Omit<ComboboxProps, "onChange" | "value"> {
   options?: Array<{ value: string; label: string }>;
   onValueChange?: (value: string) => void;
   selectedKey?: string | number;
@@ -12,9 +12,18 @@ export interface SelectProps extends Omit<DropdownProps, "onChange" | "value"> {
   errorMessage?: string;
 }
 
-const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
+const Select = React.forwardRef<HTMLInputElement, SelectProps>(
   ({ className, onValueChange, options = [], selectedKey, placeholder, errorMessage, ...props }, ref) => {
     const isDark = useDarkMode();
+    
+    // Get the selected option's label for display
+    const selectedOption = React.useMemo(() => {
+      if (!selectedKey || options.length === 0) {
+        return null;
+      }
+      const keyStr = String(selectedKey);
+      return options.find(opt => String(opt.value) === keyStr);
+    }, [selectedKey, options]);
     
     const handleChange = React.useCallback(
       (_event: any, data: { optionValue?: string; optionText?: string }) => {
@@ -42,11 +51,12 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             width: "100%",
           }}
         >
-          <Dropdown
+          <Combobox
             ref={ref}
             className={cn(className)}
             placeholder={placeholder}
-            selectedOptions={selectedKey ? [String(selectedKey)] : []}
+            value={selectedOption?.label || ''}
+            selectedOptions={selectedOption ? [String(selectedOption.value)] : []}
             onOptionSelect={handleChange}
             size="small"
             style={{
@@ -71,7 +81,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                 {opt.label}
               </Option>
             ))}
-          </Dropdown>
+          </Combobox>
         </div>
         {errorMessage && (
           <div 
