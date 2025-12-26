@@ -438,11 +438,13 @@ const PersonalDetails = () => {
                                         <FormField label="Mobile Number" required error={errors.mobile?.message as string}>
                                             <Input
                                                 {...field}
+                                                value={field.value ?? ''}
                                                 placeholder="Enter mobile number"
                                                 errorMessage={errors.mobile?.message as string}
-                                                onChange={(_e: React.ChangeEvent<HTMLInputElement>, value?: string) => {
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                     // Only allow digits
-                                                    const digitsOnly = (value ?? '').replace(/\D/g, '');
+                                                    const value = e.target.value;
+                                                    const digitsOnly = value.replace(/\D/g, '');
                                                     if (digitsOnly.length <= 10) {
                                                         field.onChange(digitsOnly);
                                                     }
@@ -532,13 +534,27 @@ const PersonalDetails = () => {
 
                         {/* Row 7: Pincode */}
                         <div className="w-full md:w-[calc(50%-12px)]">
-                            <InputField
+                            <Controller
                                 name="pincode"
                                 control={control}
-                                errors={errors}
-                                label="Pincode"
-                                required
-                                placeholder="Enter pincode"
+                                render={({ field }) => (
+                                    <FormField label="Pincode" required error={errors.pincode?.message as string}>
+                                        <Input
+                                            {...field}
+                                            value={field.value ?? ''}
+                                            placeholder="Enter pincode"
+                                            errorMessage={errors.pincode?.message as string}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                // Pincode: Must contain only numeric characters
+                                                const value = e.target.value;
+                                                const digitsOnly = value.replace(/\D/g, '');
+                                                if (digitsOnly.length <= 10) {
+                                                    field.onChange(digitsOnly);
+                                                }
+                                            }}
+                                        />
+                                    </FormField>
+                                )}
                             />
                         </div>
                         <div className="h-5"></div>

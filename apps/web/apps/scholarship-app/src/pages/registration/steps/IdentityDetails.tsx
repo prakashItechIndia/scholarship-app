@@ -229,12 +229,14 @@ const IdentityDetails = () => {
                                     <FormField label="AADHAR ID (Candidate)" required error={errors.aadhaarId?.message as string}>
                                         <Input
                                             {...field}
+                                            value={field.value ?? ''}
                                             placeholder="Enter 12 digit AADHAAR number"
                                             errorMessage={errors.aadhaarId?.message as string}
                                             className="!border-b-0"
-                                            onChange={(_e: React.ChangeEvent<HTMLInputElement>, value?: string) => {
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                 // Aadhaar Number: Must contain numeric characters only
-                                                const digitsOnly = (value ?? '').replace(/\D/g, '');
+                                                const value = e.target.value;
+                                                const digitsOnly = value.replace(/\D/g, '');
                                                 if (digitsOnly.length <= 12) {
                                                     field.onChange(digitsOnly);
                                                 }
@@ -252,12 +254,14 @@ const IdentityDetails = () => {
                                     <FormField label="PAN ID (Candidate)" required={false} error={errors.panId?.message as string}>
                                         <Input
                                             {...field}
+                                            value={field.value ?? ''}
                                             placeholder="Enter PAN number (Optional)"
                                             errorMessage={errors.panId?.message as string}
                                             className="!border-b-0"
-                                            onChange={(_e: React.ChangeEvent<HTMLInputElement>, value?: string) => {
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                 // PAN Number: Must follow the format 5 letters + 4 numbers + 1 letter; input is case-insensitive but will be stored in uppercase
-                                                const upperValue = (value ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+                                                const value = e.target.value;
+                                                const upperValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
                                                 if (upperValue.length <= 10) {
                                                     field.onChange(upperValue);
                                                 }

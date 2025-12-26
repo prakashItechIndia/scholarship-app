@@ -199,6 +199,12 @@ export class ProcessManagementService {
           P.Scholarship_Approved_Amount,
           P.Scholarship_Suggest_Amount,
           P.Data_Date,
+          P.Donated_Date,
+          P.DDCheque_Date,
+          P.DDCheque_No,
+          P.DDCheque_In_Favor,
+          P.Scholarship_Issued_Amount,
+          P.Scholarship_Issued_Date,
           UP.User_Name as Prepared_By,
           UV.User_Name as Verified_By,
           US.User_Name as Suggested_By,
@@ -345,6 +351,7 @@ export class ProcessManagementService {
           R.Mobile_Number,
           R.Father_Occupation,
           P.Scholarship_No,
+          P.Scholarship_Id,
           CASE 
             WHEN P.IsUpload_Status = '0' OR P.IsUpload_Status = '1' THEN 'Document Submitted'
             ELSE P.Status

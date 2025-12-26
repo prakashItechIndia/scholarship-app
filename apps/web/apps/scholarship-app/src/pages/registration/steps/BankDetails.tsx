@@ -126,11 +126,13 @@ const BankDetails = () => {
                                 <FormField label="Account Number" required error={errors.bankAccountNumber?.message as string}>
                                     <Input
                                         {...field}
+                                        value={field.value ?? ''}
                                         placeholder="Enter account number (8-18 digits)"
                                         errorMessage={errors.bankAccountNumber?.message as string}
-                                        onChange={(_e: React.ChangeEvent<HTMLInputElement>, value?: string) => {
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                             // Account Number: Must be between 8 and 18 digits and contain numeric characters only
-                                            const digitsOnly = (value ?? '').replace(/\D/g, '');
+                                            const value = e.target.value;
+                                            const digitsOnly = value.replace(/\D/g, '');
                                             if (digitsOnly.length <= 18) {
                                                 field.onChange(digitsOnly);
                                             }
@@ -166,13 +168,38 @@ const BankDetails = () => {
 
                     {/* Row 3: Request Amount & Scholarship Seeking For */}
                     <div className="col-span-1 w-full">
-                        <InputField
+                        <Controller
                             name="bankRequestAmount"
                             control={control}
-                            errors={errors}
-                            label="Request Amount"
-                            required
-                            placeholder={`Enter amount (₹${SCHOLARSHIP_MIN_AMOUNT.toLocaleString('en-IN')} - ₹${SCHOLARSHIP_MAX_AMOUNT.toLocaleString('en-IN')})`}
+                            render={({ field }) => (
+                                <FormField label="Request Amount" required error={errors.bankRequestAmount?.message as string}>
+                                    <Input
+                                        {...field}
+                                        value={field.value ?? ''}
+                                        placeholder={`Enter amount (₹${SCHOLARSHIP_MIN_AMOUNT.toLocaleString('en-IN')} - ₹${SCHOLARSHIP_MAX_AMOUNT.toLocaleString('en-IN')})`}
+                                        errorMessage={errors.bankRequestAmount?.message as string}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                            // Request Amount: Must contain only numbers and optionally one decimal point with up to 2 decimal places
+                                            const value = e.target.value;
+                                            // Allow only digits and one decimal point
+                                            let filteredValue = value.replace(/[^\d.]/g, '');
+                                            
+                                            // Ensure only one decimal point
+                                            const parts = filteredValue.split('.');
+                                            if (parts.length > 2) {
+                                                filteredValue = parts[0] + '.' + parts.slice(1).join('');
+                                            }
+                                            
+                                            // Limit decimal places to 2
+                                            if (parts.length === 2 && parts[1].length > 2) {
+                                                filteredValue = parts[0] + '.' + parts[1].substring(0, 2);
+                                            }
+                                            
+                                            field.onChange(filteredValue);
+                                        }}
+                                    />
+                                </FormField>
+                            )}
                         />
                     </div>
                     <div className="col-span-1 w-full">

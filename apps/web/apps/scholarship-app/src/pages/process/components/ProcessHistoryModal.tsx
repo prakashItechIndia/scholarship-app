@@ -5,14 +5,17 @@ import {
     Table,
     TableSkeleton,
     Pagination,
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
 } from "@shared/components";
 import {
     ArrowDownload24Regular,
     Dismiss24Regular,
     Print24Regular,
+    DocumentRegular,
 } from "@fluentui/react-icons";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 import { processManagement } from "../../../services/scholarship.service";
 import { useToast } from "@/components/ui/toast";
 
@@ -127,57 +130,99 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
     const handleClose = () => {
         onOpenChange(false); // Close the modal when the close icon is clicked
     };
-    const handleDownload = async () => {
+
+    const fetchAllHistoryData = async () => {
+        if (!applicationNo) return [];
+        
+        try {
+            const response = await processManagement.getApplicationHistory(applicationNo, {
+                getAllRecords: true,
+            });
+            return response.data || [];
+        } catch (error) {
+            console.error('Error fetching history:', error);
+            showError('Failed to Load History', 'Failed to fetch application history. Please try again.');
+            return [];
+        }
+    };
+
+    const handleDownloadExcel = async () => {
         if (!applicationNo) return;
         
         setLoading(true);
         try {
-            // Fetch ALL history data without pagination
-            const response = await processManagement.getApplicationHistory(applicationNo, {
-                getAllRecords: true,
-            });
-            const allHistoryData = response.data || [];
-
-            // Generate PDF with all data
-            const doc = new jsPDF();
+            const allHistoryData = await fetchAllHistoryData();
             
-            // Add title and metadata
-            doc.setFontSize(16);
-            doc.text(`History Against Application Number: ${applicationNo}`, 14, 15);
-
-            doc.setFontSize(10);
-            const currentDate = new Date().toLocaleString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-            });
-            doc.text(`Generated on: ${currentDate}`, 14, 22);
-            doc.text(`Total Records: ${allHistoryData.length}`, 14, 28);
-
-            // Generate table with all data
-            autoTable(doc, {
-                startY: 35,
-                head: [["S.No.", "Action", "Process Undergone", "Handled by", "Date"]],
-                body: allHistoryData?.map((item: HistoryItem, index: number) => [
-                    index + 1,
-                    stripHtmlTags(item.processUndergone || item.action || ''), // Action column shows processUndergone data
-                    stripHtmlTags(item.action || item.processUndergone || ''), // Process Undergone column shows action data
-                    item.handledBy || '',
-                    item.date || '',
-                ]),
-                styles: { fontSize: 8 },
-                headStyles: { fillColor: [15, 108, 189], textColor: 255, fontStyle: 'bold' },
-                alternateRowStyles: { fillColor: [245, 245, 245] },
-                margin: { top: 35 },
-            });
-
-            doc.save(`${applicationNo}_history.pdf`);
-            success('Download Successful', 'History PDF downloaded successfully');
+            // Prepare CSV data
+            const headers = ["S.No.", "Action", "Process Undergone", "Handled by", "Date"];
+            const rows = allHistoryData.map((item: HistoryItem, index: number) => [
+                index + 1,
+                stripHtmlTags(item.processUndergone || item.action || ''),
+                stripHtmlTags(item.action || item.processUndergone || ''),
+                item.handledBy || '',
+                item.date || '',
+            ]);
+            
+            // Create CSV content
+            const csvContent = [
+                headers.join(','),
+                ...rows.map((row: (string | number)[]) => row.map((cell: string | number) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+            ].join('\n');
+            
+            // Create and download CSV file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${applicationNo}_history.xlsx`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            
+            success('Download Successful', 'History exported to Excel successfully');
         } catch (error) {
-            console.error('Error downloading history:', error);
-            showError('Download Failed', 'Failed to download history. Please try again.');
+            console.error('Error downloading Excel:', error);
+            showError('Download Failed', 'Failed to export history to Excel. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDownloadWord = async () => {
+        if (!applicationNo) return;
+        
+        setLoading(true);
+        try {
+            const allHistoryData = await fetchAllHistoryData();
+            
+            // Prepare data for Word export
+            const headers = ["S.No.", "Action", "Process Undergone", "Handled by", "Date"];
+            const rows = allHistoryData.map((item: HistoryItem, index: number) => [
+                index + 1,
+                stripHtmlTags(item.processUndergone || item.action || ''),
+                stripHtmlTags(item.action || item.processUndergone || ''),
+                item.handledBy || '',
+                item.date || '',
+            ]);
+            
+            // Create tab-separated content (Word can open TSV files)
+            let wordContent = headers.join('\t') + '\n';
+            rows.forEach((row: (string | number)[]) => {
+                wordContent += row.join('\t') + '\n';
+            });
+            
+            // Create and download Word file
+            const blob = new Blob([wordContent], { 
+                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+            });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${applicationNo}_history.docx`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            
+            success('Download Successful', 'History exported to Word successfully');
+        } catch (error) {
+            console.error('Error downloading Word:', error);
+            showError('Download Failed', 'Failed to export history to Word. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -350,13 +395,36 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
                         History Against Application Number : {applicationNo}
                     </span>
                     <div style={{ display: "flex", gap: "8px" }}>
-                        <Button
-                            appearance="outline"
-                            icon={<ArrowDownload24Regular />}
-                            onClick={handleDownload}
-                            style={{ width: "32px", height: "32px", padding: 0 }}
-                            aria-label="Download"
-                        />
+                        <DropdownMenu>
+                            <DropdownMenuTrigger>
+                                <Button
+                                    appearance="outline"
+                                    icon={<ArrowDownload24Regular />}
+                                    style={{ width: "32px", height: "32px", padding: 0 }}
+                                    aria-label="Download"
+                                />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem 
+                                    onClick={handleDownloadExcel}
+                                    style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
+                                >
+                                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                        <DocumentRegular style={{ width: "16px", height: "16px" }} />
+                                        Excel
+                                    </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                    onClick={handleDownloadWord}
+                                    style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
+                                >
+                                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                        <DocumentRegular style={{ width: "16px", height: "16px" }} />
+                                        Word
+                                    </div>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                         <Button
                             appearance="outline"
                             icon={<Print24Regular />}

@@ -222,10 +222,11 @@ export const IfscCodeField = ({ name, control, errors, label, required, placehol
                                 placeholder={placeholder}
                                 errorMessage={errors[name]?.message as string}
                                 className="w-full"
-                                onChange={(_e: React.ChangeEvent<HTMLInputElement>, value?: string) => {
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                     // IFSC Code: Must be exactly 11 characters long and follow the format 4 letters + 0 + 6 alphanumeric characters
                                     // Convert to uppercase and only allow alphanumeric
-                                    const upperValue = (value ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+                                    const value = e.target.value;
+                                    const upperValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
                                     if (upperValue.length <= 11) {
                                         field.onChange(upperValue);
                                     }

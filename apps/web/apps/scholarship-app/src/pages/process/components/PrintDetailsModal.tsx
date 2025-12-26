@@ -1,13 +1,20 @@
 import * as React from "react";
-import { Modal, Button } from "@shared/components";
+import { 
+    Modal, 
+    Button,
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+} from "@shared/components";
 import {
     ArrowDownload24Regular,
     Print24Regular,
     Dismiss24Regular,
+    DocumentRegular,
 } from "@fluentui/react-icons";
 import { ApplicationData } from "../types";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import { useToast } from "@/components/ui/toast";
 
 interface PrintDetailsModalProps {
     open: boolean;
@@ -20,18 +27,109 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
     onOpenChange,
     data,
 }) => {
+    const { success, error: showError } = useToast();
+    
+    // Helper function to format date
+    const formatDate = (dateValue: unknown): string => {
+        if (!dateValue) return "--";
+        try {
+            // Handle different date formats
+            let dateStr = '';
+            if (typeof dateValue === 'string') {
+                dateStr = dateValue.trim();
+            } else if (typeof dateValue === 'number') {
+                dateStr = String(dateValue);
+            } else if (dateValue instanceof Date) {
+                // If it's already a Date object, format it directly
+                if (isNaN(dateValue.getTime())) return "--";
+                return dateValue.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            } else if (typeof dateValue === 'object') {
+                // Don't try to stringify objects
+                return "--";
+            } else {
+                dateStr = String(dateValue).trim();
+            }
+            
+            if (!dateStr || dateStr === 'null' || dateStr === 'undefined') return "--";
+            
+            // Check if the date string is in DD/MM/YYYY format
+            const ddmmyyyyPattern = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+            const match = ddmmyyyyPattern.exec(dateStr);
+            
+            let date: Date;
+            if (match) {
+                // Parse DD/MM/YYYY format
+                const day = parseInt(match[1] ?? '0', 10);
+                const month = parseInt(match[2] ?? '0', 10) - 1; // Month is 0-indexed
+                const year = parseInt(match[3] ?? '0', 10);
+                date = new Date(year, month, day);
+            } else {
+                // Try standard Date parsing (for ISO, MM/DD/YYYY, etc.)
+                date = new Date(dateStr);
+            }
+            
+            if (isNaN(date.getTime())) return "--";
+            
+            // Format as DD-MM-YYYY
+            return date.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        } catch {
+            return "--";
+        }
+    };
+    
     // Get data from ApplicationData - using API fields
-    const chequeDate = (data as Record<string, unknown>)?.Scholarship_Issued_Date 
-      ? String((data as Record<string, unknown>).Scholarship_Issued_Date) 
-      : (data as Record<string, unknown>)?.Donated_Date 
-        ? String((data as Record<string, unknown>).Donated_Date)
-        : "--";
+    // Priority: Scholarship_Issued_Date (as per existing app) > DDCheque_Date > Donated_Date
+    const apiData = data as Record<string, unknown> | undefined;
+    
+    // Helper to check if a value is valid (not null, undefined, empty string, or 'null' string)
+    const isValidValue = (val: unknown): boolean => {
+        if (val === null || val === undefined) return false;
+        if (typeof val === 'object') return false; // Don't stringify objects
+        const str = String(val).trim();
+        return str !== '' && str !== 'null' && str !== 'undefined';
+    };
+    
+    // Check for Scholarship_Issued_Date (can be string or null)
+    const scholarshipIssuedDate = apiData?.Scholarship_Issued_Date;
+    const ddChequeDate = apiData?.DDCheque_Date;
+    const donatedDate = apiData?.Donated_Date;
+    
+    // Debug: Log available date fields (remove in production)
+    React.useEffect(() => {
+        if (open && data) {
+            console.log('PrintDetailsModal - Date fields:', {
+                Scholarship_Issued_Date: scholarshipIssuedDate,
+                DDCheque_Date: ddChequeDate,
+                Donated_Date: donatedDate,
+                allData: apiData,
+            });
+        }
+    }, [open, data, scholarshipIssuedDate, ddChequeDate, donatedDate, apiData]);
+    
+    // Format date with proper null/empty checks
+    const chequeDate = isValidValue(scholarshipIssuedDate)
+      ? formatDate(scholarshipIssuedDate)
+      : isValidValue(ddChequeDate)
+        ? formatDate(ddChequeDate)
+        : isValidValue(donatedDate)
+          ? formatDate(donatedDate)
+          : "--";
     
     const chequeAmount = (data as Record<string, unknown>)?.Scholarship_Issued_Amount 
       ? String((data as Record<string, unknown>).Scholarship_Issued_Amount) 
-      : data?.approvedAmount 
-        ? String(data.approvedAmount)
-        : "--";
+      : (data as Record<string, unknown>)?.Scholarship_Approved_Amount
+        ? String((data as Record<string, unknown>).Scholarship_Approved_Amount)
+        : data?.approvedAmount 
+          ? String(data.approvedAmount)
+          : "--";
     
     const scholarshipIssueNumber = data?.scholarshipNumber && data.scholarshipNumber !== '-' 
       ? data.scholarshipNumber 
@@ -63,50 +161,72 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
         window.print();
     };
 
-    const handleDownload = () => {
-        const doc = new jsPDF();
+    const handleDownloadExcel = () => {
+        try {
+            // Prepare CSV data
+            const headers = ["ID", "Label", "Value"];
+            
+            // Combine details and approval details
+            const allDetails = [
+                ...details.map(item => [item.id, item.label, item.value]),
+                ...approvalDetails.map(item => [item.id, item.label, item.value]),
+            ];
+            
+            // Create CSV content
+            const csvContent = [
+                headers.join(','),
+                ...allDetails.map((row: (string | number)[]) => 
+                    row.map((cell: string | number) => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+                )
+            ].join('\n');
+            
+            // Create and download CSV file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${data?.applicationNo || "scholarship"}_print_details.xlsx`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            
+            success('Download Successful', 'Print details exported to Excel successfully');
+        } catch (error) {
+            console.error('Error downloading Excel:', error);
+            showError('Download Failed', 'Failed to export print details to Excel. Please try again.');
+        }
+    };
 
-        // Title
-        doc.setFontSize(16);
-        doc.text("LEO MUTHU - Scholarship Print Details ( 2025-2026 )", 14, 15);
-
-        // First Table - Application Details
-        autoTable(doc, {
-            startY: 25,
-            head: [],
-            body: details.map(item => [item.id, item.label, item.value]),
-            theme: 'grid',
-            styles: { fontSize: 10, cellPadding: 3 },
-            columnStyles: {
-                0: { cellWidth: 15, halign: 'center', fontStyle: 'normal' },
-                1: { cellWidth: 60, fontStyle: 'bold' },
-                2: { fontStyle: 'normal' }
-            },
-        });
-
-        // Get final Y position of previous table
-        const finalY = (doc as any).lastAutoTable.finalY + 10;
-
-        // Approval By Header
-        doc.setFontSize(12);
-        doc.setFont("helvetica", "bold");
-        doc.text("Approval By", 14, finalY);
-
-        // Second Table - Approval Details
-        autoTable(doc, {
-            startY: finalY + 5,
-            head: [],
-            body: approvalDetails.map(item => [item.id, item.label, item.value]),
-            theme: 'grid',
-            styles: { fontSize: 10, cellPadding: 3 },
-            columnStyles: {
-                0: { cellWidth: 15, halign: 'center', fontStyle: 'normal' },
-                1: { cellWidth: 60, fontStyle: 'bold' },
-                2: { fontStyle: 'normal' }
-            },
-        });
-
-        doc.save(`${data?.applicationNo || "scholarship"}_print_details.pdf`);
+    const handleDownloadWord = () => {
+        try {
+            // Prepare data for Word export
+            const headers = ["ID", "Label", "Value"];
+            
+            // Combine details and approval details
+            const allDetails = [
+                ...details.map(item => [item.id, item.label, item.value]),
+                ...approvalDetails.map(item => [item.id, item.label, item.value]),
+            ];
+            
+            // Create tab-separated content (Word can open TSV files)
+            let wordContent = headers.join('\t') + '\n';
+            allDetails.forEach((row: (string | number)[]) => {
+                wordContent += row.join('\t') + '\n';
+            });
+            
+            // Create and download Word file
+            const blob = new Blob([wordContent], { 
+                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+            });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${data?.applicationNo || "scholarship"}_print_details.docx`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            
+            success('Download Successful', 'Print details exported to Word successfully');
+        } catch (error) {
+            console.error('Error downloading Word:', error);
+            showError('Download Failed', 'Failed to export print details to Word. Please try again.');
+        }
     };
 
     const renderRow = (id: number, label: string, value: string) => (
@@ -161,13 +281,36 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
                         LEO MUTHU - Scholarship Print Details ( 2025-2026 )
                     </span>
                     <div style={{ display: "flex", gap: "8px" }}>
-                        <Button
-                            appearance="outline"
-                            icon={<ArrowDownload24Regular />}
-                            onClick={handleDownload}
-                            style={{ width: "32px", height: "32px", padding: 0 }}
-                            aria-label="Download"
-                        />
+                        <DropdownMenu>
+                            <DropdownMenuTrigger>
+                                <Button
+                                    appearance="outline"
+                                    icon={<ArrowDownload24Regular />}
+                                    style={{ width: "32px", height: "32px", padding: 0 }}
+                                    aria-label="Download"
+                                />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem 
+                                    onClick={handleDownloadExcel}
+                                    style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
+                                >
+                                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                        <DocumentRegular style={{ width: "16px", height: "16px" }} />
+                                        Excel
+                                    </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                    onClick={handleDownloadWord}
+                                    style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
+                                >
+                                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                        <DocumentRegular style={{ width: "16px", height: "16px" }} />
+                                        Word
+                                    </div>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                         <Button
                             appearance="outline"
                             icon={<Print24Regular />}
