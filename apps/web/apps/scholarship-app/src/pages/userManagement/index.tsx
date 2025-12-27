@@ -1,23 +1,23 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  DataTable,
+  Table,
   TableSkeleton,
   Button,
   Modal,
-  Input,
-  PageActionButtons,
+  Pagination,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  Card,
 } from "@shared/components";
 import {
-  Filter24Regular,
+  FilterRegular,
   MoreVerticalRegular,
-  Search20Regular,
-  Add24Regular,
+  SearchRegular,
+  ChevronDownRegular,
+  ArrowDownloadRegular,
+  DocumentRegular as DocumentIcon,
 } from "@fluentui/react-icons";
 import { User } from "./types";
 import { useUserTable } from "./hooks/useUserTable";
@@ -239,177 +239,371 @@ const UserManagementPage: React.FC = () => {
     <div style={{
       width: "100%",
       height: "100%",
-      backgroundColor: "#fafafa",
+      backgroundColor: "#ffffff",
       fontFamily: "'Inter', sans-serif",
-      boxSizing: "border-box",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden",
     }}>
-      {/* Title and Action Buttons */}
-      <div style={{ padding: "24px 24px 16px 24px" }}>
-        <PageActionButtons
-          title={
-            <div style={{ lineHeight: "1.4" }}>
-              <div style={{
-                fontSize: "20px",
-                fontWeight: 600,
-                color: "#242424",
-                fontFamily: "'Inter', sans-serif",
-              }}>
-                Manage User
-              </div>
-              <div style={{
-                fontSize: "14px",
-                fontWeight: 400,
-                color: "#616161",
-                fontFamily: "'Inter', sans-serif",
-                marginTop: "2px",
-              }}>
-                Maintain Roles, Rights, and User Information
-              </div>
-            </div>
-          }
-        >
+      {/* Title and Action Section */}
+      <div style={{ padding: "24px 1.5rem", flexShrink: 0 }}>
+        {/* Top Row: Title on left, Add User button on right */}
+        <div style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+        }}>
+          <div>
+            <h1 style={{
+              fontSize: "16px",
+              lineHeight: "22px",
+              fontWeight: 600,
+              color: "#242424",
+              fontFamily: "'Inter', sans-serif",
+            }}>
+              Manage User
+            </h1>
+            <p style={{
+              fontSize: "12px",
+              lineHeight: "16px",
+              fontWeight: 400,
+              color: "#242424",
+              fontFamily: "'Inter', sans-serif",
+            }}>
+              Maintain Roles, Rights, and User Information
+            </p>
+          </div>
           <Button
             onClick={handleAddUser}
             style={{
-              backgroundColor: "#005A9E",
+              backgroundColor: "#0f6cbd",
               color: "#ffffff",
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              borderRadius: "4px",
-              padding: "0 16px",
-              height: "36px",
+              padding: "8px 16px",
+              borderRadius: "6px",
               border: "none",
+              cursor: "pointer",
               fontSize: "14px",
-              fontWeight: 600,
+              fontWeight: 500,
+              fontFamily: "'Inter', sans-serif",
+              height: "32px",
             }}
           >
-            <Add24Regular style={{ width: "20px", height: "20px" }} />
             Add User
           </Button>
-        </PageActionButtons>
-      </div>
-
-      {/* Search and Filter Section */}
-      <div style={{
-        padding: "0 24px 16px 24px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-      }}>
-        <div style={{ width: "280px" }}>
-          <Input
-            placeholder="Search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            prefixIcon={<Search20Regular style={{ width: "18px", height: "18px", color: "#616161" }} />}
-            style={{
-              height: "36px",
-              borderRadius: "4px",
-              border: "1px solid #D1D1D1",
-              backgroundColor: "#FFFFFF",
-            }}
-          />
         </div>
+
+        {/* Second Row: Search on left, Action buttons on right */}
         <div style={{
           display: "flex",
           alignItems: "center",
-          gap: "8px",
+          justifyContent: "space-between",
+          marginTop: "16px",
         }}>
-          <Button
-            appearance="subtle"
-            aria-label="More options"
-            style={{
-              width: "36px",
-              height: "36px",
-              padding: 0,
-              border: "1px solid #D1D1D1",
-              borderRadius: "4px",
-              minWidth: "36px",
-              backgroundColor: "#FFFFFF",
-            }}
-          >
-            <MoreVerticalRegular style={{ width: "18px", height: "18px", color: "#242424" }} />
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button
-                appearance="subtle"
-                aria-label="Filter options"
-                style={{
-                  width: "36px",
-                  height: "36px",
-                  padding: 0,
-                  border: "1px solid #D1D1D1",
-                  borderRadius: "4px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minWidth: "36px",
-                  backgroundColor: "#FFFFFF",
-                }}
-              >
-                <Filter24Regular width={18} height={18} color="#242424" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem label="Name" />
-              <DropdownMenuItem label="User Type" />
-              <DropdownMenuItem label="User Name" />
-              <DropdownMenuItem label="Mobile Number" />
-              <DropdownMenuItem label="Email ID" />
-              <DropdownMenuItem label="Status" />
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Search field on the left */}
+          <div style={{ position: "relative", display: "flex", alignItems: "center", border: "1px solid #D1D1D1", borderRadius: "8px" }}>
+            <SearchRegular style={{ 
+              position: "absolute", 
+              left: "8px", 
+              width: "16px", 
+              height: "16px", 
+              color: "#616161",
+              pointerEvents: "none"
+            }} />
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                }
+              }}
+              style={{
+                width: "200px",
+                height: "32px",
+                paddingLeft: "32px",
+                paddingRight: "12px",
+                borderRadius: "8px",
+                border: "1px solid #FFFFFF00",
+                fontSize: "14px",
+                fontFamily: "'Inter', sans-serif",
+                outline: "none",
+                backgroundColor: "#fff",
+              }}
+            />
+          </div>
+
+          {/* Action buttons on the right */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            flexShrink: 0,
+          }}>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button
+                  appearance="outline"
+                  aria-label="More options"
+                  style={{
+                    width: "32px",
+                    minWidth: "32px",
+                    maxWidth: "32px",
+                    height: "32px",
+                    padding: 0,
+                    borderColor: "#d1d5db",
+                    backgroundColor: "#fff",
+                    borderRadius: "6px",
+                  }}
+                >
+                  <MoreVerticalRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem 
+                  onClick={() => {}}
+                  style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <DocumentIcon style={{ width: "16px", height: "16px" }} />
+                    Excel
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {}}
+                  style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <DocumentIcon style={{ width: "16px", height: "16px" }} />
+                    Word
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button
+                  appearance="outline"
+                  aria-label="Filter"
+                  style={{
+                    width: "32px",
+                    minWidth: "32px",
+                    maxWidth: "32px",
+                    height: "32px",
+                    padding: 0,
+                    borderColor: "#d1d5db",
+                    backgroundColor: "#fff",
+                    borderRadius: "6px",
+                  }}
+                >
+                  <FilterRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem 
+                  onClick={() => {}}
+                  style={{
+                    fontWeight: "normal",
+                    color: "#616161",
+                  }}
+                >
+                  Name
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {}}
+                  style={{
+                    fontWeight: "normal",
+                    color: "#616161",
+                  }}
+                >
+                  User Type
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {}}
+                  style={{
+                    fontWeight: "normal",
+                    color: "#616161",
+                  }}
+                >
+                  User Name
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {}}
+                  style={{
+                    fontWeight: "normal",
+                    color: "#616161",
+                  }}
+                >
+                  Mobile Number
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {}}
+                  style={{
+                    fontWeight: "normal",
+                    color: "#616161",
+                  }}
+                >
+                  Email ID
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {}}
+                  style={{
+                    fontWeight: "normal",
+                    color: "#616161",
+                  }}
+                >
+                  Status
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
-      {/* Table Section - Full Width */}
-      {loading ? (
-        <Card
-          variant="elevated"
-          style={{
-            overflow: "hidden",
-            border: "1px solid #e0e0e0",
-            backgroundColor: "#ffffff",
-            borderRadius: 0,
-            width: "100%",
-            margin: 0,
-            padding: "24px",
-            boxShadow: "none",
-            borderLeft: "none",
-            borderRight: "none",
-          }}
-        >
-          <div style={{ overflowX: "auto", width: "100%" }}>
+      {/* Table Section - Scrollable */}
+      <div
+        id="table-scroll-container"
+        style={{
+          flexGrow: 1,
+          flexShrink: 1,
+          flexBasis: "auto",
+          overflow: "auto",
+          backgroundColor: "#fafafa",
+          minHeight: 0,
+          maxHeight: "100%",
+        }}
+        className="custom-scrollbar"
+        onScroll={(e) => {
+          // Sync horizontal scroll with footer scrollbar
+          const footerScroll = document.getElementById('footer-scroll-sync');
+          if (footerScroll) {
+            footerScroll.scrollLeft = e.currentTarget.scrollLeft;
+          }
+        }}
+      >
+        <style>
+          {`
+            .custom-scrollbar::-webkit-scrollbar {
+              width: 8px;
+              height: 8px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+              background-color: #d1d1d1;
+              border-radius: 4px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+              background-color: #a8a8a8;
+            }
+            .footer-scrollbar::-webkit-scrollbar {
+              height: 8px;
+            }
+            .footer-scrollbar::-webkit-scrollbar-track {
+              background: #f5f5f5;
+            }
+            .footer-scrollbar::-webkit-scrollbar-thumb {
+              background-color: #d1d1d1;
+              border-radius: 4px;
+            }
+            .footer-scrollbar::-webkit-scrollbar-thumb:hover {
+              background-color: #a8a8a8;
+            }
+          `}
+        </style>
+
+        <div style={{ minWidth: "fit-content" }}>
+          {loading ? (
             <TableSkeleton
               columnCount={6}
               rowCount={5}
               columnWidths={[150, 180, 150, 150, 150, 120]}
               showCheckbox={true}
             />
+          ) : (
+            <Table
+              columns={columns}
+              data={paginatedData}
+              disableScroll={true}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Static Footer with Pagination and Horizontal Scrollbar */}
+      <div style={{
+        flexShrink: 0,
+        backgroundColor: "#ffffff",
+        borderTop: "1px solid #e0e0e0",
+      }}>
+        {/* Pagination */}
+        {!loading && (
+          <div style={{
+            padding: "12px 24px",
+            backgroundColor: "#FAFAFA",
+          }}>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              totalItems={totalItems}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+              }}
+              onPageSizeChange={(newPageSize) => {
+                setPageSize(newPageSize);
+              }}
+              pageSizeOptions={[5, 10, 20, 50, 100]}
+              showFirstLast={true}
+              showPageSize={true}
+              showPageNumbers={true}
+              maxPageButtons={7}
+              className="w-full !flex-row"
+            />
           </div>
-        </Card>
-      ) : (
-        <DataTable
-          columns={columns}
-          data={paginatedData}
-          fullWidth={true}
-          pagination={{
-            currentPage,
-            totalPages,
-            pageSize,
-            totalItems,
-            onPageChange: setCurrentPage,
-            onPageSizeChange: setPageSize,
-            pageSizeOptions: [5, 10, 20, 50, 100],
-            showFirstLast: true,
-            showPageSize: true,
-            showPageNumbers: true,
-            maxPageButtons: 7,
+        )}
+
+        {/* Horizontal Scrollbar Sync */}
+        <div
+          id="footer-scroll-sync"
+          style={{
+            overflowX: "auto",
+            overflowY: "hidden",
+            height: "12px",
           }}
-        />
-      )}
+          className="footer-scrollbar"
+          onScroll={(e) => {
+            // Sync scroll with table container
+            const tableContainer = document.getElementById('table-scroll-container');
+            if (tableContainer) {
+              tableContainer.scrollLeft = e.currentTarget.scrollLeft;
+            }
+          }}
+        >
+          <div style={{
+            height: "1px",
+            width: "fit-content",
+            minWidth: "100%",
+          }}
+            ref={(el) => {
+              // Match the width of the table content
+              if (el) {
+                const tableContainer = document.getElementById('table-scroll-container');
+                if (tableContainer && tableContainer.firstChild) {
+                  const tableWidth = (tableContainer.firstChild as HTMLElement).scrollWidth;
+                  el.style.width = `${tableWidth}px`;
+                }
+              }
+            }}
+          />
+        </div>
+      </div>
 
       {/* Delete Confirmation Modal */}
       <Modal

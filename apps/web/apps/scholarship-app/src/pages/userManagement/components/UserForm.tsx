@@ -436,6 +436,7 @@ const UserForm: React.FC = () => {
               value={formData.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
               errorMessage={errors.name}
+              style={{ width: "100%", height: "32px" }}
             />
           </div>
 
@@ -456,7 +457,7 @@ const UserForm: React.FC = () => {
               selectedKey={formData.userRole}
               onValueChange={(value) => handleInputChange("userRole", value)}
               errorMessage={errors.userRole}
-              style={{ width: "100%" }}
+              style={{ width: "100%", height: "32px" }}
             />
           </div>
 
@@ -477,6 +478,7 @@ const UserForm: React.FC = () => {
               value={formData.emailId}
               onChange={(e) => handleInputChange("emailId", e.target.value)}
               errorMessage={errors.emailId}
+              style={{ width: "100%", height: "32px" }}
             />
           </div>
 
@@ -497,7 +499,7 @@ const UserForm: React.FC = () => {
               value={formData.phoneNumber}
               onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
               errorMessage={errors.phoneNumber}
-              style={{ width: "100%" }}
+              style={{ width: "100%", height: "32px" }}
             />
           </div>
 

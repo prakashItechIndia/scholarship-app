@@ -229,6 +229,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           onOpenChange={setProfilePopoverOpen}
           onLogout={() => setLogoutModalOpen(true)}
           onChangePassword={() => setChangePasswordModalOpen(true)}
+          sidebarWidth={hideSidebar ? 0 : (sideNavConfig.expanded ? 256 : 56)}
         >
           <div className="w-[32px] h-[32px] rounded-full bg-[#C8D1FA] flex items-center justify-center cursor-pointer">
             <PersonRegular className="w-[20px] h-[20px] text-[#420610]" />

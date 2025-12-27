@@ -54,7 +54,7 @@ export const RoleDetailsForm: React.FC<RoleDetailsFormProps> = ({
             }
           }}
           errorMessage={errors.roleName}
-          style={{width: "100%", height: "32 px"}}
+          style={{width: "100%", height: "32px"}}
         />
       </div>
 

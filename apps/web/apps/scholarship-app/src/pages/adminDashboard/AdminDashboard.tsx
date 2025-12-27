@@ -131,12 +131,16 @@ const AdminDashboard: React.FC = () => {
           label: year.ScholarshipYear_Code || year.label || "",
         }));
         setAcademicYearOptions(options);
-        // Default selection removed to show "Academic Year" placeholder
+        // Auto-select the first academic year to load dashboard data
+        if (options.length > 0 && !selectedAcademicYear) {
+          setSelectedAcademicYear(options[0].value);
+        }
       } catch (err) {
         console.error('Error fetching academic years:', err);
       }
     };
     void fetchAcademicYears();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch dashboard data
@@ -414,9 +418,14 @@ const AdminDashboard: React.FC = () => {
       backgroundColor: "#fafafa",
       padding: "15px 24px 24px 24px",
       fontFamily: "'Inter', sans-serif",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden",
+      minHeight: 0,
     }}>
       {/* Header Section with PageActionButtons */}
       <div style={{
+        flexShrink: 0,
         marginLeft: "-24px",
         marginRight: "-24px",
         paddingLeft: "24px",
@@ -541,7 +550,13 @@ const AdminDashboard: React.FC = () => {
 
       {/* Financial Summary Cards */}
       <div style={{
-        marginBottom: "32px",
+        flexShrink: 0,
+        position: "sticky",
+        top: 0,
+        zIndex: 10,
+        backgroundColor: "#ffffff",
+        marginBottom: "16px",
+        paddingTop: "12px",
         paddingBottom: "12px",
         marginLeft: "-24px",
         marginRight: "-24px",
@@ -550,6 +565,7 @@ const AdminDashboard: React.FC = () => {
         borderBottom: "1px solid #e0e0e0",
         width: "100%",
         overflow: "hidden",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
       }}>
         {loading ? (
           <div style={{
@@ -558,77 +574,118 @@ const AdminDashboard: React.FC = () => {
             gap: "16px",
             width: "100%",
           }}>
-            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ backgroundColor: "#EFF6FF", height: "100px" }} />
-            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ backgroundColor: "#F0FDF4", height: "100px" }} />
-            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ backgroundColor: "#FAF5FF", height: "100px" }} />
-            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ backgroundColor: "#FFFBEB", height: "100px" }} />
-            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ backgroundColor: "#FFEFEE", height: "100px" }} />
+            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
+            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
+            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
+            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
+            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
           </div>
         ) : (
           <>
-            {/* First row - 4 cards */}
-            <div style={{
-              display: "flex",
-              alignItems: "stretch",
-              gap: "12px",
-              marginBottom: "16px",
-            }}>
-              <FinancialSummaryCard
-                icon={getIndianRupeeIcon("#2453C3")}
-                value={financialData.totalAmountSpentThisYear}
-                label="Total Amount Spent This Year"
-                showCurrency={true}
-                iconBgColor="#FFFFFF"
-                color="#EFF6FF"
-              />
-              <Separator/>
-              <FinancialSummaryCard
-                icon={getIndianRupeeIcon("#2453C3")}
-                value={financialData.amountSpentForSchoolStudents}
-                label="Amount Spent for School Students"
-                showCurrency={true}
-                iconBgColor="#FFFFFF"
-                color="#F0FDF4"
-              />
-              <Separator height="auto" />
-              <FinancialSummaryCard
-                icon={getIndianRupeeIcon("#2453C3")}
-                value={financialData.amountSpentForCollegeStudents}
-                label="Amount Spent for College Students"
-                showCurrency={true}
-                iconBgColor="#FFFFFF"
-                color="#FAF5FF"
-              />
-              <Separator height="auto" />
-              <FinancialSummaryCard
-                icon={getIndianRupeeIcon("#2453C3")}
-                value={financialData.amountSpentForResearchScholars}
-                label="Amount Spent for Research Scholars"
-                showCurrency={true}
-                iconBgColor="#FFFFFF"
-                color="#FFFBEB"
-              />
-            </div>
-            {/* Second row - 5th card */}
-            <div style={{
-              // display: "flex",
-              // gap: "16px",
-            }}>
-              <FinancialSummaryCard
-                icon={getIndianRupeeIcon("#2453C3")}
-                value={financialData.amountSpentForMedicalAssistance}
-                label="Amount Spent for Medical Assistance"
-                showCurrency={true}
-                iconBgColor="#FFFFFF"
-                color="#FFEFEE"
-              />
+            <style>{`
+              .financial-cards-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 12px;
+                width: 100%;
+              }
+              @media (min-width: 1400px) {
+                .financial-cards-grid {
+                  grid-template-columns: repeat(4, 1fr);
+                }
+              }
+              @media (max-width: 1200px) {
+                .financial-cards-grid {
+                  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                }
+              }
+              @media (max-width: 900px) {
+                .financial-cards-grid {
+                  grid-template-columns: repeat(2, 1fr);
+                }
+              }
+              @media (max-width: 600px) {
+                .financial-cards-grid {
+                  grid-template-columns: 1fr;
+                }
+              }
+            `}</style>
+            <div className="financial-cards-grid">
+            <FinancialSummaryCard
+              icon={getIndianRupeeIcon("#2453C3")}
+              value={financialData.totalAmountSpentThisYear}
+              label="Total Amount Spent This Year"
+              showCurrency={true}
+              iconBgColor="#FFFFFF"
+              color="#EFF6FF"
+            />
+            <FinancialSummaryCard
+              icon={getIndianRupeeIcon("#2453C3")}
+              value={financialData.amountSpentForSchoolStudents}
+              label="Amount Spent for School Students"
+              showCurrency={true}
+              iconBgColor="#FFFFFF"
+              color="#F0FDF4"
+            />
+            <FinancialSummaryCard
+              icon={getIndianRupeeIcon("#2453C3")}
+              value={financialData.amountSpentForCollegeStudents}
+              label="Amount Spent for College Students"
+              showCurrency={true}
+              iconBgColor="#FFFFFF"
+              color="#FAF5FF"
+            />
+            <FinancialSummaryCard
+              icon={getIndianRupeeIcon("#2453C3")}
+              value={financialData.amountSpentForResearchScholars}
+              label="Amount Spent for Research Scholars"
+              showCurrency={true}
+              iconBgColor="#FFFFFF"
+              color="#FFFBEB"
+            />
+            <FinancialSummaryCard
+              icon={getIndianRupeeIcon("#2453C3")}
+              value={financialData.amountSpentForMedicalAssistance}
+              label="Amount Spent for Medical Assistance"
+              showCurrency={true}
+              iconBgColor="#FFFFFF"
+              color="#FFEFEE"
+            />
             </div>
           </>
         )}
       </div>
 
+      {/* Scrollable Content Container - Starting from Applications Analytics */}
+      <div 
+        style={{
+          width: "100%",
+          flex: 1,
+          overflowY: "auto",
+          overflowX: "hidden",
+          marginTop: "-15px",
+          minHeight: 0,
+        }}
+        className="dashboard-scrollable-content"
+      >
+        <style>{`
+          .dashboard-scrollable-content::-webkit-scrollbar {
+            width: 8px;
+          }
+          .dashboard-scrollable-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+          }
+          .dashboard-scrollable-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+          }
+          .dashboard-scrollable-content::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+          }
+        `}</style>
       {/* Applications Analytics Section */}
-      <div style={{ width: "100%", overflow: "hidden",marginTop:"-15px" }}>
+      <div style={{ width: "100%", overflow: "hidden" }}>
         <h2 style={{
           fontSize: "20px",
           lineHeight: "28px",
@@ -643,15 +700,14 @@ const AdminDashboard: React.FC = () => {
         </h2>
         {loading ? (
           <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gap: "16px",
-            width: "100%",
+            display: "flex",
+            gap: "9px",
+            marginBottom: "16px",
           }}>
-            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
-            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
-            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
-            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
+            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px", flex: 1, width: "100%" }} />
+            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px", flex: 1, width: "100%" }} />
+            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px", flex: 1, width: "100%" }} />
+            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px", flex: 1, width: "100%" }} />
           </div>
         ) : (
           <div style={{
@@ -690,12 +746,12 @@ const AdminDashboard: React.FC = () => {
       </div>
       {/* Application Activity Chart - Full Width */}
       {loading ? (
-        <div style={{ marginBottom: "32px" }}>
+        <div style={{ marginBottom: "16px" }}>
           <CardSkeleton variant="elevated" showIcon={false} showHeader={true} contentSections={0} style={{ height: "400px" }} />
         </div>
       ) : (
         <div style={{
-          marginBottom: "30px",
+          marginBottom: "16px",
         }}>
           <ApplicationActivityChart
           data={applicationActivityData}
@@ -712,7 +768,7 @@ const AdminDashboard: React.FC = () => {
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           gap: "24px",
-          marginBottom: "32px",
+          marginBottom: "16px",
         }}>
           <CardSkeleton variant="elevated" showIcon={false} showHeader={true} contentSections={0} style={{ height: "400px" }} />
           <CardSkeleton variant="elevated" showIcon={false} showHeader={true} contentSections={0} style={{ height: "400px" }} />
@@ -722,7 +778,7 @@ const AdminDashboard: React.FC = () => {
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           gap: "24px",
-          marginBottom: "32px",
+          marginBottom: "16px",
         }}>
           {/* Application Status Donut Chart */}
           <ApplicationStatusChart
@@ -742,7 +798,7 @@ const AdminDashboard: React.FC = () => {
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           gap: "24px",
-          marginBottom: "32px",
+          marginBottom: "16px",
         }}>
           <CardSkeleton variant="elevated" showIcon={false} showHeader={true} contentSections={0} style={{ height: "400px" }} />
           <CardSkeleton variant="elevated" showIcon={false} showHeader={true} contentSections={0} style={{ height: "400px" }} />
@@ -756,7 +812,7 @@ const AdminDashboard: React.FC = () => {
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
             gap: "24px",
-            marginBottom: "32px",
+            marginBottom: "16px",
           }}>
             {/* Performance Metrics Chart */}
             <PerformanceMetricsChart metrics={performanceMetrics} />
@@ -775,7 +831,7 @@ const AdminDashboard: React.FC = () => {
             display: "grid",
             gridTemplateColumns: "1fr 450px",
             gap: "24px",
-            marginBottom: "32px" 
+            marginBottom: "16px" 
           }}>
             <ScholarshipDistributionChart
               data={programDistributionData}
@@ -813,6 +869,7 @@ const AdminDashboard: React.FC = () => {
       ) : (
         <RecentApplicationsTable data={recentApplications.length > 0 ? recentApplications : []} />
       )}
+      </div>
     </div>
   );
 };

@@ -421,7 +421,7 @@ const ReportsPage: React.FC = () => {
     <div style={{
       width: "100%",
       height: "100%",
-      backgroundColor: "#F0F2F5",
+      backgroundColor: "#ffffff",
       fontFamily: "'Inter', sans-serif",
       display: "flex",
       gap: "0px",
@@ -436,50 +436,62 @@ const ReportsPage: React.FC = () => {
         overflow: "hidden", 
       }}>
         {/* Title Section */}
-        <div style={{ 
-          padding: "20px 24px", 
-          backgroundColor: "#FFFFFF",
-          borderBottom: "1px solid #E0E0E0",
-          display: "flex",
-          flexDirection: "column",
-          gap: "4px",
-        }}>
-          <h1 style={{
-            fontSize: "20px",
-            lineHeight: "28px",
-            fontWeight: 600,
-            color: "#242424",
-            margin: 0,
-            fontFamily: "'Inter', sans-serif",
+        <div style={{ padding: "0.125rem 1.5rem 0 1.5rem", flexShrink: 0 }}>
+          <div style={{
+            marginBottom: "24px",
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            marginTop: "11px",
           }}>
-            Reports
-          </h1>
-          <p style={{
-            fontSize: "14px",
-            lineHeight: "20px",
-            fontWeight: 400,
-            color: "#616161",
-            margin: 0,
-            fontFamily: "'Inter', sans-serif",
-          }}>
-            Generate and Export Scholarship Performance Reports
-          </p>
+            <div>
+              <h1 style={{
+                fontSize: "16px",
+                lineHeight: "22px",
+                fontWeight: 600,
+                color: "#242424",
+                fontFamily: "'Inter', sans-serif",
+              }}>
+                Reports
+              </h1>
+              <p style={{
+                fontSize: "12px",
+                lineHeight: "16px",
+                fontWeight: 400,
+                color: "#242424",
+                fontFamily: "'Inter', sans-serif",
+              }}>
+                Generate and Export Scholarship Performance Reports
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Tabs Section */}
         <div style={{ 
-          padding: "0 24px", 
-          backgroundColor: "#FFFFFF",
-          borderBottom: "1px solid #E0E0E0",
-          height: "48px",
+          backgroundColor: "#FAFAFA",
+          marginBottom: "0px",
+          height: "2.75rem",
+          width: "100%",
+          flexShrink: 0,
+          paddingTop: "13px",
+          marginTop: "-12px",
         }}>
-          <ReportsTabs
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-            onExport={handleExport}
-            showActions={hasAppliedFilters && filteredData.length > 0}
-            exportLoading={exportLoading}
-          />
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "16px",
+            height: "100%",
+          }}>
+            <ReportsTabs
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+              onExport={handleExport}
+              showActions={hasAppliedFilters && filteredData.length > 0}
+              exportLoading={exportLoading}
+            />
+          </div>
         </div>
 
         {/* Error Message */}
@@ -496,26 +508,67 @@ const ReportsPage: React.FC = () => {
 
         {/* Actions and Table Section */}
         {hasAppliedFilters && filteredData.length > 0 ? (
-          <div style={{ flex: 1, padding: "24px", overflow: "hidden" }}>
-            {/* Table Section */}
-            <Card variant="elevated" style={{
-              overflow: "hidden",
-              border: "1px solid #e0e0e0",
-              backgroundColor: "#ffffff",
-              borderRadius: "8px",
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              padding: 0,
-            }}>
-              <div style={{ 
-                flex: 1, 
-                minHeight: 0, 
-                minWidth: 0, 
-                overflowX: "auto", // Enable horizontal scrolling
-                overflowY: "auto", // Enable vertical scrolling
-                width: "100%"
-              }}>
+          <div style={{ 
+            flex: 1, 
+            display: "flex", 
+            flexDirection: "column",
+            overflow: "hidden",
+            backgroundColor: "#fafafa",
+          }}>
+            {/* Table Section - Scrollable */}
+            <div
+              id="table-scroll-container"
+              style={{
+                flexGrow: 1,
+                flexShrink: 1,
+                flexBasis: "auto",
+                overflow: "auto",
+                backgroundColor: "#fafafa",
+                minHeight: 0,
+                maxHeight: "100%",
+              }}
+              className="custom-scrollbar"
+              onScroll={(e) => {
+                // Sync horizontal scroll with footer scrollbar
+                const footerScroll = document.getElementById('footer-scroll-sync');
+                if (footerScroll) {
+                  footerScroll.scrollLeft = e.currentTarget.scrollLeft;
+                }
+              }}
+            >
+              <style>
+                {`
+                  .custom-scrollbar::-webkit-scrollbar {
+                    width: 8px;
+                    height: 8px;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background-color: #d1d1d1;
+                    border-radius: 4px;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background-color: #a8a8a8;
+                  }
+                  .footer-scrollbar::-webkit-scrollbar {
+                    height: 8px;
+                  }
+                  .footer-scrollbar::-webkit-scrollbar-track {
+                    background: #f5f5f5;
+                  }
+                  .footer-scrollbar::-webkit-scrollbar-thumb {
+                    background-color: #d1d1d1;
+                    border-radius: 4px;
+                  }
+                  .footer-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background-color: #a8a8a8;
+                  }
+                `}
+              </style>
+
+              <div style={{ minWidth: "fit-content" }}>
                 {loading ? (
                   <TableSkeleton
                     columnCount={columns.length - (columns.some(col => col.key === 'checkbox') ? 1 : 0)}
@@ -526,35 +579,82 @@ const ReportsPage: React.FC = () => {
                     showCheckbox={columns.some(col => col.key === 'checkbox')}
                   />
                 ) : (
-                  <Table columns={columns} data={paginatedData} />
+                  <Table columns={columns} data={paginatedData} disableScroll={true} />
                 )}
               </div>
+            </div>
 
+            {/* Static Footer with Pagination and Horizontal Scrollbar */}
+            <div style={{
+              flexShrink: 0,
+              backgroundColor: "#ffffff",
+              borderTop: "1px solid #e0e0e0",
+            }}>
               {/* Pagination */}
-              <div style={{
-                padding: "16px",
-                borderTop: "1px solid #e0e0e0",
-                backgroundColor: "#ffffff",
-              }}>
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  pageSize={pageSize}
-                  totalItems={totalItems}
-                  onPageChange={setCurrentPage}
-                  onPageSizeChange={setPageSize}
-                  pageSizeOptions={[5, 10, 20, 50, 100]}
-                  showFirstLast={true}
-                  showPageSize={true}
-                  showPageNumbers={true}
-                  maxPageButtons={7}
+              {!loading && (
+                <div style={{
+                  padding: "12px 24px",
+                  backgroundColor: "#FAFAFA",
+                }}>
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    pageSize={pageSize}
+                    totalItems={totalItems}
+                    onPageChange={(page) => {
+                      setCurrentPage(page);
+                    }}
+                    onPageSizeChange={(newPageSize) => {
+                      setPageSize(newPageSize);
+                    }}
+                    pageSizeOptions={[5, 10, 20, 50, 100]}
+                    showFirstLast={true}
+                    showPageSize={true}
+                    showPageNumbers={true}
+                    maxPageButtons={7}
+                    className="w-full !flex-row"
+                  />
+                </div>
+              )}
+
+              {/* Horizontal Scrollbar Sync */}
+              <div
+                id="footer-scroll-sync"
+                style={{
+                  overflowX: "auto",
+                  overflowY: "hidden",
+                  height: "12px",
+                }}
+                className="footer-scrollbar"
+                onScroll={(e) => {
+                  // Sync scroll with table container
+                  const tableContainer = document.getElementById('table-scroll-container');
+                  if (tableContainer) {
+                    tableContainer.scrollLeft = e.currentTarget.scrollLeft;
+                  }
+                }}
+              >
+                <div style={{
+                  height: "1px",
+                  width: "fit-content",
+                  minWidth: "100%",
+                }}
+                  ref={(el) => {
+                    // Match the width of the table content
+                    if (el) {
+                      const tableContainer = document.getElementById('table-scroll-container');
+                      if (tableContainer && tableContainer.firstChild) {
+                        const tableWidth = (tableContainer.firstChild as HTMLElement).scrollWidth;
+                        el.style.width = `${tableWidth}px`;
+                      }
+                    }
+                  }}
                 />
               </div>
-            </Card>
+            </div>
           </div>
         ) : (
-          <div style={{ flex: 1, padding: "24px", overflow: "hidden" }}>
-            /* Empty State */
+          <div style={{ flex: 1, padding: "24px", overflow: "hidden", backgroundColor: "#fafafa" }}>
             <Card variant="elevated" style={{
               overflow: "hidden",
               border: "1px solid #e0e0e0",

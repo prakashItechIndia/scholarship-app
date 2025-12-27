@@ -324,7 +324,19 @@ const ProcessPage: React.FC = () => {
       try {
         setLoadingAcademicYears(true);
         const years = await reports.getAcademicYears();
-        setAcademicYears(Array.isArray(years) ? years : []);
+        const yearsArray = Array.isArray(years) ? years : [];
+        setAcademicYears(yearsArray);
+        // Auto-select the first academic year if none is selected
+        if (yearsArray.length > 0 && !academicYearId) {
+          const firstYear = yearsArray[0];
+          const yearIdRaw = firstYear.ScholarshipYear_Id;
+          const yearId = yearIdRaw ? (typeof yearIdRaw === 'string' ? parseInt(yearIdRaw, 10) : yearIdRaw) : undefined;
+          const yearLabel = firstYear.ScholarshipYear_Code || (yearId ? String(yearId) : '');
+          if (yearId && yearLabel) {
+            setAcademicYear(yearLabel);
+            setAcademicYearId(yearId);
+          }
+        }
       } catch (err) {
         showError('Failed to Load Academic Years', err instanceof Error ? err.message : 'Failed to fetch academic years');
         setAcademicYears([]);

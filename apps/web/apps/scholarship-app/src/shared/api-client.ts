@@ -5,6 +5,40 @@ import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 const API_BASE_URL: string =
   (import.meta.env.VITE_SSO_API_URL as string | undefined) ?? '';
 
+/**
+ * Handle session expiration by redirecting to appropriate login page
+ */
+const handleSessionExpiration = () => {
+  // Clear all scholarship session tokens
+  localStorage.removeItem('scholarship_session_token');
+  sessionStorage.removeItem('scholarship_session_token');
+  sessionStorage.removeItem('scholarship_admin_session_token');
+  localStorage.removeItem('scholarship_auth');
+  sessionStorage.removeItem('scholarship_auth');
+  
+  // Clear other tokens
+  localStorage.removeItem('icaptur_access_token');
+  localStorage.removeItem('icaptur_refresh_token');
+  localStorage.removeItem('icaptur_user');
+  
+  // Determine which login page to redirect to based on current route
+  const currentPath = window.location.pathname;
+  const isAdminRoute = currentPath.includes('admin') || 
+                      currentPath.includes('role-management') || 
+                      currentPath.includes('user-management') ||
+                      currentPath.includes('home') ||
+                      currentPath.includes('reports');
+  
+  const loginPath = isAdminRoute ? '/admin-login' : '/user-login';
+  const redirectUrl = `${loginPath}?redirect=${encodeURIComponent(currentPath)}`;
+  
+  // Use window.location for a full page reload to ensure clean state
+  // Small delay to ensure tokens are cleared before redirect
+  setTimeout(() => {
+    window.location.href = redirectUrl;
+  }, 100);
+};
+
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
@@ -25,7 +59,7 @@ apiClient.interceptors.request.use(
     if (isScholarshipEndpoint) {
       // For scholarship endpoints, use scholarship session token
       const adminSessionToken = sessionStorage.getItem('scholarship_admin_session_token');
-      const sessionToken = sessionStorage.getItem('scholarship_session_token') || 
+      const sessionToken = sessionStorage.getItem('scholarship_session_token') ?? 
                           localStorage.getItem('scholarship_session_token');
       
       if (adminSessionToken) {
@@ -60,22 +94,47 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error: unknown) => {
     const axiosError = error as AxiosError;
-    if (axiosError.response?.status === 401) {
-      // Clear tokens on 401
-      localStorage.removeItem('icaptur_access_token');
-      localStorage.removeItem('icaptur_refresh_token');
-      localStorage.removeItem('icaptur_user');
-    }
     
     // Extract error message safely
     let errorMessage = 'An error occurred';
     if (axiosError.response?.data) {
-      const responseData = axiosError.response.data as { message?: string };
+      const responseData = axiosError.response.data as { message?: string; error?: string };
       if (typeof responseData.message === 'string') {
         errorMessage = responseData.message;
+      } else if (typeof responseData.error === 'string') {
+        errorMessage = responseData.error;
       }
     } else if (axiosError instanceof Error) {
       errorMessage = axiosError.message;
+    }
+    
+    // Check for session expiration messages
+    const sessionExpiredMessages = [
+      'Session has expired',
+      'session has expired',
+      'Session expired',
+      'session expired',
+      'Please log in again',
+      'please log in again',
+      'Unauthorized',
+      'unauthorized',
+    ];
+    
+    const isSessionExpired = 
+      axiosError.response?.status === 401 ||
+      sessionExpiredMessages.some(msg => errorMessage.toLowerCase().includes(msg.toLowerCase()));
+    
+    if (isSessionExpired) {
+      // Handle session expiration with redirect
+      handleSessionExpiration();
+      return Promise.reject(new Error(errorMessage));
+    }
+    
+    // For other 401 errors, clear tokens but don't redirect (let the component handle it)
+    if (axiosError.response?.status === 401) {
+      localStorage.removeItem('icaptur_access_token');
+      localStorage.removeItem('icaptur_refresh_token');
+      localStorage.removeItem('icaptur_user');
     }
     
     return Promise.reject(new Error(errorMessage));
