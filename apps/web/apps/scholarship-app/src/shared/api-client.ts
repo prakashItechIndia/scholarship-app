@@ -126,7 +126,7 @@ apiClient.interceptors.response.use(
     
     if (isSessionExpired) {
       // Handle session expiration with redirect
-      handleSessionExpiration();
+      // handleSessionExpiration();
       return Promise.reject(new Error(errorMessage));
     }
     

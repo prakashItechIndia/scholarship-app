@@ -228,7 +228,7 @@ const ViewDocumentsDrawer: React.FC<ViewDocumentsDrawerProps> = ({
                       width: "36px",
                       height: "36px",
                       padding: 0,
-                      backgroundColor: "#0f6cbd", // Primary Blue
+                      backgroundColor: "#2453C3", // Primary Blue
                       color: "#ffffff",
                       borderRadius: "4px",
                       border: "none",

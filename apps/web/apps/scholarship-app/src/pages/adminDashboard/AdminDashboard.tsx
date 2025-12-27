@@ -244,32 +244,24 @@ const AdminDashboard: React.FC = () => {
         });
 
         // Map recent activities
-        const mappedActivities = activities.map((act: any) => {
+        const bgColors = ['#E0F9E7', '#FDEEE4', '#FFF8E5', '#EFF6FF', '#FAF5FF'];
+        const borderColors = ['#58DB95', '#F58969', '#FECE79', '#BFDBFE', '#E9D5FF'];
+        const mappedActivities = activities.map((act: any, index: number) => {
           const userName = act.User_Name || act.ApplicantName || 'Unknown';
           let action = act.ProcessUndergone || act.Action || 'Activity';
-          let color = '#EFF6FF'; // Default blue background
-          let border = '1px solid #BFDBFE'; // Default blue border
+          const color = bgColors[index % bgColors.length];
+          const border = `1px solid ${borderColors[index % borderColors.length]}`;
           
-          // Determine action, color, and border based on process
+          // Format action text
           if (action.includes('Submitted') || action.includes('Registered')) {
-            color = '#E0F9E7'; // Green background
-            border = '1px solid #58DB95'; // Green border
             action = `Submitted Application${act.Scholarship_No ? ` - Scholarship ${act.Scholarship_No}` : ''}`;
           } else if (action.includes('Updated') || action.includes('Profile')) {
-            color = '#FDEEE4'; // Orange background
-            border = '1px solid #F58969'; // Orange border
             action = 'Updated Profile';
           } else if (action.includes('Uploaded') || action.includes('Document')) {
-            color = '#FFF8E5'; // Yellow background
-            border = '1px solid #FECE79'; // Yellow border
             action = 'Uploaded Document';
           } else if (action.includes('Approved')) {
-            color = '#EFF6FF'; // Blue background
-            border = '1px solid #BFDBFE'; // Blue border
             action = `Application Approved${act.Scholarship_No ? ` - Scholarship ${act.Scholarship_No}` : ''}`;
           } else if (action.includes('Registered') || action.includes('Account')) {
-            color = '#FAF5FF'; // Purple background
-            border = '1px solid #E9D5FF'; // Purple border
             action = 'Registered Account';
           }
 
@@ -416,7 +408,7 @@ const AdminDashboard: React.FC = () => {
       width: "100%",
       height: "100%",
       backgroundColor: "#fafafa",
-      padding: "15px 24px 24px 24px",
+      padding: "15px 0 24px 24px",
       fontFamily: "'Inter', sans-serif",
       display: "flex",
       flexDirection: "column",
@@ -427,7 +419,7 @@ const AdminDashboard: React.FC = () => {
       <div style={{
         flexShrink: 0,
         marginLeft: "-24px",
-        marginRight: "-24px",
+        marginRight: "0",
         paddingLeft: "24px",
         paddingRight: "24px",
         borderBottom: "1px solid #e0e0e0",
@@ -514,7 +506,7 @@ const AdminDashboard: React.FC = () => {
             <DropdownMenuTrigger>
               <button
                 style={{
-                  backgroundColor: "#0f6cbd",
+                  backgroundColor: "#2453C3",
                   color: "#ffffff",
                   display: "flex",
                   alignItems: "center",
@@ -559,7 +551,7 @@ const AdminDashboard: React.FC = () => {
         paddingTop: "12px",
         paddingBottom: "12px",
         marginLeft: "-24px",
-        marginRight: "-24px",
+        marginRight: "0",
         paddingLeft: "24px",
         paddingRight: "24px",
         borderBottom: "1px solid #e0e0e0",
@@ -568,89 +560,153 @@ const AdminDashboard: React.FC = () => {
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
       }}>
         {loading ? (
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gap: "16px",
-            width: "100%",
-          }}>
-            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
-            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
-            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
-            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
-            <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
-          </div>
-        ) : (
           <>
             <style>{`
-              .financial-cards-grid {
+              .financial-cards-grid-container {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-                gap: 12px;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 9px;
                 width: 100%;
               }
-              @media (min-width: 1400px) {
-                .financial-cards-grid {
-                  grid-template-columns: repeat(4, 1fr);
+              @media (max-width: 1400px) {
+                .financial-cards-grid-container {
+                  grid-template-columns: repeat(3, 1fr);
                 }
               }
-              @media (max-width: 1200px) {
-                .financial-cards-grid {
-                  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-                }
-              }
-              @media (max-width: 900px) {
-                .financial-cards-grid {
+              @media (max-width: 1000px) {
+                .financial-cards-grid-container {
                   grid-template-columns: repeat(2, 1fr);
                 }
               }
               @media (max-width: 600px) {
-                .financial-cards-grid {
+                .financial-cards-grid-container {
                   grid-template-columns: 1fr;
                 }
               }
             `}</style>
-            <div className="financial-cards-grid">
-            <FinancialSummaryCard
-              icon={getIndianRupeeIcon("#2453C3")}
-              value={financialData.totalAmountSpentThisYear}
-              label="Total Amount Spent This Year"
-              showCurrency={true}
-              iconBgColor="#FFFFFF"
-              color="#EFF6FF"
-            />
-            <FinancialSummaryCard
-              icon={getIndianRupeeIcon("#2453C3")}
-              value={financialData.amountSpentForSchoolStudents}
-              label="Amount Spent for School Students"
-              showCurrency={true}
-              iconBgColor="#FFFFFF"
-              color="#F0FDF4"
-            />
-            <FinancialSummaryCard
-              icon={getIndianRupeeIcon("#2453C3")}
-              value={financialData.amountSpentForCollegeStudents}
-              label="Amount Spent for College Students"
-              showCurrency={true}
-              iconBgColor="#FFFFFF"
-              color="#FAF5FF"
-            />
-            <FinancialSummaryCard
-              icon={getIndianRupeeIcon("#2453C3")}
-              value={financialData.amountSpentForResearchScholars}
-              label="Amount Spent for Research Scholars"
-              showCurrency={true}
-              iconBgColor="#FFFFFF"
-              color="#FFFBEB"
-            />
-            <FinancialSummaryCard
-              icon={getIndianRupeeIcon("#2453C3")}
-              value={financialData.amountSpentForMedicalAssistance}
-              label="Amount Spent for Medical Assistance"
-              showCurrency={true}
-              iconBgColor="#FFFFFF"
-              color="#FFEFEE"
-            />
+            <div className="financial-cards-grid-container">
+              <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
+              <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
+              <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
+              <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
+              <CardSkeleton variant="elevated" showIcon={true} showHeader={false} contentSections={0} style={{ height: "100px" }} />
+            </div>
+          </>
+        ) : (
+          <>
+            <style>{`
+              .financial-cards-grid-container {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 9px;
+                width: 100%;
+                position: relative;
+              }
+              /* Add separators using pseudo-elements - only between cards in the same row */
+              /* Separator after 1st card (between card 1 and 2) */
+              .financial-cards-grid-container > *:nth-child(1)::after {
+                content: '';
+                position: absolute;
+                right: -4.5px;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background-color: #E0E0E0;
+                z-index: 1;
+              }
+              /* Separator after 2nd card (between card 2 and 3) */
+              .financial-cards-grid-container > *:nth-child(2)::after {
+                content: '';
+                position: absolute;
+                right: -4.5px;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background-color: #E0E0E0;
+                z-index: 1;
+              }
+              /* Separator after 3rd card (between card 3 and 4) */
+              .financial-cards-grid-container > *:nth-child(3)::after {
+                content: '';
+                position: absolute;
+                right: -4.5px;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background-color: #E0E0E0;
+                z-index: 1;
+              }
+              /* On smaller screens, adjust grid columns */
+              @media (max-width: 1400px) {
+                .financial-cards-grid-container {
+                  grid-template-columns: repeat(3, 1fr);
+                }
+                /* Hide separator after 3rd card on 3-column layout */
+                .financial-cards-grid-container > *:nth-child(3)::after {
+                  display: none;
+                }
+              }
+              @media (max-width: 1000px) {
+                .financial-cards-grid-container {
+                  grid-template-columns: repeat(2, 1fr);
+                }
+                /* Hide separators after 2nd card on 2-column layout */
+                .financial-cards-grid-container > *:nth-child(2)::after,
+                .financial-cards-grid-container > *:nth-child(3)::after {
+                  display: none;
+                }
+              }
+              @media (max-width: 600px) {
+                .financial-cards-grid-container {
+                  grid-template-columns: 1fr;
+                }
+                /* Hide all separators on single column layout */
+                .financial-cards-grid-container > *::after {
+                  display: none;
+                }
+              }
+            `}</style>
+            <div className="financial-cards-grid-container">
+              <FinancialSummaryCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.totalAmountSpentThisYear}
+                label="Total Amount Spent This Year"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#EFF6FF"
+              />
+              <FinancialSummaryCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.amountSpentForSchoolStudents}
+                label="Amount Spent for School Students"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#F0FDF4"
+              />
+              <FinancialSummaryCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.amountSpentForCollegeStudents}
+                label="Amount Spent for College Students"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#FAF5FF"
+              />
+              <FinancialSummaryCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.amountSpentForResearchScholars}
+                label="Amount Spent for Research Scholars"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#FFFBEB"
+              />
+              <FinancialSummaryCard
+                icon={getIndianRupeeIcon("#2453C3")}
+                value={financialData.amountSpentForMedicalAssistance}
+                label="Amount Spent for Medical Assistance"
+                showCurrency={true}
+                iconBgColor="#FFFFFF"
+                color="#FFEFEE"
+              />
             </div>
           </>
         )}
@@ -664,6 +720,10 @@ const AdminDashboard: React.FC = () => {
           overflowY: "auto",
           overflowX: "hidden",
           marginTop: "-15px",
+          marginLeft: "-24px",
+          marginRight: "0",
+          paddingLeft: "24px",
+          paddingRight: "24px",
           minHeight: 0,
         }}
         className="dashboard-scrollable-content"
@@ -693,7 +753,7 @@ const AdminDashboard: React.FC = () => {
           color: "#242424",
           marginBottom: "16px",
           fontFamily: "'Inter', sans-serif",
-          // marginTop:"20px"
+          marginTop:"20px"
           // paddingTop:"-20px"
         }}>
           Applications Analytics & Reports

@@ -263,9 +263,9 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
         title={
           <div 
             className="relative w-full flex items-center justify-between"
-            style={{
-              padding: "20px 24px 16px 24px",
-            }}
+            // style={{
+            //   padding: "20px 24px 16px 24px",
+            // }}
           >
             <span 
               style={{
@@ -342,7 +342,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           </div>
         }
       >
-        <div style={{ padding: "0 24px" }}>
+        <div>
           <p 
             style={{
               fontSize: "14px",

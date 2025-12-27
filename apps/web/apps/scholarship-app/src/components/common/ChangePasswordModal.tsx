@@ -281,7 +281,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                 fontWeight: 500,
                 fontFamily: "'Inter', sans-serif",
                 borderRadius: "6px",
-                backgroundColor: "#0f6cbd",
+                backgroundColor: "#2453C3",
               }}
             >
               {mutation.isPending ? 'Changing...' : 'Change'}

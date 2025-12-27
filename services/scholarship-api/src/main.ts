@@ -135,7 +135,7 @@ async function bootstrap() {
   });
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('iCaptur SSO Service')
+    .setTitle('Scholarship Management')
     .setDescription(
       'API documentation for the iCaptur.AI Single Sign-On service with OAuth2, MFA, and centralized session management',
     )

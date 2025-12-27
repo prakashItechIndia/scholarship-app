@@ -15,6 +15,9 @@ interface UseUserTableProps {
   onRowSelect?: (item: User, selected: boolean) => void;
   onSelectAll?: (selected: boolean) => void;
   data?: User[];
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  onSort?: (fieldName: string) => void;
 }
 
 export const useUserTable = ({
@@ -24,30 +27,46 @@ export const useUserTable = ({
   onRowSelect,
   onSelectAll,
   data = [],
+  sortBy,
+  sortOrder,
+  onSort,
 }: UseUserTableProps) => {
   const columns = React.useMemo(() => {
     // Helper function to create sortable header
-    const createSortableHeader = (name: string) => (
-      <div 
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "4px",
-          cursor: "pointer",
-        }}
-      >
-        <span style={{
-          fontSize: "14px",
-          lineHeight: "20px",
-          fontWeight: 600,
-          color: "#424242",
-          fontFamily: "'Inter', sans-serif",
-        }}>
-          {name}
-        </span>
-        <ArrowSortRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
-      </div>
-    );
+    const createSortableHeader = (name: string, fieldName: string) => {
+      const isActive = sortBy === fieldName;
+      const isAsc = isActive && sortOrder === 'asc';
+      const isDesc = isActive && sortOrder === 'desc';
+      
+      return (
+        <div 
+          onClick={() => onSort?.(fieldName)}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+            cursor: "pointer",
+          }}
+        >
+          <span style={{
+            fontSize: "14px",
+            lineHeight: "20px",
+            fontWeight: 600,
+            color: "#424242",
+            fontFamily: "'Inter', sans-serif",
+          }}>
+            {name}
+          </span>
+          <ArrowSortRegular style={{ 
+            width: "16px", 
+            height: "16px", 
+            color: isActive ? "#0f6cbd" : "#616161",
+            transform: isDesc ? "rotate(180deg)" : "none",
+            transition: "transform 0.2s",
+          }} />
+        </div>
+      );
+    };
 
     // Action column renderer
     const renderActions = (item: User) => (
@@ -180,7 +199,7 @@ export const useUserTable = ({
         fieldName: "name",
         minWidth: 150,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Name"),
+        onRenderHeader: () => createSortableHeader("Name", "name"),
         onRender: (item: User) => renderText(item.name),
       },
       {
@@ -189,7 +208,7 @@ export const useUserTable = ({
         fieldName: "userRole",
         minWidth: 180,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("User Role"),
+        onRenderHeader: () => createSortableHeader("User Role", "userRole"),
         onRender: (item: User) => renderText(item.userRole),
       },
       {
@@ -198,7 +217,7 @@ export const useUserTable = ({
         fieldName: "userType",
         minWidth: 150,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("User Type"),
+        onRenderHeader: () => createSortableHeader("User Type", "userType"),
         onRender: (item: User) => renderText(item.userType),
       },
       {
@@ -207,7 +226,7 @@ export const useUserTable = ({
         fieldName: "mobileNumber",
         minWidth: 150,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Mobile Number"),
+        onRenderHeader: () => createSortableHeader("Mobile Number", "mobileNumber"),
         onRender: (item: User) => renderText(item.mobileNumber),
       },
       {
@@ -216,7 +235,7 @@ export const useUserTable = ({
         fieldName: "emailId",
         minWidth: 200,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Email Id"),
+        onRenderHeader: () => createSortableHeader("Email Id", "emailId"),
         onRender: (item: User) => renderText(item.emailId),
       },
       {
@@ -225,7 +244,7 @@ export const useUserTable = ({
         fieldName: "status",
         minWidth: 120,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Status"),
+        onRenderHeader: () => createSortableHeader("Status", "status"),
         onRender: (item: User) => renderStatus(item.status),
       },
       {
@@ -238,7 +257,7 @@ export const useUserTable = ({
         onRender: renderActions,
       },
     ];
-  }, [handleEdit, handleDelete, selectedRows, onRowSelect, onSelectAll, data]);
+  }, [handleEdit, handleDelete, selectedRows, onRowSelect, onSelectAll, data, sortBy, sortOrder, onSort]);
 
   return { columns };
 };

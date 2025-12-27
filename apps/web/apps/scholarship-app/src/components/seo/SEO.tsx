@@ -17,13 +17,13 @@ export interface SEOProps {
 }
 
 const defaultSEO = {
-  title: 'iCaptur SSO - Single Sign-On Authentication',
+  title: 'Scholarship Management System - Single Sign-On Authentication',
   description:
-    'Secure single sign-on authentication for iCaptur products. Sign in to access your iCaptur account and manage your subscriptions.',
+    'Secure single sign-on authentication for Scholarship Management System. Sign in to access your Scholarship Management System account and manage your scholarships.',
   keywords:
-    'iCaptur, SSO, single sign-on, authentication, login, security, access management',
-  siteName: 'iCaptur SSO',
-  twitterHandle: '@icaptur',
+    'Scholarship Management System, SSO, single sign-on, authentication, login, security, access management',
+  siteName: 'Scholarship Management System',
+  twitterHandle: '@scholarshipmanagement',
   locale: 'en_US',
   type: 'website' as const,
   image: '/og-image.png',
@@ -52,7 +52,7 @@ export const SEO = ({
   const baseUrl =
     typeof window !== 'undefined'
       ? window.location.origin
-      : 'https://scholarship.icaptur.ai';
+      : 'https://scholarship.management';
   const fullUrl = url ? `${baseUrl}${url}` : baseUrl;
   const imageUrl = image
     ? image.startsWith('http')
@@ -72,7 +72,7 @@ export const SEO = ({
       <meta name="title" content={fullTitle} />
       <meta name="description" content={metaDescription} />
       {metaKeywords && <meta name="keywords" content={metaKeywords} />}
-      <meta name="author" content="iCaptur" />
+      <meta name="author" content="Scholarship Management System" />
       <meta name="robots" content={`${noindex ? 'noindex' : 'index'}, ${nofollow ? 'nofollow' : 'follow'}`} />
       <meta name="language" content="English" />
       <meta name="revisit-after" content="7 days" />

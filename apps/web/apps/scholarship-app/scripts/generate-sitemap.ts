@@ -1,12 +1,12 @@
 /**
- * Generate XML sitemap for iCaptur SSO
+ * Generate XML sitemap for Scholarship Management System
  * Run with: pnpm tsx scripts/generate-sitemap.ts
  */
 
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 
-const baseUrl = process.env.VITE_APP_URL || 'https://scholarship.icaptur.ai';
+const baseUrl = process.env.VITE_APP_URL || 'https://scholarship.management';
 
 interface SitemapUrl {
   loc: string;

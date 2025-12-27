@@ -15,6 +15,9 @@ interface UseRoleTableProps {
   onRowSelect?: (item: Role, selected: boolean) => void;
   onSelectAll?: (selected: boolean) => void;
   data?: Role[];
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  onSort?: (fieldName: string) => void;
 }
 
 // Export functions for edit and delete actions
@@ -27,27 +30,46 @@ export const handleDeleteRole = (item: Role, onDelete: (item: Role) => void) => 
 };
 
 // Export function for sortable header with ArrowSortRegular icon
-export const renderSortableHeader = (name: string) => (
-  <div 
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "4px",
-      cursor: "pointer",
-    }}
-  >
-    <span style={{
-      fontSize: "13px",
-      lineHeight: "20px",
-      fontWeight: 600,
-      color: "#424242",
-      fontFamily: "'Inter', sans-serif",
-    }}>
-      {name}
-    </span>
-    <ArrowSortRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
-  </div>
-);
+export const renderSortableHeader = (
+  name: string,
+  fieldName: string,
+  currentSortBy?: string,
+  currentSortOrder?: 'asc' | 'desc',
+  onSort?: (fieldName: string) => void
+) => {
+  const isActive = currentSortBy === fieldName;
+  const isAsc = isActive && currentSortOrder === 'asc';
+  const isDesc = isActive && currentSortOrder === 'desc';
+  
+  return (
+    <div 
+      onClick={() => onSort?.(fieldName)}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "4px",
+        cursor: "pointer",
+      }}
+    >
+      <span style={{
+        fontSize: "13px",
+        lineHeight: "20px",
+        fontWeight: 600,
+        color: "#424242",
+        fontFamily: "'Inter', sans-serif",
+      }}>
+        {name}
+      </span>
+      <ArrowSortRegular style={{ 
+        width: "16px", 
+        height: "16px", 
+        color: isActive ? "#0f6cbd" : "#616161",
+        transform: isDesc ? "rotate(180deg)" : "none",
+        transition: "transform 0.2s",
+      }} />
+    </div>
+  );
+};
 
 export const useRoleTable = ({
   handleEdit,
@@ -56,10 +78,14 @@ export const useRoleTable = ({
   onRowSelect,
   onSelectAll,
   data = [],
+  sortBy,
+  sortOrder,
+  onSort,
 }: UseRoleTableProps) => {
   const columns = React.useMemo(() => {
     // Helper function to create sortable header
-    const createSortableHeader = (name: string) => renderSortableHeader(name);
+    const createSortableHeader = (name: string, fieldName: string) => 
+      renderSortableHeader(name, fieldName, sortBy, sortOrder, onSort);
 
     // Action column renderer
     const renderActions = (item: Role) => (
@@ -103,12 +129,12 @@ export const useRoleTable = ({
           fontSize: "10px",
           lineHeight: "16px",
           fontWeight: "semi-bold",
-          color: status?.toLowerCase() === "active" ? "#0E700E !important" : "#616161",
-          backgroundColor: status?.toLowerCase() === "active" ? "#9FD89F" : "#F0F0F0",
+          color: status === "Active" ? "#107C10" : "#616161",
+          backgroundColor: status === "Active" ? "#EBF9EB" : "#F0F0F0",
+          border: `1px solid ${status === "Active" ? "#B3E0B3" : "#D1D1D1"}`,
           padding: "4px 30px",
           borderRadius: "12px",
           display: "inline-block",
-          border: status?.toLowerCase() === "active" ? "1px solid #0E700E" : "1px solid #E0E0E0",
         }}
       >
         {status}
@@ -196,7 +222,7 @@ export const useRoleTable = ({
         cellPaddingLeft: 8,
         cellPaddingRight: 8,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("User Role"),
+        onRenderHeader: () => createSortableHeader("User Role", "roleName"),
         onRender: (item: Role) => renderText(item.roleName),
       },
       {
@@ -209,7 +235,7 @@ export const useRoleTable = ({
         cellPaddingLeft: 8,
         cellPaddingRight: 8,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("User Type"),
+        onRenderHeader: () => createSortableHeader("User Type", "roleType"),
         onRender: (item: Role) => renderText(item.roleType),
       },
       // {
@@ -230,7 +256,7 @@ export const useRoleTable = ({
         cellPaddingLeft: 8,
         cellPaddingRight: 8,
         isSortable: true,
-        onRenderHeader: () => createSortableHeader("Status"),
+        onRenderHeader: () => createSortableHeader("Status", "status"),
         onRender: (item: Role) => renderStatus(item.status),
       },
       {
@@ -257,7 +283,7 @@ export const useRoleTable = ({
         onRender: () => <span></span>,
       },
     ];
-  }, [handleEdit, handleDelete, selectedRows, onRowSelect, onSelectAll, data]);
+  }, [handleEdit, handleDelete, selectedRows, onRowSelect, onSelectAll, data, sortBy, sortOrder, onSort]);
 
   return { columns };
 };

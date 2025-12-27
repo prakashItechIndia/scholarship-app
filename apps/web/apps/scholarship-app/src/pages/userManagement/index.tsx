@@ -35,13 +35,27 @@ const UserManagementPage: React.FC = () => {
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [sortBy, setSortBy] = React.useState<string | undefined>(undefined);
+  const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('asc');
+  const [totalItems, setTotalItems] = React.useState(0);
 
-  // Fetch users from API
+  // Fetch users from API with sorting and pagination
   React.useEffect(() => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const data = await userManagement.getAllUsers();
+        const response = await userManagement.getAllUsers({
+          sortBy,
+          sortOrder,
+          page: currentPage,
+          pageSize,
+          search: searchQuery || undefined,
+        });
+        
+        // Handle both array response (backward compatible) and paginated response
+        const data = Array.isArray(response) ? response : (response.data || response.items || []);
+        const total = Array.isArray(response) ? response.length : (response.total || response.count || data.length);
+        
         // Map API response to User interface
         // Helper function to map role to user type
         const getuserTypeFromRole = (roleName: string): "Administrator" | "Manager" | "Standard User" => {
@@ -81,6 +95,7 @@ const UserManagementPage: React.FC = () => {
           status: user.ActiveStatus === 'Active' ? 'Active' : 'Inactive',
         }));
         setUsers(mappedUsers);
+        setTotalItems(total);
         // Sync users to sessionStorage for validation in form
         sessionStorage.setItem("allUsers", JSON.stringify(mappedUsers));
       } catch (err) {
@@ -90,7 +105,7 @@ const UserManagementPage: React.FC = () => {
       }
     };
     void fetchUsers();
-  }, [showError]);
+  }, [showError, sortBy, sortOrder, currentPage, pageSize, searchQuery]);
 
   // Refresh users after form save (check sessionStorage)
   React.useEffect(() => {
@@ -100,7 +115,14 @@ const UserManagementPage: React.FC = () => {
       // Reload users from API instead of using sessionStorage
       const fetchUsers = async () => {
         try {
-          const data = await userManagement.getAllUsers();
+          const response = await userManagement.getAllUsers({
+            sortBy,
+            sortOrder,
+            page: currentPage,
+            pageSize,
+            search: searchQuery || undefined,
+          });
+          const data = Array.isArray(response) ? response : (response.data || response.items || []);
           // Helper function to map role to user type
           const getuserTypeFromRole = (roleName: string): "Administrator" | "Manager" | "Standard User" => {
             const adminRoles = ['CEO', 'Super Admin', 'Supreme Admin', 'Document Super Admin'];
@@ -151,27 +173,57 @@ const UserManagementPage: React.FC = () => {
       sessionStorage.removeItem("lastSavedUser");
       sessionStorage.removeItem("userAction");
     }
-  }, [success, showError]);
+  }, [success, showError, sortBy, sortOrder, currentPage, pageSize, searchQuery]);
 
-  // Filter users based on search query
-  const filteredUsers = React.useMemo(() => {
-    if (!searchQuery.trim()) {
-      return users;
+  // Reset to page 1 when search query or sort changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, sortBy, sortOrder]);
+
+  // Handle sort
+  const handleSort = (fieldName: string) => {
+    if (sortBy === fieldName) {
+      // Toggle sort order if same field
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // New field, default to ascending
+      setSortBy(fieldName);
+      setSortOrder('asc');
     }
-    const query = searchQuery.toLowerCase();
-    return users.filter((user) =>
-      Object.values(user).some((value) =>
-        String(value).toLowerCase().includes(query)
-      )
-    );
-  }, [users, searchQuery]);
+  };
 
-  // Paginate data
-  const paginatedData = React.useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    return filteredUsers.slice(startIndex, endIndex);
-  }, [filteredUsers, currentPage, pageSize]);
+  // Handle export
+  const handleExport = async (format: 'excel' | 'word') => {
+    try {
+      setLoading(true);
+      const blob = await userManagement.exportUsers(format, {
+        sortBy,
+        sortOrder,
+        search: searchQuery || undefined,
+      });
+
+      const extension = format === 'excel' ? 'xlsx' : 'docx';
+      const filename = `Users_Export_${new Date().toISOString().split('T')[0]}.${extension}`;
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      success('Export Successful', `Users exported as ${filename} successfully`);
+    } catch (err) {
+      showError('Export Failed', err instanceof Error ? err.message : 'Failed to export users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Use users directly from API (already paginated and sorted on backend)
+  const paginatedData = users;
 
   // Get table columns
   const { columns } = useUserTable({
@@ -201,9 +253,11 @@ const UserManagementPage: React.FC = () => {
       }
     },
     data: paginatedData,
+    sortBy,
+    sortOrder,
+    onSort: handleSort,
   });
 
-  const totalItems = filteredUsers.length;
   const totalPages = Math.ceil(totalItems / pageSize);
 
   const handleAddUser = () => {
@@ -276,7 +330,7 @@ const UserManagementPage: React.FC = () => {
           <Button
             onClick={handleAddUser}
             style={{
-              backgroundColor: "#0f6cbd",
+              backgroundColor: "#2453C3",
               color: "#ffffff",
               display: "flex",
               alignItems: "center",
@@ -365,7 +419,7 @@ const UserManagementPage: React.FC = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem 
-                  onClick={() => {}}
+                  onClick={() => void handleExport('excel')}
                   style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -374,7 +428,7 @@ const UserManagementPage: React.FC = () => {
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  onClick={() => {}}
+                  onClick={() => void handleExport('word')}
                   style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>

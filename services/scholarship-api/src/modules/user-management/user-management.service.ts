@@ -26,10 +26,17 @@ export class UserManagementService {
   /**
    * Get all users - matches BingGrid from UserCreation.aspx.cs
    * Excludes users with "Student" role as they are for user flow, not admin flow
+   * Supports sorting, pagination, and search
    */
-  async getAllUsers() {
+  async getAllUsers(params?: {
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    page?: number;
+    pageSize?: number;
+    search?: string;
+  }) {
     try {
-      const query = `
+      let query = `
         SELECT
           U.ID,
           U.User_ID,
@@ -52,9 +59,59 @@ export class UserManagementService {
           AND LOWER(R.Role_Name) != 'student'
       `;
 
-      const result = await this.db.query(query);
+      const queryParams: Record<string, unknown> = {};
 
-      return result.recordset || [];
+      // Add search filter
+      if (params?.search) {
+        query += ` AND (
+          LOWER(U.User_Name) LIKE LOWER(@search) OR
+          LOWER(U.User_ID) LIKE LOWER(@search) OR
+          LOWER(R.Role_Name) LIKE LOWER(@search) OR
+          LOWER(U.Mobile_Number) LIKE LOWER(@search) OR
+          LOWER(U.EMail_Id) LIKE LOWER(@search) OR
+          LOWER(CASE U.IsActive WHEN '0' THEN 'InActive' WHEN '1' THEN 'Active' ELSE 'false' END) LIKE LOWER(@search)
+        )`;
+        queryParams.search = `%${params.search}%`;
+      }
+
+      // Add sorting
+      const sortBy = params?.sortBy || 'User_Name';
+      const sortOrder = params?.sortOrder || 'asc';
+      const validSortFields: Record<string, string> = {
+        name: 'U.User_Name',
+        userRole: 'R.Role_Name',
+        userType: 'R.Role_Name', // Using Role_Name as proxy for userType
+        mobileNumber: 'U.Mobile_Number',
+        emailId: 'U.EMail_Id',
+        status: 'ActiveStatus',
+      };
+      const sortField = validSortFields[sortBy] || 'U.User_Name';
+      query += ` ORDER BY ${sortField} ${sortOrder.toUpperCase()}`;
+
+      // Execute query
+      const result = await this.db.query(query, queryParams);
+      const allUsers = Array.from(result.recordset || []);
+      const total = allUsers.length;
+
+      // Apply pagination if requested
+      let users = allUsers;
+      if (params?.page && params?.pageSize) {
+        const startIndex = (params.page - 1) * params.pageSize;
+        const endIndex = startIndex + params.pageSize;
+        users = allUsers.slice(startIndex, endIndex);
+      }
+
+      // Return paginated response if pagination is requested, otherwise return array (backward compatible)
+      if (params?.page && params?.pageSize) {
+        return {
+          data: users,
+          total,
+          page: params.page,
+          pageSize: params.pageSize,
+        };
+      }
+
+      return users;
     } catch (error) {
       this.logger.error('Error fetching users', error);
       throw new BadRequestException('Failed to fetch users');
@@ -304,5 +361,277 @@ This is an automated message. Please do not reply to this email.
       this.logger.error('Error fetching user', error);
       throw new BadRequestException('Failed to fetch user');
     }
+  }
+
+  /**
+   * Export users to Excel or Word
+   */
+  async exportUsers(
+    format: 'excel' | 'word',
+    params?: {
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
+      search?: string;
+    },
+  ): Promise<Buffer> {
+    try {
+      // Get all users (no pagination for export)
+      const users = await this.getAllUsers({
+        ...params,
+        page: undefined,
+        pageSize: undefined,
+      });
+
+      const data = Array.isArray(users) ? users : users.data || [];
+
+      if (format === 'excel') {
+        return this.exportToExcel(data);
+      } else {
+        return this.exportToWord(data);
+      }
+    } catch (error) {
+      this.logger.error('Error exporting users', error);
+      throw new BadRequestException('Failed to export users');
+    }
+  }
+
+  /**
+   * Export users to Excel
+   */
+  private async exportToExcel(users: unknown[]): Promise<Buffer> {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+    const ExcelJS = require('exceljs');
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Users');
+
+    if (users.length === 0) {
+      worksheet.addRow(['No data available']);
+      const buffer = await workbook.xlsx.writeBuffer();
+      return Buffer.from(buffer);
+    }
+
+    // Headers
+    const headers = ['Name', 'User Role', 'User Type', 'Mobile Number', 'Email Id', 'Status'];
+    const headerRow = worksheet.addRow(headers);
+    headerRow.font = { bold: true };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF0F6CBD' },
+    };
+    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+
+    // Helper function to map role to user type
+    const getUserTypeFromRole = (roleName: string): string => {
+      const adminRoles = ['CEO', 'Super Admin', 'Supreme Admin', 'Document Super Admin'];
+      const managerRoles = ['Scholarship Admin', 'Document Admin'];
+      
+      if (adminRoles.some(adminRole => roleName?.toLowerCase().includes(adminRole.toLowerCase()))) {
+        return 'Administrator';
+      }
+      if (managerRoles.some(managerRole => roleName?.toLowerCase().includes(managerRole.toLowerCase()))) {
+        return 'Manager';
+      }
+      return 'Standard User';
+    };
+
+    // Data rows
+    users.forEach((user: any) => {
+      worksheet.addRow([
+        user.User_Name || user.User_ID || '',
+        user.Role_Name || '',
+        getUserTypeFromRole(user.Role_Name || ''),
+        user.Mobile_Number || '',
+        user.EMail_Id || user.User_ID || '',
+        user.ActiveStatus || '',
+      ]);
+    });
+
+    // Auto-fit columns
+    worksheet.columns.forEach((column) => {
+      if (column.header) {
+        column.width = 20;
+      }
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
+  }
+
+  /**
+   * Export users to Word
+   */
+  private async exportToWord(users: unknown[]): Promise<Buffer> {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+    const {
+      Document,
+      Packer,
+      Paragraph,
+      Table,
+      TableRow,
+      TableCell,
+      WidthType,
+      AlignmentType,
+      TextRun,
+    } = require('docx');
+
+    // Helper function to map role to user type
+    const getUserTypeFromRole = (roleName: string): string => {
+      const adminRoles = ['CEO', 'Super Admin', 'Supreme Admin', 'Document Super Admin'];
+      const managerRoles = ['Scholarship Admin', 'Document Admin'];
+      
+      if (adminRoles.some(adminRole => roleName?.toLowerCase().includes(adminRole.toLowerCase()))) {
+        return 'Administrator';
+      }
+      if (managerRoles.some(managerRole => roleName?.toLowerCase().includes(managerRole.toLowerCase()))) {
+        return 'Manager';
+      }
+      return 'Standard User';
+    };
+
+    const children: any[] = [];
+
+    // Title
+    children.push(
+      new Paragraph({
+        text: 'Users Export',
+        heading: 'Heading1',
+        alignment: AlignmentType.CENTER,
+      }),
+    );
+
+    // Metadata
+    children.push(
+      new Paragraph({
+        text: `Generated on: ${new Date().toLocaleString()}`,
+      }),
+    );
+    children.push(
+      new Paragraph({
+        text: `Total Records: ${users.length}`,
+      }),
+    );
+    children.push(new Paragraph({ text: '' })); // Empty line
+
+    if (users.length === 0) {
+      children.push(
+        new Paragraph({
+          text: 'No data available',
+          alignment: AlignmentType.CENTER,
+        }),
+      );
+    } else {
+      // Create table
+      const tableRows: any[] = [];
+
+      // Header row
+      const headerCells = [
+        new TableCell({
+          children: [
+            new Paragraph({
+              text: 'Name',
+              children: [new TextRun({ bold: true })],
+            }),
+          ],
+          width: { size: 16.67, type: WidthType.PERCENTAGE },
+        }),
+        new TableCell({
+          children: [
+            new Paragraph({
+              text: 'User Role',
+              children: [new TextRun({ bold: true })],
+            }),
+          ],
+          width: { size: 16.67, type: WidthType.PERCENTAGE },
+        }),
+        new TableCell({
+          children: [
+            new Paragraph({
+              text: 'User Type',
+              children: [new TextRun({ bold: true })],
+            }),
+          ],
+          width: { size: 16.67, type: WidthType.PERCENTAGE },
+        }),
+        new TableCell({
+          children: [
+            new Paragraph({
+              text: 'Mobile Number',
+              children: [new TextRun({ bold: true })],
+            }),
+          ],
+          width: { size: 16.67, type: WidthType.PERCENTAGE },
+        }),
+        new TableCell({
+          children: [
+            new Paragraph({
+              text: 'Email Id',
+              children: [new TextRun({ bold: true })],
+            }),
+          ],
+          width: { size: 16.67, type: WidthType.PERCENTAGE },
+        }),
+        new TableCell({
+          children: [
+            new Paragraph({
+              text: 'Status',
+              children: [new TextRun({ bold: true })],
+            }),
+          ],
+          width: { size: 16.67, type: WidthType.PERCENTAGE },
+        }),
+      ];
+      tableRows.push(new TableRow({ children: headerCells }));
+
+      // Data rows
+      users.forEach((user: any) => {
+        const cells = [
+          new TableCell({
+            children: [new Paragraph({ text: String(user.User_Name || user.User_ID || '') })],
+            width: { size: 16.67, type: WidthType.PERCENTAGE },
+          }),
+          new TableCell({
+            children: [new Paragraph({ text: String(user.Role_Name || '') })],
+            width: { size: 16.67, type: WidthType.PERCENTAGE },
+          }),
+          new TableCell({
+            children: [new Paragraph({ text: getUserTypeFromRole(user.Role_Name || '') })],
+            width: { size: 16.67, type: WidthType.PERCENTAGE },
+          }),
+          new TableCell({
+            children: [new Paragraph({ text: String(user.Mobile_Number || '') })],
+            width: { size: 16.67, type: WidthType.PERCENTAGE },
+          }),
+          new TableCell({
+            children: [new Paragraph({ text: String(user.EMail_Id || user.User_ID || '') })],
+            width: { size: 16.67, type: WidthType.PERCENTAGE },
+          }),
+          new TableCell({
+            children: [new Paragraph({ text: String(user.ActiveStatus || '') })],
+            width: { size: 16.67, type: WidthType.PERCENTAGE },
+          }),
+        ];
+        tableRows.push(new TableRow({ children: cells }));
+      });
+
+      children.push(
+        new Table({
+          rows: tableRows,
+          width: { size: 100, type: WidthType.PERCENTAGE },
+        }),
+      );
+    }
+
+    const doc = new Document({
+      sections: [
+        {
+          children,
+        },
+      ],
+    });
+
+    const buffer = await Packer.toBuffer(doc);
+    return buffer;
   }
 }

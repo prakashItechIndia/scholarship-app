@@ -91,7 +91,7 @@ const ReportsTabs: React.FC<ReportsTabsProps> = ({ activeTab, onTabChange, onExp
             size="small"
             loading={exportLoading}
             buttonStyle={{
-              backgroundColor: "#0f6cbd",
+              backgroundColor: "#2453C3",
               borderRadius: "6px",
               height: "32px",
               fontSize: "12px",

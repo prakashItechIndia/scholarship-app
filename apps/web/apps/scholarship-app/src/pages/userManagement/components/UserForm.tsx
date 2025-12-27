@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   Label,
-  PageActionButtons,
 } from "@shared/components";
 import { Spinner, SpinnerSize } from "@fluentui/react";
 
@@ -243,38 +242,80 @@ const UserForm: React.FC = () => {
 
   return (
     <>
-      {/* Title Section */}
-      <PageActionButtons
-        title={
-          <div style={{ marginBottom: "0px" }}>
-            <h1 style={{
-              fontSize: "16px",
-              // lineHeight: "40px",
-              fontWeight: 700,
+      {/* Title Section with Buttons */}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+        padding: "16px 24px 14px 24px",
+        backgroundColor:"#ffffff",
+        marginBottom: "0px",
+      }}>
+        <div style={{ flex: 1 }}>
+          <h1 style={{
+            fontSize: "16px",
+            fontWeight: 700,
+            color: "#242424",
+            fontFamily: "'Inter', sans-serif",
+            marginBottom: "4px",
+          }}>
+            {isEditMode ? "Edit User" : "Add New User"}
+          </h1>
+          <p style={{
+            fontSize: "12px",
+            lineHeight: "20px",
+            color: "#707070",
+            fontFamily: "'Inter', sans-serif",
+          }}>
+            {isEditMode ? "Update user details and access levels." : "Enter user details to create a new account."}
+          </p>
+        </div>
+        {/* Action Buttons - Top Right */}
+        <div style={{
+          display: "flex",
+          gap: "12px",
+          alignItems: "center",
+        }}>
+          <Button
+            appearance="secondary"
+            onClick={handleCancel}
+            style={{
+              backgroundColor: "#ffffff",
               color: "#242424",
-              // marginBottom: "8px",
-              fontFamily: "'Inter', sans-serif",
-              paddingLeft: "24px",
-              paddingTop: "15px",
-            }}>
-              {isEditMode ? "Edit User" : "Add New User"}
-            </h1>
-            <p style={{
-              fontSize: "12px",
-              lineHeight: "20px",
-              color: "#707070",
-              fontFamily: "'Inter', sans-serif",
-              paddingLeft: "24px",
-            }}>
-              {isEditMode ? "Update user details and access levels." : "Enter user details to create a new account."}
-            </p>
-          </div>
-        }
-      />
+              border: "1px solid #d1d1d1",
+              minWidth: "100px",
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            appearance="primary"
+            onClick={handleSave}
+            disabled={loading}
+            style={{
+              backgroundColor: "#2453C3",
+              color: "#ffffff",
+              minWidth: "100px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            {loading ? (
+              <>
+                <Spinner size={SpinnerSize.small} styles={{ circle: { borderTopColor: "#FFFFFF", borderBottomColor: "#FFFFFF", borderLeftColor: "#FFFFFF", borderRightColor: "#FFFFFF" } }} />
+                <span>Saving...</span>
+              </>
+            ) : (
+              isEditMode ? "Update" : "Save"
+            )}
+          </Button>
+        </div>
+      </div>
 
       <Card variant="elevated" style={{
         border: "1px solid #e0e0e0",
-        backgroundColor: "#ffffff",
+        // backgroundColor: "#ffffff",
         // borderRadius: "8px",
         padding: "24px",
         paddingBottom: "20px",
@@ -297,7 +338,7 @@ const UserForm: React.FC = () => {
               width: "120px",
               height: "120px",
               borderRadius: "50%",
-              backgroundColor: "rgba(50, 48, 48, 1)",
+              backgroundColor: profilePhotoPreview ? "transparent" : "rgba(50, 48, 48, 1)",
               opacity: profilePhotoPreview ? 1 : 0.9,
               display: "flex",
               flexDirection: "column",
@@ -412,9 +453,9 @@ const UserForm: React.FC = () => {
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           gap: "24px",
-          marginBottom: "32px",
-          paddingBottom: "32px",
-          borderBottom: "1px solid #e0e0e0",
+          // marginBottom: "32px",
+          // paddingBottom: "32px",
+          // borderBottom: "1px solid #e0e0e0",
           marginLeft: "-24px",
           marginRight: "-24px",
           paddingLeft: "24px",
@@ -571,55 +612,6 @@ const UserForm: React.FC = () => {
               </label>
             </div>
           </div>
-        </div>
-
-        {/* Footer Buttons */}
-        <div style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: "12px",
-          marginLeft: "-24px",
-          marginRight: "-24px",
-          paddingLeft: "24px",
-          paddingRight: "24px",
-          paddingTop: "30px",  
-          marginTop: "-40px",
-          // borderTop: "1px solid #e0e0e0",
-        }}>
-          <Button
-            appearance="secondary"
-            onClick={handleCancel}
-            style={{
-              backgroundColor: "#f5f5f5",
-              color: "#242424",
-              border: "1px solid #e0e0e0",
-              minWidth: "100px",
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            appearance="primary"
-            onClick={handleSave}
-            disabled={loading}
-            style={{
-              backgroundColor: "#0f6cbd",
-              color: "#ffffff",
-              minWidth: "100px",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
-            {loading ? (
-              <>
-                <Spinner size={SpinnerSize.small} styles={{ circle: { borderTopColor: "#FFFFFF", borderBottomColor: "#FFFFFF", borderLeftColor: "#FFFFFF", borderRightColor: "#FFFFFF" } }} />
-                <span>Saving...</span>
-              </>
-            ) : (
-              isEditMode ? "Update" : "Save"
-            )}
-          </Button>
         </div>
       </Card>
     </>

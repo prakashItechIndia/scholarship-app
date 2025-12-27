@@ -34,13 +34,27 @@ const RoleManagementPage: React.FC = () => {
   const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set());
   const [deleteError, setDeleteError] = React.useState<string | null>(null);
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [sortBy, setSortBy] = React.useState<string | undefined>(undefined);
+  const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('asc');
+  const [totalItems, setTotalItems] = React.useState(0);
 
-  // Fetch roles from API
+  // Fetch roles from API with sorting and pagination
   React.useEffect(() => {
     const fetchRoles = async () => {
       try {
         setLoading(true);
-        const data = await roleManagement.getAllRoles();
+        const response = await roleManagement.getAllRoles({
+          sortBy,
+          sortOrder,
+          page: currentPage,
+          pageSize,
+          search: searchQuery || undefined,
+        });
+        
+        // Handle both array response (backward compatible) and paginated response
+        const data = Array.isArray(response) ? response : (response.data || response.items || []);
+        const total = Array.isArray(response) ? response.length : (response.total || response.count || data.length);
+        
         // Map API response to Role interface
         // Filter out "Student" role (case-insensitive) as it's for user flow, not admin flow
         const mappedRoles: Role[] = data
@@ -48,21 +62,22 @@ const RoleManagementPage: React.FC = () => {
             role.roleName?.toLowerCase() !== 'student'
           )
           ?.map((role: {
-          id: string | number;
-          roleName: string;
-          userType: string;
-          status: string;
-          isActive: number;
-        }) => ({
-          id: String(role.id),
-          roleName: role.roleName,
-          userType: role.userType,
-          status: role.status,
-          roleType: role.userType.toLowerCase().replace(' ', ''),
-          description: '',
-          permissions: [],
-        }));
+            id: string | number;
+            roleName: string;
+            userType: string;
+            status: string;
+            isActive: number;
+          }) => ({
+            id: String(role.id),
+            roleName: role.roleName,
+            userType: role.userType,
+            status: role.status,
+            roleType: role.userType.toLowerCase().replace(' ', ''),
+            description: '',
+            permissions: [],
+          }));
         setRoles(mappedRoles);
+        setTotalItems(total);
         // Sync roles to sessionStorage for validation in form
         sessionStorage.setItem("allRoles", JSON.stringify(mappedRoles));
       } catch (err) {
@@ -72,7 +87,7 @@ const RoleManagementPage: React.FC = () => {
       }
     };
     void fetchRoles();
-  }, [showError]);
+  }, [showError, sortBy, sortOrder, currentPage, pageSize, searchQuery]);
 
   // Refresh roles after form save (check sessionStorage)
   React.useEffect(() => {
@@ -83,7 +98,14 @@ const RoleManagementPage: React.FC = () => {
       // Reload roles from API instead of using sessionStorage
       const fetchRoles = async () => {
         try {
-          const data = await roleManagement.getAllRoles();
+          const response = await roleManagement.getAllRoles({
+            sortBy,
+            sortOrder,
+            page: currentPage,
+            pageSize,
+            search: searchQuery || undefined,
+          });
+          const data = Array.isArray(response) ? response : (response.data || response.items || []);
           // Filter out "Student" role (case-insensitive) as it's for user flow, not admin flow
           const mappedRoles: Role[] = data
             ?.filter((role: { roleName: string }) => 
@@ -117,32 +139,57 @@ const RoleManagementPage: React.FC = () => {
       sessionStorage.removeItem("lastSavedRole");
       sessionStorage.removeItem("roleAction");
     }
-  }, [success, showError]);
+  }, [success, showError, sortBy, sortOrder, currentPage, pageSize, searchQuery]);
 
-  // Reset to page 1 when search query changes
+  // Reset to page 1 when search query or sort changes
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, sortBy, sortOrder]);
 
-  // Filter roles based on search query
-  const filteredRoles = React.useMemo(() => {
-    if (!searchQuery.trim()) {
-      return roles;
+  // Handle sort
+  const handleSort = (fieldName: string) => {
+    if (sortBy === fieldName) {
+      // Toggle sort order if same field
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // New field, default to ascending
+      setSortBy(fieldName);
+      setSortOrder('asc');
     }
-    const query = searchQuery.toLowerCase();
-    return roles.filter((role) =>
-      Object.values(role).some((value) =>
-        String(value).toLowerCase().includes(query)
-      )
-    );
-  }, [roles, searchQuery]);
+  };
 
-  // Paginate data
-  const paginatedData = React.useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    return filteredRoles.slice(startIndex, endIndex);
-  }, [filteredRoles, currentPage, pageSize]);
+  // Handle export
+  const handleExport = async (format: 'excel' | 'word') => {
+    try {
+      setLoading(true);
+      const blob = await roleManagement.exportRoles(format, {
+        sortBy,
+        sortOrder,
+        search: searchQuery || undefined,
+      });
+
+      const extension = format === 'excel' ? 'xlsx' : 'docx';
+      const filename = `Roles_Export_${new Date().toISOString().split('T')[0]}.${extension}`;
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      success('Export Successful', `Roles exported as ${filename} successfully`);
+    } catch (err) {
+      showError('Export Failed', err instanceof Error ? err.message : 'Failed to export roles');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Use roles directly from API (already paginated and sorted on backend)
+  const paginatedData = roles;
 
   // Get table columns
   const { columns } = useRoleTable({
@@ -173,9 +220,11 @@ const RoleManagementPage: React.FC = () => {
       }
     },
     data: paginatedData,
+    sortBy,
+    sortOrder,
+    onSort: handleSort,
   });
 
-  const totalItems = filteredRoles.length;
   const totalPages = Math.ceil(totalItems / pageSize);
 
   const handleAddRole = () => {
@@ -260,7 +309,7 @@ const RoleManagementPage: React.FC = () => {
           <Button
             onClick={handleAddRole}
             style={{
-              backgroundColor: "#0f6cbd",
+              backgroundColor: "#2453C3",
               color: "#ffffff",
               display: "flex",
               alignItems: "center",
@@ -349,7 +398,7 @@ const RoleManagementPage: React.FC = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem 
-                  onClick={() => {}}
+                  onClick={() => void handleExport('excel')}
                   style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -358,7 +407,7 @@ const RoleManagementPage: React.FC = () => {
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  onClick={() => {}}
+                  onClick={() => void handleExport('word')}
                   style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>

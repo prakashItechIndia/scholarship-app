@@ -102,7 +102,7 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
         <button
           disabled={isDisabled}
           style={{
-            backgroundColor: "#0f6cbd",
+            backgroundColor: "#2453C3",
             color: "#ffffff",
             display: "flex",
             alignItems: "center",

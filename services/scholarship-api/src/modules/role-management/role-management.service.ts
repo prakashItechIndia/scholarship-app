@@ -18,10 +18,17 @@ export class RoleManagementService {
   /**
    * Get all roles - matches T_ROLES table structure
    * Excludes "Student" role as it's for user flow, not admin flow
+   * Supports sorting, pagination, and search
    */
-  async getAllRoles() {
+  async getAllRoles(params?: {
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    page?: number;
+    pageSize?: number;
+    search?: string;
+  }) {
     try {
-      const query = `
+      let query = `
         SELECT
           Id,
           Role_Name,
@@ -34,11 +41,34 @@ export class RoleManagementService {
           END as Status
         FROM T_ROLES
         WHERE LOWER(Role_Name) != 'student'
-        ORDER BY Role_Name
       `;
 
-      const result = await this.db.query(query);
-      const roles = (result.recordset || []).map((row: Record<string, unknown>) => {
+      const queryParams: Record<string, unknown> = {};
+
+      // Add search filter
+      if (params?.search) {
+        query += ` AND (
+          LOWER(Role_Name) LIKE LOWER(@search) OR
+          LOWER(User_Type) LIKE LOWER(@search) OR
+          LOWER(CASE Is_Active WHEN 0 THEN 'Inactive' WHEN 1 THEN 'Active' ELSE 'Inactive' END) LIKE LOWER(@search)
+        )`;
+        queryParams.search = `%${params.search}%`;
+      }
+
+      // Add sorting
+      const sortBy = params?.sortBy || 'Role_Name';
+      const sortOrder = params?.sortOrder || 'asc';
+      const validSortFields: Record<string, string> = {
+        roleName: 'Role_Name',
+        roleType: 'User_Type',
+        status: 'Status',
+      };
+      const sortField = validSortFields[sortBy] || 'Role_Name';
+      query += ` ORDER BY ${sortField} ${sortOrder.toUpperCase()}`;
+
+      // Execute query
+      const result = await this.db.query(query, queryParams);
+      let roles = (result.recordset || []).map((row: Record<string, unknown>) => {
         const rowRecord = row as Record<string, unknown>;
         return {
           id: getCaseInsensitiveValue<string>(rowRecord, 'Id') || '',
@@ -48,6 +78,25 @@ export class RoleManagementService {
           isActive: getCaseInsensitiveValue<number>(rowRecord, 'Is_Active') || 0,
         };
       });
+
+      const total = roles.length;
+
+      // Apply pagination if requested
+      if (params?.page && params?.pageSize) {
+        const startIndex = (params.page - 1) * params.pageSize;
+        const endIndex = startIndex + params.pageSize;
+        roles = roles.slice(startIndex, endIndex);
+      }
+
+      // Return paginated response if pagination is requested, otherwise return array (backward compatible)
+      if (params?.page && params?.pageSize) {
+        return {
+          data: roles,
+          total,
+          page: params.page,
+          pageSize: params.pageSize,
+        };
+      }
 
       return roles;
     } catch (error) {
@@ -248,6 +297,208 @@ export class RoleManagementService {
       this.logger.error('Error deleting role', error);
       throw new BadRequestException('Failed to delete role');
     }
+  }
+
+  /**
+   * Export roles to Excel or Word
+   */
+  async exportRoles(
+    format: 'excel' | 'word',
+    params?: {
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
+      search?: string;
+    },
+  ): Promise<Buffer> {
+    try {
+      // Get all roles (no pagination for export)
+      const roles = await this.getAllRoles({
+        ...params,
+        page: undefined,
+        pageSize: undefined,
+      });
+
+      const data = Array.isArray(roles) ? roles : roles.data || [];
+
+      if (format === 'excel') {
+        return this.exportToExcel(data);
+      } else {
+        return this.exportToWord(data);
+      }
+    } catch (error) {
+      this.logger.error('Error exporting roles', error);
+      throw new BadRequestException('Failed to export roles');
+    }
+  }
+
+  /**
+   * Export roles to Excel
+   */
+  private async exportToExcel(roles: unknown[]): Promise<Buffer> {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+    const ExcelJS = require('exceljs');
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Roles');
+
+    if (roles.length === 0) {
+      worksheet.addRow(['No data available']);
+      const buffer = await workbook.xlsx.writeBuffer();
+      return Buffer.from(buffer);
+    }
+
+    // Headers
+    const headers = ['Role Name', 'User Type', 'Status'];
+    const headerRow = worksheet.addRow(headers);
+    headerRow.font = { bold: true };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF0F6CBD' },
+    };
+    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+
+    // Data rows
+    roles.forEach((role: any) => {
+      worksheet.addRow([
+        role.roleName || '',
+        role.userType || '',
+        role.status || '',
+      ]);
+    });
+
+    // Auto-fit columns
+    worksheet.columns.forEach((column) => {
+      if (column.header) {
+        column.width = 20;
+      }
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
+  }
+
+  /**
+   * Export roles to Word
+   */
+  private async exportToWord(roles: unknown[]): Promise<Buffer> {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+    const {
+      Document,
+      Packer,
+      Paragraph,
+      Table,
+      TableRow,
+      TableCell,
+      WidthType,
+      AlignmentType,
+      TextRun,
+    } = require('docx');
+
+    const children: any[] = [];
+
+    // Title
+    children.push(
+      new Paragraph({
+        text: 'Roles Export',
+        heading: 'Heading1',
+        alignment: AlignmentType.CENTER,
+      }),
+    );
+
+    // Metadata
+    children.push(
+      new Paragraph({
+        text: `Generated on: ${new Date().toLocaleString()}`,
+      }),
+    );
+    children.push(
+      new Paragraph({
+        text: `Total Records: ${roles.length}`,
+      }),
+    );
+    children.push(new Paragraph({ text: '' })); // Empty line
+
+    if (roles.length === 0) {
+      children.push(
+        new Paragraph({
+          text: 'No data available',
+          alignment: AlignmentType.CENTER,
+        }),
+      );
+    } else {
+      // Create table
+      const tableRows: any[] = [];
+
+      // Header row
+      const headerCells = [
+        new TableCell({
+          children: [
+            new Paragraph({
+              text: 'Role Name',
+              children: [new TextRun({ bold: true })],
+            }),
+          ],
+          width: { size: 33.33, type: WidthType.PERCENTAGE },
+        }),
+        new TableCell({
+          children: [
+            new Paragraph({
+              text: 'User Type',
+              children: [new TextRun({ bold: true })],
+            }),
+          ],
+          width: { size: 33.33, type: WidthType.PERCENTAGE },
+        }),
+        new TableCell({
+          children: [
+            new Paragraph({
+              text: 'Status',
+              children: [new TextRun({ bold: true })],
+            }),
+          ],
+          width: { size: 33.33, type: WidthType.PERCENTAGE },
+        }),
+      ];
+      tableRows.push(new TableRow({ children: headerCells }));
+
+      // Data rows
+      roles.forEach((role: any) => {
+        const cells = [
+          new TableCell({
+            children: [new Paragraph({ text: String(role.roleName || '') })],
+            width: { size: 33.33, type: WidthType.PERCENTAGE },
+          }),
+          new TableCell({
+            children: [new Paragraph({ text: String(role.userType || '') })],
+            width: { size: 33.33, type: WidthType.PERCENTAGE },
+          }),
+          new TableCell({
+            children: [new Paragraph({ text: String(role.status || '') })],
+            width: { size: 33.33, type: WidthType.PERCENTAGE },
+          }),
+        ];
+        tableRows.push(new TableRow({ children: cells }));
+      });
+
+      children.push(
+        new Table({
+          rows: tableRows,
+          width: { size: 100, type: WidthType.PERCENTAGE },
+        }),
+      );
+    }
+
+    const doc = new Document({
+      sections: [
+        {
+          children,
+        },
+      ],
+    });
+
+    const buffer = await Packer.toBuffer(doc);
+    return buffer;
   }
 }
 
