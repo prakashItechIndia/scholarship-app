@@ -1,57 +1,80 @@
 import * as React from "react";
 import { Card } from "@shared/components";
 
-interface MetricCardProps {
-  icon: React.ReactNode;
-  value: number;
+interface FinancialSummaryCardProps {
+  icon?: React.ReactNode;
+  value: number | string;
   label: string;
   showCurrency?: boolean;
   iconBgColor?: string;
+  color?: string;
 }
 
-export const MetricCard: React.FC<MetricCardProps> = ({
+export const FinancialSummaryCard: React.FC<FinancialSummaryCardProps> = ({
   icon,
   value,
   label,
   showCurrency = false,
   iconBgColor = "#2453C3",
+  color,
 }) => {
-  const formatValue = (val: number): string => {
-    if (showCurrency) {
-      return ` ${val.toLocaleString("en-IN")}`;
+  const formatValue = (val: number | string): string => {
+    if (typeof val === "number") {
+      // If currency icon is shown, don't add ₹ symbol to the value
+      if (showCurrency && icon) {
+        return val.toLocaleString("en-IN");
+      }
+      if (showCurrency) {
+        return `₹${val.toLocaleString("en-IN")}`;
+      }
+      return val.toLocaleString("en-IN");
     }
-    return val.toLocaleString("en-IN");
+    return val;
   };
 
   return (
     <Card 
       variant="elevated" 
       style={{
-        border: "1px solid #e0e0e0",
-        backgroundColor: "#ffffff",
-        borderRadius: "8px",
-        padding: "20px",
-        height: "100%",
+        // border: "1px solid #e0e0e0",
+        backgroundColor: color ?? "#ffffff",
+        borderRadius: "12px",
+        padding: "10px 0px 20px 20px",
+        height: "96px",
+        minHeight: "100px",
+        minWidth: "430px",
+        width:"289px",
+        // gap: "16px",
+        // boxShadow: "0px 2px 4px 0px #00000024",
+        margin:"2px",
+        boxShadow:"none"
       }}
     >
       <div style={{
         display: "flex",
         alignItems: "center",
-        gap: "16px",
+        gap: "12px",
       }}>
         {/* Icon on left */}
-        <div style={{
-          width: "56px",
-          height: "56px",
-          borderRadius: "8px",
-          backgroundColor: `${iconBgColor}15`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-        }}>
-          {icon}
-        </div>
+        {icon && (
+          <div style={{
+            width: "50px",
+            height: "50px",
+            // borderRadius: "8px",
+            // padding:"0px 0px 0px 20px",
+            left:"20px",
+            top:"23px",
+            backgroundColor: iconBgColor === "#FFFFFF" ? "#FFFFFF" : `${iconBgColor}15`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            border: iconBgColor === "#FFFFFF" ? "1.5px solid #CBD0DC" : "none",
+            borderRadius: iconBgColor === "#FFFFFF" ? "28px" : "50%",
+          }}>
+            {icon}
+          </div>
+        )}
 
         {/* Content on right */}
         <div style={{
@@ -62,9 +85,9 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         }}>
           {/* Value on top */}
           <div style={{
-            fontSize: "28px",
-            lineHeight: "36px",
-            fontWeight: 700,
+            fontSize: "40px",
+            lineHeight: "52px",
+            fontWeight: 600,
             color: "#242424",
             fontFamily: "'Inter', sans-serif",
           }}>
@@ -73,8 +96,8 @@ export const MetricCard: React.FC<MetricCardProps> = ({
 
           {/* Label below */}
           <div style={{
-            fontSize: "13px",
-            lineHeight: "18px",
+            fontSize: "12px",
+            lineHeight: "16px",
             fontWeight: 400,
             color: "#616161",
             fontFamily: "'Inter', sans-serif",

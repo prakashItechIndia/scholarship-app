@@ -94,19 +94,19 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
       >
         {/* Left: Item count */}
         <div style={{ position: "absolute", left: "1rem" }}>
-          <Text className="whitespace-nowrap" style={{ fontSize: "0.875rem", color: "#616161" }}>
+          <Text className="whitespace-nowrap" style={{ fontSize: "12px", color: "#242424",lineHeight:"16px",fontWeight:"400" }}>
             {startItem}-{endItem} of {totalItems} items
           </Text>
         </div>
 
         {/* Center: Pagination controls */}
-        <div className="flex items-center gap-[3px]" style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
+        <div className="flex items-center gap-[3px]" style={{ position: "absolute", left: "50%", transform: "translateX(-50%)",width:"380px",height:"28px" }}>
           {showPageNumbers && (
             <div className="flex items-center gap-[3px]">
               {showFirstLast && (
                 <Button
                   appearance="subtle"
-                  style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
+                  style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "#FAFAFA",fontSize: "12px", color: "#242424",lineHeight:"16px",fontWeight:"400" }}
                   icon={<ChevronDoubleLeft20Regular />}
                   onClick={() => onPageChange(1)}
                   disabled={currentPage === 1}
@@ -115,8 +115,8 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
               )}
               <Button
                 appearance="subtle"
-                style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
-                icon={<ChevronLeft20Regular />}
+                style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "#FAFAFA" }}
+                icon={<ChevronLeft20Regular style={{width:"20px",height:"20px"}}/>}
                 onClick={() => onPageChange(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
                 aria-label="Previous page"
@@ -131,9 +131,10 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
                         key={page}
                         appearance="subtle"
                         style={{
-                          minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0,
-                          backgroundColor: currentPage === page ? "#f5f5f5" : "white",
-                          fontWeight: currentPage === page ? "bold" : "normal"
+                          minWidth: "1.75rem", maxWidth: "5rem", height: "1.75rem", padding: 0,
+                          backgroundColor: currentPage === page ? "#f5f5f5" : "#FAFAFA",
+                          fontWeight: currentPage === page ? "bold" : "normal",
+                          width:"3rem"
                         }}
                         onClick={() => onPageChange(page)}
                         aria-label={`Go to page ${page}`}
@@ -149,23 +150,24 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
                     key={page}
                     appearance="subtle"
                     style={{
-                      minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0,
-                      backgroundColor: currentPage === page ? "#f5f5f5" : "white",
-                      fontWeight: currentPage === page ? "bold" : "normal"
+                      minWidth: "1.75rem", maxWidth: "4rem", height: "28px", padding: 0,
+                      backgroundColor: currentPage === page ? "#FAFAFA" : "#FFFFFF",
+                      fontWeight: currentPage === page ? "bold" : "normal",
+                      width:"2rem"
                     }}
                     onClick={() => onPageChange(page)}
                     aria-label={`Go to page ${page}`}
                     aria-current={currentPage === page ? "page" : undefined}
                   >
-                    {page}
+                    {page}  
                   </Button>
                 );
               })}
 
               <Button
                 appearance="subtle"
-                style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
-                icon={<ChevronRight20Regular />}
+                style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "#FAFAFA" }}
+                icon={<ChevronRight20Regular style={{width:"20px",height:"20px"}}/>}
                 onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
                 aria-label="Next page"
@@ -173,7 +175,7 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
               {showFirstLast && (
                 <Button
                   appearance="subtle"
-                  style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "white" }}
+                  style={{ minWidth: "1.75rem", maxWidth: "1.75rem", height: "1.75rem", padding: 0, backgroundColor: "#FAFAFA" }}
                   icon={<ChevronDoubleRight20Regular />}
                   onClick={() => onPageChange(totalPages)}
                   disabled={currentPage === totalPages}
@@ -187,11 +189,11 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
         {/* Right: Items per page */}
 
         <div
-          className="flex gap-2 items-center"
-          style={{ position: "absolute", right: "1rem" }}
+          className="flex gap-1 items-center w-[49px] h-[28px]"
+          style={{ position: "absolute", right: "7rem" }}
         >
           {showPageSize && onPageSizeChange && (
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <div
@@ -204,6 +206,10 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
                       cursor: "pointer",
                       backgroundColor: "transparent",
                       border: "none",
+                      fontSize:"12px",
+                      fontWeight:"400",
+                      color:"#242424",
+                      lineHeight:"16px"
                     }}
                   >
                     {pageSize}
@@ -227,7 +233,7 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Text style={{ whiteSpace: "nowrap" }}>Items per page</Text>
+              <Text style={{ whiteSpace: "nowrap",fontSize:"12px",color:"#242424",lineHeight:"16px",fontWeight:"400",marginLeft:"-2px",marginBottom:"4px" }}>Items per page</Text>
             </div>
           )}
         </div>

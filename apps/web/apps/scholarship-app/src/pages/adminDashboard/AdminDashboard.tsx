@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Select, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, PageActionButtons, CardSkeleton, TableSkeleton, Card, Skeleton } from "@shared/components";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, PageActionButtons, CardSkeleton, TableSkeleton, Card, Skeleton } from "@shared/components";
 import {
   ArrowDownload24Regular,
   ChevronDown24Regular,
@@ -11,6 +11,7 @@ import {
   People20Regular,
 } from "@fluentui/react-icons";
 import { UnifiedCard } from "./components/UnifiedCard";
+import { FinancialSummaryCard } from "./components/FinancialSummaryCard";
 import { ApplicationActivityChart } from "./components/ApplicationActivityChart";
 import { ApplicationStatusChart } from "./components/ApplicationStatusChart";
 import { RecentActivityWidget } from "./components/RecentActivityWidget";
@@ -130,16 +131,13 @@ const AdminDashboard: React.FC = () => {
           label: year.ScholarshipYear_Code || year.label || "",
         }));
         setAcademicYearOptions(options);
-        // Set default to first year if available
-        if (options.length > 0 && !selectedAcademicYear) {
-          setSelectedAcademicYear(options[0].value);
-        }
+        // Default selection removed to show "Academic Year" placeholder
       } catch (err) {
         console.error('Error fetching academic years:', err);
       }
     };
     void fetchAcademicYears();
-  }, [selectedAcademicYear]);
+  }, []);
 
   // Fetch dashboard data
   React.useEffect(() => {
@@ -434,7 +432,7 @@ const AdminDashboard: React.FC = () => {
                 lineHeight: "22px",
                 fontWeight: 600,
                 color: "#242424",
-                marginBottom: "4px",
+                // marginBottom: "4px",
                 fontFamily: "'Inter', sans-serif",
               }}>
                 Hello {userName}!
@@ -443,7 +441,7 @@ const AdminDashboard: React.FC = () => {
                 fontSize: "12px",
                 lineHeight: "22px",
                 fontWeight: 400,
-                color: "#707070",
+                color: "#616161",
                 fontFamily: "'Inter', sans-serif",
                 margin: 0,
               }}>
@@ -457,13 +455,51 @@ const AdminDashboard: React.FC = () => {
           alignItems: "center",
           gap: "16px",
         }}>
-          <div style={{ width: "140px",marginRight: "120px" }}>
-            <Select
-              placeholder="Academic Year"
-              options={academicYearOptions.length > 0 ? academicYearOptions : [{ value: "2025", label: "2025" }]}
-              selectedKey={selectedAcademicYear || "2025"}
-              onValueChange={(value) => setSelectedAcademicYear(value)}
-            />
+          <div>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <button
+                  style={{
+                    width: "127px",
+                    height: "32px",
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #E0E0E0",
+                    borderRadius: "6px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "0 10px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    color: selectedAcademicYear ? "#242424" : "#616161",
+                    fontFamily: "'Inter', sans-serif",
+                  }}
+                >
+                  <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",fontSize:"12px",color:"#616161",fontWeight:400 }}>
+                    {selectedAcademicYear 
+                      ? academicYearOptions.find(opt => opt.value === selectedAcademicYear)?.label || selectedAcademicYear
+                      : "Academic Year"}
+                  </span>
+                  <ChevronDown24Regular style={{ width: "16px", height: "16px", color: "#616161", flexShrink: 0 }} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {academicYearOptions.length > 0 ? (
+                  academicYearOptions.map((option) => (
+                    <DropdownMenuItem 
+                      key={option.value} 
+                      onClick={() => setSelectedAcademicYear(option.value)}
+                    >
+                      {option.label}
+                    </DropdownMenuItem>
+                  ))
+                ) : (
+                  <DropdownMenuItem onClick={() => setSelectedAcademicYear("2025")}>
+                    2025
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger>
@@ -481,11 +517,12 @@ const AdminDashboard: React.FC = () => {
                   fontSize: "14px",
                   fontWeight: 500,
                   fontFamily: "'Inter', sans-serif",
-                  height: "43px",
+                  height: "32px",
+                  width: "105px",
                 }}
               >
-                <ArrowDownload24Regular style={{ width: "16px", height: "16px",color:"#FFFFFF"}} />
-                Export
+                <ArrowDownload24Regular style={{ width: "16px", height: "16px",}} />
+                <span style={{color:"#FFFFFF",lineHeight:"20px",fontSize:"12px"}}> Export</span>
                 <ChevronDown24Regular style={{ width: "16px", height: "16px" ,color:"#FFFFFF"}} />
               </button>
             </DropdownMenuTrigger>
@@ -505,7 +542,7 @@ const AdminDashboard: React.FC = () => {
       {/* Financial Summary Cards */}
       <div style={{
         marginBottom: "32px",
-        paddingBottom: "24px",
+        paddingBottom: "12px",
         marginLeft: "-24px",
         marginRight: "-24px",
         paddingLeft: "24px",
@@ -533,10 +570,10 @@ const AdminDashboard: React.FC = () => {
             <div style={{
               display: "flex",
               alignItems: "stretch",
-              gap: "15px",
+              gap: "12px",
               marginBottom: "16px",
             }}>
-              <UnifiedCard
+              <FinancialSummaryCard
                 icon={getIndianRupeeIcon("#2453C3")}
                 value={financialData.totalAmountSpentThisYear}
                 label="Total Amount Spent This Year"
@@ -544,8 +581,8 @@ const AdminDashboard: React.FC = () => {
                 iconBgColor="#FFFFFF"
                 color="#EFF6FF"
               />
-              <Separator height="auto" />
-              <UnifiedCard
+              <Separator/>
+              <FinancialSummaryCard
                 icon={getIndianRupeeIcon("#2453C3")}
                 value={financialData.amountSpentForSchoolStudents}
                 label="Amount Spent for School Students"
@@ -554,7 +591,7 @@ const AdminDashboard: React.FC = () => {
                 color="#F0FDF4"
               />
               <Separator height="auto" />
-              <UnifiedCard
+              <FinancialSummaryCard
                 icon={getIndianRupeeIcon("#2453C3")}
                 value={financialData.amountSpentForCollegeStudents}
                 label="Amount Spent for College Students"
@@ -563,7 +600,7 @@ const AdminDashboard: React.FC = () => {
                 color="#FAF5FF"
               />
               <Separator height="auto" />
-              <UnifiedCard
+              <FinancialSummaryCard
                 icon={getIndianRupeeIcon("#2453C3")}
                 value={financialData.amountSpentForResearchScholars}
                 label="Amount Spent for Research Scholars"
@@ -574,10 +611,10 @@ const AdminDashboard: React.FC = () => {
             </div>
             {/* Second row - 5th card */}
             <div style={{
-              display: "flex",
-              gap: "16px",
+              // display: "flex",
+              // gap: "16px",
             }}>
-              <UnifiedCard
+              <FinancialSummaryCard
                 icon={getIndianRupeeIcon("#2453C3")}
                 value={financialData.amountSpentForMedicalAssistance}
                 label="Amount Spent for Medical Assistance"
@@ -591,7 +628,7 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Applications Analytics Section */}
-      <div style={{ marginBottom: "32px", width: "100%", overflow: "hidden" }}>
+      <div style={{ width: "100%", overflow: "hidden",marginTop:"-15px" }}>
         <h2 style={{
           fontSize: "20px",
           lineHeight: "28px",
@@ -599,6 +636,8 @@ const AdminDashboard: React.FC = () => {
           color: "#242424",
           marginBottom: "16px",
           fontFamily: "'Inter', sans-serif",
+          // marginTop:"20px"
+          // paddingTop:"-20px"
         }}>
           Applications Analytics & Reports
         </h2>
@@ -617,31 +656,31 @@ const AdminDashboard: React.FC = () => {
         ) : (
           <div style={{
             display: "flex",
-            gap: "16px",
+            gap: "9px",
           }}>
             <UnifiedCard
-              icon={<People20Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
+              icon={<People20Regular style={{ width: "24px", height: "24px", color: "#2453C3" }} />}
               value={applicationMetrics.totalApplications}
               label="Total Applications"
               iconBgColor="#FFFFFF"
             />
             <Separator height="auto" />
             <UnifiedCard
-              icon={<DocumentBulletList24Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
+              icon={<DocumentBulletList24Regular style={{ width: "24px", height: "24px", color: "#2453C3" }} />}
               value={applicationMetrics.submitted}
               label="Submitted"
               iconBgColor="#FFFFFF"
             />
             <Separator height="auto" />
             <UnifiedCard
-              icon={<DocumentCheckmark24Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
+              icon={<DocumentCheckmark24Regular style={{ width: "24px", height: "24px", color: "#2453C3" }} />}
               value={applicationMetrics.approved}
               label="Approved"
               iconBgColor="#FFFFFF"
             />
             <Separator height="auto" />
             <UnifiedCard
-              icon={<DocumentTableSearch24Regular style={{ width: "28px", height: "28px", color: "#2453C3" }} />}
+              icon={<DocumentTableSearch24Regular style={{ width: "24px", height: "24px", color: "#2453C3" }} />}
               value={applicationMetrics.underReview}
               label="Under Review"
               iconBgColor="#FFFFFF"
@@ -734,7 +773,7 @@ const AdminDashboard: React.FC = () => {
           {/* Scholarship Distribution and Schedule Calendar Row */}
           <div style={{ 
             display: "grid",
-            gridTemplateColumns: "1fr 550px",
+            gridTemplateColumns: "1fr 450px",
             gap: "24px",
             marginBottom: "32px" 
           }}>

@@ -60,15 +60,17 @@ const Select = React.forwardRef<HTMLInputElement, SelectProps>(
             onOptionSelect={handleChange}
             size="small"
             style={{
-              width: "100%",
+              width: "127px",
+              maxWidth: "100%",
+              minWidth:"10%",
               border: `1px solid ${borderColor}`,
               borderRadius: tokens.borderRadiusLarge,
               backgroundColor: tokens.colorNeutralBackground1,
               color: tokens.colorNeutralForeground1,
               fontSize: tokens.fontSizeBase300,
-              height: tokens.formFieldHeight,
-              minHeight: tokens.formFieldMinHeight,
-              maxHeight: tokens.formFieldMaxHeight,
+              height: "32px",
+              minHeight: "30px",
+              maxHeight: "40px",
               paddingLeft: "12px",
               paddingRight: "12px",
               paddingTop: "8px",

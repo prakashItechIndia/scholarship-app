@@ -64,20 +64,21 @@ export const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
         marginBottom: "24px",
       }}>
         <h3 style={{
-          fontSize: "18px",
-          lineHeight: "24px",
+          fontSize: "16px",
+          lineHeight: "22px",
           fontWeight: 600,
           color: "#242424",
-          marginBottom: "4px",
+          marginBottom: "6px",
           fontFamily: "'Inter', sans-serif",
         }}>
           Recent Activity
         </h3>
         <p style={{
-          fontSize: "14px",
-          lineHeight: "20px",
+          fontSize: "12px",
+          lineHeight: "16px",
           color: "#616161",
           fontFamily: "'Inter', sans-serif",
+          fontWeight: 400,
         }}>
           Monitor the most recent interactions and updates our staff.
         </p>

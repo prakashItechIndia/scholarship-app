@@ -38,27 +38,35 @@ export const UnifiedCard: React.FC<UnifiedCardProps> = ({
       style={{
         // border: "1px solid #e0e0e0",
         backgroundColor: color ?? "#ffffff",
-        borderRadius: "8px",
-        padding: "10px 10px 20px 20px",
-        height: "100%",
+        borderRadius: "12px",
+        padding: "12px 0px 20px 20px",
+        height: "84px",
         minHeight: "100px",
-        minWidth: "430px",
+        // minWidth: "430px",
+        width:"100%",
+        // minWidth:"200px",
+        // maxWidth:"500px",
         // gap: "16px",
         boxShadow: "0px 2px 4px 0px #00000024",
         margin:"2px",
+        // boxShadow:"none"
+        marginBottom:"20px"
       }}
     >
       <div style={{
         display: "flex",
         alignItems: "center",
-        gap: "16px",
+        gap: "12px",
       }}>
         {/* Icon on left */}
         {icon && (
           <div style={{
-            width: "56px",
-            height: "56px",
+            width: "50px",
+            height: "50px",
             // borderRadius: "8px",
+            // padding:"0px 0px 0px 20px",
+            left:"20px",
+            top:"23px",
             backgroundColor: iconBgColor === "#FFFFFF" ? "#FFFFFF" : `${iconBgColor}15`,
             display: "flex",
             alignItems: "center",
@@ -77,11 +85,12 @@ export const UnifiedCard: React.FC<UnifiedCardProps> = ({
           flexDirection: "column",
           gap: "4px",
           flex: 1,
+          padding:"6px"
         }}>
           {/* Value on top */}
           <div style={{
-            fontSize: "40px",
-            lineHeight: "52px",
+            fontSize: "32px",
+            lineHeight: "40px",
             fontWeight: 600,
             color: "#242424",
             fontFamily: "'Inter', sans-serif",

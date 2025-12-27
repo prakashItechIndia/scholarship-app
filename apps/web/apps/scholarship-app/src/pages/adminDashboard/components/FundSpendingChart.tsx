@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Card, Select } from "@shared/components";
+import { Card, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@shared/components";
+import { ChevronDown24Regular } from "@fluentui/react-icons";
 
 interface FundSpendingDataPoint {
   month: string;
@@ -118,12 +119,43 @@ export const FundSpendingChart: React.FC<FundSpendingChartProps> = ({
           </p>
         </div>
         <div>
-          <Select
-            placeholder="Select Year"
-            options={yearOptions}
-            selectedKey={selectedYear}
-            onValueChange={(value) => onYearChange?.(value)}
-          />
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <button
+                style={{
+                  width: "122px",
+                  height: "30px",
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #E0E0E0",
+                  borderRadius: "6px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "0 10px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  color: selectedYear ? "#616161" : "#616161",
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 400,
+                }}
+              >
+                <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontSize: "12px", color: "#616161", fontWeight: 400 }}>
+                  {selectedYear || "Select Year"}
+                </span>
+                <ChevronDown24Regular style={{ width: "16px", height: "16px", color: "#616161", flexShrink: 0 }} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {yearOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => onYearChange?.(option.value)}
+                >
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -253,13 +285,13 @@ export const FundSpendingChart: React.FC<FundSpendingChartProps> = ({
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#3b82f6" }} />
-          <span style={{ fontSize: "14px", color: "#616161", fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: "13px",lineHeight:"20px",fontWeight:400, color: "#707070", fontFamily: "'Inter', sans-serif" }}>
             Total budget 2024
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <div style={{ width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#ef4444" }} />
-          <span style={{ fontSize: "14px", color: "#616161", fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: "13px",lineHeight:"20px",fontWeight:400, color: "#707070", fontFamily: "'Inter', sans-serif" }}>
             Total budget 2025
           </span>
         </div>

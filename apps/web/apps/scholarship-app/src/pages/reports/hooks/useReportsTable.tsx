@@ -41,10 +41,10 @@ export const useReportsTable = ({
       }}
     >
       <span style={{
-        fontSize: "13px",
+        fontSize: "14px",
         lineHeight: "20px",
         fontWeight: 600,
-        color: "#616161",
+        color: "#424242",
         fontFamily: "'Inter', sans-serif",
       }}>
         {name}
@@ -59,87 +59,6 @@ export const useReportsTable = ({
     return (item as ScholarshipReportData).applicationNo || (item as ApprovedFormData).applicationNo || "";
   };
 
-  // Common checkbox column
-  const checkboxColumn = React.useMemo(() => ({
-    key: "checkbox",
-    name: "",
-    fieldName: "checkbox",
-    minWidth: 48,
-    maxWidth: 48,
-    isSortable: false,
-    onRender: (item?: ScholarshipReportData | ApprovedFormData) => (
-      <input
-        type="checkbox"
-        checked={item ? selectedRows.has(getApplicationNo(item)) : false}
-        onChange={(e) => {
-          e.stopPropagation();
-          if (item && onRowSelect) {
-            onRowSelect(item, e.target.checked);
-          }
-        }}
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          width: "16px",
-          height: "16px",
-          cursor: "pointer",
-          accentColor: "#0f6cbd",
-        }}
-      />
-    ),
-    onRenderHeader: () => {
-      const allSelected = data.length > 0 && selectedRows.size === data.length;
-      const someSelected = selectedRows.size > 0 && selectedRows.size < data.length;
-      return (
-        <input
-          type="checkbox"
-          checked={allSelected}
-          ref={(input) => {
-            if (input) {
-              input.indeterminate = someSelected;
-            }
-          }}
-          onChange={(e) => {
-            e.stopPropagation();
-            if (onSelectAll) {
-              onSelectAll(e.target.checked);
-            }
-          }}
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            width: "16px",
-            height: "16px",
-            cursor: "pointer",
-            accentColor: "#0f6cbd",
-          }}
-        />
-      );
-    },
-  }), [selectedRows, data, onRowSelect, onSelectAll]);
-
-  // Common actions column
-  const actionsColumn = React.useMemo(() => ({
-    key: "actions",
-    name: "",
-    fieldName: "actions",
-    minWidth: 50,
-    isSortable: false,
-    onRender: (item?: ScholarshipReportData | ApprovedFormData) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button appearance="subtle" style={{ minWidth: "auto", padding: "4px" }}>
-            <MoreHorizontalRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem
-            icon={<PrintRegular style={{ width: "20px", height: "20px" }} />}
-            label="Print Details"
-            onClick={() => item && onViewPdf && onViewPdf(item)}
-          />
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  }), [onViewPdf]);
 
   // Helper to get field value from data object
   const getFieldValue = (item: any, fieldName: string): string => {

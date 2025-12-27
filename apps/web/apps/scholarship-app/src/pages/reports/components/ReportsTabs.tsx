@@ -37,12 +37,11 @@ const ReportsTabs: React.FC<ReportsTabsProps> = ({ activeTab, onTabChange, onExp
         justifyContent: "space-between",
         gap: "24px",
         borderBottom: "none",
-        height: "2.75rem",
-        backgroundColor: "#F5F5F5",
-        paddingRight: "16px",
+        height: "100%",
+        backgroundColor: "transparent",
       }}>
         {/* Tabs Left */}
-        <div style={{ display: "flex", gap: "24px", height: "100%" }}>
+        <div style={{ display: "flex", gap: "0px", height: "100%" }}>
           {tabLabels.map((tab) => {
             const isActive = activeTab === tab.value;
             return (
@@ -50,20 +49,22 @@ const ReportsTabs: React.FC<ReportsTabsProps> = ({ activeTab, onTabChange, onExp
                 key={tab.value}
                 onClick={() => onTabChange(tab.value)}
                 style={{
-                  padding: "12px 22px",
-                  fontSize: "13px",
+                  padding: "0 24px",
+                  fontSize: "14px",
                   lineHeight: "20px",
                   fontWeight: 600,
-                  color: isActive ? "black" : "#616161",
+                  color: isActive ? "#242424" : "#616161",
                   fontFamily: "'Inter', sans-serif",
                   border: "none",
-                  borderBottom: `2px solid ${isActive ? "#0f6cbd" : "transparent"}`,
+                  borderBottom: `3px solid ${isActive ? "#2453C3" : "transparent"}`,
                   cursor: "pointer",
                   transition: "all 0.2s",
                   outline: "none",
                   backgroundColor: "transparent",
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
                 }}
-                className="hover:text-[#242424]"
               >
                 {tab.label}
               </button>
@@ -79,10 +80,18 @@ const ReportsTabs: React.FC<ReportsTabsProps> = ({ activeTab, onTabChange, onExp
                 { format: "excel", label: "Excel (.xlsx)" },
                 { format: "pdf", label: "PDF" },
                 { format: "csv", label: "CSV" },
+                { format: "word", label: "Word (.docx)" },
               ]}
               onExport={onExport}
               size="small"
               loading={exportLoading}
+              buttonStyle={{
+                backgroundColor: "#2453C3",
+                borderRadius: "4px",
+                height: "32px",
+                fontSize: "12px",
+                fontWeight: 600,
+              }}
             />
 
             <DropdownMenu open={moreMenuOpen} onOpenChange={setMoreMenuOpen}>

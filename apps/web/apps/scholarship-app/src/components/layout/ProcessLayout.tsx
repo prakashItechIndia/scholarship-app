@@ -212,16 +212,16 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
             onClick={() => console.log("Search clicked")}
             aria-label="Search"
           >
-            <SearchRegular className="w-5 h-5 text-gray-600" />
+            <SearchRegular className="w-[20px] h-[20px] text-[#616161]" />
           </div>
         )}
         <div
           onClick={() => console.log("Notifications clicked")}
         >
-          <AlertBadgeRegular className="w-5 h-5 text-gray-600" />
+          <AlertBadgeRegular className="w-[20px] h-[20px] text-[#616161]" />
         </div>
         {/* Vertical separator */}
-        <div className="h-6 w-px bg-gray-300"></div>
+        <div className="h-6 w-px bg-[#E0E0E0]"></div>
         <ProfilePopover
           userName={userName}
           userRole={userRole}
@@ -230,8 +230,8 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           onLogout={() => setLogoutModalOpen(true)}
           onChangePassword={() => setChangePasswordModalOpen(true)}
         >
-          <div className="w-9 h-9 rounded-full bg-[#C8D1FA] flex items-center justify-center cursor-pointer">
-            <PersonRegular className="w-5 h-5 text-[#2C3C85]" />
+          <div className="w-[32px] h-[32px] rounded-full bg-[#C8D1FA] flex items-center justify-center cursor-pointer">
+            <PersonRegular className="w-[20px] h-[20px] text-[#420610]" />
           </div>
         </ProfilePopover>
       </div>

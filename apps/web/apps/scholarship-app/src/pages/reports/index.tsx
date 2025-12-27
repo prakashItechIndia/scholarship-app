@@ -5,7 +5,7 @@ import {
   Pagination,
   Card,
 } from "@shared/components";
-import { ScholarshipReportData, ReportFilters, ReportTab } from "./types";
+import { ScholarshipReportData, ReportFilters, ReportTab, ApprovedFormData } from "./types";
 import ReportsTabs from "./components/ReportsTabs";
 import ReportsFilters from "./components/ReportsFilters";
 import EmptyState from "./components/EmptyState";
@@ -46,9 +46,9 @@ const ReportsPage: React.FC = () => {
 
   // Print Modal State
   const [printModalOpen, setPrintModalOpen] = React.useState(false);
-  const [selectedReportForPrint, setSelectedReportForPrint] = React.useState<ScholarshipReportData | null>(null);
+  const [selectedReportForPrint, setSelectedReportForPrint] = React.useState<ScholarshipReportData | ApprovedFormData | null>(null);
 
-  const handleViewPdf = React.useCallback((item: ScholarshipReportData) => {
+  const handleViewPdf = React.useCallback((item: ScholarshipReportData | ApprovedFormData) => {
     setSelectedReportForPrint(item);
     setPrintModalOpen(true);
   }, []);
@@ -421,8 +421,7 @@ const ReportsPage: React.FC = () => {
     <div style={{
       width: "100%",
       height: "100%",
-      backgroundColor: "#fafafa",
-      // padding: "24px",
+      backgroundColor: "#F0F2F5",
       fontFamily: "'Inter', sans-serif",
       display: "flex",
       gap: "0px",
@@ -433,23 +432,30 @@ const ReportsPage: React.FC = () => {
         flex: 1, 
         display: "flex", 
         flexDirection: "column",
-        minWidth: 0, // Allow flex item to shrink below content size
-        overflow: "hidden", // Prevent overflow from affecting parent
+        minWidth: 0, 
+        overflow: "hidden", 
       }}>
         {/* Title Section */}
-        <div style={{ paddingTop: "8px", paddingBottom: "9px", paddingLeft: "24px", }}>
+        <div style={{ 
+          padding: "20px 24px", 
+          backgroundColor: "#FFFFFF",
+          borderBottom: "1px solid #E0E0E0",
+          display: "flex",
+          flexDirection: "column",
+          gap: "4px",
+        }}>
           <h1 style={{
-            fontSize: "16px",
-            lineHeight: "22px",
+            fontSize: "20px",
+            lineHeight: "28px",
             fontWeight: 600,
             color: "#242424",
-            marginTop: 0,
+            margin: 0,
             fontFamily: "'Inter', sans-serif",
           }}>
             Reports
           </h1>
           <p style={{
-            fontSize: "12px",
+            fontSize: "14px",
             lineHeight: "20px",
             fontWeight: 400,
             color: "#616161",
@@ -461,7 +467,12 @@ const ReportsPage: React.FC = () => {
         </div>
 
         {/* Tabs Section */}
-        <div>
+        <div style={{ 
+          padding: "0 24px", 
+          backgroundColor: "#FFFFFF",
+          borderBottom: "1px solid #E0E0E0",
+          height: "48px",
+        }}>
           <ReportsTabs
             activeTab={activeTab}
             onTabChange={handleTabChange}
@@ -485,20 +496,17 @@ const ReportsPage: React.FC = () => {
 
         {/* Actions and Table Section */}
         {hasAppliedFilters && filteredData.length > 0 ? (
-          <>
+          <div style={{ flex: 1, padding: "24px", overflow: "hidden" }}>
             {/* Table Section */}
             <Card variant="elevated" style={{
               overflow: "hidden",
               border: "1px solid #e0e0e0",
-              borderRight: "none",
               backgroundColor: "#ffffff",
               borderRadius: "8px",
-              borderTopRightRadius: "0",
-              borderBottomRightRadius: "0",
-              flex: 1,
+              height: "100%",
               display: "flex",
               flexDirection: "column",
-              minWidth: 0, // Allow flex item to shrink below content size
+              padding: 0,
             }}>
               <div style={{ 
                 flex: 1, 
@@ -543,24 +551,24 @@ const ReportsPage: React.FC = () => {
                 />
               </div>
             </Card>
-          </>
+          </div>
         ) : (
-          /* Empty State */
-          <Card variant="elevated" style={{
-            overflow: "hidden",
-            border: "1px solid #e0e0e0",
-            borderRight: "none",
-            backgroundColor: "#ffffff",
-            borderRadius: "8px",
-            borderTopRightRadius: "0",
-            borderBottomRightRadius: "0",
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}>
-            <EmptyState />
-          </Card>
+          <div style={{ flex: 1, padding: "24px", overflow: "hidden" }}>
+            /* Empty State */
+            <Card variant="elevated" style={{
+              overflow: "hidden",
+              border: "1px solid #e0e0e0",
+              backgroundColor: "#ffffff",
+              borderRadius: "8px",
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "100%",
+            }}>
+              <EmptyState />
+            </Card>
+          </div>
         )}
       </div>
 
@@ -580,7 +588,7 @@ const ReportsPage: React.FC = () => {
           onOpenChange={setPrintModalOpen}
           data={{
             ...selectedReportForPrint,
-            amount: selectedReportForPrint.issuedAmount
+            amount: (selectedReportForPrint as any)?.issuedAmount || (selectedReportForPrint as any)?.scholarship
           } as any}
         />
       )}

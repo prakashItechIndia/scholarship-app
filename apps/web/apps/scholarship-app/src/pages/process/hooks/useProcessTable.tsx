@@ -4,13 +4,14 @@ import StatusBadge from "../components/StatusBadge";
 import {
   MoreHorizontalRegular,
   ArrowSort20Regular,
-  ArrowSortUp20Regular,
-  ArrowSortDown20Regular,
   ArrowUploadRegular,
   DocumentRegular,
   HistoryRegular,
   PrintRegular,
   HatGraduationRegular,
+  DocumentBulletListRegular,
+  PersonMoneyRegular,
+  DocumentPrintRegular,
 } from "@fluentui/react-icons";
 import { Button, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@shared/components";
 
@@ -122,16 +123,10 @@ export const useProcessTable = ({
     // Helper function to create sortable header
     const createSortableHeader = (name: string, fieldName: string) => {
       const isActive = sortField === fieldName;
-      const currentOrder = isActive ? sortOrder : null;
       
       const getSortIcon = () => {
-        if (!isActive) {
-          return <ArrowSort20Regular style={{ width: "16px", height: "16px", color: "#616161" }} />;
-        }
-        if (currentOrder === 'asc') {
-          return <ArrowSortUp20Regular style={{ width: "16px", height: "16px", color: "#0F6CBD" }} />;
-        }
-        return <ArrowSortDown20Regular style={{ width: "16px", height: "16px", color: "#0F6CBD" }} />;
+        // Always show the same sort icon regardless of state
+        return <ArrowSort20Regular style={{ width: "16px", height: "16px", color: "#424242" }} />;
       };
 
       return (
@@ -148,8 +143,8 @@ export const useProcessTable = ({
           <span style={{
             fontSize: "13px",
             lineHeight: "20px",
-            fontWeight: 600,
-            color: isActive ? "#0F6CBD" : "#616161",
+            fontWeight: 500,
+            color: "#424242",
             fontFamily: "'Inter', sans-serif",
           }}>
             {name}
@@ -174,15 +169,15 @@ export const useProcessTable = ({
       );
       const menuItemScholarshipHistory = (
         <DropdownMenuItem
-          icon={<HatGraduationRegular style={{ width: "16px", height: "16px" }} />}
-          label="View Document"
+          icon={<PersonMoneyRegular style={{ width: "16px", height: "16px" }} />}
+          label="Scholarship History"
           onClick={() => handleViewScholarshipHistory && handleViewScholarshipHistory(item)}
           style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
         />
       );
       const menuItemViewDocuments = (
         <DropdownMenuItem
-          icon={<DocumentRegular style={{ width: "16px", height: "16px" }} />}
+          icon={<DocumentBulletListRegular style={{ width: "16px", height: "16px" }} />}
           label="View Documents"
           onClick={() => handleViewDocument && handleViewDocument(item)}
           style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
@@ -190,7 +185,7 @@ export const useProcessTable = ({
       );
       const menuItemPrintDetails = (
         <DropdownMenuItem
-          icon={<PrintRegular style={{ width: "16px", height: "16px" }} />}
+          icon={<DocumentPrintRegular style={{ width: "16px", height: "16px" }} />}
           label="Print Details"
           onClick={() => handlePrintDetails && handlePrintDetails(item)}
           style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
@@ -407,15 +402,15 @@ export const useProcessTable = ({
           e.stopPropagation(); // Also stop on mousedown
         }}
         style={{
-          fontSize: "14px",
-          lineHeight: "20px",
-          fontWeight: 500,
-          color: "#0f6cbd",
+          fontSize: "13px",
+          lineHeight: "19px",
+          fontWeight: 400,
+          color: "#424242",
           cursor: "pointer",
           fontFamily: "'Inter', sans-serif",
           display: "inline-block",
         }}
-        className="hover:underline"
+        // className="hover:underline"
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
@@ -447,7 +442,7 @@ export const useProcessTable = ({
               fontWeight: 400,
             }}
           >
-            {label}
+            {label} 
           </span>
         );
       }
@@ -552,9 +547,9 @@ export const useProcessTable = ({
     const renderText = (value: string | undefined, item?: ApplicationData) => (
       <span
         style={{
-          fontSize: "14px",
-          lineHeight: "20px",
-          color: "#616161",
+          fontSize: "13px",
+          lineHeight: "19px",
+          color: "#424242",
           fontFamily: "'Inter', sans-serif",
           cursor: item ? "pointer" : "default",
         }}

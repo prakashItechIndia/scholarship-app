@@ -40,7 +40,7 @@ export const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = (
     },
   ],
 }) => {
-  const size = 390;
+  const size = 350;
   const centerX = size / 2 - 10;
   const centerY = size / 2 + 20;
   const ringWidth = 16;
@@ -57,7 +57,7 @@ export const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = (
       flexDirection: "column",
       height: "100%",
     }}>
-      <div style={{ marginBottom: "12px" }}>
+      <div style={{ marginBottom: "20px" }}>
         <h3 style={{
           fontSize: "16px",
           lineHeight: "22px",
@@ -131,6 +131,7 @@ export const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = (
                   x={labelX}
                   y={labelY}
                   fontSize="12"
+                  // lineHeight="12px"
                   fontWeight={500}
                   fill="#242424"
                   fontFamily="'Inter', sans-serif"
@@ -178,8 +179,9 @@ export const PerformanceMetricsChart: React.FC<PerformanceMetricsChartProps> = (
                 gap: "12px",
               }}>
                 <span style={{
-                  fontSize: "12px",
+                  fontSize: "13px",
                   fontWeight: 400,
+                  lineHeight:"20px",
                   color: "#424242",
                   fontFamily: "'Inter', sans-serif",
                   whiteSpace: "nowrap",

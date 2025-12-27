@@ -17,6 +17,7 @@ import {
   Filter24Regular,
   MoreVerticalRegular,
   Search20Regular,
+  Add24Regular,
 } from "@fluentui/react-icons";
 import { User } from "./types";
 import { useUserTable } from "./hooks/useUserTable";
@@ -243,12 +244,12 @@ const UserManagementPage: React.FC = () => {
       boxSizing: "border-box",
     }}>
       {/* Title and Action Buttons */}
-      <div style={{ padding: "24px 24px 0px 24px" }}>
+      <div style={{ padding: "24px 24px 16px 24px" }}>
         <PageActionButtons
           title={
-            <div style={{ lineHeight: "1.2" }}>
+            <div style={{ lineHeight: "1.4" }}>
               <div style={{
-                fontSize: "16px",
+                fontSize: "20px",
                 fontWeight: 600,
                 color: "#242424",
                 fontFamily: "'Inter', sans-serif",
@@ -256,19 +257,37 @@ const UserManagementPage: React.FC = () => {
                 Manage User
               </div>
               <div style={{
-                fontSize: "12px",
+                fontSize: "14px",
                 fontWeight: 400,
-                color: "#242424",
+                color: "#616161",
                 fontFamily: "'Inter', sans-serif",
-                marginTop: "4px",
+                marginTop: "2px",
               }}>
                 Maintain Roles, Rights, and User Information
               </div>
             </div>
           }
-          primaryButtonLabel="Add User"
-          onPrimaryAction={handleAddUser}
-        />
+        >
+          <Button
+            onClick={handleAddUser}
+            style={{
+              backgroundColor: "#005A9E",
+              color: "#ffffff",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              borderRadius: "4px",
+              padding: "0 16px",
+              height: "36px",
+              border: "none",
+              fontSize: "14px",
+              fontWeight: 600,
+            }}
+          >
+            <Add24Regular style={{ width: "20px", height: "20px" }} />
+            Add User
+          </Button>
+        </PageActionButtons>
       </div>
 
       {/* Search and Filter Section */}
@@ -277,41 +296,40 @@ const UserManagementPage: React.FC = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        // gap: "20px",
       }}>
-        <div style={{ border:"#D1D1D1",height:"32px",width:"216px",marginBottom:"4px" }}>
+        <div style={{ width: "280px" }}>
           <Input
             placeholder="Search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            prefixIcon={<Search20Regular style={{ width: "18px", height: "15px", color: "#707070" }} />}
+            prefixIcon={<Search20Regular style={{ width: "18px", height: "18px", color: "#616161" }} />}
             style={{
-              
-              // paddingLeft: "10px",
-              // marginBottom: "40px",
-              height:"35px",
-              borderRadius:"8px"
+              height: "36px",
+              borderRadius: "4px",
+              border: "1px solid #D1D1D1",
+              backgroundColor: "#FFFFFF",
             }}
           />
         </div>
         <div style={{
           display: "flex",
           alignItems: "center",
-          gap: "12px",
+          gap: "8px",
         }}>
           <Button
             appearance="subtle"
             aria-label="More options"
             style={{
-              width: "20px",
-              height: "20px",
-              minHeight: "35px",
-              minWidth: "35px",
+              width: "36px",
+              height: "36px",
               padding: 0,
-              border: "1px solid #e0e0e0",
+              border: "1px solid #D1D1D1",
+              borderRadius: "4px",
+              minWidth: "36px",
+              backgroundColor: "#FFFFFF",
             }}
           >
-            <MoreVerticalRegular style={{ width: "16px", height: "16px", color: "#242424  " }} />
+            <MoreVerticalRegular style={{ width: "18px", height: "18px", color: "#242424" }} />
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger>
@@ -319,18 +337,19 @@ const UserManagementPage: React.FC = () => {
                 appearance="subtle"
                 aria-label="Filter options"
                 style={{
-                  width: "28px",
-                  height: "28px",
+                  width: "36px",
+                  height: "36px",
                   padding: 0,
-                  border: "1px solid #e0e0e0",
+                  border: "1px solid #D1D1D1",
+                  borderRadius: "4px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  minHeight: "35px",
-                  minWidth: "35px",
+                  minWidth: "36px",
+                  backgroundColor: "#FFFFFF",
                 }}
               >
-                <Filter24Regular width={16} height={16} />
+                <Filter24Regular width={18} height={18} color="#242424" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
