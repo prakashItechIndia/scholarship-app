@@ -120,9 +120,14 @@ const identitySchema = z
     }));
 
 const IdentityDetails = () => {
-    const { formData, updateFormData } = useRegistration();
+    const { updateFormData } = useRegistration();
     const [scholarshipYearId, setScholarshipYearId] = useState<number | null>(null);
     const [applicantOptions, setApplicantOptions] = useState<{ value: string; label: string }[]>([]);
+    const [aadhaarValidationStatus, setAadhaarValidationStatus] = useState<{
+        isValidating: boolean;
+        isUnique: boolean | null;
+        error: string | null;
+    }>({ isValidating: false, isUnique: null, error: null });
     const { error: showError } = useToast();
     
     // Fetch applicant categories on mount
@@ -175,12 +180,23 @@ const IdentityDetails = () => {
             panId: getStringValue(formData, 'panId'),
         }),
         async onValidate(data) {
-            // Validate Aadhaar ID with API
+            // BRD Section 6.2.2: Validate Aadhaar ID with API (uniqueness check)
             if (data.aadhaarId && scholarshipYearId) {
                 try {
-                    await scholarshipApplication.checkAadhaarId(data.aadhaarId, scholarshipYearId);
+                    const result = await scholarshipApplication.checkAadhaarId(data.aadhaarId, scholarshipYearId) as { exists?: boolean; count?: number } | undefined;
+                    // Backend returns { exists: boolean, count: number }
+                    if (result && typeof result === 'object' && 'exists' in result && result.exists === true) {
+                        const errorMessage = 'This AADHAAR ID has already been used for an application in this scholarship year. Please use a different AADHAAR ID.';
+                        form.setError('aadhaarId', { type: 'manual', message: errorMessage });
+                        throw new Error(errorMessage);
+                    }
                 } catch (err: unknown) {
-                    const errorMessage = err instanceof Error ? err.message : 'Aadhaar ID already exists';
+                    // If it's already our custom error, re-throw it
+                    if (err instanceof Error && err.message.includes('AADHAAR ID')) {
+                        throw err;
+                    }
+                    // Otherwise, it's an API error
+                    const errorMessage = err instanceof Error ? err.message : 'Failed to verify AADHAAR ID uniqueness. Please try again.';
                     form.setError('aadhaarId', { type: 'manual', message: errorMessage });
                     throw new Error(errorMessage);
                 }
@@ -189,9 +205,20 @@ const IdentityDetails = () => {
             // Validate PAN ID with API if provided
             if (data.panId?.trim() && scholarshipYearId) {
                 try {
-                    await scholarshipApplication.checkPanId(data.panId.toUpperCase(), scholarshipYearId);
+                    const result = await scholarshipApplication.checkPanId(data.panId.toUpperCase(), scholarshipYearId) as { exists?: boolean; count?: number } | undefined;
+                    // Backend returns { exists: boolean, count: number }
+                    if (result && typeof result === 'object' && 'exists' in result && result.exists === true) {
+                        const errorMessage = 'This PAN ID has already been used for an application in this scholarship year. Please use a different PAN ID.';
+                        form.setError('panId', { type: 'manual', message: errorMessage });
+                        throw new Error(errorMessage);
+                    }
                 } catch (err: unknown) {
-                    const errorMessage = err instanceof Error ? err.message : 'PAN ID already exists';
+                    // If it's already our custom error, re-throw it
+                    if (err instanceof Error && err.message.includes('PAN ID')) {
+                        throw err;
+                    }
+                    // Otherwise, it's an API error
+                    const errorMessage = err instanceof Error ? err.message : 'Failed to verify PAN ID uniqueness. Please try again.';
                     form.setError('panId', { type: 'manual', message: errorMessage });
                     throw new Error(errorMessage);
                 }
@@ -199,7 +226,62 @@ const IdentityDetails = () => {
         },
     });
 
-    const { control, handleSubmit, formState: { errors } } = form;
+    const { control, handleSubmit, formState: { errors }, watch } = form;
+    const aadhaarValue = watch('aadhaarId');
+
+    // Debounced uniqueness check for AADHAAR ID
+    useEffect(() => {
+        // Reset validation status when AADHAAR ID changes
+        setAadhaarValidationStatus({ isValidating: false, isUnique: null, error: null });
+
+        // Only check uniqueness if:
+        // 1. AADHAAR ID is exactly 12 digits
+        // 2. Passes all format validations (numeric, first digit, Verhoeff)
+        // 3. Scholarship year ID is available
+        if (
+            aadhaarValue?.length === 12 &&
+            /^\d+$/.test(aadhaarValue) &&
+            parseInt(aadhaarValue[0] ?? '0', 10) !== 0 &&
+            parseInt(aadhaarValue[0] ?? '0', 10) !== 1 &&
+            verhoeffCheck(aadhaarValue) &&
+            scholarshipYearId
+        ) {
+            // Debounce the API call
+            const timeoutId = setTimeout(() => {
+                void (async () => {
+                    setAadhaarValidationStatus({ isValidating: true, isUnique: null, error: null });
+                    try {
+                        const result = await scholarshipApplication.checkAadhaarId(aadhaarValue, scholarshipYearId) as { exists?: boolean; count?: number } | undefined;
+                        const exists = result && typeof result === 'object' && 'exists' in result && result.exists === true;
+                        if (exists) {
+                            setAadhaarValidationStatus({
+                                isValidating: false,
+                                isUnique: false,
+                                error: 'This AADHAAR ID has already been used for an application in this scholarship year.',
+                            });
+                            // Set form error
+                            form.setError('aadhaarId', {
+                                type: 'manual',
+                                message: 'This AADHAAR ID has already been used for an application in this scholarship year.',
+                            });
+                        } else {
+                            setAadhaarValidationStatus({ isValidating: false, isUnique: true, error: null });
+                            // Clear any previous errors
+                            form.clearErrors('aadhaarId');
+                        }
+                    } catch (err) {
+                        setAadhaarValidationStatus({
+                            isValidating: false,
+                            isUnique: null,
+                            error: err instanceof Error ? err.message : 'Failed to verify AADHAAR ID uniqueness.',
+                        });
+                    }
+                })();
+            }, 500); // 500ms debounce
+
+            return () => clearTimeout(timeoutId);
+        }
+    }, [aadhaarValue, scholarshipYearId, form]);
 
     return (
         <StepLayout
@@ -225,25 +307,102 @@ const IdentityDetails = () => {
                             <Controller
                                 name="aadhaarId"
                                 control={control}
-                                render={({ field }) => (
-                                    <FormField label="AADHAR ID (Candidate)" required error={errors.aadhaarId?.message as string}>
-                                        <Input
-                                            {...field}
-                                            value={field.value ?? ''}
-                                            placeholder="Enter 12 digit AADHAAR number"
-                                            errorMessage={errors.aadhaarId?.message as string}
-                                            className="!border-b-0"
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                                // Aadhaar Number: Must contain numeric characters only
-                                                const value = e.target.value;
-                                                const digitsOnly = value.replace(/\D/g, '');
-                                                if (digitsOnly.length <= 12) {
-                                                    field.onChange(digitsOnly);
-                                                }
-                                            }}
-                                        />
-                                    </FormField>
-                                )}
+                                render={({ field }) => {
+                                    // Real-time validation feedback
+                                    const currentValue = field.value ?? '';
+                                    let validationError: string | null = null;
+                                    
+                                    // BRD Section 6.2.2: Length check - Must be exactly 12 digits
+                                    if (currentValue.length > 0 && currentValue.length !== 12) {
+                                        validationError = 'AADHAAR ID must be exactly 12 digits';
+                                    }
+                                    // BRD Section 6.2.2: Character check - Only numeric characters (0-9) allowed
+                                    else if (currentValue.length > 0 && !/^\d+$/.test(currentValue)) {
+                                        validationError = 'AADHAAR ID must contain only numeric characters (0-9)';
+                                    }
+                                    // BRD Section 6.2.2: First digit check - Cannot start with 0 or 1
+                                    else if (currentValue.length > 0) {
+                                        const firstDigit = parseInt(currentValue[0], 10);
+                                        if (firstDigit === 0 || firstDigit === 1) {
+                                            validationError = 'AADHAAR ID cannot start with 0 or 1. Please enter a valid AADHAAR number.';
+                                        }
+                                        // BRD Section 6.2.2: Verhoeff checksum - Mathematical validation
+                                        else if (currentValue.length === 12 && !verhoeffCheck(currentValue)) {
+                                            validationError = 'AADHAAR ID failed Verhoeff checksum validation. Please enter a valid AADHAAR number.';
+                                        }
+                                    }
+                                    
+                                    // Combine validation errors (schema errors take precedence)
+                                    const errorMessage = errors.aadhaarId?.message ?? validationError ?? aadhaarValidationStatus.error ?? null;
+                                    const showError = Boolean(errorMessage);
+                                    
+                                    return (
+                                        <FormField 
+                                            label="AADHAR ID (Candidate)" 
+                                            required 
+                                            error={errorMessage as string}
+                                        >
+                                            <Input
+                                                {...field}
+                                                value={field.value ?? ''}
+                                                placeholder="Enter 12 digit AADHAAR number"
+                                                errorMessage={errorMessage as string}
+                                                className="!border-b-0"
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                    // BRD Section 6.2.2: Character check - Only numeric characters (0-9) allowed
+                                                    const value = e.target.value;
+                                                    const digitsOnly = value.replace(/\D/g, '');
+                                                    
+                                                    // BRD Section 6.2.2: Length check - Must be exactly 12 digits
+                                                    if (digitsOnly.length <= 12) {
+                                                        field.onChange(digitsOnly);
+                                                        
+                                                        // Trigger validation on change for immediate feedback
+                                                        if (digitsOnly.length === 12) {
+                                                            // Validate first digit and Verhoeff immediately
+                                                            const firstDigit = parseInt(digitsOnly[0], 10);
+                                                            if (firstDigit === 0 || firstDigit === 1) {
+                                                                form.setError('aadhaarId', {
+                                                                    type: 'manual',
+                                                                    message: 'AADHAAR ID cannot start with 0 or 1. Please enter a valid AADHAAR number.',
+                                                                });
+                                                            } else if (!verhoeffCheck(digitsOnly)) {
+                                                                form.setError('aadhaarId', {
+                                                                    type: 'manual',
+                                                                    message: 'AADHAAR ID failed Verhoeff checksum validation. Please enter a valid AADHAAR number.',
+                                                                });
+                                                            } else {
+                                                                // Clear format errors if valid, but keep uniqueness check pending
+                                                                form.clearErrors('aadhaarId');
+                                                            }
+                                                        } else {
+                                                            // Clear errors if not 12 digits yet (user is still typing)
+                                                            if (digitsOnly.length < 12) {
+                                                                form.clearErrors('aadhaarId');
+                                                            }
+                                                        }
+                                                        
+                                                        // Reset uniqueness validation status when user types
+                                                        if (digitsOnly.length !== 12 || digitsOnly !== aadhaarValue) {
+                                                            setAadhaarValidationStatus({ isValidating: false, isUnique: null, error: null });
+                                                        }
+                                                    }
+                                                }}
+                                                onBlur={field.onBlur}
+                                            />
+                                            {/* Real-time validation feedback */}
+                                            {field.value?.length === 12 && !showError && (
+                                                <div className="text-xs mt-1">
+                                                    {aadhaarValidationStatus.isValidating ? (
+                                                        <span className="text-blue-600">Verifying uniqueness...</span>
+                                                    ) : aadhaarValidationStatus.isUnique === true ? (
+                                                        <span className="text-green-600">✓ AADHAAR ID is valid and available</span>
+                                                    ) : null}
+                                                </div>
+                                            )}
+                                        </FormField>
+                                    );
+                                }}
                             />
                         </FormRow>
                         <FormRow>

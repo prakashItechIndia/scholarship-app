@@ -181,6 +181,13 @@ export const envSchema = z.object({
   // Zoho CRM - Specific Refresh Tokens (uses same CLIENT_ID/SECRET as above)
   ZOHO_CRM_REFRESH_TOKEN_INDIA: z.string().optional(),
   ZOHO_CRM_REFRESH_TOKEN_INTL: z.string().optional(),
+  // OAuth Social Login Configuration
+  MICROSOFT_CLIENT_ID: z.string().optional(),
+  MICROSOFT_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  APPLE_CLIENT_ID: z.string().optional(),
+  APPLE_CLIENT_SECRET: z.string().optional(),
   // Firebase (backend) - used to sync user updates to Firebase Auth and Firestore
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_CLIENT_EMAIL: z.string().email().optional(),
@@ -234,8 +241,8 @@ export const envSchema = z.object({
   DB_POOL_CONNECTION_TIMEOUT_MS: z
     .string()
     .optional()
-    .transform((value) => (value ? Number.parseInt(value, 10) : 5000))
-    .pipe(z.number().int().positive().default(5000)),
+    .transform((value) => (value ? Number.parseInt(value, 10) : 30000))
+    .pipe(z.number().int().positive().default(30000)), // Increased default from 5000ms to 30000ms for remote DB connections
   // S3 Configuration
   S3_PUBLIC_URL: z.string().url().optional(),
 });

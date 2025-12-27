@@ -64,7 +64,7 @@ const buildSqlServerConfig = (
       connectTimeout:
         configService.get('DB_POOL_CONNECTION_TIMEOUT_MS', {
           infer: true,
-        }) ?? 5000,
+        }) ?? 30000, // Increased from 5000ms to 30000ms for remote database connections
     },
     pool: {
       max: configService.get('DB_POOL_MAX', { infer: true }) ?? 20,

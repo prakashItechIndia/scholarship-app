@@ -49,10 +49,21 @@ const scholarshipApis = createScholarshipApiClients(apiClient);
  */
 export const scholarshipAuth = {
   /**
-   * Login with username and password
+   * Admin login with username and password (blocks Student users)
    */
   login: async (username: string, password: string) => {
-    const response = await scholarshipApis.auth.scholarshipAuthControllerLogin({
+    const response = await apiClient.post('/scholarship-auth/login', {
+      username,
+      password,
+    });
+    return response.data;
+  },
+
+  /**
+   * User login with username and password (allows Student users)
+   */
+  userLogin: async (username: string, password: string) => {
+    const response = await apiClient.post('/scholarship-auth/user-login', {
       username,
       password,
     });

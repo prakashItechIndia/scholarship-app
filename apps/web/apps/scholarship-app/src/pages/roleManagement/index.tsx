@@ -32,7 +32,12 @@ const RoleManagementPage: React.FC = () => {
         setLoading(true);
         const data = await roleManagement.getAllRoles();
         // Map API response to Role interface
-        const mappedRoles: Role[] = data?.map((role: {
+        // Filter out "Student" role (case-insensitive) as it's for user flow, not admin flow
+        const mappedRoles: Role[] = data
+          ?.filter((role: { roleName: string }) => 
+            role.roleName?.toLowerCase() !== 'student'
+          )
+          ?.map((role: {
           id: string | number;
           roleName: string;
           userType: string;
@@ -69,7 +74,12 @@ const RoleManagementPage: React.FC = () => {
       const fetchRoles = async () => {
         try {
           const data = await roleManagement.getAllRoles();
-          const mappedRoles: Role[] = data?.map((role: {
+          // Filter out "Student" role (case-insensitive) as it's for user flow, not admin flow
+          const mappedRoles: Role[] = data
+            ?.filter((role: { roleName: string }) => 
+              role.roleName?.toLowerCase() !== 'student'
+            )
+            ?.map((role: {
             id: string | number;
             roleName: string;
             userType: string;

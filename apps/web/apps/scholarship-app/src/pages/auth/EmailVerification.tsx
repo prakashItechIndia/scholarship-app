@@ -34,11 +34,11 @@ const EmailVerificationPage = () => {
   });
 
   const handleResendVerification = useCallback(async () => {
-    if (!email) {
-      showError('Error', 'Email address is required');
-      return;
-    }
-
+    // if (!email) {
+    //   showError('Error', 'Email address is required');
+    //   return;
+    // }
+if(email){
     try {
       setIsSending(true);
 
@@ -56,7 +56,7 @@ const EmailVerificationPage = () => {
       showError('Error', errorMessage);
     } finally {
       setIsSending(false);
-    }
+    }}
   }, [email, showError, success]);
 
   useEffect(() => {
