@@ -21,11 +21,11 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
           gap: "4px",
           cursor: "pointer",
         }}
-        className="hover:opacity-80"
+        // className="hover:opacity-80"
       >
         <span style={{
           fontSize: "13px",
-          lineHeight: "20px",
+          lineHeight: "19px",
           fontWeight: 500,
           color: "#424242",
           fontFamily: "'Inter', sans-serif",
@@ -42,9 +42,9 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
           fontSize: "12px",
           lineHeight: "16px",
           fontWeight: 500,
-          color: status === "Registered" ? "#0E1CDD" : "#0f6cbd",
+          color: status === "Completed" ? "#0E1CDD" : "#0f6cbd",
           backgroundColor: status === "Registered" ? "#E4EEFF" : "#e6f2ff",
-          border: status === "Registered" ? "1px solid #AFCAFF" : "none",
+          border: status === "Completed" ? "1px solid #AFCAFF" : "none",
           padding: "4px 30px",
           borderRadius: "12px",
           fontFamily: "'Inter', sans-serif",
@@ -166,17 +166,20 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
 
   return (
     <Card variant="elevated" style={{
-      border: "1px solid #e0e0e0",
-      backgroundColor: "#ffffff",
-      borderRadius: "8px",
-      padding: "24px",
+      border: "none",
+      backgroundColor: "transparent",
+      borderRadius: "0px",
+      paddingBottom: "24px",
+      boxShadow: "none",
+      marginBottom: "16px",
     }}>
       <div style={{
         marginBottom: "16px",
+        marginTop: "-14px",
       }}>
         <h3 style={{
-          fontSize: "13px",
-          lineHeight: "20px",
+          fontSize: "16px",
+          lineHeight: "22px",
           fontWeight: 600,
           color: "#242424",
           marginBottom: "4px",
@@ -200,8 +203,9 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
         data={data} 
         cardStyle={{ 
           boxShadow: "none", 
-          borderRadius: "8px",
-          border: "1px solid #e0e0e0"
+          borderRadius: "12px",
+          border: "1px solid #D1D1D1",
+          backgroundColor: "transparent"
         }}
       />
     </Card>

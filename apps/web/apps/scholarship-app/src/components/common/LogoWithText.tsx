@@ -80,6 +80,7 @@ export const LogoWithText: React.FC<LogoWithTextProps> = ({
             color: "#242424",
             fontSize: "16px",
             fontWeight: 'semibold',
+            lineHeight: "22px",
           }}
         >
           Shri. Leo Muthu Scholarship (LMS)
@@ -91,7 +92,7 @@ export const LogoWithText: React.FC<LogoWithTextProps> = ({
             color: "#707070",
             fontSize: "12px",
             fontWeight: 400,
-            marginTop: subtitleSize === "xs" ? "2px" : "4px",
+            lineHeight: "16px", 
           }}
         >
           An Initiative of ARAM Foundation

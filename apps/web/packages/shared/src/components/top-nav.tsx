@@ -126,7 +126,7 @@ export const TopNav = React.forwardRef<HTMLElement, TopNavProps>(
       <header
         ref={ref}
         className={cn(
-          "flex items-center justify-between w-full h-[58px] min-h-[52px] pl-0 pr-4 py-2 bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50 m-0",
+          "flex items-center justify-between w-full h-[52 px] min-h-[52px] pl-0 pr-4 py-2 bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50 m-0",
           className
         )}
         {...props}

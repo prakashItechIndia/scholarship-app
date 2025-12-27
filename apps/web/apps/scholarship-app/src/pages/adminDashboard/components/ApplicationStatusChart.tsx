@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Card, Select } from "@shared/components";
+import { Card, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@shared/components";
+import { ChevronDown24Regular } from "@fluentui/react-icons";
 
 interface ApplicationStatusData {
   pending: number;
@@ -98,12 +99,43 @@ export const ApplicationStatusChart: React.FC<ApplicationStatusChartProps> = ({
           </p>
         </div>
         <div style={{color: "#616161" }}>
-          <Select
-            placeholder="Select Month"
-            options={monthOptions}
-            selectedKey={selectedMonth}
-            onValueChange={(value) => onMonthChange?.(value)}
-          />
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <button
+                style={{
+                  width: "130px",
+                  height: "32px",
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #E0E0E0",
+                  borderRadius: "6px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "0 10px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  color: selectedMonth ? "#616161" : "#616161",
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 400,
+                }}
+              >
+                <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontSize: "12px", color: "#616161", fontWeight: 400 }}>
+                  {selectedMonth || "Select Month"}
+                </span>
+                <ChevronDown24Regular style={{ width: "16px", height: "16px", color: "#616161", flexShrink: 0 }} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {monthOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => onMonthChange?.(option.value)}
+                >
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -114,7 +146,7 @@ export const ApplicationStatusChart: React.FC<ApplicationStatusChartProps> = ({
         gap: "24px",
       }}>
         {/* Donut Chart */}
-        <div style={{ position: "relative",marginBottom: "34px",paddingBottom: "104px" }}>
+        <div style={{ position: "relative",marginBottom: "34px",paddingBottom: "114px",marginTop:"-10px" }}>
           <svg width="240" height="240" style={{ overflow: "visible" }}>
             {segments.map((segment, index) => {
               // Calculate angles deterministically based on previous segments
@@ -174,7 +206,7 @@ export const ApplicationStatusChart: React.FC<ApplicationStatusChartProps> = ({
           display: "grid",
           gridTemplateColumns: "repeat(2, auto)",
           justifyContent: "center",
-          columnGap: "64px",
+          columnGap: "50px",
           rowGap: "16px",
           width: "100%",
         }}>
@@ -187,7 +219,7 @@ export const ApplicationStatusChart: React.FC<ApplicationStatusChartProps> = ({
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
+                gap: "10px",
               }}
             >
               <div style={{
@@ -198,10 +230,11 @@ export const ApplicationStatusChart: React.FC<ApplicationStatusChartProps> = ({
               }} />
               <div style={{
                 display: "flex",
-                gap: "40px",
+                gap: "45px",
               }}>
                 <span style={{
                   fontSize: "13px",
+                  lineHeight: "20px",
                   fontWeight: 400,
                   color: "#424242",
                   fontFamily: "'Inter', sans-serif",

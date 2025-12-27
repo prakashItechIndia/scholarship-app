@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Card, Select } from "@shared/components";
+import { Card, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@shared/components";
+import { ChevronDown24Regular } from "@fluentui/react-icons";
 import { ScholarshipDistributionData } from "../types";
 import { mockScholarshipDistributionData } from "../constants";
 
@@ -83,12 +84,43 @@ export const ScholarshipDistributionChart: React.FC<ScholarshipDistributionChart
           </p>
         </div>
         <div>
-          <Select
-            placeholder="Select Period"
-            options={periodOptions}
-            selectedKey={selectedPeriod}
-            onValueChange={(value) => onPeriodChange?.(value)}
-          />
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <button
+                style={{
+                  width: "94px",
+                  height: "30px",
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #E0E0E0",
+                  borderRadius: "6px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "0 10px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  color: selectedPeriod ? "#616161" : "#616161",
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 400,
+                }}
+              >
+                <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontSize: "12px", color: "#616161", fontWeight: 400 }}>
+                  {selectedPeriod || "Select Period"}
+                </span>
+                <ChevronDown24Regular style={{ width: "16px", height: "16px", color: "#616161", flexShrink: 0 }} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {periodOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => onPeriodChange?.(option.value)}
+                >
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -199,25 +231,25 @@ export const ScholarshipDistributionChart: React.FC<ScholarshipDistributionChart
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <div style={{ width: "8px", height: "8px", backgroundColor: colors.meritExcellence }} />
-          <span style={{ fontSize: "13px", color: "#000000B2", fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: "12px", color: "#000000B2", fontFamily: "'Inter', sans-serif",fontWeight:400 }}>
             Merit Excellence
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <div style={{ width: "8px", height: "8px", backgroundColor: colors.stemInnovation }} />
-          <span style={{ fontSize: "13px", color: "#000000B2", fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: "12px", color: "#000000B2", fontFamily: "'Inter', sans-serif",fontWeight:400 }}>
             STEM Innovation
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <div style={{ width: "8px", height: "8px", backgroundColor: colors.achievement }} />
-          <span style={{ fontSize: "13px", color: "#000000B2", fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: "12px", color: "#000000B2", fontFamily: "'Inter', sans-serif",fontWeight:400 }}>
             Achievement
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <div style={{ width: "8px", height: "8px", backgroundColor: colors.sports }} />
-          <span style={{ fontSize: "13px", color: "#000000B2", fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: "12px", color: "#000000B2", fontFamily: "'Inter', sans-serif",fontWeight:400 }}>
             Sports
           </span>
         </div>

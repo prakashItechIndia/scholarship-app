@@ -37,7 +37,7 @@ export const useUserTable = ({
         }}
       >
         <span style={{
-          fontSize: "13px",
+          fontSize: "14px",
           lineHeight: "20px",
           fontWeight: 600,
           color: "#424242",
@@ -45,9 +45,7 @@ export const useUserTable = ({
         }}>
           {name}
         </span>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-         <ArrowSortRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
-        </div>
+        <ArrowSortRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
       </div>
     );
 
@@ -92,14 +90,16 @@ export const useUserTable = ({
         style={{
           fontSize: "12px",
           lineHeight: "16px",
-          fontWeight: 500,
-          color: status === "Active" ? "#0E700E" : "#616161",
-          backgroundColor: status === "Active" ? "#9FD89F" : "#F0F0F0",
-          opacity: status === "Active" ? 0.8 : 0.9,
-          padding: "4px 30px",
+          fontWeight: 600,
+          color: status === "Active" ? "#107C10" : "#616161",
+          backgroundColor: status === "Active" ? "#EBF9EB" : "#F0F0F0",
+          border: `1px solid ${status === "Active" ? "#B3E0B3" : "#D1D1D1"}`,
+          padding: "2px 24px",
           borderRadius: "12px",
           fontFamily: "'Inter', sans-serif",
           display: "inline-block",
+          textAlign: "center",
+          minWidth: "80px",
         }}
       >
         {status}
@@ -206,7 +206,8 @@ export const useUserTable = ({
         name: "Mobile Number",
         fieldName: "mobileNumber",
         minWidth: 150,
-        isSortable: false,
+        isSortable: true,
+        onRenderHeader: () => createSortableHeader("Mobile Number"),
         onRender: (item: User) => renderText(item.mobileNumber),
       },
       {

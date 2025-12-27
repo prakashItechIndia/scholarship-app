@@ -94,36 +94,34 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
       {/* Header Section */}
       <div
         style={{
-          backgroundColor: "#F5F5F5",
-        padding: "24px",
-          paddingBottom: 0,
-        display: "flex",
-        flexDirection: "column",
-        gap: "12px",
+          backgroundColor: "#FFFFFF",
+          padding: "24px",
+          paddingBottom: "16px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
         }}
       >
         <h3
           style={{
-          fontSize: "16px",
-          lineHeight: "24px",
-          fontWeight: 600,
-          color: "#242424",
-          margin: 0,
-          fontFamily: "'Inter', sans-serif",
+            fontSize: "16px",
+            lineHeight: "24px",
+            fontWeight: 600,
+            color: "#242424",
+            margin: 0,
+            fontFamily: "'Inter', sans-serif",
           }}
         >
           Report Generation Filter
         </h3>
-        <div
-          style={{
-          height: "1px",
-          backgroundColor: "#cccccc",
-          width: "calc(100% + 48px)",
-          marginLeft: "-24px",
-            marginRight: "-24px",
-          }}
-        />
       </div>
+      <div
+        style={{
+          height: "1px",
+          backgroundColor: "#E0E0E0",
+          width: "100%",
+        }}
+      />
 
       {/* Content Section */}
       <div
@@ -513,52 +511,50 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
       {/* Footer Section */}
       <div
         style={{
-        backgroundColor: "#FFFFFF",
-        padding: "0 24px 24px 24px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "16px",
+          backgroundColor: "#FFFFFF",
+          padding: "24px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+          borderTop: "1px solid #E0E0E0",
         }}
       >
         <div
           style={{
-          height: "1px",
-            backgroundColor: "#b3b3b3",
-          width: "calc(100% + 48px)",
-          marginLeft: "-24px",
-            marginRight: "-24px",
-          }}
-        />
-        <div
-          style={{
             display: "flex",
-            justifyContent: !isApplyDisabled ? "space-between" : "flex-end",
+            justifyContent: "space-between",
+            gap: "12px",
           }}
         >
-          {!isApplyDisabled && (
-            <Button
-              appearance="outline"
-              onClick={onResetFilter}
-              style={{
-                backgroundColor: "#ffffff",
-                border: "1px solid #D1D1D1",
-                color: "#242424",
-                minWidth: "100px",
-                borderRadius: "4px",
-                fontWeight: 600,
-              }}
-            >
-              Reset Filter
-            </Button>
-          )}
+          <Button
+            appearance="outline"
+            onClick={onResetFilter}
+            style={{
+              backgroundColor: "#ffffff",
+              border: "1px solid #D1D1D1",
+              color: "#242424",
+              flex: 1,
+              height: "36px",
+              borderRadius: "4px",
+              fontWeight: 600,
+              fontSize: "14px",
+            }}
+          >
+            Reset Filter
+          </Button>
           <Button
             appearance="primary"
             onClick={onApplyFilter}
             disabled={isApplyDisabled}
             style={{
-              backgroundColor: isApplyDisabled ? "#cccccc" : "#0f6cbd",
+              backgroundColor: isApplyDisabled ? "#cccccc" : "#2453C3",
               color: "#ffffff",
-              minWidth: "100px",
+              flex: 1,
+              height: "36px",
+              borderRadius: "4px",
+              fontWeight: 600,
+              fontSize: "14px",
+              border: "none",
               cursor: isApplyDisabled ? "not-allowed" : "pointer",
             }}
           >

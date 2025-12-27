@@ -25,11 +25,13 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
     <Card variant="elevated" style={{
       border: "1px solid #e0e0e0",
       backgroundColor: "#ffffff",
-      borderRadius: "8px",
+      borderRadius: "12px",
       padding: "24px",
       paddingTop:"15px",
       height: "370px",
-      boxShadow: "none"
+      marginTop:"6px",  
+      // boxShadow: "none"
+      boxShadow:"0px 2px 4px 0px #00000024"
     }}>
       <div style={{
         display: "flex",
@@ -65,6 +67,14 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
             onSelectDate={onDateChange}
             placeholder="Select Date"
             allowTextInput={false}
+            formatDate={(date) => {
+              if (!date) return "";
+              const months = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+              ];
+              return `${months[date.getMonth()]} ${date.getFullYear()}`;
+            }}
             styles={{
               icon: { display: "none" }
             }}
@@ -75,12 +85,15 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
                   minHeight: "32px",
                   borderRadius: "4px",
                   border: "1px solid #e0e0e0",
+                  width:"170px",
+                  color:"#424242"
                 },
                 field: {
                   height: "32px",
                   lineHeight: "32px",
                   fontSize: "14px",
-                  paddingLeft: "34px", // Space for icon
+                  paddingLeft: "30px", // Space for icon
+                  color:"#424242"
                 },
               }
             }}
@@ -102,6 +115,7 @@ export const ApplicationActivityChart: React.FC<ApplicationActivityChartProps> =
       <div style={{
         width: "100%",
         overflowX: "auto",
+        marginTop: "-8px",
       }}>
         <svg
           width={chartWidth}

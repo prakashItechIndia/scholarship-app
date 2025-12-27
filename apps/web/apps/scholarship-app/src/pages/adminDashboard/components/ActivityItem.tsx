@@ -34,12 +34,13 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
           width: "32px",
           height: "32px",
           borderRadius: "20%",
-          backgroundColor: "#FFFFFF",
+          backgroundColor: "#FFFFFF33",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           flexShrink: 0,
-          // boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+          boxShadow: "0px 4px 16px 0px #0000000A",
+
         }}
       >
         <VectorIcon
@@ -53,12 +54,13 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          gap: "4px",
+          gap: "2px",
         }}
       >
         <div
           style={{
-            fontSize: "14px",
+            fontSize: "16px",
+            lineHeight: "22px",
             fontWeight: 600,
             color: "#242424",
             fontFamily: "'Inter', sans-serif",
@@ -71,12 +73,13 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            gap: "8px",
           }}
         >
           <div
             style={{
-              fontSize: "12px",
+              fontSize: "13px",
+              lineHeight: "20px",
+              fontWeight: 400,
               color: "#616161",
               fontFamily: "'Inter', sans-serif",
             }}
