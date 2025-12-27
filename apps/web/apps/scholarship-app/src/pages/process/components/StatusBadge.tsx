@@ -37,7 +37,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
       borderColor: "#fdcfb4",
     },
     Registered: {
-      bgColor: "#ebf3fc",
+      bgColor: "#aeb9f600",
       textColor: "#115ea3",
       borderColor: "#b4d6fa",
     },

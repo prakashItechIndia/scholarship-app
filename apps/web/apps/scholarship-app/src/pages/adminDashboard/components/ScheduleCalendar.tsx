@@ -92,6 +92,7 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
         alignItems: "center",
         marginBottom: "24px",
         height: "10%",
+        marginTop: "-2px",
       }}>
         <div>
           <h3 style={{
@@ -205,7 +206,7 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
             gridTemplateColumns: "repeat(7, 1fr)",
             padding: "8px 20px 0px 18px",
             borderTop: "2px solid #E0E0E0",
-            marginBottom: "20px",
+            // marginBottom: "20px",
           }}>
             {days.map((item, index) => {
               const event = item.isCurrentMonth ? getEventForDate(item.day) : null;
@@ -219,7 +220,7 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
-                    padding: "8px 4px",
+                    padding: "8px 4px 6px 0px",
                   }}
                 >
                   <div 

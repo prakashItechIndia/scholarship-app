@@ -113,7 +113,7 @@ const ProcessPage: React.FC = () => {
   const [selectedVerifyApplication, setSelectedVerifyApplication] = React.useState<ApplicationData | null>(null);
 
   const [selectedDocument, setSelectedDocument] = React.useState<ApplicationData | null>(null);
-  const [academicYear, setAcademicYear] = React.useState("All Years");
+  const [academicYear, setAcademicYear] = React.useState("Academic Year");
   const [academicYearId, setAcademicYearId] = React.useState<number | undefined>();
   const [academicYears, setAcademicYears] = React.useState<{ ScholarshipYear_Id?: string | number; ScholarshipYear_Code?: string; [key: string]: unknown }[]>([]);
   const [loadingAcademicYears, setLoadingAcademicYears] = React.useState(false);
@@ -688,8 +688,8 @@ const ProcessPage: React.FC = () => {
         }}>
           <div>
             <h1 style={{
-              fontSize: "1rem",
-              lineHeight: "1.375rem",
+              fontSize: "16px",
+              lineHeight: "22px",
               fontWeight: 600,
               color: "#242424",
 
@@ -699,10 +699,10 @@ const ProcessPage: React.FC = () => {
               {tabHeaderInfo[activeTab]?.title || "Overview"}
             </h1>
             <p style={{
-              fontSize: "0.75rem",
-              lineHeight: "1rem",
+              fontSize: "12px",
+              lineHeight: "16px",
               fontWeight: 400,
-              color: "#616161",
+              color: "#242424",
               fontFamily: "'Inter', sans-serif",
             }}>
               {tabHeaderInfo[activeTab]?.subtitle || "High-Level View of Document Details and Progress"}
@@ -716,6 +716,7 @@ const ProcessPage: React.FC = () => {
                 style={{
                   minWidth: "140px",
                   justifyContent: "space-between",
+                  borderRadius: "6px",
 
                   backgroundColor: "#fff",
                 }}
@@ -726,20 +727,22 @@ const ProcessPage: React.FC = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem
+              {/* <DropdownMenuItem
                 onClick={() => {
-                  setAcademicYear("All Years");
+                  setAcademicYear("Academic Year");
                   setAcademicYearId(undefined);
                 }}
                 style={{
-                  fontWeight: academicYear === "All Years" ? "bold" : "normal",
-                  color: academicYear === "All Years" ? "#242424" : "#616161",
-                  backgroundColor: "transparent",
+                  fontWeight: academicYear === "Academic Year" ? "semi-bold" : "normal",
+                  color: academicYear === "Academic Year" ? "#242424" : "#616161",
+                  backgroundColor: "#FFFFFF",
+                  // border: "1px solid #D1D1D1",
+
                 }}
                 className="!text-[#242424]"
               >
-                All Years
-              </DropdownMenuItem>
+                Academic Year
+              </DropdownMenuItem> */}
               {loadingAcademicYears ? (
                 <DropdownMenuItem 
                   style={{ color: "#616161", backgroundColor: "transparent" }}
@@ -783,14 +786,14 @@ const ProcessPage: React.FC = () => {
 
       {/* Tabs and Search Section */}
       <div style={{
-        backgroundColor: "#fafafa",
+        backgroundColor: "#FAFAFA",
 
-        borderBottom: "1px solid #e0e0e0", // Added border here as requested
         marginBottom: "0px",
         height: "2.75rem",
         width: "100%",
         flexShrink: 0,
         paddingTop: "13px",
+        marginTop: "-12px",
       }}>
         <div style={{
           display: "flex",
@@ -812,7 +815,7 @@ const ProcessPage: React.FC = () => {
             paddingRight: "24px",
             flexShrink: 0,
           }}>
-            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+            <div style={{ position: "relative", display: "flex", alignItems: "center",border:"1px solid #D1D1D1",borderRadius:"8px" }}>
               <SearchRegular style={{ 
                 position: "absolute", 
                 left: "8px", 
@@ -841,8 +844,8 @@ const ProcessPage: React.FC = () => {
                   height: "32px",
                   paddingLeft: "32px",
                   paddingRight: "12px",
-                  borderRadius: "4px",
-                  border: "1px solid #d1d5db",
+                  borderRadius: "8px",
+                  border: "1px solid ##FFFFFF00",
                   fontSize: "14px",
                   fontFamily: "'Inter', sans-serif",
                   outline: "none",
@@ -951,7 +954,7 @@ const ProcessPage: React.FC = () => {
                     backgroundColor: "#fff",
                   }}
                 >
-                  <ArrowDownloadRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
+                  <MoreVerticalRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -1121,7 +1124,7 @@ const ProcessPage: React.FC = () => {
         {/* Pagination */}
         <div style={{
           padding: "12px 24px",
-          backgroundColor: "#ffffff",
+          backgroundColor: "#FAFAFA",
         }}>
           <Pagination
             currentPage={currentPage}

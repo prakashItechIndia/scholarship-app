@@ -15,6 +15,9 @@ import {
     Dismiss24Regular,
     Print24Regular,
     DocumentRegular,
+    DocumentDataRegular,
+    TableRegular,
+    DocumentPrintRegular,
 } from "@fluentui/react-icons";
 import { processManagement } from "../../../services/scholarship.service";
 import { useToast } from "@/components/ui/toast";
@@ -386,7 +389,8 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
         <Modal
             open={open}
             onOpenChange={onOpenChange}
-            size="xl" // Adjusted size to accommodate table
+            size="full" // Use full width for better table visibility
+            className="!max-w-[55vw]" // Custom width override
 
             // Custom header to include actions
             headerContent={
@@ -394,7 +398,7 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
                     <span style={{ fontSize: "16px", fontWeight: 600, color: "#242424", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap" }}>
                         History Against Application Number : {applicationNo}
                     </span>
-                    <div style={{ display: "flex", gap: "8px" }}>
+                    <div style={{ display: "flex", gap: "8px",marginLeft:"440px" }}>
                         <DropdownMenu>
                             <DropdownMenuTrigger>
                                 <Button
@@ -409,8 +413,8 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
                                     onClick={handleDownloadExcel}
                                     style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
                                 >
-                                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                        <DocumentRegular style={{ width: "16px", height: "16px" }} />
+                                    <div style={{ display: "flex", alignItems: "center", gap: "8px",fontSize: "13px",fontWeight:400,lineHeight:"20px",color:"#424242" }}>
+                                        <TableRegular style={{ width: "18px", height: "18px" }} />
                                         Excel
                                     </div>
                                 </DropdownMenuItem>
@@ -418,8 +422,8 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
                                     onClick={handleDownloadWord}
                                     style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
                                 >
-                                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                        <DocumentRegular style={{ width: "16px", height: "16px" }} />
+                                    <div style={{ display: "flex", alignItems: "center", gap: "8px",fontSize: "13px",fontWeight:400,lineHeight:"20px",color:"#424242" }}>
+                                        <DocumentDataRegular style={{ width: "18px", height: "18px" }} />
                                         Word
                                     </div>
                                 </DropdownMenuItem>
@@ -427,17 +431,18 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
                         </DropdownMenu>
                         <Button
                             appearance="outline"
-                            icon={<Print24Regular />}
+                            icon={<DocumentPrintRegular />}
                             onClick={handlePrint}
-                            style={{ width: "32px", height: "32px", padding: 0 }}
+                            style={{ width: "32px", height: "32px", marginLeft:"5px" }}
                             aria-label="Print"
                         />
                         <Button
                             appearance="subtle"
                             icon={<Dismiss24Regular />}
                             onClick={handleClose} // Close the modal on click
-                            style={{ width: "32px", height: "32px", padding: 0 }}
+                            style={{ width: "32px", height: "32px",paddingLeft:"20px" }}
                             aria-label="Close"
+                            className="no-hover-effect"
                         />
                     </div>
                 </div >
@@ -445,7 +450,7 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
             hideDefaultHeader={true} // We are providing custom header content
         >
             <div style={{ display: "flex", flexDirection: "column", height: "60vh" }}>
-                <div style={{ flex: 1, overflow: "auto" }}>
+                <div style={{ flex: 1, overflow: "auto", borderRadius: "8px", border: "1px solid #e0e0e0" }}>
                     {loading ? (
                         <TableSkeleton
                             columnCount={5}
@@ -464,28 +469,48 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
                 </div>
 
                 <div style={{
-                    paddingTop: "16px",
-                    borderTop: "1px solid #e0e0e0",
+                    padding: "12px 14px",
+                    backgroundColor: "#FAFAFA",
+                    // borderTop: "1px solid #e0e0e0",
                     width: "100%"
                 }}>
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        pageSize={pageSize}
-                        totalItems={totalItems}
-                        onPageChange={(page) => {
-                            setCurrentPage(page);
-                        }}
-                        onPageSizeChange={(newPageSize) => {
-                            setPageSize(newPageSize);
-                            setCurrentPage(1); // Reset to first page when page size changes
-                        }}
-                        pageSizeOptions={[5, 10, 20, 50]}
-                        showFirstLast={true}
-                        showPageSize={true}
-                        showPageNumbers={true}
-                        className="w-full"
-                    />
+                    <div style={{ position: "relative" }}>
+                        <style>{`
+                            .modal-pagination-shift .flex.items-center.gap-\\[3px\\] {
+                                left: 58% !important;
+                            }
+                            .no-hover-effect:hover {
+                                background-color: transparent !important;
+                                opacity: 1 !important;
+                            }
+                            .modal-pagination-shift .flex.gap-1.items-center.w-\\[49px\\].h-\\[28px\\] {
+                                top: 8px !important;
+                            }
+                            .modal-pagination-shift .flex.gap-1.items-center.w-\\[49px\\].h-\\[28px\\] span {
+                                margin-bottom: 2px !important;
+                                margin-top: 2px !important;
+                            }
+                        `}</style>
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            pageSize={pageSize}
+                            totalItems={totalItems}
+                            onPageChange={(page) => {
+                                setCurrentPage(page);
+                            }}
+                            onPageSizeChange={(newPageSize) => {
+                                setPageSize(newPageSize);
+                                setCurrentPage(1); // Reset to first page when page size changes
+                            }}
+                            pageSizeOptions={[5, 10, 20, 50]}
+                            showFirstLast={true}
+                            showPageSize={true}
+                            showPageNumbers={true}
+                            maxPageButtons={7}
+                            className="w-full !flex-row modal-pagination-shift"
+                        />
+                    </div>
                 </div>
             </div>
         </Modal >

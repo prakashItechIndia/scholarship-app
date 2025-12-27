@@ -14,7 +14,8 @@ const ProcessTabs: React.FC<ProcessTabsProps> = ({ activeTab, onTabChange }) => 
         display: "flex",
         gap: "24px",
         borderBottom: "none",
-        padding: "12px"
+        padding: "12px",
+        paddingBottom: "10px",
       }}>
         {tabLabels.map((tab) => {
           const isActive = activeTab === tab.value;
@@ -23,19 +24,20 @@ const ProcessTabs: React.FC<ProcessTabsProps> = ({ activeTab, onTabChange }) => 
               key={tab.value}
               onClick={() => onTabChange(tab.value)}
               style={{
-                padding: "12px 0",
+                padding: "10px 0",
                 fontSize: "13px", // matching 13px request
                 lineHeight: "20px",
-                fontWeight: 600,  // matching 600 request
+                fontWeight: isActive ? 600 : 400,  // matching 600 request
                 fontFamily: "'Inter', sans-serif",
-                color: isActive ? "#0f6cbd" : "#616161",
-                backgroundColor: "transparent",
+                color: isActive ? "#242424" : "#424242", 
+                backgroundColor: "#FAFAFA",
                 border: "none",
-                borderBottom: `2px solid ${isActive ? "#0f6cbd" : "transparent"}`,
+                borderBottom: `5px solid ${isActive ? "#0f6cbd" : "transparent"}`,
                 cursor: "pointer",
                 marginBottom: "12px", // Pull border down to overlap container border
                 transition: "all 0.2s",
                 outline: "none",
+                
               }}
               className="hover:text-[#242424]"
             >
