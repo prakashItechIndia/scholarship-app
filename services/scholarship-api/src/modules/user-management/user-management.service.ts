@@ -25,6 +25,7 @@ export class UserManagementService {
 
   /**
    * Get all users - matches BingGrid from UserCreation.aspx.cs
+   * Excludes users with "Student" role as they are for user flow, not admin flow
    */
   async getAllUsers() {
     try {
@@ -46,7 +47,9 @@ export class UserManagementService {
           END as ActiveStatus
         FROM TBL_USERMASTER U
         LEFT OUTER JOIN T_ROLES R ON U.Role_Id = R.Id
-        WHERE R.Is_Active = 1 AND U.IsDeleted = 0
+        WHERE R.Is_Active = 1 
+          AND U.IsDeleted = 0
+          AND LOWER(R.Role_Name) != 'student'
       `;
 
       const result = await this.db.query(query);

@@ -4,6 +4,7 @@ import { PermissionGuard } from '../permissions/PermissionGuard';
 import {
   isScholarshipLoggedIn,
   getScholarshipUserType,
+  isStudentRole,
   getLandingPage,
   canUserTypeAccessRoute,
 } from '../../utils/routeProtection';
@@ -44,10 +45,47 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children, path }) => {
   const isPublic = isPublicRoute(path);
   const needsAuth = requiresAuth(path);
   const currentPath = location.pathname;
+  const isStudent = isStudentRole();
+  
+  // Check if set-password has a token in query params - allow access regardless of login status
+  const hasToken = location.search.includes('token=');
+
+  // Priority check: Allow set-password page when token is present (password reset/set flow)
+  // This must be checked FIRST before any redirects, as users need to set passwords even if logged in
+  if ((currentPath === '/set-password' || path === '/set-password') && hasToken) {
+    return <>{children}</>;
+  }
+
+  // Early check: Student users can always access user flow pages
+  // This ensures Student users can access these pages regardless of login status or other conditions
+  if (isStudent) {
+    const studentFlowPages = [
+      '/user-login',
+      '/set-password',
+      '/email-verification',
+      '/registration',
+      '/user-dashboard',
+      '/forgot-password',
+      '/reset-password',
+      '/create-password',
+    ];
+    if (studentFlowPages.includes(currentPath) || studentFlowPages.includes(path)) {
+      return <>{children}</>;
+    }
+  }
 
   // Case 1: User is logged in and trying to access public route (login page)
   // → Redirect to landing page based on userType
+  // Exception: Student users can access registration, set-password, and email-verification pages even when logged in
+  // Note: set-password with token is already handled in priority check above
   if (isLoggedIn && isPublic) {
+    // Allow Student users to access registration, set-password, and email-verification pages (they may need to complete these steps)
+    // Check both currentPath and path prop to handle route matching
+    const studentAllowedPages = ['/registration', '/set-password', '/email-verification'];
+    if (isStudent && (studentAllowedPages.includes(currentPath) || studentAllowedPages.includes(path))) {
+      return <>{children}</>;
+    }
+    
     const landingPage = getLandingPage(userType);
     // Prevent redirect loop - only redirect if we're not already on the landing page
     if (currentPath !== landingPage) {
@@ -96,6 +134,24 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children, path }) => {
   // Case 4: User is logged in and route requires permission check via PermissionContext
   // Use PermissionGuard for screen-level permissions (action-level: create, view, update, delete)
   if (isLoggedIn && routeConfig?.screenUrl) {
+    // Student role users have access to user flow pages without permission checks
+    // (Already handled in early check above, but keeping for safety)
+    if (isStudent) {
+      const userFlowPages = [
+        '/user-login',
+        '/set-password',
+        '/email-verification',
+        '/registration',
+        '/user-dashboard',
+        '/forgot-password',
+        '/reset-password',
+        '/create-password',
+      ];
+      if (userFlowPages.includes(currentPath) || userFlowPages.includes(path)) {
+        return <>{children}</>;
+      }
+    }
+    
     // Administrators have full access to all pages - skip permission checks
     if (userType === 'Administrator') {
       return <>{children}</>;

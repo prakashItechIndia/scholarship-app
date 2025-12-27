@@ -97,9 +97,46 @@ export const getScholarshipUserType = (): string | null => {
 };
 
 /**
+ * Check if user has Student role
+ * Student role has User_Type as NULL in T_ROLES table
+ */
+export const isStudentRole = (): boolean => {
+  try {
+    const userData = getScholarshipUserData();
+    if (!userData?.user) {
+      return false;
+    }
+    
+    const userType = userData.user.userType;
+    const roleId = userData.user.roleId;
+    
+    // Student role has User_Type as NULL/empty and roleId = 10 (based on T_ROLES table)
+    // Check both conditions for robustness
+    if ((!userType || userType === '') && roleId === 10) {
+      return true;
+    }
+    
+    // Also check if userType is explicitly null/empty (Student role characteristic)
+    // This handles cases where roleId might vary but userType is still NULL
+    if (!userType || userType === '') {
+      return true;
+    }
+    
+    return false;
+  } catch {
+    return false;
+  }
+};
+
+/**
  * Get landing page based on user type
  */
 export const getLandingPage = (userType?: string | null): string => {
+  // Check if user has Student role (User_Type is NULL/empty)
+  if (isStudentRole()) {
+    return '/user-dashboard'; // Student role users go to user dashboard
+  }
+  
   if (!userType) {
     return '/home'; // Default landing page
   }

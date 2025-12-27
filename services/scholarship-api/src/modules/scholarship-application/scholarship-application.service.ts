@@ -778,7 +778,7 @@ export class ScholarshipApplicationService {
         'http://localhost:5173';
 
       // Create verification URL - redirects to email-verification page with token
-      const verificationUrl = `${appUrl}/email-verification?token=${verificationToken}&email=${encodeURIComponent(email)}`;
+      const verificationUrl = `${appUrl}/set-password?token=${verificationToken}&email=${encodeURIComponent(email)}`;
 
       // Send verification email
       const emailSent = await this.emailService.sendEmail({

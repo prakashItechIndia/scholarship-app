@@ -17,6 +17,7 @@ export class RoleManagementService {
 
   /**
    * Get all roles - matches T_ROLES table structure
+   * Excludes "Student" role as it's for user flow, not admin flow
    */
   async getAllRoles() {
     try {
@@ -32,6 +33,7 @@ export class RoleManagementService {
             ELSE 'Inactive'
           END as Status
         FROM T_ROLES
+        WHERE LOWER(Role_Name) != 'student'
         ORDER BY Role_Name
       `;
 

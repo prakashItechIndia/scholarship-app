@@ -7,6 +7,7 @@ import appleIcon from '@shared/assets/icons/apple.svg';
 interface SocialLoginButtonProps {
   provider: 'microsoft' | 'google' | 'apple';
   onClick?: () => void;
+  disabled?: boolean;
 }
 
 const PROVIDER_CONFIG = {

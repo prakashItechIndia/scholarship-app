@@ -113,7 +113,13 @@ export interface InlineObject2 {
      * @type {string}
      * @memberof InlineObject2
      */
-    email: string;
+    username: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject2
+     */
+    password: string;
 }
 /**
  * 
@@ -126,17 +132,66 @@ export interface InlineObject3 {
      * @type {string}
      * @memberof InlineObject3
      */
-    email: string;
+    provider: InlineObject3ProviderEnum;
     /**
      * 
      * @type {string}
      * @memberof InlineObject3
      */
-    password: string;
+    code: string;
     /**
      * 
      * @type {string}
      * @memberof InlineObject3
+     */
+    redirectUri: string;
+}
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum InlineObject3ProviderEnum {
+    Microsoft = 'microsoft',
+    Google = 'google',
+    Apple = 'apple'
+}
+
+/**
+ * 
+ * @export
+ * @interface InlineObject4
+ */
+export interface InlineObject4 {
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject4
+     */
+    email: string;
+}
+/**
+ * 
+ * @export
+ * @interface InlineObject5
+ */
+export interface InlineObject5 {
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject5
+     */
+    email: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject5
+     */
+    password: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject5
      */
     token?: string;
 }
@@ -6805,13 +6860,13 @@ export const ScholarshipApplicationApiAxiosParamCreator = function (configuratio
         /**
          * 
          * @summary Send verification email for new user onboarding
-         * @param {InlineObject2} inlineObject2 
+         * @param {InlineObject4} inlineObject4 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        scholarshipApplicationControllerSendVerificationEmail: async (inlineObject2: InlineObject2, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'inlineObject2' is not null or undefined
-            assertParamExists('scholarshipApplicationControllerSendVerificationEmail', 'inlineObject2', inlineObject2)
+        scholarshipApplicationControllerSendVerificationEmail: async (inlineObject4: InlineObject4, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'inlineObject4' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerSendVerificationEmail', 'inlineObject4', inlineObject4)
             const localVarPath = `/scholarship-application/send-verification-email`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6831,7 +6886,7 @@ export const ScholarshipApplicationApiAxiosParamCreator = function (configuratio
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject2, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject4, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -6841,13 +6896,13 @@ export const ScholarshipApplicationApiAxiosParamCreator = function (configuratio
         /**
          * 
          * @summary Set password for new user (onboarding completion)
-         * @param {InlineObject3} inlineObject3 
+         * @param {InlineObject5} inlineObject5 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        scholarshipApplicationControllerSetNewPassword: async (inlineObject3: InlineObject3, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'inlineObject3' is not null or undefined
-            assertParamExists('scholarshipApplicationControllerSetNewPassword', 'inlineObject3', inlineObject3)
+        scholarshipApplicationControllerSetNewPassword: async (inlineObject5: InlineObject5, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'inlineObject5' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerSetNewPassword', 'inlineObject5', inlineObject5)
             const localVarPath = `/scholarship-application/set-password`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6867,7 +6922,7 @@ export const ScholarshipApplicationApiAxiosParamCreator = function (configuratio
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject3, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject5, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -7045,23 +7100,23 @@ export const ScholarshipApplicationApiFp = function(configuration?: Configuratio
         /**
          * 
          * @summary Send verification email for new user onboarding
-         * @param {InlineObject2} inlineObject2 
+         * @param {InlineObject4} inlineObject4 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async scholarshipApplicationControllerSendVerificationEmail(inlineObject2: InlineObject2, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerSendVerificationEmail(inlineObject2, options);
+        async scholarshipApplicationControllerSendVerificationEmail(inlineObject4: InlineObject4, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerSendVerificationEmail(inlineObject4, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
          * @summary Set password for new user (onboarding completion)
-         * @param {InlineObject3} inlineObject3 
+         * @param {InlineObject5} inlineObject5 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async scholarshipApplicationControllerSetNewPassword(inlineObject3: InlineObject3, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerSetNewPassword(inlineObject3, options);
+        async scholarshipApplicationControllerSetNewPassword(inlineObject5: InlineObject5, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerSetNewPassword(inlineObject5, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -7181,22 +7236,22 @@ export const ScholarshipApplicationApiFactory = function (configuration?: Config
         /**
          * 
          * @summary Send verification email for new user onboarding
-         * @param {InlineObject2} inlineObject2 
+         * @param {InlineObject4} inlineObject4 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        scholarshipApplicationControllerSendVerificationEmail(inlineObject2: InlineObject2, options?: any): AxiosPromise<void> {
-            return localVarFp.scholarshipApplicationControllerSendVerificationEmail(inlineObject2, options).then((request) => request(axios, basePath));
+        scholarshipApplicationControllerSendVerificationEmail(inlineObject4: InlineObject4, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerSendVerificationEmail(inlineObject4, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Set password for new user (onboarding completion)
-         * @param {InlineObject3} inlineObject3 
+         * @param {InlineObject5} inlineObject5 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        scholarshipApplicationControllerSetNewPassword(inlineObject3: InlineObject3, options?: any): AxiosPromise<void> {
-            return localVarFp.scholarshipApplicationControllerSetNewPassword(inlineObject3, options).then((request) => request(axios, basePath));
+        scholarshipApplicationControllerSetNewPassword(inlineObject5: InlineObject5, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerSetNewPassword(inlineObject5, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -7329,25 +7384,25 @@ export class ScholarshipApplicationApi extends BaseAPI {
     /**
      * 
      * @summary Send verification email for new user onboarding
-     * @param {InlineObject2} inlineObject2 
+     * @param {InlineObject4} inlineObject4 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScholarshipApplicationApi
      */
-    public scholarshipApplicationControllerSendVerificationEmail(inlineObject2: InlineObject2, options?: any) {
-        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerSendVerificationEmail(inlineObject2, options).then((request) => request(this.axios, this.basePath));
+    public scholarshipApplicationControllerSendVerificationEmail(inlineObject4: InlineObject4, options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerSendVerificationEmail(inlineObject4, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Set password for new user (onboarding completion)
-     * @param {InlineObject3} inlineObject3 
+     * @param {InlineObject5} inlineObject5 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScholarshipApplicationApi
      */
-    public scholarshipApplicationControllerSetNewPassword(inlineObject3: InlineObject3, options?: any) {
-        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerSetNewPassword(inlineObject3, options).then((request) => request(this.axios, this.basePath));
+    public scholarshipApplicationControllerSetNewPassword(inlineObject5: InlineObject5, options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerSetNewPassword(inlineObject5, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -7421,11 +7476,14 @@ export const ScholarshipAuthenticationApiAxiosParamCreator = function (configura
         /**
          * 
          * @summary Admin login for scholarship portal
+         * @param {string} userAgent 
          * @param {InlineObject} inlineObject 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        scholarshipAuthControllerLogin: async (inlineObject: InlineObject, options: any = {}): Promise<RequestArgs> => {
+        scholarshipAuthControllerLogin: async (userAgent: string, inlineObject: InlineObject, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userAgent' is not null or undefined
+            assertParamExists('scholarshipAuthControllerLogin', 'userAgent', userAgent)
             // verify required parameter 'inlineObject' is not null or undefined
             assertParamExists('scholarshipAuthControllerLogin', 'inlineObject', inlineObject)
             const localVarPath = `/scholarship-auth/login`;
@@ -7440,6 +7498,10 @@ export const ScholarshipAuthenticationApiAxiosParamCreator = function (configura
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            if (userAgent !== undefined && userAgent !== null) {
+                localVarHeaderParameter['user-agent'] = String(userAgent);
+            }
+
 
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
@@ -7448,6 +7510,92 @@ export const ScholarshipAuthenticationApiAxiosParamCreator = function (configura
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(inlineObject, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Authenticates user via OAuth provider. Follows same flow as manual login - only authentication source differs.
+         * @summary Social login (Microsoft, Google, Apple)
+         * @param {string} userAgent 
+         * @param {InlineObject3} inlineObject3 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipAuthControllerSocialLogin: async (userAgent: string, inlineObject3: InlineObject3, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userAgent' is not null or undefined
+            assertParamExists('scholarshipAuthControllerSocialLogin', 'userAgent', userAgent)
+            // verify required parameter 'inlineObject3' is not null or undefined
+            assertParamExists('scholarshipAuthControllerSocialLogin', 'inlineObject3', inlineObject3)
+            const localVarPath = `/scholarship-auth/social-login`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (userAgent !== undefined && userAgent !== null) {
+                localVarHeaderParameter['user-agent'] = String(userAgent);
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject3, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary User login for scholarship portal (allows Student users)
+         * @param {string} userAgent 
+         * @param {InlineObject2} inlineObject2 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipAuthControllerUserLogin: async (userAgent: string, inlineObject2: InlineObject2, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userAgent' is not null or undefined
+            assertParamExists('scholarshipAuthControllerUserLogin', 'userAgent', userAgent)
+            // verify required parameter 'inlineObject2' is not null or undefined
+            assertParamExists('scholarshipAuthControllerUserLogin', 'inlineObject2', inlineObject2)
+            const localVarPath = `/scholarship-auth/user-login`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (userAgent !== undefined && userAgent !== null) {
+                localVarHeaderParameter['user-agent'] = String(userAgent);
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject2, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -7478,12 +7626,37 @@ export const ScholarshipAuthenticationApiFp = function(configuration?: Configura
         /**
          * 
          * @summary Admin login for scholarship portal
+         * @param {string} userAgent 
          * @param {InlineObject} inlineObject 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async scholarshipAuthControllerLogin(inlineObject: InlineObject, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipAuthControllerLogin(inlineObject, options);
+        async scholarshipAuthControllerLogin(userAgent: string, inlineObject: InlineObject, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipAuthControllerLogin(userAgent, inlineObject, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Authenticates user via OAuth provider. Follows same flow as manual login - only authentication source differs.
+         * @summary Social login (Microsoft, Google, Apple)
+         * @param {string} userAgent 
+         * @param {InlineObject3} inlineObject3 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipAuthControllerSocialLogin(userAgent: string, inlineObject3: InlineObject3, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipAuthControllerSocialLogin(userAgent, inlineObject3, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary User login for scholarship portal (allows Student users)
+         * @param {string} userAgent 
+         * @param {InlineObject2} inlineObject2 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipAuthControllerUserLogin(userAgent: string, inlineObject2: InlineObject2, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipAuthControllerUserLogin(userAgent, inlineObject2, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -7509,12 +7682,35 @@ export const ScholarshipAuthenticationApiFactory = function (configuration?: Con
         /**
          * 
          * @summary Admin login for scholarship portal
+         * @param {string} userAgent 
          * @param {InlineObject} inlineObject 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        scholarshipAuthControllerLogin(inlineObject: InlineObject, options?: any): AxiosPromise<void> {
-            return localVarFp.scholarshipAuthControllerLogin(inlineObject, options).then((request) => request(axios, basePath));
+        scholarshipAuthControllerLogin(userAgent: string, inlineObject: InlineObject, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipAuthControllerLogin(userAgent, inlineObject, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Authenticates user via OAuth provider. Follows same flow as manual login - only authentication source differs.
+         * @summary Social login (Microsoft, Google, Apple)
+         * @param {string} userAgent 
+         * @param {InlineObject3} inlineObject3 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipAuthControllerSocialLogin(userAgent: string, inlineObject3: InlineObject3, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipAuthControllerSocialLogin(userAgent, inlineObject3, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary User login for scholarship portal (allows Student users)
+         * @param {string} userAgent 
+         * @param {InlineObject2} inlineObject2 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipAuthControllerUserLogin(userAgent: string, inlineObject2: InlineObject2, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipAuthControllerUserLogin(userAgent, inlineObject2, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -7541,13 +7737,40 @@ export class ScholarshipAuthenticationApi extends BaseAPI {
     /**
      * 
      * @summary Admin login for scholarship portal
+     * @param {string} userAgent 
      * @param {InlineObject} inlineObject 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScholarshipAuthenticationApi
      */
-    public scholarshipAuthControllerLogin(inlineObject: InlineObject, options?: any) {
-        return ScholarshipAuthenticationApiFp(this.configuration).scholarshipAuthControllerLogin(inlineObject, options).then((request) => request(this.axios, this.basePath));
+    public scholarshipAuthControllerLogin(userAgent: string, inlineObject: InlineObject, options?: any) {
+        return ScholarshipAuthenticationApiFp(this.configuration).scholarshipAuthControllerLogin(userAgent, inlineObject, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Authenticates user via OAuth provider. Follows same flow as manual login - only authentication source differs.
+     * @summary Social login (Microsoft, Google, Apple)
+     * @param {string} userAgent 
+     * @param {InlineObject3} inlineObject3 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipAuthenticationApi
+     */
+    public scholarshipAuthControllerSocialLogin(userAgent: string, inlineObject3: InlineObject3, options?: any) {
+        return ScholarshipAuthenticationApiFp(this.configuration).scholarshipAuthControllerSocialLogin(userAgent, inlineObject3, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary User login for scholarship portal (allows Student users)
+     * @param {string} userAgent 
+     * @param {InlineObject2} inlineObject2 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipAuthenticationApi
+     */
+    public scholarshipAuthControllerUserLogin(userAgent: string, inlineObject2: InlineObject2, options?: any) {
+        return ScholarshipAuthenticationApiFp(this.configuration).scholarshipAuthControllerUserLogin(userAgent, inlineObject2, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

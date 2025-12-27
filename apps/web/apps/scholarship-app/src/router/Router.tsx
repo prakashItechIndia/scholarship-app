@@ -19,6 +19,7 @@ const RegistrationPage = lazy(() => import('../pages/registration/RegistrationFo
 const VerificationPage = lazy(() => import('../pages/auth/Verification'));
 const SetPasswordPage = lazy(() => import('../pages/auth/SetPassword'));
 const EmailVerificationPage = lazy(() => import('../pages/auth/EmailVerification'));
+const OAuthCallbackPage = lazy(() => import('../pages/auth/OAuthCallback'));
 const ProcessPage = lazy(() => import('../pages/process'));
 
 const UserDashboardPage = lazy(() => import('../pages/userDashboard'));
@@ -174,6 +175,18 @@ export const Router = () => {
               <Suspense fallback={<LoadingScreen message="Loading..." />}>
                 <ErrorBoundary>
                   <EmailVerificationPage />
+                </ErrorBoundary>
+              </Suspense>
+            </RouteGuard>
+          }
+        />
+        <Route
+          path="/oauth-callback/:provider"
+          element={
+            <RouteGuard path="/oauth-callback/:provider">
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <OAuthCallbackPage />
                 </ErrorBoundary>
               </Suspense>
             </RouteGuard>

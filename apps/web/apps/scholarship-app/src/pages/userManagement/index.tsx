@@ -56,7 +56,12 @@ const UserManagementPage: React.FC = () => {
           return 'Standard User';
         };
 
-        const mappedUsers: User[] = data?.map((user: {
+        // Filter out users with "Student" role (case-insensitive) as they are for user flow, not admin flow
+        const mappedUsers: User[] = data
+          ?.filter((user: { Role_Name: string }) => 
+            user.Role_Name?.toLowerCase() !== 'student'
+          )
+          ?.map((user: {
           ID: number;
           User_ID: string;
           User_Name: string;
@@ -109,7 +114,12 @@ const UserManagementPage: React.FC = () => {
             return 'Standard User';
           };
 
-          const mappedUsers: User[] = data?.map((user: {
+          // Filter out users with "Student" role (case-insensitive) as they are for user flow, not admin flow
+          const mappedUsers: User[] = data
+            ?.filter((user: { Role_Name: string }) => 
+              user.Role_Name?.toLowerCase() !== 'student'
+            )
+            ?.map((user: {
             ID: number;
             User_ID: string;
             User_Name: string;

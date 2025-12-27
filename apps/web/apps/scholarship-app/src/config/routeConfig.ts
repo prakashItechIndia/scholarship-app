@@ -83,6 +83,11 @@ export const routeConfig: RouteConfig[] = [
     requiresAuth: false,
     isPublic: true,
   },
+  {
+    path: '/oauth-callback/:provider',
+    requiresAuth: false,
+    isPublic: true,
+  },
   
   // Protected routes (require login and permissions)
   {
