@@ -71,8 +71,8 @@ const Select = React.forwardRef<HTMLInputElement, SelectProps>(
               height: "32px",
               minHeight: "30px",
               maxHeight: "40px",
-              paddingLeft: "12px",
-              paddingRight: "12px",
+              // paddingLeft: "12px",
+              // paddingRight: "12px",
               paddingTop: "8px",
               paddingBottom: "8px",
             }}

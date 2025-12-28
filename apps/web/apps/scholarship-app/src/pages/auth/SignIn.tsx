@@ -87,6 +87,7 @@ const SignInPage = () => {
 
   // Handle social login
   const handleSocialLogin = (provider: SocialProvider) => {
+    return;
     try {
       socialLogin.initiate(provider);
     } catch (err) {

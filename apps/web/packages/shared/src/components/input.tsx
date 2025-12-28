@@ -75,13 +75,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               backgroundColor: tokens.colorNeutralBackground1,
               color: tokens.colorNeutralForeground1,
               fontSize: tokens.fontSizeBase300,
-              height: tokens.formFieldHeight,
-              minHeight: tokens.formFieldMinHeight,
-              maxHeight: tokens.formFieldMaxHeight,
+              // height: tokens.formFieldHeight,
+              // minHeight: tokens.formFieldMinHeight,
+              // maxHeight: tokens.formFieldMaxHeight,
               paddingLeft: paddingLeft,
               paddingRight: paddingRight,
-              paddingTop: "8px",
-              paddingBottom: "8px",
+              // paddingTop: "8px",
+              // paddingBottom: "8px",
             }}
             {...props}
           />

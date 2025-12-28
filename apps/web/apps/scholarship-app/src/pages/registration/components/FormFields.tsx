@@ -12,6 +12,7 @@ interface BaseFormFieldProps {
     label: string;
     required?: boolean;
     placeholder?: string;
+    className?: string;
 }
 
 /**
@@ -123,7 +124,7 @@ export const SelectField = ({ name, control, errors, label, required, options, p
 /**
  * DatePicker Field Component
  */
-export const DatePickerField = ({ name, control, errors, label, required }: BaseFormFieldProps) => {
+export const DatePickerField = ({ name, control, errors, label, required, className }: BaseFormFieldProps) => {
     return (
         <Controller
             name={name}
@@ -134,6 +135,7 @@ export const DatePickerField = ({ name, control, errors, label, required }: Base
                         value={field.value}
                         onSelectDate={(date) => field.onChange(date)}
                         errorMessage={errors[name]?.message as string}
+                        className={className}
                     />
                 </FormField>
             )}
