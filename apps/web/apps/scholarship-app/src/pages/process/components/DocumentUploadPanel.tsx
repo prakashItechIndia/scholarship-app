@@ -610,10 +610,11 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                                                 display: "inline-block",
                                                 padding: "4px 12px",
                                                 borderRadius: "100px",
-                                                fontSize: "12px",
-                                                fontWeight: 500,
-                                                backgroundColor: doc.status === "Uploaded" ? "#f1faf1" : "#f5f5f5",
-                                                color: doc.status === "Uploaded" ? "#0e700e" : "#424242",
+                                                fontSize: "10px",
+                                                lineHeight:"14px",
+                                                fontWeight: 600,
+                                                backgroundColor: doc.status === "Uploaded" ? "#f1faf1" : "#F0F0F0",
+                                                color: doc.status === "Uploaded" ? "#0E700E" : "#424242",
                                                 border: `1px solid ${doc.status === "Uploaded" ? "#9fd89f" : "#e0e0e0"}`,
                                             }}
                                         >
