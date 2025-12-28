@@ -264,8 +264,7 @@ const AdminSignInPage = () => {
                       },
                     }}
                     onClick={() => {
-                      // TODO: Navigate to forgot password page
-                      console.log('Forgot password clicked');
+                      void navigate('/forgot-password');
                     }}
                   >
                     Forgot your password?

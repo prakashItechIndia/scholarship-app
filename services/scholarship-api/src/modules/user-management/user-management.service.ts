@@ -2,6 +2,10 @@ import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
 import { ScholarshipAuthService } from '../scholarship-auth/scholarship-auth.service';
 import { EmailService } from '../email/email.service';
+import { FileStorageService } from '../file-storage/file-storage.service';
+import { getCaseInsensitiveValue } from '../../utils/case-insensitive';
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
 
 interface UserData {
   userType: number;
@@ -11,6 +15,7 @@ interface UserData {
   mobileNumber: string;
   email: string;
   isActive: number;
+  profileImagePath?: string;
 }
 
 @Injectable()
@@ -21,6 +26,7 @@ export class UserManagementService {
     private readonly db: DatabaseService,
     private readonly authService: ScholarshipAuthService,
     private readonly emailService: EmailService,
+    private readonly fileStorage: FileStorageService,
   ) {}
 
   /**
@@ -47,6 +53,7 @@ export class UserManagementService {
           U.EMail_Id,
           U.Role_Id,
           U.IsActive,
+          U.PROFILE_IMAGE_PATH,
           CASE U.IsActive
             WHEN '0' THEN 'InActive'
             WHEN '1' THEN 'Active'
@@ -176,16 +183,51 @@ export class UserManagementService {
         userData.password,
       );
 
-      // Call stored procedure
-      await this.db.execute('USP_SAVE_USER_Master', {
-        UserType: userData.userType,
-        Name: userData.name,
-        UserName: userData.userName,
-        Password: encryptedPassword,
-        MobileNumber: userData.mobileNumber,
-        EMail: userData.email,
-        IsActive: userData.isActive,
+      // Use raw SQL query to include PROFILE_IMAGE_PATH
+      const insertQuery = `
+        INSERT INTO TBL_USERMASTER (
+          User_ID,
+          User_Name,
+          Password,
+          Password_change,
+          Mobile_Number,
+          EMail_Id,
+          Role_Id,
+          IsActive,
+          IsDeleted,
+          PROFILE_IMAGE_PATH,
+          Created_Date,
+          Created_By
+        ) VALUES (
+          @userName,
+          @name,
+          @password,
+          0,
+          @mobileNumber,
+          @email,
+          @userType,
+          @isActive,
+          0,
+          @profileImagePath,
+          GETDATE(),
+          @userName
+        )
+      `;
+
+      await this.db.query(insertQuery, {
+        userName: userData.userName,
+        name: userData.name,
+        password: encryptedPassword,
+        mobileNumber: userData.mobileNumber,
+        email: userData.email,
+        userType: userData.userType,
+        isActive: userData.isActive,
+        profileImagePath: userData.profileImagePath || null,
       });
+
+      this.logger.debug(
+        `User created with SQL query: ${userData.userName}, profileImagePath: ${userData.profileImagePath || 'NULL'}`,
+      );
 
       // USR-002: Send temporary password via email
       try {
@@ -295,16 +337,36 @@ This is an automated message. Please do not reply to this email.
         userData.password,
       );
 
-      // Call stored procedure
-      await this.db.execute('USP_Update_USER_Master', {
-        UserType: userData.userType,
-        Name: userData.name,
-        UserName: userData.userName,
-        Password: encryptedPassword,
-        MobileNumber: userData.mobileNumber,
-        EMail: userData.email,
-        IsActive: userData.isActive,
+      // Use raw SQL query to include PROFILE_IMAGE_PATH
+      const updateQuery = `
+        UPDATE TBL_USERMASTER
+        SET
+          User_Name = @name,
+          Password = @password,
+          Mobile_Number = @mobileNumber,
+          EMail_Id = @email,
+          Role_Id = @userType,
+          IsActive = @isActive,
+          PROFILE_IMAGE_PATH = @profileImagePath,
+          Modified_Date = GETDATE(),
+          Modified_By = @userName
+        WHERE User_ID = @userName
+      `;
+
+      await this.db.query(updateQuery, {
+        userName: userData.userName,
+        name: userData.name,
+        password: encryptedPassword,
+        mobileNumber: userData.mobileNumber,
+        email: userData.email,
+        userType: userData.userType,
+        isActive: userData.isActive,
+        profileImagePath: userData.profileImagePath || null,
       });
+
+      this.logger.debug(
+        `User updated with SQL query: ${userData.userName}, profileImagePath: ${userData.profileImagePath || 'NULL'}`,
+      );
 
       return { message: 'User updated successfully' };
     } catch (error) {
@@ -342,7 +404,8 @@ This is an automated message. Please do not reply to this email.
           U.Mobile_Number,
           U.EMail_Id,
           U.Role_Id,
-          U.IsActive
+          U.IsActive,
+          U.PROFILE_IMAGE_PATH
         FROM TBL_USERMASTER U
         WHERE U.User_ID = @userId AND U.IsDeleted = 0
       `;
@@ -633,5 +696,272 @@ This is an automated message. Please do not reply to this email.
 
     const buffer = await Packer.toBuffer(doc);
     return buffer;
+  }
+
+  /**
+   * Update profile image path for a user
+   */
+  private async updateProfileImagePath(
+    userId: string,
+    profileImagePath: string | null,
+  ): Promise<void> {
+    try {
+      this.logger.debug(
+        `Updating PROFILE_IMAGE_PATH for user: ${userId} with path: ${profileImagePath}`,
+      );
+
+      // Handle NULL value properly in SQL
+      const query = profileImagePath
+        ? `
+          UPDATE TBL_USERMASTER
+          SET PROFILE_IMAGE_PATH = @profileImagePath,
+              Modified_Date = GETDATE(),
+              Modified_By = @userId
+          WHERE User_ID = @userId
+        `
+        : `
+          UPDATE TBL_USERMASTER
+          SET PROFILE_IMAGE_PATH = NULL,
+              Modified_Date = GETDATE(),
+              Modified_By = @userId
+          WHERE User_ID = @userId
+        `;
+
+      const result = await this.db.query(
+        query,
+        profileImagePath ? { userId, profileImagePath } : { userId },
+      );
+
+      // Log the result to verify update
+      this.logger.debug(
+        `Profile image path update query executed. Rows affected: ${result.rowsAffected?.[0] || 0}`,
+      );
+
+      // Verify the update was successful
+      const verifyQuery = `
+        SELECT PROFILE_IMAGE_PATH
+        FROM TBL_USERMASTER
+        WHERE User_ID = @userId
+      `;
+      const verifyResult = await this.db.query(verifyQuery, { userId });
+      const record = verifyResult.recordset?.[0] as Record<string, unknown>;
+      // Handle case-insensitive column name
+      const updatedPath = getCaseInsensitiveValue<string>(
+        record,
+        'PROFILE_IMAGE_PATH',
+      );
+
+      if (updatedPath === profileImagePath) {
+        this.logger.log(
+          `Successfully updated profile image path for user: ${userId}`,
+        );
+      } else {
+        this.logger.warn(
+          `Profile image path update may have failed. Expected: ${profileImagePath}, Got: ${updatedPath || 'NULL'}`,
+        );
+      }
+    } catch (error) {
+      this.logger.error(
+        `Error updating profile image path for user ${userId}:`,
+        error,
+      );
+      throw new BadRequestException('Failed to update profile image path');
+    }
+  }
+
+  /**
+   * Upload profile image for a user (legacy method - kept for backward compatibility)
+   */
+  async uploadProfileImage(
+    userId: string,
+    file: Express.Multer.File,
+  ): Promise<{ message: string; profileImagePath: string | null }> {
+    const result = await this.manageProfileImage(userId, file, 'update');
+    return {
+      message: result.message,
+      profileImagePath: result.profileImagePath || '',
+    };
+  }
+
+  /**
+   * Unified method to manage profile image: Add, Update, or Remove
+   * @param userId - User ID (email/username)
+   * @param file - Optional file for add/update operations
+   * @param action - 'add' | 'update' | 'remove'
+   */
+  async manageProfileImage(
+    userId: string,
+    file: Express.Multer.File | null,
+    action: 'add' | 'update' | 'remove' = 'update',
+  ): Promise<{
+    message: string;
+    profileImagePath: string | null;
+  }> {
+    try {
+      // Check if user exists
+      const exists = await this.checkUserId(userId);
+      if (!exists) {
+        throw new BadRequestException('User not found');
+      }
+
+      // Get existing profile image path
+      const user = await this.getUserById(userId);
+      const oldImagePath = getCaseInsensitiveValue<string>(
+        user as Record<string, unknown>,
+        'PROFILE_IMAGE_PATH',
+      );
+
+      // Handle remove action
+      if (action === 'remove') {
+        if (!oldImagePath) {
+        this.logger.warn(`No profile image to remove for user: ${userId}`);
+          return {
+            message: 'No profile image found to remove',
+            profileImagePath: null,
+          };
+        }
+
+        // Delete the image file
+        try {
+          await this.fileStorage.deleteFile(oldImagePath);
+          this.logger.log(`Deleted profile image file: ${oldImagePath}`);
+        } catch (deleteError) {
+          this.logger.warn(
+            `Failed to delete profile image file: ${oldImagePath}`,
+            deleteError,
+          );
+          // Continue to update database even if file deletion fails
+        }
+
+        // Set PROFILE_IMAGE_PATH to NULL in database
+        await this.updateProfileImagePath(userId, null);
+
+        return {
+          message: 'Profile image removed successfully',
+          profileImagePath: null,
+        };
+      }
+
+      // Handle add/update actions (require file)
+      if (!file) {
+        throw new BadRequestException(
+          'File is required for add/update operations',
+        );
+      }
+
+      // Save new profile image
+      const fileResult = await this.fileStorage.saveProfileImage(userId, file);
+
+      // Update profile image path in database
+      await this.updateProfileImagePath(userId, fileResult.filePath);
+
+      // Delete old image if it exists (for update scenario)
+      if (oldImagePath && action === 'update') {
+        try {
+          await this.fileStorage.deleteFile(oldImagePath);
+          this.logger.log(`Deleted old profile image: ${oldImagePath}`);
+        } catch (deleteError) {
+          // Log but don't fail if old image deletion fails
+          this.logger.warn(
+            `Failed to delete old profile image: ${oldImagePath}`,
+            deleteError,
+          );
+        }
+      }
+
+      const actionMessage =
+        action === 'add'
+          ? 'Profile image added successfully'
+          : 'Profile image updated successfully';
+
+      return {
+        message: actionMessage,
+        profileImagePath: fileResult.filePath,
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      this.logger.error('Error managing profile image', error);
+      throw new BadRequestException('Failed to manage profile image');
+    }
+  }
+
+  /**
+   * Get profile image file buffer for a user
+   */
+  async getProfileImageFile(
+    userId: string,
+  ): Promise<{ buffer: Buffer; contentType: string; filename: string }> {
+    try {
+      // Get user's profile image path
+      const user = await this.getUserById(userId);
+      const profileImagePath = getCaseInsensitiveValue<string>(
+        user as Record<string, unknown>,
+        'PROFILE_IMAGE_PATH',
+      );
+
+      if (!profileImagePath) {
+        throw new BadRequestException('Profile image not found for this user');
+      }
+
+      // Get upload base path
+      const uploadBasePath = this.fileStorage.getUploadBasePath();
+
+      // Construct full file path
+      let fullFilePath: string;
+      if (profileImagePath.startsWith('/')) {
+        // Remove leading slash and prepend upload base path
+        fullFilePath = join(uploadBasePath, profileImagePath.substring(1));
+      } else {
+        // Relative path, prepend upload base path
+        fullFilePath = join(uploadBasePath, profileImagePath);
+      }
+
+      // Check if file exists
+      if (!existsSync(fullFilePath)) {
+        this.logger.error(`Profile image file not found: ${fullFilePath}`);
+        throw new BadRequestException(
+          `Profile image file not found for user: ${userId}`,
+        );
+      }
+
+      // Read file buffer
+      const buffer = readFileSync(fullFilePath);
+
+      // Determine content type from file extension
+      const fileExtension = fullFilePath.toLowerCase().split('.').pop() || '';
+      let contentType = 'image/jpeg'; // default
+      if (fileExtension === 'png') {
+        contentType = 'image/png';
+      } else if (['jpg', 'jpeg'].includes(fileExtension)) {
+        contentType = 'image/jpeg';
+      } else if (fileExtension === 'gif') {
+        contentType = 'image/gif';
+      }
+
+      // Extract filename from path
+      const filename =
+        fullFilePath.split(/[/\\]/).pop() ||
+        `profile_${userId}.${fileExtension}`;
+
+      this.logger.log(
+        `Serving profile image for user: ${userId} (${filename})`,
+      );
+
+      return {
+        buffer,
+        contentType,
+        filename,
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      this.logger.error('Error getting profile image file', error);
+      throw new BadRequestException(
+        `Failed to retrieve profile image: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
   }
 }

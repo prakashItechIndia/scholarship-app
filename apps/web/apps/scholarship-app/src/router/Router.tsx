@@ -12,6 +12,7 @@ const SignInPage = lazy(() => import('../pages/auth/SignIn.tsx'));
 const CreatePasswordPage = lazy(() => import('../pages/auth/CreatePassword'));
 const ForgotPasswordPage = lazy(() => import('../pages/auth/ForgotPassword'));
 const ResetPasswordPage = lazy(() => import('../pages/auth/ResetPassword'));
+const AdminResetPasswordPage = lazy(() => import('../pages/auth/AdminResetPassword'));
 const ChangePasswordPage = lazy(() => import('../pages/auth/ChangePassword'));
 const ScholarshipChangePasswordPage = lazy(() => import('../pages/auth/ScholarshipChangePassword'));
 const MfaVerifyPage = lazy(() => import('../pages/auth/MfaVerify'));
@@ -102,6 +103,18 @@ export const Router = () => {
               <Suspense fallback={<LoadingScreen message="Loading..." />}>
                 <ErrorBoundary>
                   <ResetPasswordPage />
+                </ErrorBoundary>
+              </Suspense>
+            </RouteGuard>
+          }
+        />
+        <Route
+          path="/admin-reset-password"
+          element={
+            <RouteGuard path="/admin-reset-password">
+              <Suspense fallback={<LoadingScreen message="Loading..." />}>
+                <ErrorBoundary>
+                  <AdminResetPasswordPage />
                 </ErrorBoundary>
               </Suspense>
             </RouteGuard>

@@ -86,6 +86,28 @@ export const scholarshipAuth = {
       });
     return response.data;
   },
+
+  /**
+   * Request password reset (forgot password)
+   */
+  forgotPassword: async (email: string) => {
+    const response = await apiClient.post<{ message: string }>(
+      '/scholarship-auth/forgot-password',
+      { email },
+    );
+    return response.data;
+  },
+
+  /**
+   * Reset password using token
+   */
+  resetPassword: async (email: string, token: string, newPassword: string) => {
+    const response = await apiClient.post<{ message: string }>(
+      '/scholarship-auth/reset-password',
+      { email, token, newPassword },
+    );
+    return response.data;
+  },
 };
 
 /**
@@ -915,6 +937,40 @@ export const userManagement = {
    */
   deleteUser: async (userId: string) => {
     const response = await apiClient.delete(`/user-management/user/${encodeURIComponent(userId)}`);
+    return response.data;
+  },
+
+  /**
+   * Upload/Update profile image for a user
+   */
+  uploadProfileImage: async (
+    userId: string,
+    file: File,
+    action: 'add' | 'update' = 'update',
+  ) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('action', action);
+
+    const response = await apiClient.post<{
+      message: string;
+      profileImagePath: string | null;
+    }>(`/user-management/user/${encodeURIComponent(userId)}/profile-image`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  /**
+   * Remove profile image for a user
+   */
+  removeProfileImage: async (userId: string) => {
+    const response = await apiClient.delete<{
+      message: string;
+      profileImagePath: string | null;
+    }>(`/user-management/user/${encodeURIComponent(userId)}/profile-image`);
     return response.data;
   },
 };

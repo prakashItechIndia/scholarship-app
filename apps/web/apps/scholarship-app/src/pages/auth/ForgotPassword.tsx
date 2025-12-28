@@ -10,7 +10,7 @@ import { WelcomeText } from '@/components/auth/WelcomeText';
 import { SubmitButton } from '@/components/auth/SubmitButton';
 import { TermsOfServiceText } from '@/components/auth/TermsOfServiceText';
 import { EmailField } from '@/components/auth/EmailField';
-import { requestPasswordReset } from '../../services/auth.service';
+import { scholarshipAuth } from '../../services/scholarship.service';
 import { preserveQueryParams } from '../../utils/redirect';
 import { SEO } from '../../components/seo/SEO';
 import { Form } from '@shared/components';
@@ -21,12 +21,10 @@ import { generateOrganizationSchema } from '../../utils/schema';
 import adminLoginBanner from '@shared/assets/icons/adminLogin.png';
 
 const schema = z.object({
-  username: z
+  email: z
     .string()
-    .default('')
-    .refine((val) => val.trim().length > 0, {
-      message: 'Username is required',
-    }),
+    .min(1, 'Email is required')
+    .email('Please enter a valid email address'),
 });
 
 type ForgotPasswordFormData = z.infer<typeof schema>;
@@ -34,12 +32,9 @@ type ForgotPasswordFormData = z.infer<typeof schema>;
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
   const [emailSent, setEmailSent] = useState(false);
-  const [enteredUsername, setEnteredUsername] = useState('');
+  const [enteredEmail, setEnteredEmail] = useState('');
   const { success, error } = useToast();
   const [searchParams] = useSearchParams();
-  const returnUrl =
-    searchParams.get('redirect') ?? searchParams.get('returnUrl');
-  const productCode = searchParams.get('product');
 
   const form = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(schema),
@@ -62,15 +57,14 @@ const ForgotPasswordPage = () => {
   });
 
   const mutation = useMutation({
-    mutationFn: (username: string) =>
-      requestPasswordReset(username, returnUrl ?? undefined, productCode ?? undefined),
+    mutationFn: (email: string) => scholarshipAuth.forgotPassword(email),
     onSuccess: (data) => {
       success(
         'Success',
         data.message || 'Password reset email sent successfully. Please check your inbox.',
       );
       setEmailSent(true);
-      setEnteredUsername(getValues('username'));
+      setEnteredEmail(getValues('email'));
     },
     onError: (err: Error) => {
       error(
@@ -81,7 +75,7 @@ const ForgotPasswordPage = () => {
   });
 
   const onSubmit = (values: ForgotPasswordFormData) => {
-    mutation.mutate(values.username);
+    mutation.mutate(values.email);
   };
 
   const signInUrl = preserveQueryParams('/admin-login', [
@@ -91,9 +85,10 @@ const ForgotPasswordPage = () => {
   ]);
 
   if (emailSent) {
-    const maskedUsername = enteredUsername.length > 2
-      ? `${enteredUsername.substring(0, 2)}${'*'.repeat(Math.min(enteredUsername.length - 2, 5))}`
-      : enteredUsername;
+    const emailParts = enteredEmail.split('@');
+    const maskedEmail = emailParts.length === 2
+      ? `${enteredEmail.substring(0, 2)}${'*'.repeat(Math.min(enteredEmail.length - 2, 5))}@${emailParts[1]}`
+      : enteredEmail;
 
     return (
       <>
@@ -109,12 +104,12 @@ const ForgotPasswordPage = () => {
           
           <WelcomeText 
             variant="email" 
-            subtitle="If the username exists, a password reset link has been sent to your email address."
+            subtitle="If the email exists, a password reset link has been sent to your email address."
           />
 
           <div className="space-y-6">
             <div className="rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-700 border border-blue-200">
-              <strong>{maskedUsername}</strong>
+              <strong>{maskedEmail}</strong>
             </div>
             <p className="text-sm text-Neutral-Foreground-2-Rest">
               Please check your inbox and click the reset link to create a new
@@ -136,7 +131,7 @@ const ForgotPasswordPage = () => {
     <>
       <SEO
         title="Forgot Password - Admin"
-        description="Reset your Leo Muthu Scholarship admin account password. Enter your username and we'll send you a secure password reset link."
+        description="Reset your Leo Muthu Scholarship admin account password. Enter your email address and we'll send you a secure password reset link."
         url="/forgot-password"
         keywords="forgot password, password reset, recover account, admin password"
         noindex={true}
@@ -147,7 +142,7 @@ const ForgotPasswordPage = () => {
         
         <WelcomeText 
           variant="email" 
-          subtitle="Enter your username and we'll send you a link to reset your password."
+          subtitle="Enter your email address and we'll send you a link to reset your password."
         />
 
         <Form {...form}>
@@ -155,9 +150,9 @@ const ForgotPasswordPage = () => {
             <Stack tokens={{ childrenGap: 24 }}>
               <EmailField 
                 control={form.control} 
-                name="username" 
+                name="email" 
                 variant="password" 
-                placeholder="Enter your username"
+                placeholder="Enter your email address"
               />
 
               <Stack tokens={{ childrenGap: 8 }}>
