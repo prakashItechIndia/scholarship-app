@@ -20,7 +20,7 @@ interface BaseFormFieldProps {
 export const TextInputField = ({ name, control, errors, label, required, placeholder }: BaseFormFieldProps) => {
     const tokens = useThemeTokens();
     const fieldStyles = getFieldStyles(tokens);
-    
+
     return (
         <Controller
             name={name}
@@ -71,7 +71,7 @@ interface DropdownFieldProps extends BaseFormFieldProps {
 export const DropdownField = ({ name, control, errors, label, required, options, placeholder }: DropdownFieldProps) => {
     const tokens = useThemeTokens();
     const fieldStyles = getFieldStyles(tokens);
-    
+
     return (
         <Controller
             name={name}
@@ -157,18 +157,28 @@ export const ChoiceGroupField = ({ name, control, errors, label, required, optio
                 name={name}
                 control={control}
                 render={({ field }) => (
-                    <ChoiceGroup
-                        selectedKey={field.value}
-                        options={options}
-                        onChange={(_, option) => field.onChange(option?.key)}
-                        styles={{
-                            flexContainer: {
-                                display: 'flex',
-                                flexDirection: 'row',
-                                gap: '24px',
-                            },
-                        }}
-                    />
+                    <div>
+                        <ChoiceGroup
+                            selectedKey={field.value}
+                            options={options}
+                            onChange={(_, option) => field.onChange(option?.key)}
+                            styles={{
+                                flexContainer: {
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    gap: '24px',
+                                },
+                            }}
+                        />
+                        {errorMessage && (
+                            <span
+                                className="text-[#a4262c] text-[12px] font-normal pt-1 block"
+                                role="alert"
+                            >
+                                {errorMessage}
+                            </span>
+                        )}
+                    </div>
                 )}
             />
         </FormField>
@@ -200,21 +210,21 @@ interface IfscCodeFieldProps extends BaseFormFieldProps {
 export const IfscCodeField = ({ name, control, errors, label, required, placeholder, onLookupClick }: IfscCodeFieldProps) => {
     return (
         <div className="w-full">
-        <Controller
-            name={name}
-            control={control}
+            <Controller
+                name={name}
+                control={control}
                 render={({ field }) => (
-                <Stack tokens={{ childrenGap: 4 }} className="w-full" styles={{ root: { alignItems: 'flex-start' } }}>
-                    {/* Label and Lookup Link on same line with justify-between */}
-                    <div className="flex justify-between items-center w-full" style={{ minHeight: '20px' }}>
-                        <Label required={required} className="!text-[#242424] !text-[13px] !mb-0 !font-medium">{label}</Label>
-                        <span 
-                            className="text-red-600 dark:text-red-400 text-xs cursor-pointer font-medium hover:underline"
-                            onClick={onLookupClick}
-                        >
-                            (Lookup IFSC Code)
-                        </span>
-                    </div>
+                    <Stack tokens={{ childrenGap: 4 }} className="w-full" styles={{ root: { alignItems: 'flex-start' } }}>
+                        {/* Label and Lookup Link on same line with justify-between */}
+                        <div className="flex justify-between items-center w-full" style={{ minHeight: '20px' }}>
+                            <Label required={required} className="!text-[#242424] !text-[13px] !mb-0 !font-medium">{label}</Label>
+                            <span
+                                className="text-red-600 dark:text-red-400 text-xs cursor-pointer font-medium hover:underline"
+                                onClick={onLookupClick}
+                            >
+                                (Lookup IFSC Code)
+                            </span>
+                        </div>
                         <div className="w-full">
                             <Input
                                 {...field}
@@ -231,11 +241,11 @@ export const IfscCodeField = ({ name, control, errors, label, required, placehol
                                         field.onChange(upperValue);
                                     }
                                 }}
-                    />
+                            />
                         </div>
-                </Stack>
-            )}
-        />
+                    </Stack>
+                )}
+            />
         </div>
     );
 };

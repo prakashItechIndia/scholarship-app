@@ -657,8 +657,8 @@ const UserDashboard: React.FC = () => {
             </h2>
             <p
               style={{
-                fontSize: "14px",
-                lineHeight: "20px",
+                fontSize: "12px",
+                lineHeight: "16px",
                 fontWeight: 400,
                 color: "#616161",
                 fontFamily: "'Inter', sans-serif",
@@ -668,14 +668,14 @@ const UserDashboard: React.FC = () => {
               Track the progress of your submitted application
             </p>
           </div>
-          <div className="flex items-center gap-1 mt-4 md:mt-0 px-6 md:px-0 md:mr-0 mb-6 md:mb-0">
+          <div className="flex items-center gap-[2px] mt-4 md:mt-0 px-6 md:px-0 md:mr-0 mb-6 md:mb-0">
             <Button
               variant="default"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "8px",
-                padding: "8px 16px",
+                padding: "8px 10px",
                 fontSize: "14px",
                 lineHeight: "20px",
                 fontWeight: 500,
@@ -685,7 +685,7 @@ const UserDashboard: React.FC = () => {
                 borderRadius: "8px",
                 cursor: "pointer",
                 marginRight: "0",
-                marginLeft: "24px",
+                marginLeft: "0", // Removed marginLeft
               }}
               onClick={() => navigate("/registration")}
             >

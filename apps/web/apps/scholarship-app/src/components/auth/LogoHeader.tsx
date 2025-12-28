@@ -30,7 +30,7 @@ export const LogoHeader = ({ variant = 'email' }: LogoHeaderProps) => {
     <Stack styles={{ root: { position: 'relative', zIndex: 1 } }}>
       <LogoWithText
         logoSize="45px"
-        titleSize="lg"
+        titleSize="md"
         subtitleSize="xs"
         gap="12px"
       />

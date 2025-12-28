@@ -204,11 +204,11 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
     window.location.href = '/admin-login';
   };
 
-  const isIndexPage = location.pathname === "/user-dashboard";
+  const isUserDashboard = location.pathname === "/User-dashboard";
 
   const topNavConfig: TopNavProps = {
-    className: isIndexPage ? "bg-[#2453C3] border-b border-[#1e45a3]" : "bg-white border-b border-gray-200",
-    left: <NavbarLogo textColor={isIndexPage ? "#ffffff" : undefined} subtitleColor={isIndexPage ? "#e0e0e0" : undefined} />,
+    className: isUserDashboard ? "bg-[#2453C3] border-b border-[#1e45a3]" : "bg-white border-b border-gray-200",
+    left: <NavbarLogo textColor={isUserDashboard ? "#ffffff" : undefined} subtitleColor={isUserDashboard ? "#e0e0e0" : undefined} />,
     right: (
       <div className="flex items-center gap-6">
         {!hideSidebar && (
@@ -216,16 +216,16 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
             onClick={() => console.log("Search clicked")}
             aria-label="Search"
           >
-            <SearchRegular className={`w-[20px] h-[20px] ${isIndexPage ? "text-[#ffffff]" : "text-[#616161]"}`} />
+            <SearchRegular className={`w-[20px] h-[20px] ${isUserDashboard ? "text-[#ffffff]" : "text-[#616161]"}`} />
           </div>
         )}
         <div
           onClick={() => console.log("Notifications clicked")}
         >
-          <AlertBadgeRegular className={`w-[20px] h-[20px] ${isIndexPage ? "text-[#ffffff]" : "text-[#616161]"}`} />
+          <AlertBadgeRegular className={`w-[20px] h-[20px] ${isUserDashboard ? "text-[#ffffff]" : "text-[#616161]"}`} />
         </div>
         {/* Vertical separator */}
-        <div className={`h-6 w-px ${isIndexPage ? "bg-[#ffffff]/30" : "bg-[#E0E0E0]"}`}></div>
+        <div className={`h-6 w-px ${isUserDashboard ? "bg-[#ffffff]/30" : "bg-[#E0E0E0]"}`}></div>
         <ProfilePopover
           userName={userName}
           userRole={userRole}
@@ -322,8 +322,8 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
                 color: "#ffffff",
                 border: "none",
                 borderRadius: "8px",
-                height:"32px",
-                width:"96px"
+                height: "32px",
+                width: "96px"
               }}
             >
               Logout
@@ -341,8 +341,8 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
                 color: "#242424",
                 border: "1px solid #d1d1d1",
                 borderRadius: "8px",
-                height:"32px",
-                width:"96px"
+                height: "32px",
+                width: "96px"
               }}
             >
               Cancel
