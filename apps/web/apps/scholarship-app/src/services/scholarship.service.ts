@@ -86,6 +86,28 @@ export const scholarshipAuth = {
       });
     return response.data;
   },
+
+  /**
+   * Request password reset (forgot password)
+   */
+  forgotPassword: async (email: string) => {
+    const response = await apiClient.post<{ message: string }>(
+      '/scholarship-auth/forgot-password',
+      { email },
+    );
+    return response.data;
+  },
+
+  /**
+   * Reset password using token
+   */
+  resetPassword: async (email: string, token: string, newPassword: string) => {
+    const response = await apiClient.post<{ message: string }>(
+      '/scholarship-auth/reset-password',
+      { email, token, newPassword },
+    );
+    return response.data;
+  },
 };
 
 /**

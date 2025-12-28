@@ -187,11 +187,49 @@ export interface InlineObject5 {
      * @type {string}
      * @memberof InlineObject5
      */
-    password: string;
+    token: string;
     /**
      * 
      * @type {string}
      * @memberof InlineObject5
+     */
+    newPassword: string;
+}
+/**
+ * 
+ * @export
+ * @interface InlineObject6
+ */
+export interface InlineObject6 {
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject6
+     */
+    email: string;
+}
+/**
+ * 
+ * @export
+ * @interface InlineObject7
+ */
+export interface InlineObject7 {
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject7
+     */
+    email: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject7
+     */
+    password: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineObject7
      */
     token?: string;
 }
@@ -7007,13 +7045,13 @@ export const ScholarshipApplicationApiAxiosParamCreator = function (configuratio
         /**
          * 
          * @summary Send verification email for new user onboarding
-         * @param {InlineObject4} inlineObject4 
+         * @param {InlineObject6} inlineObject6 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        scholarshipApplicationControllerSendVerificationEmail: async (inlineObject4: InlineObject4, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'inlineObject4' is not null or undefined
-            assertParamExists('scholarshipApplicationControllerSendVerificationEmail', 'inlineObject4', inlineObject4)
+        scholarshipApplicationControllerSendVerificationEmail: async (inlineObject6: InlineObject6, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'inlineObject6' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerSendVerificationEmail', 'inlineObject6', inlineObject6)
             const localVarPath = `/scholarship-application/send-verification-email`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7033,7 +7071,7 @@ export const ScholarshipApplicationApiAxiosParamCreator = function (configuratio
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject4, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject6, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -7043,13 +7081,13 @@ export const ScholarshipApplicationApiAxiosParamCreator = function (configuratio
         /**
          * 
          * @summary Set password for new user (onboarding completion)
-         * @param {InlineObject5} inlineObject5 
+         * @param {InlineObject7} inlineObject7 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        scholarshipApplicationControllerSetNewPassword: async (inlineObject5: InlineObject5, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'inlineObject5' is not null or undefined
-            assertParamExists('scholarshipApplicationControllerSetNewPassword', 'inlineObject5', inlineObject5)
+        scholarshipApplicationControllerSetNewPassword: async (inlineObject7: InlineObject7, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'inlineObject7' is not null or undefined
+            assertParamExists('scholarshipApplicationControllerSetNewPassword', 'inlineObject7', inlineObject7)
             const localVarPath = `/scholarship-application/set-password`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7069,7 +7107,7 @@ export const ScholarshipApplicationApiAxiosParamCreator = function (configuratio
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject5, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject7, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -7247,23 +7285,23 @@ export const ScholarshipApplicationApiFp = function(configuration?: Configuratio
         /**
          * 
          * @summary Send verification email for new user onboarding
-         * @param {InlineObject4} inlineObject4 
+         * @param {InlineObject6} inlineObject6 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async scholarshipApplicationControllerSendVerificationEmail(inlineObject4: InlineObject4, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerSendVerificationEmail(inlineObject4, options);
+        async scholarshipApplicationControllerSendVerificationEmail(inlineObject6: InlineObject6, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerSendVerificationEmail(inlineObject6, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
          * @summary Set password for new user (onboarding completion)
-         * @param {InlineObject5} inlineObject5 
+         * @param {InlineObject7} inlineObject7 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async scholarshipApplicationControllerSetNewPassword(inlineObject5: InlineObject5, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerSetNewPassword(inlineObject5, options);
+        async scholarshipApplicationControllerSetNewPassword(inlineObject7: InlineObject7, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipApplicationControllerSetNewPassword(inlineObject7, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -7383,22 +7421,22 @@ export const ScholarshipApplicationApiFactory = function (configuration?: Config
         /**
          * 
          * @summary Send verification email for new user onboarding
-         * @param {InlineObject4} inlineObject4 
+         * @param {InlineObject6} inlineObject6 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        scholarshipApplicationControllerSendVerificationEmail(inlineObject4: InlineObject4, options?: any): AxiosPromise<void> {
-            return localVarFp.scholarshipApplicationControllerSendVerificationEmail(inlineObject4, options).then((request) => request(axios, basePath));
+        scholarshipApplicationControllerSendVerificationEmail(inlineObject6: InlineObject6, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerSendVerificationEmail(inlineObject6, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Set password for new user (onboarding completion)
-         * @param {InlineObject5} inlineObject5 
+         * @param {InlineObject7} inlineObject7 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        scholarshipApplicationControllerSetNewPassword(inlineObject5: InlineObject5, options?: any): AxiosPromise<void> {
-            return localVarFp.scholarshipApplicationControllerSetNewPassword(inlineObject5, options).then((request) => request(axios, basePath));
+        scholarshipApplicationControllerSetNewPassword(inlineObject7: InlineObject7, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipApplicationControllerSetNewPassword(inlineObject7, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -7531,25 +7569,25 @@ export class ScholarshipApplicationApi extends BaseAPI {
     /**
      * 
      * @summary Send verification email for new user onboarding
-     * @param {InlineObject4} inlineObject4 
+     * @param {InlineObject6} inlineObject6 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScholarshipApplicationApi
      */
-    public scholarshipApplicationControllerSendVerificationEmail(inlineObject4: InlineObject4, options?: any) {
-        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerSendVerificationEmail(inlineObject4, options).then((request) => request(this.axios, this.basePath));
+    public scholarshipApplicationControllerSendVerificationEmail(inlineObject6: InlineObject6, options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerSendVerificationEmail(inlineObject6, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Set password for new user (onboarding completion)
-     * @param {InlineObject5} inlineObject5 
+     * @param {InlineObject7} inlineObject7 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScholarshipApplicationApi
      */
-    public scholarshipApplicationControllerSetNewPassword(inlineObject5: InlineObject5, options?: any) {
-        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerSetNewPassword(inlineObject5, options).then((request) => request(this.axios, this.basePath));
+    public scholarshipApplicationControllerSetNewPassword(inlineObject7: InlineObject7, options?: any) {
+        return ScholarshipApplicationApiFp(this.configuration).scholarshipApplicationControllerSetNewPassword(inlineObject7, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -7622,6 +7660,42 @@ export const ScholarshipAuthenticationApiAxiosParamCreator = function (configura
         },
         /**
          * 
+         * @summary Request password reset for admin user
+         * @param {InlineObject4} inlineObject4 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipAuthControllerForgotPassword: async (inlineObject4: InlineObject4, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'inlineObject4' is not null or undefined
+            assertParamExists('scholarshipAuthControllerForgotPassword', 'inlineObject4', inlineObject4)
+            const localVarPath = `/scholarship-auth/forgot-password`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject4, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Admin login for scholarship portal
          * @param {string} userAgent 
          * @param {InlineObject} inlineObject 
@@ -7657,6 +7731,42 @@ export const ScholarshipAuthenticationApiAxiosParamCreator = function (configura
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(inlineObject, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Reset password using token
+         * @param {InlineObject5} inlineObject5 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipAuthControllerResetPassword: async (inlineObject5: InlineObject5, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'inlineObject5' is not null or undefined
+            assertParamExists('scholarshipAuthControllerResetPassword', 'inlineObject5', inlineObject5)
+            const localVarPath = `/scholarship-auth/reset-password`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject5, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -7772,6 +7882,17 @@ export const ScholarshipAuthenticationApiFp = function(configuration?: Configura
         },
         /**
          * 
+         * @summary Request password reset for admin user
+         * @param {InlineObject4} inlineObject4 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipAuthControllerForgotPassword(inlineObject4: InlineObject4, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipAuthControllerForgotPassword(inlineObject4, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Admin login for scholarship portal
          * @param {string} userAgent 
          * @param {InlineObject} inlineObject 
@@ -7780,6 +7901,17 @@ export const ScholarshipAuthenticationApiFp = function(configuration?: Configura
          */
         async scholarshipAuthControllerLogin(userAgent: string, inlineObject: InlineObject, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipAuthControllerLogin(userAgent, inlineObject, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Reset password using token
+         * @param {InlineObject5} inlineObject5 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scholarshipAuthControllerResetPassword(inlineObject5: InlineObject5, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scholarshipAuthControllerResetPassword(inlineObject5, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -7828,6 +7960,16 @@ export const ScholarshipAuthenticationApiFactory = function (configuration?: Con
         },
         /**
          * 
+         * @summary Request password reset for admin user
+         * @param {InlineObject4} inlineObject4 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipAuthControllerForgotPassword(inlineObject4: InlineObject4, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipAuthControllerForgotPassword(inlineObject4, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Admin login for scholarship portal
          * @param {string} userAgent 
          * @param {InlineObject} inlineObject 
@@ -7836,6 +7978,16 @@ export const ScholarshipAuthenticationApiFactory = function (configuration?: Con
          */
         scholarshipAuthControllerLogin(userAgent: string, inlineObject: InlineObject, options?: any): AxiosPromise<void> {
             return localVarFp.scholarshipAuthControllerLogin(userAgent, inlineObject, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Reset password using token
+         * @param {InlineObject5} inlineObject5 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scholarshipAuthControllerResetPassword(inlineObject5: InlineObject5, options?: any): AxiosPromise<void> {
+            return localVarFp.scholarshipAuthControllerResetPassword(inlineObject5, options).then((request) => request(axios, basePath));
         },
         /**
          * Authenticates user via OAuth provider. Follows same flow as manual login - only authentication source differs.
@@ -7883,6 +8035,18 @@ export class ScholarshipAuthenticationApi extends BaseAPI {
 
     /**
      * 
+     * @summary Request password reset for admin user
+     * @param {InlineObject4} inlineObject4 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipAuthenticationApi
+     */
+    public scholarshipAuthControllerForgotPassword(inlineObject4: InlineObject4, options?: any) {
+        return ScholarshipAuthenticationApiFp(this.configuration).scholarshipAuthControllerForgotPassword(inlineObject4, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Admin login for scholarship portal
      * @param {string} userAgent 
      * @param {InlineObject} inlineObject 
@@ -7892,6 +8056,18 @@ export class ScholarshipAuthenticationApi extends BaseAPI {
      */
     public scholarshipAuthControllerLogin(userAgent: string, inlineObject: InlineObject, options?: any) {
         return ScholarshipAuthenticationApiFp(this.configuration).scholarshipAuthControllerLogin(userAgent, inlineObject, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Reset password using token
+     * @param {InlineObject5} inlineObject5 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScholarshipAuthenticationApi
+     */
+    public scholarshipAuthControllerResetPassword(inlineObject5: InlineObject5, options?: any) {
+        return ScholarshipAuthenticationApiFp(this.configuration).scholarshipAuthControllerResetPassword(inlineObject5, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

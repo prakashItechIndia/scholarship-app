@@ -4,9 +4,10 @@ import { ConfigModule } from '@nestjs/config';
 import { ScholarshipAuthController } from './scholarship-auth.controller';
 import { ScholarshipAuthService } from './scholarship-auth.service';
 import { DatabaseModule } from '../../database';
+import { EmailModule } from '../email/email.module';
 
 @Module({
-  imports: [DatabaseModule, HttpModule, ConfigModule],
+  imports: [DatabaseModule, HttpModule, ConfigModule, EmailModule],
   controllers: [ScholarshipAuthController],
   providers: [ScholarshipAuthService],
   exports: [ScholarshipAuthService],

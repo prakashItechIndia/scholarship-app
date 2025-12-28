@@ -54,6 +54,11 @@ export const routeConfig: RouteConfig[] = [
     isPublic: true,
   },
   {
+    path: '/admin-reset-password',
+    requiresAuth: false,
+    isPublic: true,
+  },
+  {
     path: '/change-password',
     requiresAuth: true,
     screenUrl: '/change-password',

@@ -180,8 +180,19 @@ export class RoleManagementController {
     status: 200,
     description: 'User permissions retrieved successfully',
   })
+  @ApiResponse({
+    status: 200,
+    description: 'User has no permissions (empty screens array)',
+  })
   async getUserPermissions(@Param('userId', ParseIntPipe) userId: number) {
-    return this.permissionsService.getUserPermissions(userId);
+    const permissions = await this.permissionsService.getUserPermissions(userId);
+    // Return empty object with screens array if null, instead of null
+    return permissions || {
+      userId,
+      roleId: 0,
+      roleName: '',
+      screens: [],
+    };
   }
 
   @Get('user/:userId/has-permission')
