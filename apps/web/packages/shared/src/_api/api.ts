@@ -8324,6 +8324,40 @@ export const UserManagementApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * 
+         * @summary Get user profile image
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerGetProfileImage: async (userId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('userManagementControllerGetProfileImage', 'userId', userId)
+            const localVarPath = `/user-management/user/{userId}/profile-image`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get user by ID
          * @param {string} userId 
          * @param {*} [options] Override http request option.
@@ -8372,6 +8406,88 @@ export const UserManagementApiAxiosParamCreator = function (configuration?: Conf
             }
 
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Upload a file to add/update profile image, or send action=remove to delete existing image
+         * @summary Manage user profile image (Add, Update, or Remove)
+         * @param {string} userId 
+         * @param {any} [file] Image file (required for add/update, optional for remove)
+         * @param {string} [action] Action to perform: add (first time), update (replace existing), remove (delete)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerManageProfileImage: async (userId: string, file?: any, action?: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('userManagementControllerManageProfileImage', 'userId', userId)
+            const localVarPath = `/user-management/user/{userId}/profile-image`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+
+            if (file !== undefined) { 
+                localVarFormParams.append('file', file as any);
+            }
+    
+            if (action !== undefined) { 
+                localVarFormParams.append('action', action as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Remove user profile image
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerRemoveProfileImage: async (userId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('userManagementControllerRemoveProfileImage', 'userId', userId)
+            const localVarPath = `/user-management/user/{userId}/profile-image`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -8489,6 +8605,17 @@ export const UserManagementApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get user profile image
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userManagementControllerGetProfileImage(userId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userManagementControllerGetProfileImage(userId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get user by ID
          * @param {string} userId 
          * @param {*} [options] Override http request option.
@@ -8506,6 +8633,30 @@ export const UserManagementApiFp = function(configuration?: Configuration) {
          */
         async userManagementControllerGetUserTypes(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.userManagementControllerGetUserTypes(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Upload a file to add/update profile image, or send action=remove to delete existing image
+         * @summary Manage user profile image (Add, Update, or Remove)
+         * @param {string} userId 
+         * @param {any} [file] Image file (required for add/update, optional for remove)
+         * @param {string} [action] Action to perform: add (first time), update (replace existing), remove (delete)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userManagementControllerManageProfileImage(userId: string, file?: any, action?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userManagementControllerManageProfileImage(userId, file, action, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Remove user profile image
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userManagementControllerRemoveProfileImage(userId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userManagementControllerRemoveProfileImage(userId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -8586,6 +8737,16 @@ export const UserManagementApiFactory = function (configuration?: Configuration,
         },
         /**
          * 
+         * @summary Get user profile image
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerGetProfileImage(userId: string, options?: any): AxiosPromise<any> {
+            return localVarFp.userManagementControllerGetProfileImage(userId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get user by ID
          * @param {string} userId 
          * @param {*} [options] Override http request option.
@@ -8602,6 +8763,28 @@ export const UserManagementApiFactory = function (configuration?: Configuration,
          */
         userManagementControllerGetUserTypes(options?: any): AxiosPromise<void> {
             return localVarFp.userManagementControllerGetUserTypes(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Upload a file to add/update profile image, or send action=remove to delete existing image
+         * @summary Manage user profile image (Add, Update, or Remove)
+         * @param {string} userId 
+         * @param {any} [file] Image file (required for add/update, optional for remove)
+         * @param {string} [action] Action to perform: add (first time), update (replace existing), remove (delete)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerManageProfileImage(userId: string, file?: any, action?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.userManagementControllerManageProfileImage(userId, file, action, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Remove user profile image
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerRemoveProfileImage(userId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.userManagementControllerRemoveProfileImage(userId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -8690,6 +8873,18 @@ export class UserManagementApi extends BaseAPI {
 
     /**
      * 
+     * @summary Get user profile image
+     * @param {string} userId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserManagementApi
+     */
+    public userManagementControllerGetProfileImage(userId: string, options?: any) {
+        return UserManagementApiFp(this.configuration).userManagementControllerGetProfileImage(userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Get user by ID
      * @param {string} userId 
      * @param {*} [options] Override http request option.
@@ -8709,6 +8904,32 @@ export class UserManagementApi extends BaseAPI {
      */
     public userManagementControllerGetUserTypes(options?: any) {
         return UserManagementApiFp(this.configuration).userManagementControllerGetUserTypes(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Upload a file to add/update profile image, or send action=remove to delete existing image
+     * @summary Manage user profile image (Add, Update, or Remove)
+     * @param {string} userId 
+     * @param {any} [file] Image file (required for add/update, optional for remove)
+     * @param {string} [action] Action to perform: add (first time), update (replace existing), remove (delete)
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserManagementApi
+     */
+    public userManagementControllerManageProfileImage(userId: string, file?: any, action?: string, options?: any) {
+        return UserManagementApiFp(this.configuration).userManagementControllerManageProfileImage(userId, file, action, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Remove user profile image
+     * @param {string} userId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserManagementApi
+     */
+    public userManagementControllerRemoveProfileImage(userId: string, options?: any) {
+        return UserManagementApiFp(this.configuration).userManagementControllerRemoveProfileImage(userId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

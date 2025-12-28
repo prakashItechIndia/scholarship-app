@@ -49,6 +49,7 @@ export class FileStorageService {
       'BarcodeImage',
       'TempImage',
       'DD_Check_DT',
+      'user_profile_images',
     ];
 
     directories.forEach((dir) => {
@@ -303,6 +304,47 @@ export class FileStorageService {
   private getFileExtension(filename: string): string {
     const lastDot = filename.lastIndexOf('.');
     return lastDot !== -1 ? filename.substring(lastDot) : '';
+  }
+
+  /**
+   * Save user profile image
+   * Pattern: /user_profile_images/{userId}_{timestamp}.{ext}
+   */
+  async saveProfileImage(
+    userId: string,
+    file: Express.Multer.File,
+  ): Promise<FileUploadResult> {
+    try {
+      const profileImagesFolder = join(
+        this.uploadBasePath,
+        'user_profile_images',
+      );
+
+      // Get file extension
+      const fileExtension = this.getFileExtension(file.originalname);
+
+      // Create filename: {userId}_{timestamp}.{ext}
+      const timestamp = Date.now();
+      const fileName = `${userId}_${timestamp}${fileExtension}`;
+      const filePath = join(profileImagesFolder, fileName);
+
+      // Save file
+      writeFileSync(filePath, file.buffer);
+
+      // Return relative path (matching old system format)
+      const relativePath = `/user_profile_images/${fileName}`;
+
+      this.logger.log(`Saved profile image: ${relativePath}`);
+
+      return {
+        filePath: relativePath,
+        fileName,
+        fullPath: filePath,
+      };
+    } catch (error) {
+      this.logger.error(`Error saving profile image: ${error}`);
+      throw error;
+    }
   }
 
   /**
