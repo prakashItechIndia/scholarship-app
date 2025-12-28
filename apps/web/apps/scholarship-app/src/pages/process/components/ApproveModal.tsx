@@ -263,7 +263,7 @@ const ApproveModal: React.FC<ApproveModalProps> = ({
                     <Button
                         appearance="primary"
                         onClick={() => onOpenChange(false)}
-                        style={{ backgroundColor: "#0F6CBD", color: "white", minWidth: "120px", marginTop: "10px" }}
+                        style={{ backgroundColor: "#2453C3", color: "white", minWidth: "120px", marginTop: "10px" }}
                     >
                         Close
                     </Button>
@@ -354,7 +354,7 @@ const ApproveModal: React.FC<ApproveModalProps> = ({
                             appearance="primary"
                             onClick={handleSubmit}
                             disabled={loading || !approvedAmount}
-                            style={{ backgroundColor: "#0F6CBD", color: "white", minWidth: "100px", display: "flex", alignItems: "center", gap: "8px" }}
+                            style={{ backgroundColor: "#2453C3", color: "white", minWidth: "100px", display: "flex", alignItems: "center", gap: "8px" }}
                         >
                             {loading ? (
                                 <>

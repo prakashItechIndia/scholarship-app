@@ -16,7 +16,7 @@ export class AppController {
   })
   getRoot() {
     return {
-      service: 'iCaptur SSO Service',
+      service: 'Scholarship Management',
       version: '1.0.0',
       status: 'running',
       endpoints: {

@@ -250,7 +250,7 @@ export const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
                       width: "4px",
                       height: "4px",
                       borderRadius: "50%",
-                      backgroundColor: isSelected ? "#2453C3" : "#0f6cbd",
+                      backgroundColor: "#2453C3",
                       marginTop: "2px"
                     }} />
                   )}

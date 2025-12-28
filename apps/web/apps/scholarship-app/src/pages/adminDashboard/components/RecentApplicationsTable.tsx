@@ -175,7 +175,7 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
     }}>
       <div style={{
         marginBottom: "16px",
-        marginTop: "-14px",
+        // marginTop: "-14px",
       }}>
         <h3 style={{
           fontSize: "16px",

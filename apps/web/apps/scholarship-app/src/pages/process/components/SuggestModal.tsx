@@ -234,7 +234,7 @@ const SuggestModal: React.FC<SuggestModalProps> = ({
                     <Button
                         appearance="primary"
                         onClick={() => onOpenChange(false)}
-                        style={{ backgroundColor: "#0F6CBD", color: "white", minWidth: "120px", marginTop: "10px" }}
+                        style={{ backgroundColor: "#2453C3", color: "white", minWidth: "120px", marginTop: "10px" }}
                     >
                         Close
                     </Button>
@@ -325,7 +325,7 @@ const SuggestModal: React.FC<SuggestModalProps> = ({
                             appearance="primary"
                             onClick={handleSubmit}
                             disabled={loading || !suggestedAmount}
-                            style={{ backgroundColor: "#0F6CBD", color: "white", minWidth: "100px" }}
+                            style={{ backgroundColor: "#2453C3", color: "white", minWidth: "100px" }}
                         >
                             Suggest
                         </Button>

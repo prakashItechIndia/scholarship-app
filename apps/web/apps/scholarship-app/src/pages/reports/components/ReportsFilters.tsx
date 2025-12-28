@@ -40,12 +40,18 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
           reports.getAcademicYears(),
           reports.getChequeIssuedBy(),
         ]);
-        setAcademicYears(
-          years.map((y: any) => ({
-            value: y.ScholarshipYear_Id?.toString() || "",
-            label: y.ScholarshipYear_Code || "",
-          }))
-        );
+        const academicYearsMapped = years.map((y: any) => ({
+          value: y.ScholarshipYear_Id?.toString() || "",
+          label: y.ScholarshipYear_Code || "",
+        }));
+        setAcademicYears(academicYearsMapped);
+        // Auto-select the first academic year if none is selected
+        if (academicYearsMapped.length > 0 && !filters.academicYear) {
+          const firstYearId = Number(academicYearsMapped[0].value);
+          if (!isNaN(firstYearId)) {
+            onFilterUpdate("academicYear", firstYearId);
+          }
+        }
         setChequeIssuedByOptions(
           issuedBy.map((item: any) => ({
             value: item.Id?.toString() || "",
@@ -57,6 +63,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
       }
     };
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFilterChange = (key: keyof ReportFilters, value: any) => {
@@ -162,6 +169,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
                 onValueChange={(value) =>
                   handleFilterChange("academicYear", value ? Number(value) : undefined)
                 }
+                style={{ width: "100%", height: "32px" }}
               />
             </div>
 
@@ -208,6 +216,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
                 options={genderOptions}
                 selectedKey={filters.gender || ""}
                 onValueChange={(value) => handleFilterChange("gender", value)}
+                style={{ width: "100%", height: "32px" }}
               />
             </div>
 
@@ -230,6 +239,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
                 options={statusOptions}
                 selectedKey={filters.status || ""}
                 onValueChange={(value) => handleFilterChange("status", value)}
+                style={{ width: "100%", height: "32px" }}
               />
             </div>
           </>
@@ -260,6 +270,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
                 onValueChange={(value) =>
                   handleFilterChange("academicYear", value ? Number(value) : undefined)
                 }
+                style={{ width: "100%", height: "32px" }}
               />
             </div>
 
@@ -293,6 +304,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
                     handleFilterChange("issuedBy", selectedOption?.label);
                   }
                 }}
+                style={{ width: "100%", height: "32px" }}
               />
             </div>
 
@@ -339,6 +351,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
                 options={issuedTypeOptions}
                 selectedKey={filters.issuedType || ""}
                 onValueChange={(value) => handleFilterChange("issuedType", value)}
+                style={{ width: "100%", height: "32px" }}
               />
             </div>
           </>
@@ -369,6 +382,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
                 onValueChange={(value) =>
                   handleFilterChange("academicYear", value ? Number(value) : undefined)
                 }
+                style={{ width: "100%", height: "32px" }}
               />
             </div>
 
@@ -390,6 +404,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
                 placeholder="Enter Application No"
                 value={filters.applicationNo || ""}
                 onChange={(e) => handleFilterChange("applicationNo", e.target.value)}
+                style={{ width: "100%", height: "32px" }}
               />
             </div>
 
@@ -411,6 +426,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
                 placeholder="Enter Student ID"
                 value={filters.studentId || ""}
                 onChange={(e) => handleFilterChange("studentId", e.target.value)}
+                style={{ width: "100%", height: "32px" }}
               />
             </div>
 
@@ -454,6 +470,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
                 placeholder="Enter Mobile Number"
                 value={filters.mobileNumber || ""}
                 onChange={(e) => handleFilterChange("mobileNumber", e.target.value)}
+                style={{ width: "100%", height: "32px" }}
               />
             </div>
           </>
@@ -478,10 +495,10 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
               display: "flex",
               alignItems: "center",
               width: "100%",
-              height: "40px",
+              height: "32px",
               padding: "0 12px",
               border: "1px solid #d1d1d1",
-              borderRadius: "4px",
+              borderRadius: "8px",
               backgroundColor: "#ffffff",
             }}
           >

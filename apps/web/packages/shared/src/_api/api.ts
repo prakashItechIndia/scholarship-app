@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * iCaptur SSO Service
+ * Scholarship Management
  * API documentation for the iCaptur.AI Single Sign-On service with OAuth2, MFA, and centralized session management
  *
  * The version of the OpenAPI document: 1.0.0
@@ -5508,11 +5508,81 @@ export const RoleManagementApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * 
-         * @summary Get all roles
+         * @summary Export roles to Excel or Word
+         * @param {string} format 
+         * @param {string} sortBy 
+         * @param {string} sortOrder 
+         * @param {string} search 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        roleManagementControllerGetAllRoles: async (options: any = {}): Promise<RequestArgs> => {
+        roleManagementControllerExportRoles: async (format: string, sortBy: string, sortOrder: string, search: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'format' is not null or undefined
+            assertParamExists('roleManagementControllerExportRoles', 'format', format)
+            // verify required parameter 'sortBy' is not null or undefined
+            assertParamExists('roleManagementControllerExportRoles', 'sortBy', sortBy)
+            // verify required parameter 'sortOrder' is not null or undefined
+            assertParamExists('roleManagementControllerExportRoles', 'sortOrder', sortOrder)
+            // verify required parameter 'search' is not null or undefined
+            assertParamExists('roleManagementControllerExportRoles', 'search', search)
+            const localVarPath = `/role-management/export/{format}`
+                .replace(`{${"format"}}`, encodeURIComponent(String(format)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (sortBy !== undefined) {
+                localVarQueryParameter['sortBy'] = sortBy;
+            }
+
+            if (sortOrder !== undefined) {
+                localVarQueryParameter['sortOrder'] = sortOrder;
+            }
+
+            if (search !== undefined) {
+                localVarQueryParameter['search'] = search;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get all roles
+         * @param {string} sortBy 
+         * @param {string} sortOrder 
+         * @param {number} page 
+         * @param {number} pageSize 
+         * @param {string} search 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerGetAllRoles: async (sortBy: string, sortOrder: string, page: number, pageSize: number, search: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sortBy' is not null or undefined
+            assertParamExists('roleManagementControllerGetAllRoles', 'sortBy', sortBy)
+            // verify required parameter 'sortOrder' is not null or undefined
+            assertParamExists('roleManagementControllerGetAllRoles', 'sortOrder', sortOrder)
+            // verify required parameter 'page' is not null or undefined
+            assertParamExists('roleManagementControllerGetAllRoles', 'page', page)
+            // verify required parameter 'pageSize' is not null or undefined
+            assertParamExists('roleManagementControllerGetAllRoles', 'pageSize', pageSize)
+            // verify required parameter 'search' is not null or undefined
+            assertParamExists('roleManagementControllerGetAllRoles', 'search', search)
             const localVarPath = `/role-management/roles`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5524,6 +5594,26 @@ export const RoleManagementApiAxiosParamCreator = function (configuration?: Conf
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (sortBy !== undefined) {
+                localVarQueryParameter['sortBy'] = sortBy;
+            }
+
+            if (sortOrder !== undefined) {
+                localVarQueryParameter['sortOrder'] = sortOrder;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+            if (search !== undefined) {
+                localVarQueryParameter['search'] = search;
+            }
 
 
     
@@ -5914,12 +6004,31 @@ export const RoleManagementApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Get all roles
+         * @summary Export roles to Excel or Word
+         * @param {string} format 
+         * @param {string} sortBy 
+         * @param {string} sortOrder 
+         * @param {string} search 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async roleManagementControllerGetAllRoles(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerGetAllRoles(options);
+        async roleManagementControllerExportRoles(format: string, sortBy: string, sortOrder: string, search: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerExportRoles(format, sortBy, sortOrder, search, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get all roles
+         * @param {string} sortBy 
+         * @param {string} sortOrder 
+         * @param {number} page 
+         * @param {number} pageSize 
+         * @param {string} search 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async roleManagementControllerGetAllRoles(sortBy: string, sortOrder: string, page: number, pageSize: number, search: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.roleManagementControllerGetAllRoles(sortBy, sortOrder, page, pageSize, search, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -6074,12 +6183,30 @@ export const RoleManagementApiFactory = function (configuration?: Configuration,
         },
         /**
          * 
-         * @summary Get all roles
+         * @summary Export roles to Excel or Word
+         * @param {string} format 
+         * @param {string} sortBy 
+         * @param {string} sortOrder 
+         * @param {string} search 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        roleManagementControllerGetAllRoles(options?: any): AxiosPromise<void> {
-            return localVarFp.roleManagementControllerGetAllRoles(options).then((request) => request(axios, basePath));
+        roleManagementControllerExportRoles(format: string, sortBy: string, sortOrder: string, search: string, options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerExportRoles(format, sortBy, sortOrder, search, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all roles
+         * @param {string} sortBy 
+         * @param {string} sortOrder 
+         * @param {number} page 
+         * @param {number} pageSize 
+         * @param {string} search 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        roleManagementControllerGetAllRoles(sortBy: string, sortOrder: string, page: number, pageSize: number, search: string, options?: any): AxiosPromise<void> {
+            return localVarFp.roleManagementControllerGetAllRoles(sortBy, sortOrder, page, pageSize, search, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -6232,13 +6359,33 @@ export class RoleManagementApi extends BaseAPI {
 
     /**
      * 
-     * @summary Get all roles
+     * @summary Export roles to Excel or Word
+     * @param {string} format 
+     * @param {string} sortBy 
+     * @param {string} sortOrder 
+     * @param {string} search 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RoleManagementApi
      */
-    public roleManagementControllerGetAllRoles(options?: any) {
-        return RoleManagementApiFp(this.configuration).roleManagementControllerGetAllRoles(options).then((request) => request(this.axios, this.basePath));
+    public roleManagementControllerExportRoles(format: string, sortBy: string, sortOrder: string, search: string, options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerExportRoles(format, sortBy, sortOrder, search, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get all roles
+     * @param {string} sortBy 
+     * @param {string} sortOrder 
+     * @param {number} page 
+     * @param {number} pageSize 
+     * @param {string} search 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RoleManagementApi
+     */
+    public roleManagementControllerGetAllRoles(sortBy: string, sortOrder: string, page: number, pageSize: number, search: string, options?: any) {
+        return RoleManagementApiFp(this.configuration).roleManagementControllerGetAllRoles(sortBy, sortOrder, page, pageSize, search, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -7881,11 +8028,81 @@ export const UserManagementApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * 
-         * @summary Get all users
+         * @summary Export users to Excel or Word
+         * @param {string} format 
+         * @param {string} sortBy 
+         * @param {string} sortOrder 
+         * @param {string} search 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        userManagementControllerGetAllUsers: async (options: any = {}): Promise<RequestArgs> => {
+        userManagementControllerExportUsers: async (format: string, sortBy: string, sortOrder: string, search: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'format' is not null or undefined
+            assertParamExists('userManagementControllerExportUsers', 'format', format)
+            // verify required parameter 'sortBy' is not null or undefined
+            assertParamExists('userManagementControllerExportUsers', 'sortBy', sortBy)
+            // verify required parameter 'sortOrder' is not null or undefined
+            assertParamExists('userManagementControllerExportUsers', 'sortOrder', sortOrder)
+            // verify required parameter 'search' is not null or undefined
+            assertParamExists('userManagementControllerExportUsers', 'search', search)
+            const localVarPath = `/user-management/export/{format}`
+                .replace(`{${"format"}}`, encodeURIComponent(String(format)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (sortBy !== undefined) {
+                localVarQueryParameter['sortBy'] = sortBy;
+            }
+
+            if (sortOrder !== undefined) {
+                localVarQueryParameter['sortOrder'] = sortOrder;
+            }
+
+            if (search !== undefined) {
+                localVarQueryParameter['search'] = search;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get all users
+         * @param {string} sortBy 
+         * @param {string} sortOrder 
+         * @param {number} page 
+         * @param {number} pageSize 
+         * @param {string} search 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerGetAllUsers: async (sortBy: string, sortOrder: string, page: number, pageSize: number, search: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sortBy' is not null or undefined
+            assertParamExists('userManagementControllerGetAllUsers', 'sortBy', sortBy)
+            // verify required parameter 'sortOrder' is not null or undefined
+            assertParamExists('userManagementControllerGetAllUsers', 'sortOrder', sortOrder)
+            // verify required parameter 'page' is not null or undefined
+            assertParamExists('userManagementControllerGetAllUsers', 'page', page)
+            // verify required parameter 'pageSize' is not null or undefined
+            assertParamExists('userManagementControllerGetAllUsers', 'pageSize', pageSize)
+            // verify required parameter 'search' is not null or undefined
+            assertParamExists('userManagementControllerGetAllUsers', 'search', search)
             const localVarPath = `/user-management/users`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7897,6 +8114,26 @@ export const UserManagementApiAxiosParamCreator = function (configuration?: Conf
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (sortBy !== undefined) {
+                localVarQueryParameter['sortBy'] = sortBy;
+            }
+
+            if (sortOrder !== undefined) {
+                localVarQueryParameter['sortOrder'] = sortOrder;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+            if (search !== undefined) {
+                localVarQueryParameter['search'] = search;
+            }
 
 
     
@@ -8047,12 +8284,31 @@ export const UserManagementApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Get all users
+         * @summary Export users to Excel or Word
+         * @param {string} format 
+         * @param {string} sortBy 
+         * @param {string} sortOrder 
+         * @param {string} search 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async userManagementControllerGetAllUsers(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.userManagementControllerGetAllUsers(options);
+        async userManagementControllerExportUsers(format: string, sortBy: string, sortOrder: string, search: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userManagementControllerExportUsers(format, sortBy, sortOrder, search, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get all users
+         * @param {string} sortBy 
+         * @param {string} sortOrder 
+         * @param {number} page 
+         * @param {number} pageSize 
+         * @param {string} search 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userManagementControllerGetAllUsers(sortBy: string, sortOrder: string, page: number, pageSize: number, search: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.userManagementControllerGetAllUsers(sortBy, sortOrder, page, pageSize, search, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -8127,12 +8383,30 @@ export const UserManagementApiFactory = function (configuration?: Configuration,
         },
         /**
          * 
-         * @summary Get all users
+         * @summary Export users to Excel or Word
+         * @param {string} format 
+         * @param {string} sortBy 
+         * @param {string} sortOrder 
+         * @param {string} search 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        userManagementControllerGetAllUsers(options?: any): AxiosPromise<void> {
-            return localVarFp.userManagementControllerGetAllUsers(options).then((request) => request(axios, basePath));
+        userManagementControllerExportUsers(format: string, sortBy: string, sortOrder: string, search: string, options?: any): AxiosPromise<void> {
+            return localVarFp.userManagementControllerExportUsers(format, sortBy, sortOrder, search, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get all users
+         * @param {string} sortBy 
+         * @param {string} sortOrder 
+         * @param {number} page 
+         * @param {number} pageSize 
+         * @param {string} search 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userManagementControllerGetAllUsers(sortBy: string, sortOrder: string, page: number, pageSize: number, search: string, options?: any): AxiosPromise<void> {
+            return localVarFp.userManagementControllerGetAllUsers(sortBy, sortOrder, page, pageSize, search, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -8209,13 +8483,33 @@ export class UserManagementApi extends BaseAPI {
 
     /**
      * 
-     * @summary Get all users
+     * @summary Export users to Excel or Word
+     * @param {string} format 
+     * @param {string} sortBy 
+     * @param {string} sortOrder 
+     * @param {string} search 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof UserManagementApi
      */
-    public userManagementControllerGetAllUsers(options?: any) {
-        return UserManagementApiFp(this.configuration).userManagementControllerGetAllUsers(options).then((request) => request(this.axios, this.basePath));
+    public userManagementControllerExportUsers(format: string, sortBy: string, sortOrder: string, search: string, options?: any) {
+        return UserManagementApiFp(this.configuration).userManagementControllerExportUsers(format, sortBy, sortOrder, search, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get all users
+     * @param {string} sortBy 
+     * @param {string} sortOrder 
+     * @param {number} page 
+     * @param {number} pageSize 
+     * @param {string} search 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserManagementApi
+     */
+    public userManagementControllerGetAllUsers(sortBy: string, sortOrder: string, page: number, pageSize: number, search: string, options?: any) {
+        return UserManagementApiFp(this.configuration).userManagementControllerGetAllUsers(sortBy, sortOrder, page, pageSize, search, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

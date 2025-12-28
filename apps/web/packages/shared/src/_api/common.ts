@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * iCaptur SSO Service
+ * Scholarship Management
  * API documentation for the iCaptur.AI Single Sign-On service with OAuth2, MFA, and centralized session management
  *
  * The version of the OpenAPI document: 1.0.0

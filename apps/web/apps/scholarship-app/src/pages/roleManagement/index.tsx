@@ -1,13 +1,22 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  DataTable,
+  Table,
   TableSkeleton,
   Button,
   Modal,
-  PageActionButtons,
-  Card,
+  Pagination,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
 } from "@shared/components";
+import {
+  MoreVerticalRegular,
+  DocumentRegular as DocumentIcon,
+  SearchRegular,
+  FilterRegular,
+} from "@fluentui/react-icons";
 import { Role } from "./types";
 import { useRoleTable } from "./hooks/useRoleTable";
 import { roleManagement } from "../../services/scholarship.service";
@@ -24,13 +33,28 @@ const RoleManagementPage: React.FC = () => {
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set());
   const [deleteError, setDeleteError] = React.useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [sortBy, setSortBy] = React.useState<string | undefined>(undefined);
+  const [sortOrder, setSortOrder] = React.useState<'asc' | 'desc'>('asc');
+  const [totalItems, setTotalItems] = React.useState(0);
 
-  // Fetch roles from API
+  // Fetch roles from API with sorting and pagination
   React.useEffect(() => {
     const fetchRoles = async () => {
       try {
         setLoading(true);
-        const data = await roleManagement.getAllRoles();
+        const response = await roleManagement.getAllRoles({
+          sortBy,
+          sortOrder,
+          page: currentPage,
+          pageSize,
+          search: searchQuery || undefined,
+        });
+        
+        // Handle both array response (backward compatible) and paginated response
+        const data = Array.isArray(response) ? response : (response.data || response.items || []);
+        const total = Array.isArray(response) ? response.length : (response.total || response.count || data.length);
+        
         // Map API response to Role interface
         // Filter out "Student" role (case-insensitive) as it's for user flow, not admin flow
         const mappedRoles: Role[] = data
@@ -38,21 +62,22 @@ const RoleManagementPage: React.FC = () => {
             role.roleName?.toLowerCase() !== 'student'
           )
           ?.map((role: {
-          id: string | number;
-          roleName: string;
-          userType: string;
-          status: string;
-          isActive: number;
-        }) => ({
-          id: String(role.id),
-          roleName: role.roleName,
-          userType: role.userType,
-          status: role.status,
-          roleType: role.userType.toLowerCase().replace(' ', ''),
-          description: '',
-          permissions: [],
-        }));
+            id: string | number;
+            roleName: string;
+            userType: string;
+            status: string;
+            isActive: number;
+          }) => ({
+            id: String(role.id),
+            roleName: role.roleName,
+            userType: role.userType,
+            status: role.status,
+            roleType: role.userType.toLowerCase().replace(' ', ''),
+            description: '',
+            permissions: [],
+          }));
         setRoles(mappedRoles);
+        setTotalItems(total);
         // Sync roles to sessionStorage for validation in form
         sessionStorage.setItem("allRoles", JSON.stringify(mappedRoles));
       } catch (err) {
@@ -62,7 +87,7 @@ const RoleManagementPage: React.FC = () => {
       }
     };
     void fetchRoles();
-  }, [showError]);
+  }, [showError, sortBy, sortOrder, currentPage, pageSize, searchQuery]);
 
   // Refresh roles after form save (check sessionStorage)
   React.useEffect(() => {
@@ -73,7 +98,14 @@ const RoleManagementPage: React.FC = () => {
       // Reload roles from API instead of using sessionStorage
       const fetchRoles = async () => {
         try {
-          const data = await roleManagement.getAllRoles();
+          const response = await roleManagement.getAllRoles({
+            sortBy,
+            sortOrder,
+            page: currentPage,
+            pageSize,
+            search: searchQuery || undefined,
+          });
+          const data = Array.isArray(response) ? response : (response.data || response.items || []);
           // Filter out "Student" role (case-insensitive) as it's for user flow, not admin flow
           const mappedRoles: Role[] = data
             ?.filter((role: { roleName: string }) => 
@@ -107,14 +139,57 @@ const RoleManagementPage: React.FC = () => {
       sessionStorage.removeItem("lastSavedRole");
       sessionStorage.removeItem("roleAction");
     }
-  }, [success, showError]);
+  }, [success, showError, sortBy, sortOrder, currentPage, pageSize, searchQuery]);
 
-  // Paginate data
-  const paginatedData = React.useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    return roles.slice(startIndex, endIndex);
-  }, [roles, currentPage, pageSize]);
+  // Reset to page 1 when search query or sort changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, sortBy, sortOrder]);
+
+  // Handle sort
+  const handleSort = (fieldName: string) => {
+    if (sortBy === fieldName) {
+      // Toggle sort order if same field
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // New field, default to ascending
+      setSortBy(fieldName);
+      setSortOrder('asc');
+    }
+  };
+
+  // Handle export
+  const handleExport = async (format: 'excel' | 'word') => {
+    try {
+      setLoading(true);
+      const blob = await roleManagement.exportRoles(format, {
+        sortBy,
+        sortOrder,
+        search: searchQuery || undefined,
+      });
+
+      const extension = format === 'excel' ? 'xlsx' : 'docx';
+      const filename = `Roles_Export_${new Date().toISOString().split('T')[0]}.${extension}`;
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      success('Export Successful', `Roles exported as ${filename} successfully`);
+    } catch (err) {
+      showError('Export Failed', err instanceof Error ? err.message : 'Failed to export roles');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Use roles directly from API (already paginated and sorted on backend)
+  const paginatedData = roles;
 
   // Get table columns
   const { columns } = useRoleTable({
@@ -145,9 +220,11 @@ const RoleManagementPage: React.FC = () => {
       }
     },
     data: paginatedData,
+    sortBy,
+    sortOrder,
+    onSort: handleSort,
   });
 
-  const totalItems = roles.length;
   const totalPages = Math.ceil(totalItems / pageSize);
 
   const handleAddRole = () => {
@@ -194,91 +271,345 @@ const RoleManagementPage: React.FC = () => {
     <div style={{
       width: "100%",
       height: "100%",
-      backgroundColor: "#fafafa",
+      backgroundColor: "#ffffff",
       fontFamily: "'Inter', sans-serif",
       boxSizing: "border-box",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden",
     }}>
-      {/* Title and Action Buttons */}
-      <div style={{ padding: "16px 24px 0px 24px" }}>
-        <PageActionButtons
-          title={
-            <div style={{  }}>
-              <div style={{
-                fontSize: "16px",
-                fontWeight: 600,
-                color: "#242424",
-                // fontFamily: "'Inter', sans-serif",
-                lineHeight: "22px",
-              }}>
-                Role and Permissions
-              </div>
-              <div style={{
-                fontSize: "12px",
-                fontWeight: 400,
-                color: "#242424",
+      {/* Title and Action Section */}
+      <div style={{ padding: "24px 1.5rem", flexShrink: 0 }}>
+        {/* Top Row: Title on left, Add Role button on right */}
+        <div style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+        }}>
+          <div>
+            <h1 style={{
+              fontSize: "16px",
+              lineHeight: "22px",
+              fontWeight: 600,
+              color: "#242424",
+              fontFamily: "'Inter', sans-serif",
+            }}>
+              Role and Permissions
+            </h1>
+            <p style={{
+              fontSize: "12px",
+              lineHeight: "16px",
+              fontWeight: 400,
+              color: "#242424",
+              fontFamily: "'Inter', sans-serif",
+            }}>
+              Maintain Roles, Rights, and User Information
+            </p>
+          </div>
+          <Button
+            onClick={handleAddRole}
+            style={{
+              backgroundColor: "#2453C3",
+              color: "#ffffff",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "8px 16px",
+              borderRadius: "6px",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: 500,
+              fontFamily: "'Inter', sans-serif",
+              height: "32px",
+            }}
+          >
+            Add Role
+          </Button>
+        </div>
+
+        {/* Second Row: Search on left, Action buttons on right */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginTop: "16px",
+        }}>
+          {/* Search field on the left */}
+          <div style={{ position: "relative", display: "flex", alignItems: "center", border: "1px solid #D1D1D1", borderRadius: "8px" }}>
+            <SearchRegular style={{ 
+              position: "absolute", 
+              left: "8px", 
+              width: "16px", 
+              height: "16px", 
+              color: "#616161",
+              pointerEvents: "none"
+            }} />
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                }
+              }}
+              style={{
+                width: "200px",
+                height: "32px",
+                paddingLeft: "32px",
+                paddingRight: "12px",
+                borderRadius: "8px",
+                border: "1px solid #FFFFFF00",
+                fontSize: "14px",
                 fontFamily: "'Inter', sans-serif",
-                marginTop: "2px",
-                lineHeight: "22px",
-              }}>
-                Maintain Roles, Rights, and User Information
-              </div>
-            </div>
-          }
-          primaryButtonLabel="Add Role"
-          onPrimaryAction={handleAddRole}
-          onMoreClick={() => {
-            // Handle more options click - can be extended later
-            console.log("More options clicked");
-          }}
-        />
+                outline: "none",
+                backgroundColor: "#fff",
+              }}
+            />
+          </div>
+
+          {/* Action buttons on the right */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            flexShrink: 0,
+          }}>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button
+                  appearance="outline"
+                  aria-label="More options"
+                  style={{
+                    width: "32px",
+                    minWidth: "32px",
+                    maxWidth: "32px",
+                    height: "32px",
+                    padding: 0,
+                    borderColor: "#d1d5db",
+                    backgroundColor: "#fff",
+                    borderRadius: "6px",
+                  }}
+                >
+                  <MoreVerticalRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem 
+                  onClick={() => void handleExport('excel')}
+                  style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <DocumentIcon style={{ width: "16px", height: "16px" }} />
+                    Excel
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => void handleExport('word')}
+                  style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <DocumentIcon style={{ width: "16px", height: "16px" }} />
+                    Word
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button
+                  appearance="outline"
+                  aria-label="Filter"
+                  style={{
+                    width: "32px",
+                    minWidth: "32px",
+                    maxWidth: "32px",
+                    height: "32px",
+                    padding: 0,
+                    borderColor: "#d1d5db",
+                    backgroundColor: "#fff",
+                    borderRadius: "6px",
+                  }}
+                >
+                  <FilterRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem 
+                  onClick={() => {}}
+                  style={{
+                    fontWeight: "normal",
+                    color: "#616161",
+                  }}
+                >
+                  Role Name
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {}}
+                  style={{
+                    fontWeight: "normal",
+                    color: "#616161",
+                  }}
+                >
+                  User Type
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => {}}
+                  style={{
+                    fontWeight: "normal",
+                    color: "#616161",
+                  }}
+                >
+                  Status
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
       </div>
 
-      {/* Table Section - Full Width */}
-      {loading ? (
-        <Card
-          variant="elevated"
-          style={{
-            overflow: "hidden",
-            border: "1px solid #e0e0e0",
-            backgroundColor: "#ffffff",
-            borderRadius: 0,
-            width: "100%",
-            margin: 0,
-            padding: "24px",
-            boxShadow: "none",
-            borderLeft: "none",
-            borderRight: "none",
-          }}
-        >
-          <div style={{ overflowX: "auto", width: "100%" }}>
+      {/* Table Section - Scrollable */}
+      <div
+        id="table-scroll-container"
+        style={{
+          flexGrow: 1,
+          flexShrink: 1,
+          flexBasis: "auto",
+          overflow: "auto",
+          backgroundColor: "#fafafa",
+          minHeight: 0,
+          maxHeight: "100%",
+        }}
+        className="custom-scrollbar"
+        onScroll={(e) => {
+          // Sync horizontal scroll with footer scrollbar
+          const footerScroll = document.getElementById('footer-scroll-sync');
+          if (footerScroll) {
+            footerScroll.scrollLeft = e.currentTarget.scrollLeft;
+          }
+        }}
+      >
+        <style>
+          {`
+            .custom-scrollbar::-webkit-scrollbar {
+              width: 8px;
+              height: 8px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+              background-color: #d1d1d1;
+              border-radius: 4px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+              background-color: #a8a8a8;
+            }
+            .footer-scrollbar::-webkit-scrollbar {
+              height: 8px;
+            }
+            .footer-scrollbar::-webkit-scrollbar-track {
+              background: #f5f5f5;
+            }
+            .footer-scrollbar::-webkit-scrollbar-thumb {
+              background-color: #d1d1d1;
+              border-radius: 4px;
+            }
+            .footer-scrollbar::-webkit-scrollbar-thumb:hover {
+              background-color: #a8a8a8;
+            }
+          `}
+        </style>
+
+        <div style={{ minWidth: "fit-content" }}>
+          {loading ? (
             <TableSkeleton
               columnCount={3}
               rowCount={5}
               columnWidths={[300, 200, 150]}
               showCheckbox={true}
             />
+          ) : (
+            <Table
+              columns={columns}
+              data={paginatedData}
+              disableScroll={true}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Static Footer with Pagination and Horizontal Scrollbar */}
+      <div style={{
+        flexShrink: 0,
+        backgroundColor: "#ffffff",
+        borderTop: "1px solid #e0e0e0",
+      }}>
+        {/* Pagination */}
+        {!loading && (
+          <div style={{
+            padding: "12px 24px",
+            backgroundColor: "#FAFAFA",
+          }}>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              totalItems={totalItems}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+              }}
+              onPageSizeChange={(newPageSize) => {
+                setPageSize(newPageSize);
+              }}
+              pageSizeOptions={[5, 10, 20, 50, 100]}
+              showFirstLast={true}
+              showPageSize={true}
+              showPageNumbers={true}
+              maxPageButtons={7}
+              className="w-full !flex-row"
+            />
           </div>
-        </Card>
-      ) : (
-        <DataTable
-          columns={columns}
-          data={paginatedData}
-          fullWidth={true}
-          pagination={{
-            currentPage,
-            totalPages,
-            pageSize,
-            totalItems,
-            onPageChange: setCurrentPage,
-            onPageSizeChange: setPageSize,
-            pageSizeOptions: [5, 10, 20, 50, 100],
-            showFirstLast: true,
-            showPageSize: true,
-            showPageNumbers: true,
-            maxPageButtons: 7,
+        )}
+
+        {/* Horizontal Scrollbar Sync */}
+        <div
+          id="footer-scroll-sync"
+          style={{
+            overflowX: "auto",
+            overflowY: "hidden",
+            height: "12px",
           }}
-        />
-      )}
+          className="footer-scrollbar"
+          onScroll={(e) => {
+            // Sync scroll with table container
+            const tableContainer = document.getElementById('table-scroll-container');
+            if (tableContainer) {
+              tableContainer.scrollLeft = e.currentTarget.scrollLeft;
+            }
+          }}
+        >
+          <div style={{
+            height: "1px",
+            width: "fit-content",
+            minWidth: "100%",
+          }}
+            ref={(el) => {
+              // Match the width of the table content
+              if (el) {
+                const tableContainer = document.getElementById('table-scroll-container');
+                if (tableContainer && tableContainer.firstChild) {
+                  const tableWidth = (tableContainer.firstChild as HTMLElement).scrollWidth;
+                  el.style.width = `${tableWidth}px`;
+                }
+              }
+            }}
+          />
+        </div>
+      </div>
 
       {/* Delete Confirmation Modal */}
       <Modal

@@ -14,6 +14,7 @@ export interface ProfilePopoverProps {
   onLogout: () => void;
   onChangePassword: () => void;
   children: React.ReactNode;
+  sidebarWidth?: number;
 }
 
 export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
@@ -24,7 +25,29 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
   onLogout,
   onChangePassword,
   children,
+  sidebarWidth = 0,
 }) => {
+
+  const popoverRef = React.useRef<HTMLDivElement>(null);
+
+  // Simple positioning adjustment
+  React.useEffect(() => {
+    if (!open || sidebarWidth <= 0) return;
+
+    const adjustPosition = () => {
+      // Find the popover element
+      const popoverElement = popoverRef.current?.closest('[data-popper-placement]') as HTMLElement;
+      if (popoverElement) {
+        const rect = popoverElement.getBoundingClientRect();
+        if (rect.left < sidebarWidth) {
+          popoverElement.style.left = `${sidebarWidth}px`;
+        }
+      }
+    };
+
+    const timeoutId = setTimeout(adjustPosition, 50);
+    return () => clearTimeout(timeoutId);
+  }, [open, sidebarWidth]);
 
   return (
     <Popover
@@ -33,11 +56,17 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
         const openState = (data as { open?: boolean })?.open ?? false;
         onOpenChange(openState);
       }}
+      positioning={{
+        position: "below",
+        align: "end",
+        offset: { crossAxis: 0, mainAxis: 4 },
+      }}
     >
       <PopoverTrigger disableButtonEnhancement>
         {children as React.ReactElement}
       </PopoverTrigger>
       <PopoverContent
+        ref={popoverRef}
         className="w-[280px]"
         style={{
           borderRadius: "8px",

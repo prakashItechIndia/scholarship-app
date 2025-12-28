@@ -618,10 +618,49 @@ export interface Screen {
  */
 export const roleManagement = {
   /**
-   * Get all roles
+   * Get all roles with optional sorting and pagination
    */
-  getAllRoles: async () => {
-    const response = await apiClient.get('/role-management/roles');
+  getAllRoles: async (params?: {
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    page?: number;
+    pageSize?: number;
+    search?: string;
+  }) => {
+    const queryParams = new URLSearchParams();
+    if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+    if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.pageSize) queryParams.append('pageSize', params.pageSize.toString());
+    if (params?.search) queryParams.append('search', params.search);
+    
+    const url = `/role-management/roles${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const response = await apiClient.get(url);
+    return response.data;
+  },
+
+  /**
+   * Export roles to Excel or Word
+   */
+  exportRoles: async (
+    format: 'excel' | 'word',
+    params?: {
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
+      search?: string;
+    }
+  ) => {
+    const queryParams = new URLSearchParams();
+    if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+    if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+    if (params?.search) queryParams.append('search', params.search);
+    
+    const response = await apiClient.get(
+      `/role-management/export/${format}?${queryParams.toString()}`,
+      {
+        responseType: 'blob',
+      }
+    );
     return response.data;
   },
 
@@ -769,10 +808,49 @@ export const roleManagement = {
  */
 export const userManagement = {
   /**
-   * Get all users
+   * Get all users with optional sorting and pagination
    */
-  getAllUsers: async () => {
-    const response = await apiClient.get('/user-management/users');
+  getAllUsers: async (params?: {
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    page?: number;
+    pageSize?: number;
+    search?: string;
+  }) => {
+    const queryParams = new URLSearchParams();
+    if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+    if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.pageSize) queryParams.append('pageSize', params.pageSize.toString());
+    if (params?.search) queryParams.append('search', params.search);
+    
+    const url = `/user-management/users${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const response = await apiClient.get(url);
+    return response.data;
+  },
+
+  /**
+   * Export users to Excel or Word
+   */
+  exportUsers: async (
+    format: 'excel' | 'word',
+    params?: {
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
+      search?: string;
+    }
+  ) => {
+    const queryParams = new URLSearchParams();
+    if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+    if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+    if (params?.search) queryParams.append('search', params.search);
+    
+    const response = await apiClient.get(
+      `/user-management/export/${format}?${queryParams.toString()}`,
+      {
+        responseType: 'blob',
+      }
+    );
     return response.data;
   },
 

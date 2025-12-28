@@ -296,7 +296,7 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
                     <Button
                         appearance="primary"
                         onClick={() => onOpenChange(false)}
-                        style={{ backgroundColor: "#0F6CBD", color: "white", minWidth: "120px", marginTop: "10px" }}
+                        style={{ backgroundColor: "#2453C3", color: "white", minWidth: "120px", marginTop: "10px" }}
                     >
                         Close
                     </Button>
@@ -420,7 +420,7 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
                             }}
                             onDragOver={(e) => {
                                 e.preventDefault();
-                                e.currentTarget.style.borderColor = "#0F6CBD";
+                                e.currentTarget.style.borderColor = "#2453C3";
                                 e.currentTarget.style.backgroundColor = "#f0f7ff";
                             }}
                             onDragLeave={(e) => {
@@ -537,7 +537,7 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
                             appearance="primary"
                             onClick={handleSubmit}
                             disabled={loading || !paymentMode}
-                            style={{ backgroundColor: "#0F6CBD", color: "white", minWidth: "80px", display: "flex", alignItems: "center", gap: "8px" }}
+                            style={{ backgroundColor: "#2453C3", color: "white", minWidth: "80px", display: "flex", alignItems: "center", gap: "8px" }}
                         >
                             {loading ? (
                                 <>

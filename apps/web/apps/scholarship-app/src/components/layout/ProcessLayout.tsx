@@ -229,6 +229,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           onOpenChange={setProfilePopoverOpen}
           onLogout={() => setLogoutModalOpen(true)}
           onChangePassword={() => setChangePasswordModalOpen(true)}
+          sidebarWidth={hideSidebar ? 0 : (sideNavConfig.expanded ? 256 : 56)}
         >
           <div className="w-[32px] h-[32px] rounded-full bg-[#C8D1FA] flex items-center justify-center cursor-pointer">
             <PersonRegular className="w-[20px] h-[20px] text-[#420610]" />
@@ -262,9 +263,9 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
         title={
           <div 
             className="relative w-full flex items-center justify-between"
-            style={{
-              padding: "20px 24px 16px 24px",
-            }}
+            // style={{
+            //   padding: "20px 24px 16px 24px",
+            // }}
           >
             <span 
               style={{
@@ -341,7 +342,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           </div>
         }
       >
-        <div style={{ padding: "0 24px" }}>
+        <div>
           <p 
             style={{
               fontSize: "14px",

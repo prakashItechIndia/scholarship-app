@@ -23,8 +23,8 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({
         alignItems: "center",
         gap: "12px",
         padding: "12px",
-        backgroundColor: `${color}`,
-        borderRadius: "4px",
+        backgroundColor: color,
+        borderRadius: "8px",
         border:border,
         height:"80px"
       }}

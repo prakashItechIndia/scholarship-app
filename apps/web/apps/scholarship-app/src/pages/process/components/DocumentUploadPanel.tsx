@@ -2,6 +2,7 @@ import * as React from "react";
 import {
     Button,
     TableSkeleton,
+    Input,
 } from "@shared/components";
 import {
     DismissRegular,
@@ -31,6 +32,7 @@ interface DocumentRow {
     url?: string; // Document URL for view
     fileType?: string; // Type of the file for preview
     documentPath?: string; // Document path from API
+    isNew?: boolean; // Flag to indicate if this is a newly added row (editable)
 }
 
 const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
@@ -49,6 +51,7 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
     const [previewData, setPreviewData] = React.useState<{ isOpen: boolean; url: string; name: string; type?: string } | null>(null);
     const [previewLoading, setPreviewLoading] = React.useState(false);
     const [previewError, setPreviewError] = React.useState<string | null>(null);
+    const [newRowCounter, setNewRowCounter] = React.useState(0); // Counter for generating unique IDs for new rows
 
     // Fetch documents and document types when panel opens
     React.useEffect(() => {
@@ -291,6 +294,30 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
         });
     };
 
+    const handleAddNewRow = () => {
+        const newId = `new-doc-${Date.now()}-${newRowCounter}`;
+        setNewRowCounter(prev => prev + 1);
+        
+        const newRow: DocumentRow = {
+            id: newId,
+            name: "",
+            status: "Not uploaded",
+            isNew: true,
+        };
+        
+        setDocuments(prev => [...prev, newRow]);
+    };
+
+    const handleDocumentNameChange = (docId: string, newName: string) => {
+        setDocuments(prev => 
+            prev.map(doc => 
+                doc.id === docId 
+                    ? { ...doc, name: newName }
+                    : doc
+            )
+        );
+    };
+
     const confirmDelete = async () => {
         if (!deleteData?.documentId || !data?.applicationNo) {
             setDeleteData(null);
@@ -493,7 +520,22 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                                     <td style={{ padding: "12px 24px" }}>
                                         <input type="checkbox" style={{ width: "16px", height: "16px" }} />
                                     </td>
-                                    <td style={{ padding: "12px", fontSize: "14px", color: "#242424" }}>{doc.name}</td>
+                                    <td style={{ padding: "12px", fontSize: "14px", color: "#242424" }}>
+                                        {doc.isNew ? (
+                                            <Input
+                                                type="text"
+                                                value={doc.name}
+                                                onChange={(e) => handleDocumentNameChange(doc.id, e.target.value)}
+                                                placeholder="Enter document name"
+                                                style={{
+                                                    width: "100%",
+                                                    minWidth: "200px",
+                                                }}
+                                            />
+                                        ) : (
+                                            doc.name
+                                        )}
+                                    </td>
                                     <td style={{ padding: "12px", fontSize: "14px", color: "#242424" }}>
                                         {doc.uploadedOn ? (
                                             doc.uploadedOn
@@ -566,6 +608,7 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                     }}
                 >
                     <div
+                        onClick={handleAddNewRow}
                         style={{
                             display: "flex",
                             alignItems: "center",
@@ -585,7 +628,7 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                     <Button
                         appearance="primary"
                         style={{
-                            backgroundColor: "#0F6CBD", // Fluent Primary
+                            backgroundColor: "#2453C3", // Fluent Primary
                             minWidth: "120px",
                         }}
                         onClick={() => {

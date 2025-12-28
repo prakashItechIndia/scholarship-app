@@ -529,7 +529,7 @@ export const useProcessTable = ({
           appearance={isCustomStyled ? "subtle" : "primary"}
           onClick={() => handleProcess && handleProcess(item)}
           style={{
-            backgroundColor: isCustomStyled ? "transparent" : "#0F6CBD",
+            backgroundColor: isCustomStyled ? "transparent" : "#2453C3",
             color: isCustomStyled ? "#0F6CBD" : "#ffffff",
             minWidth: "120px",
             height: "32px",

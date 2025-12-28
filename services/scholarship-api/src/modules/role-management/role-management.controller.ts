@@ -11,7 +11,10 @@ import {
   ParseIntPipe,
   Query,
   UseGuards,
+  Res,
+  BadRequestException,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { RoleManagementService } from './role-management.service';
 import { RolePermissionsService } from './role-permissions.service';
@@ -38,8 +41,20 @@ export class RoleManagementController {
     status: 200,
     description: 'Roles retrieved successfully',
   })
-  async getAllRoles() {
-    return this.roleService.getAllRoles();
+  async getAllRoles(
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
+    @Query('page') page?: number,
+    @Query('pageSize') pageSize?: number,
+    @Query('search') search?: string,
+  ) {
+    return this.roleService.getAllRoles({
+      sortBy,
+      sortOrder,
+      page: page ? Number(page) : undefined,
+      pageSize: pageSize ? Number(pageSize) : undefined,
+      search,
+    });
   }
 
   @Get('role/:roleId')
@@ -233,6 +248,43 @@ export class RoleManagementController {
       action,
     );
     return { hasPermission };
+  }
+
+  @Get('export/:format')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Export roles to Excel or Word' })
+  @ApiResponse({
+    status: 200,
+    description: 'Roles exported successfully',
+  })
+  async exportRoles(
+    @Res() res: Response,
+    @Param('format') format: 'excel' | 'word',
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
+    @Query('search') search?: string,
+  ) {
+    try {
+      const buffer = await this.roleService.exportRoles(format, {
+        sortBy,
+        sortOrder,
+        search,
+      });
+
+      const contentType =
+        format === 'excel'
+          ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      const extension = format === 'excel' ? 'xlsx' : 'docx';
+      const filename = `Roles_Export_${new Date().toISOString().split('T')[0]}.${extension}`;
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.setHeader('Content-Length', buffer.length.toString());
+      res.send(buffer);
+    } catch (error) {
+      throw new BadRequestException(`Failed to export roles: ${error.message}`);
+    }
   }
 }
 

@@ -42,12 +42,12 @@ export const FinancialSummaryCard: React.FC<FinancialSummaryCardProps> = ({
         padding: "10px 0px 20px 20px",
         height: "96px",
         minHeight: "100px",
-        minWidth: "430px",
-        width:"289px",
+        width: "100%",
         // gap: "16px",
         // boxShadow: "0px 2px 4px 0px #00000024",
-        margin:"2px",
-        boxShadow:"none"
+        margin: "2px",
+        boxShadow: "none",
+        position: "relative"
       }}
     >
       <div style={{

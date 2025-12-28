@@ -51,7 +51,7 @@ export const AppShell = ({ children }: PropsWithChildren) => {
       </aside>
       <div className="flex-1">
         <header className="bg-white border-b p-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold">iCaptur SSO</h1>
+          <h1 className="text-xl font-semibold">Scholarship Management System</h1>
           <div className="flex items-center gap-2">
             <DefaultButton
               onClick={() => {
