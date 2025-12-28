@@ -36,6 +36,25 @@ interface DocumentRow {
     isNew?: boolean; // Flag to indicate if this is a newly added row (editable)
 }
 
+// Helper function to format date as DD-MM-YYYY
+const formatDateToDDMMYYYY = (dateString: string | null | undefined): string | undefined => {
+    if (!dateString) return undefined;
+    
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return undefined;
+        
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        
+        return `${day}-${month}-${year}`;
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return undefined;
+    }
+};
+
 const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
     isOpen,
     onClose,
@@ -95,13 +114,7 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                 id: doc.Document_Type ?? '',
                 documentId: doc.Document_Id, // May be null for t_esch_ApplicantDocuments
                 name: doc.Document_Type ?? '',
-                uploadedOn: doc.Uploaded_Date 
-                    ? new Date(doc.Uploaded_Date).toLocaleDateString("en-GB", { 
-                        day: "2-digit", 
-                        month: "2-digit", 
-                        year: "numeric" 
-                    }).replace(/\//g, "-")
-                    : undefined, // Table doesn't have Uploaded_Date column
+                uploadedOn: formatDateToDDMMYYYY(doc.Uploaded_Date),
                 status: "Uploaded" as const,
                 url: doc.Document_URL ?? doc.Document_Path ?? undefined, // Use full URL from backend if available
                 documentPath: doc.Document_Path,

@@ -53,7 +53,7 @@ export class UserManagementService {
           U.EMail_Id,
           U.Role_Id,
           U.IsActive,
-          U.PROFILE_IMAGE_PATH,
+          U.Profile_Image_Path,
           CASE U.IsActive
             WHEN '0' THEN 'InActive'
             WHEN '1' THEN 'Active'
@@ -183,7 +183,7 @@ export class UserManagementService {
         userData.password,
       );
 
-      // Use raw SQL query to include PROFILE_IMAGE_PATH
+      // Use raw SQL query to include Profile_Image_Path
       const insertQuery = `
         INSERT INTO TBL_USERMASTER (
           User_ID,
@@ -195,7 +195,7 @@ export class UserManagementService {
           Role_Id,
           IsActive,
           IsDeleted,
-          PROFILE_IMAGE_PATH,
+          Profile_Image_Path,
           Created_Date,
           Created_By
         ) VALUES (
@@ -337,7 +337,7 @@ This is an automated message. Please do not reply to this email.
         userData.password,
       );
 
-      // Use raw SQL query to include PROFILE_IMAGE_PATH
+      // Use raw SQL query to include Profile_Image_Path
       const updateQuery = `
         UPDATE TBL_USERMASTER
         SET
@@ -347,7 +347,7 @@ This is an automated message. Please do not reply to this email.
           EMail_Id = @email,
           Role_Id = @userType,
           IsActive = @isActive,
-          PROFILE_IMAGE_PATH = @profileImagePath,
+          Profile_Image_Path = @profileImagePath,
           Modified_Date = GETDATE(),
           Modified_By = @userName
         WHERE User_ID = @userName
@@ -405,7 +405,7 @@ This is an automated message. Please do not reply to this email.
           U.EMail_Id,
           U.Role_Id,
           U.IsActive,
-          U.PROFILE_IMAGE_PATH
+          U.Profile_Image_Path
         FROM TBL_USERMASTER U
         WHERE U.User_ID = @userId AND U.IsDeleted = 0
       `;
@@ -707,21 +707,21 @@ This is an automated message. Please do not reply to this email.
   ): Promise<void> {
     try {
       this.logger.debug(
-        `Updating PROFILE_IMAGE_PATH for user: ${userId} with path: ${profileImagePath}`,
+        `Updating Profile_Image_Path for user: ${userId} with path: ${profileImagePath}`,
       );
 
       // Handle NULL value properly in SQL
       const query = profileImagePath
         ? `
           UPDATE TBL_USERMASTER
-          SET PROFILE_IMAGE_PATH = @profileImagePath,
+          SET Profile_Image_Path = @profileImagePath,
               Modified_Date = GETDATE(),
               Modified_By = @userId
           WHERE User_ID = @userId
         `
         : `
           UPDATE TBL_USERMASTER
-          SET PROFILE_IMAGE_PATH = NULL,
+          SET Profile_Image_Path = NULL,
               Modified_Date = GETDATE(),
               Modified_By = @userId
           WHERE User_ID = @userId
@@ -739,7 +739,7 @@ This is an automated message. Please do not reply to this email.
 
       // Verify the update was successful
       const verifyQuery = `
-        SELECT PROFILE_IMAGE_PATH
+        SELECT Profile_Image_Path
         FROM TBL_USERMASTER
         WHERE User_ID = @userId
       `;
@@ -748,7 +748,7 @@ This is an automated message. Please do not reply to this email.
       // Handle case-insensitive column name
       const updatedPath = getCaseInsensitiveValue<string>(
         record,
-        'PROFILE_IMAGE_PATH',
+        'Profile_Image_Path',
       );
 
       if (updatedPath === profileImagePath) {
@@ -808,7 +808,7 @@ This is an automated message. Please do not reply to this email.
       const user = await this.getUserById(userId);
       const oldImagePath = getCaseInsensitiveValue<string>(
         user as Record<string, unknown>,
-        'PROFILE_IMAGE_PATH',
+        'Profile_Image_Path',
       );
 
       // Handle remove action
@@ -833,7 +833,7 @@ This is an automated message. Please do not reply to this email.
           // Continue to update database even if file deletion fails
         }
 
-        // Set PROFILE_IMAGE_PATH to NULL in database
+        // Set Profile_Image_Path to NULL in database
         await this.updateProfileImagePath(userId, null);
 
         return {
@@ -898,7 +898,7 @@ This is an automated message. Please do not reply to this email.
       const user = await this.getUserById(userId);
       const profileImagePath = getCaseInsensitiveValue<string>(
         user as Record<string, unknown>,
-        'PROFILE_IMAGE_PATH',
+        'Profile_Image_Path',
       );
 
       if (!profileImagePath) {

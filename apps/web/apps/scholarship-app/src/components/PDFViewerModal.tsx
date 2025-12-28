@@ -4,14 +4,12 @@ import {
   DismissRegular,
   ArrowDownloadRegular,
   PrintRegular,
-  ArrowRotateClockwiseRegular,
-  ArrowRotateCounterclockwiseRegular,
   ZoomInRegular,
   ZoomOutRegular,
-  MaximizeRegular,
   MoreVerticalRegular,
   ChevronLeftRegular,
   ChevronRightRegular,
+  PanelLeftRegular,
 } from "@fluentui/react-icons";
 import Constants from "../pages/process/constants";
 
@@ -123,9 +121,6 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
     setZoomLevel((prev) => Math.max(prev - 10, 50));
   };
 
-  const handleFitToScreen = () => {
-    setZoomLevel(100);
-  };
 
   if (!open) return null;
 
@@ -151,9 +146,9 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
     >
       <div
         style={{
-          width: "600px",
+          width: "800px",
           height: "90vh",
-          maxWidth: "600px",
+          maxWidth: "800px",
           maxHeight: "900px",
           backgroundColor: "#ffffff",
           borderRadius: "8px",
@@ -168,14 +163,14 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
         <div
           style={{
             height: "48px",
-                      display: "flex",
+            display: "flex",
             alignItems: "center",
-                      justifyContent: "space-between",
+            justifyContent: "space-between",
             padding: "0 16px",
             borderBottom: "1px solid #e0e0e0",
             backgroundColor: "#ffffff",
-                    }}
-                  >
+          }}
+        >
           <span
             style={{
               fontSize: "16px",
@@ -202,7 +197,7 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
           >
             <DismissRegular style={{ width: "20px", height: "20px" }} />
           </button>
-                      </div>
+        </div>
 
         {/* Toolbar */}
         <div
@@ -212,12 +207,11 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
             alignItems: "center",
             justifyContent: "space-between",
             padding: "0 16px",
-            borderBottom: "1px solid #e0e0e0",
-            backgroundColor: "#fafafa",
+            backgroundColor: "#323639",
             gap: "16px",
           }}
         >
-          {/* Left side - Document name and page navigation */}
+          {/* Left side - Hamburger menu, Document name and page navigation */}
           <div
             style={{
               display: "flex",
@@ -227,10 +221,26 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
               minWidth: 0,
             }}
           >
+            {/* Hamburger Menu */}
+            <button
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: "4px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#ffffff",
+              }}
+              title="Menu"
+            >
+              <PanelLeftRegular style={{ width: "20px", height: "20px" }} />
+            </button>
             <span
               style={{
                 fontSize: "14px",
-                color: "#242424",
+                color: "#ffffff",
                 fontFamily: "'Inter', sans-serif",
                 fontWeight: 500,
                 overflow: "hidden",
@@ -246,7 +256,7 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
                 alignItems: "center",
                 gap: "8px",
                 fontSize: "14px",
-                color: "#616161",
+                color: "#ffffff",
                 fontFamily: "'Inter', sans-serif",
               }}
             >
@@ -260,7 +270,7 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
                   padding: "4px",
                   display: "flex",
                   alignItems: "center",
-                  color: currentPage === 1 ? "#c0c0c0" : "#616161",
+                  color: currentPage === 1 ? "#666666" : "#ffffff",
                 }}
               >
                 <ChevronLeftRegular style={{ width: "16px", height: "16px" }} />
@@ -281,22 +291,22 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
                   padding: "4px",
                   display: "flex",
                   alignItems: "center",
-                  color: currentPage === totalPages ? "#c0c0c0" : "#616161",
+                  color: currentPage === totalPages ? "#666666" : "#ffffff",
                 }}
               >
                 <ChevronRightRegular style={{ width: "16px", height: "16px" }} />
               </button>
-                      </div>
+            </div>
             <span
               style={{
                 fontSize: "14px",
-                color: "#616161",
+                color: "#ffffff",
                 fontFamily: "'Inter', sans-serif",
               }}
             >
               {zoomLevel}%
             </span>
-                      </div>
+          </div>
 
           {/* Right side - Toolbar icons */}
           <div
@@ -316,7 +326,7 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#616161",
+                color: "#ffffff",
                 borderRadius: "4px",
               }}
               title="Zoom Out"
@@ -333,50 +343,12 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#616161",
+                color: "#ffffff",
                 borderRadius: "4px",
               }}
               title="Zoom In"
             >
               <ZoomInRegular style={{ width: "18px", height: "18px" }} />
-            </button>
-            <button
-              onClick={handleFitToScreen}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: "6px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#616161",
-                borderRadius: "4px",
-              }}
-              title="Fit to Screen"
-            >
-              <MaximizeRegular style={{ width: "18px", height: "18px" }} />
-            </button>
-            <button
-              onClick={() => {
-                // Rotate functionality
-              }}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: "6px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#616161",
-                borderRadius: "4px",
-              }}
-              title="Rotate"
-            >
-              <ArrowRotateClockwiseRegular
-                style={{ width: "18px", height: "18px" }}
-                        />
             </button>
             <button
               onClick={handleDownload}
@@ -388,7 +360,7 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#616161",
+                color: "#ffffff",
                 borderRadius: "4px",
               }}
               title="Download"
@@ -405,7 +377,7 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#616161",
+                color: "#ffffff",
                 borderRadius: "4px",
               }}
               title="Print"
@@ -418,10 +390,10 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
                 border: "none",
                 cursor: "pointer",
                 padding: "6px",
-        display: "flex",
+                display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#616161",
+                color: "#ffffff",
                 borderRadius: "4px",
               }}
               title="More Options"
@@ -436,11 +408,12 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
           style={{
           flex: 1,
           position: "relative",
-          overflow: "hidden",
-            backgroundColor: "#f5f5f5",
+          overflow: "auto",
+            backgroundColor: "#525659",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            padding: "0 16px",
           }}
         >
           {isLoading && (
@@ -520,10 +493,11 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
               style={{
                 width: "100%",
                 height: "100%",
-                overflow: "hidden",
+                overflow: "auto",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                padding: "16px 0",
               }}
             >
               <div
@@ -551,38 +525,33 @@ const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
               </div>
             </div>
           ) : (
-            <iframe
-              src={`${displayUrl}#toolbar=0&navpanes=0&scrollbar=0&zoom=page-fit`}
+            <div
               style={{
                 width: "100%",
                 height: "100%",
-                border: "none",
-                display: isLoading ? "none" : "block",
-                overflow: "hidden",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                // padding: "16px 0",
               }}
-              onLoad={() => setIsLoading(false)}
-              onError={() => {
-                setIsLoading(false);
-                setError("Failed to load PDF document");
-              }}
-              title="PDF Viewer"
-            />
+            >
+              <iframe
+                src={`${displayUrl}#toolbar=0&navpanes=0&scrollbar=0&zoom=page-fit`}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  border: "none",
+                  display: isLoading ? "none" : "block",
+                }}
+                onLoad={() => setIsLoading(false)}
+                onError={() => {
+                  setIsLoading(false);
+                  setError("Failed to load PDF document");
+                }}
+                title="PDF Viewer"
+              />
+            </div>
           )}
-        </div>
-
-        {/* Close Button at Bottom Right */}
-        <div
-          style={{
-            padding: "16px",
-            display: "flex",
-            justifyContent: "flex-end",
-            borderTop: "1px solid #e0e0e0",
-            backgroundColor: "#ffffff",
-          }}
-        >
-          <Button appearance="outline" onClick={() => onOpenChange(false)}>
-            Close
-          </Button>
         </div>
       </div>
 

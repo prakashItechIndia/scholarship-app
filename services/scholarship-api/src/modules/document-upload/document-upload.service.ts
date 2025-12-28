@@ -219,6 +219,28 @@ export class DocumentUploadService {
         applicationId,
       });
 
+      // Try to update Uploaded_Date in t_esch_ApplicantDocuments if column exists
+      try {
+        const updateUploadedDateQuery = `
+          UPDATE t_esch_ApplicantDocuments
+          SET Uploaded_Date = GETDATE()
+          WHERE Application_Id = @applicationId AND DocumentType = @documentType
+        `;
+        const updateResult = await this.db.query(updateUploadedDateQuery, {
+          applicationId,
+          documentType,
+        });
+        this.logger.debug(`Updated Uploaded_Date for ${applicationId} - ${documentType}. Rows affected: ${updateResult.rowsAffected?.[0] || 0}`);
+      } catch (error: any) {
+        // If Uploaded_Date column doesn't exist, log and continue
+        if (error.message && error.message.includes('Uploaded_Date')) {
+          this.logger.warn(`Uploaded_Date column does not exist in t_esch_ApplicantDocuments. Please run the SQL script to add it.`);
+        } else {
+          this.logger.warn('Could not update Uploaded_Date in t_esch_ApplicantDocuments:', error.message);
+        }
+      }
+
+
       return {
         message: 'Document uploaded successfully',
         documentPath: fileResult.filePath,
@@ -342,40 +364,97 @@ export class DocumentUploadService {
   /**
    * Get documents for an application
    * Matches old app logic - uses t_esch_ApplicantDocuments table
-   * Column names: Application_Id, DocumentType, DocumentPath, Is_Verified
-   * Note: Table does NOT have Document_Id, Uploaded_Date, or Uploaded_By columns
+   * Uses sp_ExecuteSql stored procedure for raw query execution
    */
   async getApplicationDocuments(applicationId: string) {
     try {
-      // Query t_esch_ApplicantDocuments (matches old app - viewdocs.aspx.cs line 92-93)
-      // Actual columns: Application_Id, DocumentType, DocumentPath, Is_Verified
-      // IMPORTANT: Only select columns that actually exist in the table
-      let query = `
-        SELECT
-          Application_Id,
-          DocumentType,
-          DocumentPath,
-          Is_Verified
-        FROM t_esch_ApplicantDocuments
-        WHERE Application_Id = @applicationId
-        ORDER BY DocumentType ASC
+      // First check if Uploaded_Date column exists
+      const checkColumnQuery = `
+        SELECT COUNT(*) as ColumnExists
+        FROM sys.columns 
+        WHERE object_id = OBJECT_ID('t_esch_ApplicantDocuments') 
+        AND name = 'Uploaded_Date'
       `;
+      const columnCheck = await this.db.execute('sp_ExecuteSql', {
+        Statement: checkColumnQuery,
+      });
+      const columnCheckRow = columnCheck.recordset?.[0] as Record<string, unknown> | undefined;
+      const hasUploadedDate = (columnCheckRow?.ColumnExists as number) > 0;
 
-      let result = await this.db.query(query, { applicationId });
-
-      // If no results from t_esch_ApplicantDocuments, try t_Registration_Documents as fallback
-      if (!result.recordset || result.recordset.length === 0) {
+      // Build query based on column existence
+      let query = '';
+      if (hasUploadedDate) {
         query = `
           SELECT
             Application_Id,
-            Document_Type,
-            Document_Path,
-            NULL as Is_Verified
-          FROM t_Registration_Documents
-          WHERE Application_Id = @applicationId
-          ORDER BY Document_Type ASC
+            DocumentType,
+            DocumentPath,
+            Is_Verified,
+            Uploaded_Date
+          FROM t_esch_ApplicantDocuments
+          WHERE Application_Id = '${applicationId.replace(/'/g, "''")}'
+          ORDER BY DocumentType ASC
         `;
-        result = await this.db.query(query, { applicationId });
+      } else {
+        query = `
+          SELECT
+            Application_Id,
+            DocumentType,
+            DocumentPath,
+            Is_Verified,
+            NULL as Uploaded_Date
+          FROM t_esch_ApplicantDocuments
+          WHERE Application_Id = '${applicationId.replace(/'/g, "''")}'
+          ORDER BY DocumentType ASC
+        `;
+      }
+
+      let result = await this.db.execute('sp_ExecuteSql', {
+        Statement: query,
+      });
+
+      // If no results from t_esch_ApplicantDocuments, try t_Registration_Documents as fallback
+      if (!result.recordset || result.recordset.length === 0) {
+        const checkColumnQuery2 = `
+          SELECT COUNT(*) as ColumnExists
+          FROM sys.columns 
+          WHERE object_id = OBJECT_ID('t_Registration_Documents') 
+          AND name = 'Uploaded_Date'
+        `;
+        const columnCheck2 = await this.db.execute('sp_ExecuteSql', {
+          Statement: checkColumnQuery2,
+        });
+        const columnCheckRow2 = columnCheck2.recordset?.[0] as Record<string, unknown> | undefined;
+        const hasUploadedDate2 = (columnCheckRow2?.ColumnExists as number) > 0;
+
+        if (hasUploadedDate2) {
+          query = `
+            SELECT
+              Application_Id,
+              Document_Type,
+              Document_Path,
+              NULL as Is_Verified,
+              Uploaded_Date
+            FROM t_Registration_Documents
+            WHERE Application_Id = '${applicationId.replace(/'/g, "''")}'
+            ORDER BY Document_Type ASC
+          `;
+        } else {
+          query = `
+            SELECT
+              Application_Id,
+              Document_Type,
+              Document_Path,
+              NULL as Is_Verified,
+              NULL as Uploaded_Date
+            FROM t_Registration_Documents
+            WHERE Application_Id = '${applicationId.replace(/'/g, "''")}'
+            ORDER BY Document_Type ASC
+          `;
+        }
+        result = await this.db.execute('sp_ExecuteSql', {
+          Statement: query,
+        });
       }
 
       // Get base URL for constructing full document URLs
@@ -419,13 +498,30 @@ export class DocumentUploadService {
         // Log for debugging
         this.logger.debug(`Document URL constructed: ${documentUrl} from path: ${documentPath}`);
         
+        // Get Uploaded_Date from row if available, otherwise null
+        let uploadedDate: string | null = null;
+        if (rowRecord.Uploaded_Date) {
+          if (rowRecord.Uploaded_Date instanceof Date) {
+            uploadedDate = rowRecord.Uploaded_Date.toISOString();
+          } else if (typeof rowRecord.Uploaded_Date === 'string') {
+            // If it's already a string, use it directly
+            uploadedDate = rowRecord.Uploaded_Date;
+          } else {
+            // Try to convert to string
+            uploadedDate = String(rowRecord.Uploaded_Date);
+          }
+        }
+        
+        // Log for debugging
+        this.logger.debug(`Document ${documentType} - Uploaded_Date from DB: ${uploadedDate || 'NULL'}`);
+        
         return {
           Document_Id: index + 1, // Generate sequential ID since table doesn't have Document_Id
           Application_Id: rowRecord.Application_Id || applicationId,
           Document_Type: documentType,
           Document_Path: documentPath, // Keep original path for reference
           Document_URL: documentUrl, // Full URL for frontend to use directly
-          Uploaded_Date: null, // Table doesn't have this column - set to null
+          Uploaded_Date: uploadedDate, // Use Uploaded_Date from database if available
           Uploaded_By: null, // Table doesn't have this column - set to null
           Is_Verified: rowRecord.Is_Verified || 0,
         };
