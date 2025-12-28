@@ -11,6 +11,8 @@ import ReportsFilters from "./components/ReportsFilters";
 import EmptyState from "./components/EmptyState";
 import { useReportsTable } from "./hooks/useReportsTable";
 import PrintDetailsModal from "../process/components/PrintDetailsModal";
+import ScholarshipHistoryModal from "../process/components/ScholarshipHistoryModal";
+import ViewDocumentsDrawer from "../../components/ViewDocumentsDrawer";
 import { reports } from "../../services/scholarship.service";
 import { useToast } from "@/components/ui/toast";
 import { useActionLoading } from "@/hooks";
@@ -51,6 +53,24 @@ const ReportsPage: React.FC = () => {
   const handleViewPdf = React.useCallback((item: ScholarshipReportData | ApprovedFormData) => {
     setSelectedReportForPrint(item);
     setPrintModalOpen(true);
+  }, []);
+
+  // View Documents State
+  const [viewDocumentsDrawerOpen, setViewDocumentsDrawerOpen] = React.useState(false);
+  const [selectedReportForDocuments, setSelectedReportForDocuments] = React.useState<ScholarshipReportData | ApprovedFormData | null>(null);
+
+  const handleViewDocuments = React.useCallback((item: ScholarshipReportData | ApprovedFormData) => {
+    setSelectedReportForDocuments(item);
+    setViewDocumentsDrawerOpen(true);
+  }, []);
+
+  // Scholarship History State
+  const [scholarshipHistoryModalOpen, setScholarshipHistoryModalOpen] = React.useState(false);
+  const [selectedReportForHistory, setSelectedReportForHistory] = React.useState<ScholarshipReportData | ApprovedFormData | null>(null);
+
+  const handleViewScholarshipHistory = React.useCallback((item: ScholarshipReportData | ApprovedFormData) => {
+    setSelectedReportForHistory(item);
+    setScholarshipHistoryModalOpen(true);
   }, []);
 
   // Format date to DD/MM/YYYY for API
@@ -212,6 +232,8 @@ const ReportsPage: React.FC = () => {
     selectedRows,
     data: filteredData,
     onViewPdf: handleViewPdf,
+    onViewDocuments: handleViewDocuments,
+    onViewScholarshipHistory: handleViewScholarshipHistory,
     activeTab,
   });
 
@@ -693,6 +715,30 @@ const ReportsPage: React.FC = () => {
           } as any}
         />
       )}
+
+      {/* View Documents Drawer */}
+      <ViewDocumentsDrawer
+        open={viewDocumentsDrawerOpen}
+        onOpenChange={setViewDocumentsDrawerOpen}
+        documents={((selectedReportForDocuments as any)?.documents ?? []).map((doc: any) => ({
+          name: doc.name,
+          type: doc.type,
+          url: doc.url,
+          size: (doc.size as string) ?? "120 KB",
+          uploadedDate: doc.uploadedDate,
+          status: doc.status,
+        }))}
+        applicationNo={getApplicationNo(selectedReportForDocuments)}
+        studentName={(selectedReportForDocuments as any)?.studentName}
+      />
+
+      {/* Scholarship History Modal */}
+      <ScholarshipHistoryModal
+        open={scholarshipHistoryModalOpen}
+        onOpenChange={setScholarshipHistoryModalOpen}
+        applicationNo={getApplicationNo(selectedReportForHistory)}
+        studentName={(selectedReportForHistory as any)?.studentName}
+      />
     </div>
   );
 };

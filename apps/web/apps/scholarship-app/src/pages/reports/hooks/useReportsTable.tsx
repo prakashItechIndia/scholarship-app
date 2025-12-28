@@ -2,6 +2,9 @@ import * as React from "react";
 import { ScholarshipReportData, ApprovedFormData, ReportTab } from "../types";
 import {
   ArrowSort20Regular,
+  DocumentBulletListRegular,
+  DocumentPrintRegular,
+  MoneyHandRegular,
   MoreHorizontalRegular,
   PrintRegular,
 } from "@fluentui/react-icons";
@@ -19,6 +22,8 @@ interface UseReportsTableProps {
   selectedRows?: Set<string>;
   data?: (ScholarshipReportData | ApprovedFormData)[];
   onViewPdf?: (item: ScholarshipReportData | ApprovedFormData) => void;
+  onViewDocuments?: (item: ScholarshipReportData | ApprovedFormData) => void;
+  onViewScholarshipHistory?: (item: ScholarshipReportData | ApprovedFormData) => void;
   activeTab?: ReportTab;
 }
 
@@ -28,6 +33,8 @@ export const useReportsTable = ({
   selectedRows = new Set(),
   data = [],
   onViewPdf,
+  onViewDocuments,
+  onViewScholarshipHistory,
   activeTab = "categories-wise",
 }: UseReportsTableProps) => {
   // Helper function to create sortable header
@@ -483,16 +490,26 @@ export const useReportsTable = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem
-                icon={<PrintRegular style={{ width: "20px", height: "20px" }} />}
-                label="Print Details"
-                onClick={() => item && onViewPdf && onViewPdf(item)}
-              />
-            </DropdownMenuContent>
+            <DropdownMenuItem
+              icon={<DocumentBulletListRegular style={{ width: "20px", height: "20px" }} />}
+              label="View Documents"
+              onClick={() => item && onViewDocuments && onViewDocuments(item)}
+            />
+            <DropdownMenuItem
+              icon={<MoneyHandRegular style={{ width: "20px", height: "20px" }} />}
+              label="Scholarship History"
+              onClick={() => item && onViewScholarshipHistory && onViewScholarshipHistory(item)}
+            />
+            <DropdownMenuItem
+              icon={<PrintRegular style={{ width: "20px", height: "20px" }} />}
+              label="Print Details"
+              onClick={() => item && onViewPdf && onViewPdf(item)}
+            />
+          </DropdownMenuContent>
           </DropdownMenu>
         ),
       },
-    ], [selectedRows, onRowSelect, onSelectAll, data, createSortableHeader, onViewPdf, getApplicationNo, getFieldValue]);
+    ], [selectedRows, onRowSelect, onSelectAll, data, createSortableHeader, onViewPdf, onViewDocuments, onViewScholarshipHistory, getApplicationNo, getFieldValue]);
 
   // Columns for Approved Form Report (Tab 3)
   const approvedFormColumns = React.useMemo(() => [
@@ -683,7 +700,17 @@ export const useReportsTable = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem
-              icon={<PrintRegular style={{ width: "20px", height: "20px" }} />}
+              icon={<DocumentBulletListRegular style={{ width: "20px", height: "20px" }} />}
+              label="View Documents"
+              onClick={() => item && onViewDocuments && onViewDocuments(item)}
+            />
+            <DropdownMenuItem
+              icon={<MoneyHandRegular style={{ width: "20px", height: "20px" }} />}
+              label="Scholarship History"
+              onClick={() => item && onViewScholarshipHistory && onViewScholarshipHistory(item)}
+            />
+            <DropdownMenuItem
+              icon={<DocumentPrintRegular style={{ width: "20px", height: "20px" }} />}
               label="Print Details"
               onClick={() => item && onViewPdf && onViewPdf(item)}
             />
@@ -691,7 +718,7 @@ export const useReportsTable = ({
         </DropdownMenu>
       ),
     },
-  ], [selectedRows, onRowSelect, onSelectAll, data, createSortableHeader, onViewPdf, getApplicationNo, getFieldValue]);
+  ], [selectedRows, onRowSelect, onSelectAll, data, createSortableHeader, onViewPdf, onViewDocuments, onViewScholarshipHistory, getApplicationNo, getFieldValue]);
 
   // Return columns based on active tab
   const columns = React.useMemo(() => {
