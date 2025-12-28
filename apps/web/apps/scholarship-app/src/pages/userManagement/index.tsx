@@ -18,6 +18,8 @@ import {
   ChevronDownRegular,
   ArrowDownloadRegular,
   DocumentRegular as DocumentIcon,
+  AddRegular,
+  AddFilled,
 } from "@fluentui/react-icons";
 import { User } from "./types";
 import { useUserTable } from "./hooks/useUserTable";
@@ -300,7 +302,7 @@ const UserManagementPage: React.FC = () => {
       overflow: "hidden",
     }}>
       {/* Title and Action Section */}
-      <div style={{ padding: "24px 1.5rem", flexShrink: 0 }}>
+      <div style={{ padding: "16px 1.5rem 24px 1.5rem", flexShrink: 0 }}>
         {/* Top Row: Title on left, Add User button on right */}
         <div style={{
           display: "flex",
@@ -314,6 +316,7 @@ const UserManagementPage: React.FC = () => {
               fontWeight: 600,
               color: "#242424",
               fontFamily: "'Inter', sans-serif",
+              margin: 0,
             }}>
               Manage User
             </h1>
@@ -323,6 +326,7 @@ const UserManagementPage: React.FC = () => {
               fontWeight: 400,
               color: "#242424",
               fontFamily: "'Inter', sans-serif",
+              margin: 0,
             }}>
               Maintain Roles, Rights, and User Information
             </p>
@@ -334,17 +338,21 @@ const UserManagementPage: React.FC = () => {
               color: "#ffffff",
               display: "flex",
               alignItems: "center",
-              gap: "8px",
-              padding: "8px 16px",
-              borderRadius: "6px",
+              justifyContent: "center",
+              gap: "6px",
+              padding: "0 12px",
+              borderRadius: "8px",
               border: "none",
               cursor: "pointer",
-              fontSize: "14px",
-              fontWeight: 500,
+              fontSize: "13px",
+              fontWeight: 600,
               fontFamily: "'Inter', sans-serif",
               height: "32px",
+              width: "110px",
+              lineHeight: "20px"
             }}
           >
+            <AddFilled style={{ width: "16px", height: "16px",fontWeight:900,color: "#ffffff", }} />
             Add User
           </Button>
         </div>
@@ -361,8 +369,8 @@ const UserManagementPage: React.FC = () => {
             <SearchRegular style={{ 
               position: "absolute", 
               left: "8px", 
-              width: "16px", 
-              height: "16px", 
+              width: "12px", 
+              height: "12px", 
               color: "#616161",
               pointerEvents: "none"
             }} />
@@ -377,16 +385,17 @@ const UserManagementPage: React.FC = () => {
                 }
               }}
               style={{
-                width: "200px",
+                width: "216px",
                 height: "32px",
-                paddingLeft: "32px",
+                paddingLeft: "25px",
                 paddingRight: "12px",
                 borderRadius: "8px",
                 border: "1px solid #FFFFFF00",
-                fontSize: "14px",
+                fontSize: "13px",
                 fontFamily: "'Inter', sans-serif",
                 outline: "none",
                 backgroundColor: "#fff",
+                color:"#707070"
               }}
             />
           </div>

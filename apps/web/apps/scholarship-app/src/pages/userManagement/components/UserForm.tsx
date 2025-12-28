@@ -254,18 +254,20 @@ const UserForm: React.FC = () => {
         <div style={{ flex: 1 }}>
           <h1 style={{
             fontSize: "16px",
-            fontWeight: 700,
+            fontWeight: 600,
             color: "#242424",
             fontFamily: "'Inter', sans-serif",
             marginBottom: "4px",
+            lineHeight:"22px"
           }}>
             {isEditMode ? "Edit User" : "Add New User"}
           </h1>
           <p style={{
             fontSize: "12px",
-            lineHeight: "20px",
+            lineHeight: "16px",
             color: "#707070",
             fontFamily: "'Inter', sans-serif",
+            fontWeight:400
           }}>
             {isEditMode ? "Update user details and access levels." : "Enter user details to create a new account."}
           </p>
@@ -284,6 +286,7 @@ const UserForm: React.FC = () => {
               color: "#242424",
               border: "1px solid #d1d1d1",
               minWidth: "100px",
+               borderRadius:"8px"
             }}
           >
             Cancel
@@ -299,6 +302,7 @@ const UserForm: React.FC = () => {
               display: "flex",
               alignItems: "center",
               gap: "8px",
+              borderRadius:"8px"
             }}
           >
             {loading ? (
@@ -325,7 +329,7 @@ const UserForm: React.FC = () => {
         <div style={{
           display: "flex",
           alignItems: "center",
-          gap: "24px",
+          gap: "20px",
           // marginBottom: "32px",
           paddingBottom: "32px",
           // borderBottom: "1px solid #e0e0e0",
@@ -335,11 +339,11 @@ const UserForm: React.FC = () => {
             onMouseLeave={() => setIsHovered(false)}
             onClick={handleProfilePhotoClick}
             style={{
-              width: "120px",
-              height: "120px",
+              width: "80px",
+              height: "80px",
               borderRadius: "50%",
-              backgroundColor: profilePhotoPreview ? "transparent" : "rgba(50, 48, 48, 1)",
-              opacity: profilePhotoPreview ? 1 : 0.9,
+              backgroundColor: "rgba(50, 48, 48, 1)",
+              opacity: profilePhotoPreview ? 1 : 0.8,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -355,8 +359,8 @@ const UserForm: React.FC = () => {
                   src={profilePhotoPreview}
                   alt="Profile"
                   style={{
-                    width: "100%",
-                    height: "100%",
+                    width: "50px",
+                    height: "50px",
                     objectFit: "cover",
                     backgroundColor: "#54545400",
                   }}
@@ -389,8 +393,8 @@ const UserForm: React.FC = () => {
               <>
                 {!isHovered && (
                   <ProfileAvatar 
-                    width={80} 
-                    height={80} 
+                    width={50} 
+                    height={50} 
                   />
                 )}
                 {isHovered && (

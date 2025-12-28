@@ -390,15 +390,15 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
             open={open}
             onOpenChange={onOpenChange}
             size="full" // Use full width for better table visibility
-            className="!max-w-[55vw]" // Custom width override
+            className="!max-w-[800px]" // Custom width override
 
             // Custom header to include actions
             headerContent={
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", gap: "60px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%",gap:"40px" }}>
                     <span style={{ fontSize: "16px", fontWeight: 600, color: "#242424", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap" }}>
                         History Against Application Number : {applicationNo}
                     </span>
-                    <div style={{ display: "flex", gap: "8px",marginLeft:"440px" }}>
+                    <div style={{ display: "flex", gap: "8px",marginLeft:"200px" }}>
                         <DropdownMenu>
                             <DropdownMenuTrigger>
                                 <Button
@@ -449,7 +449,7 @@ const ProcessHistoryModal: React.FC<ProcessHistoryModalProps> = ({
             }
             hideDefaultHeader={true} // We are providing custom header content
         >
-            <div style={{ display: "flex", flexDirection: "column", height: "60vh" }}>
+            <div style={{ display: "flex", flexDirection: "column", height: "570px" }}>
                 <div style={{ flex: 1, overflow: "auto", borderRadius: "8px", border: "1px solid #e0e0e0" }}>
                     {loading ? (
                         <TableSkeleton

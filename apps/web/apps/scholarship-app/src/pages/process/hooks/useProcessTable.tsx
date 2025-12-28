@@ -161,7 +161,7 @@ export const useProcessTable = ({
       // Define available menu items for reuse
       const menuItemViewHistory = (
         <DropdownMenuItem
-          icon={<HistoryRegular style={{ width: "16px", height: "16px" }} />}
+          icon={<HistoryRegular style={{ width: "20px", height: "20px" }} />}
           label="View History"
           onClick={() => handleViewHistory && handleViewHistory(item)}
           style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
@@ -169,7 +169,7 @@ export const useProcessTable = ({
       );
       const menuItemScholarshipHistory = (
         <DropdownMenuItem
-          icon={<PersonMoneyRegular style={{ width: "16px", height: "16px" }} />}
+          icon={<PersonMoneyRegular style={{ width: "20px", height: "20px" }} />}
           label="Scholarship History"
           onClick={() => handleViewScholarshipHistory && handleViewScholarshipHistory(item)}
           style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
@@ -177,7 +177,7 @@ export const useProcessTable = ({
       );
       const menuItemViewDocuments = (
         <DropdownMenuItem
-          icon={<DocumentBulletListRegular style={{ width: "16px", height: "16px" }} />}
+          icon={<DocumentBulletListRegular style={{ width: "20px", height: "20px" }} />}
           label="View Documents"
           onClick={() => handleViewDocument && handleViewDocument(item)}
           style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
@@ -185,7 +185,7 @@ export const useProcessTable = ({
       );
       const menuItemPrintDetails = (
         <DropdownMenuItem
-          icon={<DocumentPrintRegular style={{ width: "16px", height: "16px" }} />}
+          icon={<DocumentPrintRegular style={{ width: "20px", height: "20px" }} />}
           label="Print Details"
           onClick={() => handlePrintDetails && handlePrintDetails(item)}
           style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
@@ -236,38 +236,50 @@ export const useProcessTable = ({
       // If we have menu items, render Dropdown
       if (menuItems.length > 0) {
         return (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button
-                  appearance="subtle"
-                  size="small"
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    padding: 0,
-                  }}
-                  aria-label="More options"
-                >
-                  <MoreHorizontalRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {menuItems.map((item, index) => (
-                  <React.Fragment key={index}>{item}</React.Fragment>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <>
+            <style>{`
+              .more-actions-no-hover:hover {
+                background-color: transparent !important;
+              }
+              .more-actions-no-hover:active {
+                background-color: transparent !important;
+              }
+            `}</style>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", paddingLeft: "12px" }}>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button
+                    appearance="subtle"
+                    size="small"
+                    className="more-actions-no-hover"
+                    style={{
+                      width: "32px",
+                      height: "32px",
+                      padding: 0,
+                    }}
+                    aria-label="More options"
+                  >
+                    <MoreHorizontalRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {menuItems.map((item, index) => (
+                    <React.Fragment key={index}>{item}</React.Fragment>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </>
         );
       }
 
       // Default: Direct PDF Viewer Button
       return (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", paddingLeft: "12px" }}>
           <Button
             appearance="subtle"
             size="small"
+            className="more-actions-no-hover"
             style={{
               width: "32px",
               height: "32px",
@@ -292,7 +304,7 @@ export const useProcessTable = ({
       const isMenuAvailable = isRegistered || isCompleted;
 
       return (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "8px" }}>
           <Button
             appearance="outline"
             onClick={() => handleUpload && handleUpload(item)}
@@ -314,10 +326,12 @@ export const useProcessTable = ({
                 <Button
                   appearance="subtle"
                   size="small"
+                  className="more-actions-no-hover"
                   style={{
                     width: "32px",
                     height: "32px",
                     padding: 0,
+                    marginLeft: "12px",
                   }}
                   aria-label="More options"
                 >
@@ -341,7 +355,6 @@ export const useProcessTable = ({
                     />
                   </>
                 )}
-
                 {isCompleted && (
                   <>
                     <DropdownMenuItem
@@ -376,10 +389,12 @@ export const useProcessTable = ({
             <Button
               appearance="subtle"
               size="small"
+              className="more-actions-no-hover"
               style={{
                 width: "32px",
                 height: "32px",
                 padding: 0,
+                marginLeft: "12px",
               }}
               aria-label="View Application"
               onClick={() => handleViewPDF(item)}
@@ -571,6 +586,7 @@ export const useProcessTable = ({
       fieldName: "actions",
       minWidth: 48,
       maxWidth: 48,
+      width: 48,
       isSortable: false,
       onRenderHeader: () => <span />, // Empty header or icon if preferred, but user just said "three horizontal button"
       onRender: renderActions,

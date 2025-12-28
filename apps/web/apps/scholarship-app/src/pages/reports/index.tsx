@@ -442,7 +442,7 @@ const ReportsPage: React.FC = () => {
             display: "flex",
             alignItems: "flex-start",
             justifyContent: "space-between",
-            marginTop: "11px",
+            marginTop: "16px",
           }}>
             <div>
               <h1 style={{
@@ -451,6 +451,7 @@ const ReportsPage: React.FC = () => {
                 fontWeight: 600,
                 color: "#242424",
                 fontFamily: "'Inter', sans-serif",
+                marginBottom:"4px"
               }}>
                 Reports
               </h1>
@@ -654,12 +655,12 @@ const ReportsPage: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div style={{ flex: 1, padding: "24px", overflow: "hidden", backgroundColor: "#fafafa" }}>
+          <div style={{ flex: 1, overflow: "hidden", backgroundColor: "#fafafa" }}>
             <Card variant="elevated" style={{
               overflow: "hidden",
               border: "1px solid #e0e0e0",
               backgroundColor: "#ffffff",
-              borderRadius: "8px",
+              // borderRadius: "8px",
               flex: 1,
               display: "flex",
               alignItems: "center",

@@ -460,9 +460,9 @@ const RoleForm: React.FC = () => {
     {
       key: "select",
       name: "",
-      width: 50,
-      minWidth: 50,
-      maxWidth: 50,
+      width: 100,
+      minWidth: 100,
+      maxWidth: 100,
       cellPaddingLeft: "20px",
       cellPaddingRight: "8px",
       onRenderHeader: () => (
@@ -513,8 +513,9 @@ const RoleForm: React.FC = () => {
     {
       key: "menu",
       name: "Menu",
-      width: "auto",
-      minWidth: 200,
+      minWidth:235,
+      maxWidth: 235,
+      width: 235,
       cellPaddingLeft: "8px",
       cellPaddingRight: "16px",
       onRenderHeader: () => (
@@ -542,14 +543,14 @@ const RoleForm: React.FC = () => {
     {
       key: "create",
       name: "Create",
-      width: 120,
-      minWidth: 120,
-      maxWidth: 120,
+      width: 80,
+      minWidth: 80,
+      maxWidth: 80,
       cellPaddingLeft: "8px",
       cellPaddingRight: "8px",
       onRenderHeader: () => (
         <div style={{ 
-          textAlign: "center",
+          textAlign: "left",
           width: "100%",
           fontSize: "13px",
           lineHeight: "20px",
@@ -562,7 +563,7 @@ const RoleForm: React.FC = () => {
       ),
       onRender: (item: RolePermission, index?: number) => (
         <div style={{ 
-          textAlign: "center",
+          textAlign: "left",
           width: "100%",
         }}>
           <input
@@ -582,14 +583,14 @@ const RoleForm: React.FC = () => {
     {
       key: "update",
       name: "Update",
-      width: 120,
-      minWidth: 120,
-      maxWidth: 120,
+      width: 80,
+      minWidth: 80,
+      maxWidth: 80,
       cellPaddingLeft: "8px",
       cellPaddingRight: "8px",
       onRenderHeader: () => (
         <div style={{ 
-          textAlign: "center",
+          textAlign: "left",
           width: "100%",
           fontSize: "13px",
           lineHeight: "20px",
@@ -602,7 +603,7 @@ const RoleForm: React.FC = () => {
       ),
       onRender: (item: RolePermission, index?: number) => (
         <div style={{ 
-          textAlign: "center",
+          textAlign: "left",
           width: "100%",
         }}>
           <input
@@ -622,14 +623,14 @@ const RoleForm: React.FC = () => {
     {
       key: "view",
       name: "View",
-      width: 120,
-      minWidth: 120,
-      maxWidth: 120,
+      width:80,
+      minWidth: 80,
+      maxWidth: 80,
       cellPaddingLeft: "8px",
       cellPaddingRight: "8px",
       onRenderHeader: () => (
         <div style={{ 
-          textAlign: "center",
+          textAlign: "left",
           width: "100%",
           fontSize: "13px",
           lineHeight: "20px",
@@ -642,7 +643,7 @@ const RoleForm: React.FC = () => {
       ),
       onRender: (item: RolePermission, index?: number) => (
         <div style={{ 
-          textAlign: "center",
+          textAlign: "left",
           width: "100%",
         }}>
           <input
@@ -662,14 +663,14 @@ const RoleForm: React.FC = () => {
     {
       key: "delete",
       name: "Delete",
-      width: 120,
-      minWidth: 120,
-      maxWidth: 120,
+      width: 60,
+      minWidth: 60,
+      maxWidth: 60,
       cellPaddingLeft: "8px",
       cellPaddingRight: "8px",
       onRenderHeader: () => (
         <div style={{ 
-          textAlign: "center",
+          textAlign: "left",
           width: "100%",
           fontSize: "13px",
           lineHeight: "20px",
@@ -682,7 +683,7 @@ const RoleForm: React.FC = () => {
       ),
       onRender: (item: RolePermission, index?: number) => (
         <div style={{ 
-          textAlign: "center",
+          textAlign: "left",
           width: "100%",
         }}>
           <input
@@ -704,41 +705,46 @@ const RoleForm: React.FC = () => {
   return (
     <>
       {/* Title Section */}
-      <PageActionButtons
-        title={
-          <div style={{ marginBottom: "10px" }}>
-            <h1 style={{
-              fontSize: "16px",
-              // lineHeight: "40px",
-              fontWeight: 600,
-              color: "#242424",
-              // marginBottom: "8px",
-              fontFamily: "'Inter', sans-serif",
-              paddingLeft: "24px",
-              paddingTop: "25px",
-              lineHeight: "22px",
-            }}>
-              {isEditMode ? "Edit Role" : "Add Role"}
-            </h1>
-            <p style={{
-              fontSize: "12px",
-              lineHeight: "16px",
-              color: "#707070",
-              fontFamily: "'Inter', sans-serif",
-              paddingLeft: "24px",
-              fontWeight: 400,
-            }}>
-              Create and define a new user role with specific permissions and access levels.
-            </p>
-          </div>
-        }
-      />
+      <div style={{
+        backgroundColor: "#ffffff",
+        borderBottom: "1px solid #e0e0e0",
+        // marginBottom: "12px",
+        padding: "20px 14px 15px 24px",
+      }}>
+        <PageActionButtons
+          title={
+            <div>
+              <h1 style={{
+                fontSize: "16px",
+                fontWeight: 600,
+                color: "#242424",
+                fontFamily: "'Inter', sans-serif",
+                lineHeight: "22px",
+                margin: 0,
+                paddingTop:"5px"
+              }}>
+                {isEditMode ? "Edit Role" : "Add Role"}
+              </h1>
+              <p style={{
+                fontSize: "12px",
+                lineHeight: "16px",
+                color: "#707070",
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 400,
+                margin: 0,
+              }}>
+                Create and define a new user role with specific permissions and access levels.
+              </p>
+            </div>
+          }
+        />
+      </div>
 
       <Card variant="elevated" style={{
         border: "1px solid #e0e0e0",
         backgroundColor: "#ffffff",
         // borderRadius: "8px",
-        padding: "30px 24px 0px 24px",
+        padding: "30px 24px 15px 28px",
         // height: "100%",
         // paddingBottom: "0px",
       }}>
@@ -840,7 +846,7 @@ const RoleForm: React.FC = () => {
               </>
             )}
           </div>
-          <div>
+          <div style={{marginLeft:"10px"}}>
             <Label style={{
               fontSize: "13px",
               lineHeight: "20px",
@@ -890,13 +896,14 @@ const RoleForm: React.FC = () => {
         }}>
           <div style={{ 
             borderBottom: "1px solid #e0e0e0",
-            paddingBottom: "34px",
+            paddingBottom: "24px",
             marginLeft: "-24px",
             marginRight: "-24px",
             paddingLeft: "24px",
             paddingRight: "24px",
+            paddingTop:"5px"
           }}>
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "15px"}}>
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "22px"}}>
               <h3 style={{
                 fontSize: "13px",
                 lineHeight: "20px",
@@ -904,13 +911,16 @@ const RoleForm: React.FC = () => {
                 color: "#242424",
                 fontFamily: "'Inter', sans-serif",
                 margin: 0,
+                paddingTop:"3px"
               }}>
                 Permissions
               </h3>
             </div>
             <div style={{
-              border: "1px solid #e0e0e0",
+              // border: "1px solid #e0e0e0",
               borderRadius: "4px",
+              // padding:"10px",
+              width:"60%"
             }}>
               <DataTable
                 data={formData.permissions}
@@ -929,7 +939,7 @@ const RoleForm: React.FC = () => {
           paddingLeft: "24px",
           paddingRight: "24px",
           paddingTop: "20px",
-          paddingBottom: "20px",
+          // paddingBottom: "20px",
           marginTop: "-60px",
           // borderTop: "1px solid #e0e0e0",
         }}>

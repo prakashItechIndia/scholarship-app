@@ -49,17 +49,17 @@ export const useUserTable = ({
           }}
         >
           <span style={{
-            fontSize: "14px",
-            lineHeight: "20px",
-            fontWeight: 600,
+            fontSize: "13px",
+            lineHeight: "19px",
+            fontWeight: 400,
             color: "#424242",
             fontFamily: "'Inter', sans-serif",
           }}>
             {name}
           </span>
           <ArrowSortRegular style={{ 
-            width: "16px", 
-            height: "16px", 
+            width: "14px", 
+            height: "14px", 
             color: isActive ? "#0f6cbd" : "#616161",
             transform: isDesc ? "rotate(180deg)" : "none",
             transition: "transform 0.2s",
@@ -129,9 +129,10 @@ export const useUserTable = ({
     const renderText = (value: string | undefined) => (
       <span style={{
         fontSize: "13px",
-        lineHeight: "20px",
+        lineHeight: "19px",
         color: "#242424",
         fontFamily: "'Inter', sans-serif",
+        fontWeight: 400,
       }}>
         {value || "-"}
       </span>
