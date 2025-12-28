@@ -63,7 +63,7 @@ const ReportsTabs: React.FC<ReportsTabsProps> = ({ activeTab, onTabChange, onExp
                 }}
                 className="hover:text-[#242424]"
               >
-                {tab.label}
+                {tab.label} 
               </button>
             );
           })}

@@ -12,10 +12,8 @@ import {
   DropdownMenuItem,
 } from "@shared/components";
 import {
-  MoreVerticalRegular,
-  DocumentRegular as DocumentIcon,
-  SearchRegular,
-  FilterRegular,
+  MoreHorizontalRegular,
+  AddFilled,
 } from "@fluentui/react-icons";
 import { Role } from "./types";
 import { useRoleTable } from "./hooks/useRoleTable";
@@ -306,169 +304,52 @@ const RoleManagementPage: React.FC = () => {
               Maintain Roles, Rights, and User Information
             </p>
           </div>
-          <Button
-            onClick={handleAddRole}
-            style={{
-              backgroundColor: "#2453C3",
-              color: "#ffffff",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "8px 16px",
-              borderRadius: "6px",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontWeight: 500,
-              fontFamily: "'Inter', sans-serif",
-              height: "32px",
-            }}
-          >
-            Add Role
-          </Button>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <Button
+              onClick={handleAddRole}
+              style={{
+                backgroundColor: "#2453C3",
+                color: "#ffffff",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "8px 16px",
+                borderRadius: "6px",
+                border: "none",
+                cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: 500,
+                fontFamily: "'Inter', sans-serif",
+                height: "32px",
+              }}
+            >
+              <AddFilled style={{ width: "16px", height: "16px" }} />
+              Add Role
+            </Button>
+            <Button
+              appearance="outline"
+              style={{
+                width: "32px",
+                minWidth: "32px",
+                height: "32px",
+                padding: 0,
+                borderColor: "#D1D1D1",
+                backgroundColor: "#fff",
+                borderRadius: "6px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <MoreHorizontalRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
+            </Button>
+          </div>
+
+
         </div>
 
         {/* Second Row: Search on left, Action buttons on right */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginTop: "16px",
-        }}>
-          {/* Search field on the left */}
-          <div style={{ position: "relative", display: "flex", alignItems: "center", border: "1px solid #D1D1D1", borderRadius: "8px" }}>
-            <SearchRegular style={{ 
-              position: "absolute", 
-              left: "8px", 
-              width: "16px", 
-              height: "16px", 
-              color: "#616161",
-              pointerEvents: "none"
-            }} />
-            <input
-              type="text"
-              placeholder="Search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                }
-              }}
-              style={{
-                width: "200px",
-                height: "32px",
-                paddingLeft: "32px",
-                paddingRight: "12px",
-                borderRadius: "8px",
-                border: "1px solid #FFFFFF00",
-                fontSize: "14px",
-                fontFamily: "'Inter', sans-serif",
-                outline: "none",
-                backgroundColor: "#fff",
-              }}
-            />
-          </div>
-
-          {/* Action buttons on the right */}
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            flexShrink: 0,
-          }}>
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button
-                  appearance="outline"
-                  aria-label="More options"
-                  style={{
-                    width: "32px",
-                    minWidth: "32px",
-                    maxWidth: "32px",
-                    height: "32px",
-                    padding: 0,
-                    borderColor: "#d1d5db",
-                    backgroundColor: "#fff",
-                    borderRadius: "6px",
-                  }}
-                >
-                  <MoreVerticalRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem 
-                  onClick={() => void handleExport('excel')}
-                  style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <DocumentIcon style={{ width: "16px", height: "16px" }} />
-                    Excel
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => void handleExport('word')}
-                  style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <DocumentIcon style={{ width: "16px", height: "16px" }} />
-                    Word
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button
-                  appearance="outline"
-                  aria-label="Filter"
-                  style={{
-                    width: "32px",
-                    minWidth: "32px",
-                    maxWidth: "32px",
-                    height: "32px",
-                    padding: 0,
-                    borderColor: "#d1d5db",
-                    backgroundColor: "#fff",
-                    borderRadius: "6px",
-                  }}
-                >
-                  <FilterRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem 
-                  onClick={() => {}}
-                  style={{
-                    fontWeight: "normal",
-                    color: "#616161",
-                  }}
-                >
-                  Role Name
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => {}}
-                  style={{
-                    fontWeight: "normal",
-                    color: "#616161",
-                  }}
-                >
-                  User Type
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => {}}
-                  style={{
-                    fontWeight: "normal",
-                    color: "#616161",
-                  }}
-                >
-                  Status
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
+        
       </div>
 
       {/* Table Section - Scrollable */}

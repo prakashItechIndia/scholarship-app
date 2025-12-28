@@ -64,6 +64,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
       style={{
         display: "inline-flex",
         alignItems: "center",
+        justifyContent: "center",
         padding: "4px 10px",
         borderRadius: "10000px",
         fontSize: "12px",
@@ -73,6 +74,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
         backgroundColor: config.bgColor,
         color: config.textColor,
         fontFamily: "'Inter', sans-serif",
+        minWidth: "140px",
       }}
     >
       {status}
