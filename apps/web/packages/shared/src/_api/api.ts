@@ -3813,6 +3813,50 @@ export const ProcessManagementApiAxiosParamCreator = function (configuration?: C
             };
         },
         /**
+         * Generates a PDF with: Top section (dynamic application data), Center section (uploaded cheque image), Bottom section (payment summary)
+         * @summary Get merged scholarship PDF with cheque image
+         * @param {string} applicationId 
+         * @param {string} scholarshipId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetMergedScholarshipPDF: async (applicationId: string, scholarshipId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'applicationId' is not null or undefined
+            assertParamExists('processManagementControllerGetMergedScholarshipPDF', 'applicationId', applicationId)
+            // verify required parameter 'scholarshipId' is not null or undefined
+            assertParamExists('processManagementControllerGetMergedScholarshipPDF', 'scholarshipId', scholarshipId)
+            const localVarPath = `/process-management/scholarship-pdf`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (applicationId !== undefined) {
+                localVarQueryParameter['applicationId'] = applicationId;
+            }
+
+            if (scholarshipId !== undefined) {
+                localVarQueryParameter['scholarshipId'] = scholarshipId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Get applications for Overview tab
          * @param {string} [mainCategory] 
@@ -4232,6 +4276,18 @@ export const ProcessManagementApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Generates a PDF with: Top section (dynamic application data), Center section (uploaded cheque image), Bottom section (payment summary)
+         * @summary Get merged scholarship PDF with cheque image
+         * @param {string} applicationId 
+         * @param {string} scholarshipId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async processManagementControllerGetMergedScholarshipPDF(applicationId: string, scholarshipId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.processManagementControllerGetMergedScholarshipPDF(applicationId, scholarshipId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 
          * @summary Get applications for Overview tab
          * @param {string} [mainCategory] 
@@ -4405,6 +4461,17 @@ export const ProcessManagementApiFactory = function (configuration?: Configurati
          */
         processManagementControllerGetIssueAmountApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any): AxiosPromise<void> {
             return localVarFp.processManagementControllerGetIssueAmountApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Generates a PDF with: Top section (dynamic application data), Center section (uploaded cheque image), Bottom section (payment summary)
+         * @summary Get merged scholarship PDF with cheque image
+         * @param {string} applicationId 
+         * @param {string} scholarshipId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processManagementControllerGetMergedScholarshipPDF(applicationId: string, scholarshipId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.processManagementControllerGetMergedScholarshipPDF(applicationId, scholarshipId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -4582,6 +4649,19 @@ export class ProcessManagementApi extends BaseAPI {
      */
     public processManagementControllerGetIssueAmountApplications(mainCategory?: string, key?: string, academicYearId?: number, page?: number, pageSize?: number, sortField?: string, sortOrder?: 'asc' | 'desc', options?: any) {
         return ProcessManagementApiFp(this.configuration).processManagementControllerGetIssueAmountApplications(mainCategory, key, academicYearId, page, pageSize, sortField, sortOrder, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Generates a PDF with: Top section (dynamic application data), Center section (uploaded cheque image), Bottom section (payment summary)
+     * @summary Get merged scholarship PDF with cheque image
+     * @param {string} applicationId 
+     * @param {string} scholarshipId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProcessManagementApi
+     */
+    public processManagementControllerGetMergedScholarshipPDF(applicationId: string, scholarshipId: string, options?: any) {
+        return ProcessManagementApiFp(this.configuration).processManagementControllerGetMergedScholarshipPDF(applicationId, scholarshipId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

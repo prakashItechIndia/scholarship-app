@@ -8,8 +8,13 @@ import {
   HttpCode,
   HttpStatus,
   ParseIntPipe,
+  UseInterceptors,
+  UploadedFiles,
+  Res,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { Response } from 'express';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiConsumes } from '@nestjs/swagger';
 import { ProcessManagementService } from './process-management.service';
 
 @ApiTags('Process Management')
@@ -256,12 +261,34 @@ export class ProcessManagementController {
 
   @Post('issue-amount')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FilesInterceptor('documents', 5)) // Allow up to 5 files
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Issue amount for approved application' })
   @ApiResponse({ status: 200, description: 'Amount issued successfully' })
-  async issueAmount(@Body() data: unknown) {
-    return this.processService.issueAmount(
-      data as Parameters<typeof this.processService.issueAmount>[0],
-    );
+  async issueAmount(
+    @Body() body: Record<string, unknown>,
+    @UploadedFiles() files?: Express.Multer.File[],
+  ) {
+    // Parse form data - convert string numbers to numbers where needed
+    const data: Parameters<typeof this.processService.issueAmount>[0] = {
+      applicationId: String(body.applicationId || ''),
+      scholarshipId: body.scholarshipId ? Number(body.scholarshipId) : undefined,
+      paymentMode: String(body.paymentMode || ''),
+      comments: body.comments ? String(body.comments) : undefined,
+      ddChequeNo: body.ddChequeNo ? String(body.ddChequeNo) : undefined,
+      ddChequeInFavor: body.ddChequeInFavor ? String(body.ddChequeInFavor) : undefined,
+      ddChequeDate: body.ddChequeDate ? String(body.ddChequeDate) : undefined,
+      ddChequeInFavorType: body.ddChequeInFavorType ? String(body.ddChequeInFavorType) : undefined,
+      ddChequeInstitutionId: body.ddChequeInstitutionId ? Number(body.ddChequeInstitutionId) : undefined,
+      ddChequeOtherInstitution: body.ddChequeOtherInstitution ? String(body.ddChequeOtherInstitution) : undefined,
+      ddChequeIssuedBy: body.ddChequeIssuedBy ? Number(body.ddChequeIssuedBy) : undefined,
+      scholarshipIssuedDate: body.scholarshipIssuedDate ? String(body.scholarshipIssuedDate) : undefined,
+      bankName: body.bankName ? String(body.bankName) : undefined,
+      branchDetails: body.branchDetails ? String(body.branchDetails) : undefined,
+      issuedBy: body.issuedBy ? Number(body.issuedBy) : undefined,
+    };
+    
+    return this.processService.issueAmount(data, files);
   }
 
   @Get('history/:applicationId')
@@ -292,5 +319,39 @@ export class ProcessManagementController {
   @ApiResponse({ status: 200, description: 'Scholarship history retrieved successfully' })
   async getScholarshipHistory(@Param('applicationId') applicationId: string) {
     return this.processService.getScholarshipHistory(applicationId);
+  }
+
+  @Get('scholarship-pdf')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get merged scholarship PDF with cheque image',
+    description:
+      'Generates a PDF with: Top section (dynamic application data), Center section (uploaded cheque image), Bottom section (payment summary)',
+  })
+  @ApiQuery({ name: 'applicationId', required: true })
+  @ApiQuery({ name: 'scholarshipId', required: true })
+  @ApiResponse({
+    status: 200,
+    description: 'PDF generated successfully',
+    content: {
+      'application/pdf': {},
+    },
+  })
+  async getMergedScholarshipPDF(
+    @Query('applicationId') applicationId: string,
+    @Query('scholarshipId') scholarshipId: string,
+    @Res() res: Response,
+  ) {
+    const pdfBuffer = await this.processService.generateMergedScholarshipPDF(
+      applicationId,
+      scholarshipId,
+    );
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `inline; filename="scholarship_${applicationId}_${scholarshipId}.pdf"`,
+    );
+    res.send(pdfBuffer);
   }
 }

@@ -16,6 +16,11 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
       textColor: "#0e700e",
       borderColor: "#9fd89f",
     },
+    finalCompleted: { // Same as Completed - shows only in Issue Amount tab
+      bgColor: "#ebf3fc",
+      textColor: "#0F6CBD",
+      borderColor: "#0F6CBD",
+    },
     Verified: { // Same as Completed
       bgColor: "#f1faf1",
       textColor: "#0e700e",
@@ -77,7 +82,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
         minWidth: "140px",
       }}
     >
-      {status}
+      {status==='finalCompleted' ? 'Completed' : status}
     </span>
   );
 };

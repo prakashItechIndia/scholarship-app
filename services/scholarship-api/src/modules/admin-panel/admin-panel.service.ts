@@ -136,6 +136,7 @@ export class AdminPanelService {
       LEFT OUTER JOIN TBL_USERMASTER US ON P.Suggested_By = US.Id,
       T_Scholarship_Year SY
       WHERE 1=1
+        AND P.Status != 'finalCompleted'  -- Exclude finalCompleted from Overview tab (only show in Issue Amount tab)
     `;
 
     const params: Record<string, unknown> = {};

@@ -191,6 +191,14 @@ export const useProcessTable = ({
           style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
         />
       );
+      const menuItemFinalForm = (
+        <DropdownMenuItem
+          icon={<DocumentBulletListRegular style={{ width: "20px", height: "20px" }} />}
+          label="Final Form"
+          onClick={() => handleViewScholarshipPDF && handleViewScholarshipPDF(item)}
+          style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
+        />
+      );
 
       let menuItems: React.ReactNode[] = [];
 
@@ -215,8 +223,14 @@ export const useProcessTable = ({
           menuItems = [menuItemViewHistory, menuItemScholarshipHistory];
         }
       } else if (activeTab === "issue-amount") {
-        // "Issue Amount" page: "Approved" status -> Click dot = PDF. So NO menu items.
-        menuItems = [];
+        // "Issue Amount" page: 
+        // - "Approved" status -> Click dot = PDF. So NO menu items.
+        // - "finalCompleted" status -> Show "Final Form" menu item to view merged PDF
+        if (status === "finalCompleted") {
+          menuItems = [menuItemFinalForm];
+        } else {
+          menuItems = [];
+        }
       } else if (activeTab === "overview" || activeTab === "documents") { // Fallback for overview/documents (though documents uses renderDocumentActions)
         if (status === "Registered") {
           menuItems = [menuItemViewHistory, menuItemScholarshipHistory];
@@ -503,6 +517,7 @@ export const useProcessTable = ({
             </span>
           );
         }
+
         
         // If suggestLinkEnable is false, show as plain text (non-clickable)
         if (!item.suggestLinkEnable) {
@@ -521,6 +536,8 @@ export const useProcessTable = ({
           );
         }
         
+ 
+
         // For Completed status, show "Suggest X" as clickable button (no "---" label)
         // For other statuses, show "Suggest X" as clickable button
         return (
@@ -545,23 +562,21 @@ export const useProcessTable = ({
       // For other cases, show as clickable button
       const isCustomStyled = label.includes("Approve") || label.includes("Issue") || label.includes("Suggest");
 
-      return (
-        <Button
-          appearance={isCustomStyled ? "subtle" : "primary"}
-          onClick={() => handleProcess && handleProcess(item)}
-          style={{
-            backgroundColor: isCustomStyled ? "transparent" : "#2453C3",
-            color: isCustomStyled ? "#0F6CBD" : "#ffffff",
-            minWidth: "120px",
-            height: "32px",
-            fontWeight: 600,
-            fontSize: "13px",
-            border: "none",
-          }}
-        >
-          {label}
-        </Button>
-      );
+      return status === "finalCompleted" ? "-" : <Button
+        appearance={isCustomStyled ? "subtle" : "primary"}
+        onClick={() => handleProcess && handleProcess(item)}
+        style={{
+          backgroundColor: isCustomStyled ? "transparent" : "#2453C3",
+          color: isCustomStyled ? "#0F6CBD" : "#ffffff",
+          minWidth: "120px",
+          height: "32px",
+          fontWeight: 600,
+          fontSize: "13px",
+          border: "none",
+        }}
+      >
+        {label}
+      </Button>
     };
 
     // Common text renderer - now clickable to show PDF

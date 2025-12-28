@@ -228,7 +228,7 @@ const ProcessPage: React.FC = () => {
       mobileNumber: String(apiData.Mobile_Number || ''),
       fatherOccupation: String(apiData.Father_Occupation || ''),
       scholarshipNumber: String(apiData.Scholarship_No || '-'),
-      status: status,
+      status: status, // Keep original status - 'finalCompleted' will show in Issue Amount tab
       scholarship: String(apiData.Scholarship_Id || ''),
       preparedBy: String(apiData.Prepared_By || '-'),
       verifiedBy: String(apiData.Verified_By || '-'),
@@ -264,6 +264,7 @@ const ProcessPage: React.FC = () => {
       if (status === 'Waiting') return 'Approve';
       if (status === 'Approved') return 'Issue Amount';
       if (status === 'Completed') return 'View';
+      if (status === 'finalCompleted') return 'View';
     }
     if (tab === 'documents') return 'Upload';
     if (tab === 'verify') return 'Verify';
@@ -275,7 +276,11 @@ const ProcessPage: React.FC = () => {
       if (status === 'Rejected') return 'Rejected';
       return 'Approve';
     }
-    if (tab === 'issue-amount') return 'Issue Amount';
+    if (tab === 'issue-amount') {
+      // For issue-amount tab, show "View" for finalCompleted status (already issued)
+      if (status === 'finalCompleted') return 'View';
+      return 'Issue Amount';
+    }
     return 'View';
   };
 
@@ -535,10 +540,23 @@ const ProcessPage: React.FC = () => {
   // Handle process action
   const handleProcess = React.useCallback((item: ApplicationData) => {
     const actionLabel = item.processActionLabel;
+    const apiData = item as Record<string, unknown>;
+    const originalStatus = String(apiData.Status || ''); // Get original status from database
 
     if (actionLabel === "Issue Amount") {
       setSelectedIssueAmountApplication(item);
       setIssueAmountModalOpen(true);
+    } else if (actionLabel === "View" && activeTab === 'issue-amount' && originalStatus === 'finalCompleted') {
+      // For "finalCompleted" status in issue-amount tab, open the merged PDF
+      const scholarshipId = item.scholarshipNumber || item.scholarship || apiData.Scholarship_Id;
+      if (scholarshipId && scholarshipId !== '-') {
+        handleViewScholarshipPDF(item);
+      } else {
+        // Fallback to regular PDF
+        setSelectedPdfUrl(`https://scholarship.leomuthu.com/Registered_Pdf_ScholerShip/${item.applicationNo}.pdf`);
+        setSelectedPdfApplicationNo(item.applicationNo);
+        setPdfViewerOpen(true);
+      }
     } else if (actionLabel === "Approved") {
       // For "Approved" status, directly open the PDF
       setSelectedPdfUrl(`https://scholarship.leomuthu.com/Registered_Pdf_ScholerShip/${item.applicationNo}.pdf`);
@@ -557,7 +575,7 @@ const ProcessPage: React.FC = () => {
     } else {
       console.log("Process action for:", item.applicationNo, item.processActionLabel);
     }
-  }, []);
+  }, [activeTab, handleViewScholarshipPDF]);
 
   // Refresh applications after modal actions
   const refreshApplications = React.useCallback(() => {
@@ -1507,6 +1525,11 @@ const ProcessPage: React.FC = () => {
         onOpenChange={setIssueAmountModalOpen}
         data={selectedIssueAmountApplication}
         onIssueSuccess={refreshApplications}
+        onViewPDF={(pdfUrl, applicationNo) => {
+          setSelectedPdfUrl(pdfUrl);
+          setSelectedPdfApplicationNo(applicationNo);
+          setPdfViewerOpen(true);
+        }}
       />
       <PrintDetailsModal
         open={printDetailsModalOpen}

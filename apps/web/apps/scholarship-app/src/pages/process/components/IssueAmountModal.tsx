@@ -20,6 +20,7 @@ interface IssueAmountModalProps {
     onOpenChange: (open: boolean) => void;
     data?: ApplicationData | null;
     onIssueSuccess?: () => void;
+    onViewPDF?: (pdfUrl: string, applicationNo: string) => void;
 }
 
 const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
@@ -27,6 +28,7 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
     onOpenChange,
     data,
     onIssueSuccess,
+    onViewPDF,
 }) => {
     const { success, error: showError } = useToast();
     const [comment, setComment] = React.useState("");
@@ -34,11 +36,18 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
     const [ddChequeNo, setDdChequeNo] = React.useState("");
     const [ddChequeInFavor, setDdChequeInFavor] = React.useState("");
     const [ddChequeDate, setDdChequeDate] = React.useState("");
+    const [ddChequeInFavorType, setDdChequeInFavorType] = React.useState<string>("");
+    const [ddChequeInstitutionId, setDdChequeInstitutionId] = React.useState<string>("");
+    const [ddChequeOtherInstitution, setDdChequeOtherInstitution] = React.useState("");
+    const [ddChequeIssuedBy, setDdChequeIssuedBy] = React.useState<string>("");
+    const [scholarshipIssuedDate, setScholarshipIssuedDate] = React.useState("");
     const [bankName, setBankName] = React.useState("");
     const [branchDetails, setBranchDetails] = React.useState("");
     const [uploadedFiles, setUploadedFiles] = React.useState<File[]>([]);
     const [isSubmitted, setIsSubmitted] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
+    const [institutions, setInstitutions] = React.useState<Array<{ value: string; label: string }>>([]);
+    const [users, setUsers] = React.useState<Array<{ value: string; label: string }>>([]);
 
     // Clean up state when modal closes/opens
     React.useEffect(() => {
@@ -48,12 +57,42 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
             setDdChequeNo("");
             setDdChequeInFavor("");
             setDdChequeDate("");
+            setDdChequeInFavorType("");
+            setDdChequeInstitutionId("");
+            setDdChequeOtherInstitution("");
+            setDdChequeIssuedBy("");
+            setScholarshipIssuedDate("");
             setBankName("");
             setBranchDetails("");
             setUploadedFiles([]);
             setIsSubmitted(false);
         }
     }, [open]);
+
+    // Fetch institutions and users for dropdowns
+    React.useEffect(() => {
+        if (open) {
+            // TODO: Fetch institutions from API
+            // For now, using placeholder data
+            setInstitutions([
+                { value: "1", label: "Institution 1" },
+                { value: "2", label: "Institution 2" },
+            ]);
+            
+            // TODO: Fetch users from API (sp_GetAllChequeIssuedBy)
+            // For now, using placeholder data
+            setUsers([
+                { value: "1", label: "User 1" },
+                { value: "2", label: "User 2" },
+            ]);
+        }
+    }, [open]);
+
+    // Word count validation for comments
+    const wordCount = React.useMemo(() => {
+        if (!comment) return 0;
+        return comment.trim().split(/\s+/).filter(word => word.length > 0).length;
+    }, [comment]);
 
     // Helper to safely convert to string
     const safeString = (value: unknown): string => {
@@ -158,19 +197,36 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
             return;
         }
 
+        // Validate word count for comments
+        if (wordCount > 200) {
+            showError('Validation Error', 'Comments cannot exceed 200 words');
+            return;
+        }
+
+        // Note: Removed validation for DD/Cheque In Favor Type and DD/Cheque Issued By
+        // as per UI requirements - only showing basic fields for Cheque/DD
+
         try {
             setLoading(true);
             // Get current user ID from localStorage
             const authData = localStorage.getItem('scholarship_auth');
             const userId = authData ? JSON.parse(authData).userId : undefined;
+            const apiData = data as Record<string, unknown> | undefined;
+            const scholarshipId = apiData?.Scholarship_Id ? Number(apiData.Scholarship_Id) : undefined;
 
             await processManagement.issueAmount({
                 applicationId: data.applicationNo,
+                scholarshipId,
                 paymentMode,
                 comments: comment,
                 ddChequeNo: paymentMode === 'Demand Draft (DD)' || paymentMode === 'Cheque' ? ddChequeNo : '',
                 ddChequeInFavor: paymentMode === 'Demand Draft (DD)' || paymentMode === 'Cheque' ? ddChequeInFavor : '',
                 ddChequeDate: paymentMode === 'Demand Draft (DD)' || paymentMode === 'Cheque' ? ddChequeDate : '',
+                ddChequeInFavorType: paymentMode === 'Demand Draft (DD)' || paymentMode === 'Cheque' ? ddChequeInFavorType : '',
+                ddChequeInstitutionId: ddChequeInFavorType === 'Institution' && ddChequeInstitutionId ? Number(ddChequeInstitutionId) : undefined,
+                ddChequeOtherInstitution: ddChequeInFavorType === 'Institution' ? ddChequeOtherInstitution : '',
+                ddChequeIssuedBy: paymentMode === 'Demand Draft (DD)' || paymentMode === 'Cheque' ? Number(ddChequeIssuedBy) : undefined,
+                scholarshipIssuedDate: paymentMode === 'Demand Draft (DD)' || paymentMode === 'Cheque' ? scholarshipIssuedDate : '',
                 bankName: paymentMode === 'Demand Draft (DD)' || paymentMode === 'Cheque' ? bankName : '',
                 branchDetails: paymentMode === 'Demand Draft (DD)' || paymentMode === 'Cheque' ? branchDetails : '',
                 documents: uploadedFiles,
@@ -179,6 +235,28 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
 
             setIsSubmitted(true);
             success('Success', 'Amount issued successfully');
+
+            // Generate and open PDF after successful submission
+            try {
+                const scholarshipId = apiData?.Scholarship_Id ? String(apiData.Scholarship_Id) : undefined;
+                if (scholarshipId && onViewPDF) {
+                    // Wait a bit for the backend to process the file
+                    setTimeout(async () => {
+                        try {
+                            const mergedPdfUrl = await processManagement.getMergedScholarshipPDF({
+                                applicationId: data.applicationNo,
+                                scholarshipId: scholarshipId,
+                            });
+                            onViewPDF(mergedPdfUrl, data.applicationNo);
+                        } catch (pdfError) {
+                            console.warn('Failed to load merged PDF:', pdfError);
+                            // Still close modal even if PDF fails
+                        }
+                    }, 1000);
+                }
+            } catch (pdfError) {
+                console.warn('Error generating PDF:', pdfError);
+            }
 
             // Refresh data and close modal after success
             if (onIssueSuccess) {
@@ -502,8 +580,13 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
                             <Label style={{ fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
                                 Comments
                             </Label>
-                            <span style={{ fontSize: "12px", color: "#616161", fontFamily: "'Inter', sans-serif" }}>
-                                200 words
+                            <span style={{ 
+                                fontSize: "12px", 
+                                color: wordCount > 200 ? "#dc2626" : "#616161", 
+                                fontFamily: "'Inter', sans-serif",
+                                fontWeight: wordCount > 200 ? 600 : 400
+                            }}>
+                                {wordCount} / 200 words
                             </span>
                         </div>
                         <textarea

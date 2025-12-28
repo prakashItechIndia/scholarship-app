@@ -1135,11 +1135,17 @@ export const processManagement = {
    */
   issueAmount: async (data: {
     applicationId: string;
+    scholarshipId?: number;
     paymentMode: string;
     comments?: string;
     ddChequeNo?: string;
     ddChequeInFavor?: string;
     ddChequeDate?: string;
+    ddChequeInFavorType?: string;
+    ddChequeInstitutionId?: number;
+    ddChequeOtherInstitution?: string;
+    ddChequeIssuedBy?: number;
+    scholarshipIssuedDate?: string;
     bankName?: string;
     branchDetails?: string;
     documents?: File[];
@@ -1147,19 +1153,25 @@ export const processManagement = {
   }) => {
     const formData = new FormData();
     formData.append('applicationId', data.applicationId);
+    if (data.scholarshipId) formData.append('scholarshipId', data.scholarshipId.toString());
     formData.append('paymentMode', data.paymentMode);
     if (data.comments) formData.append('comments', data.comments);
     if (data.ddChequeNo) formData.append('ddChequeNo', data.ddChequeNo);
     if (data.ddChequeInFavor) formData.append('ddChequeInFavor', data.ddChequeInFavor);
     if (data.ddChequeDate) formData.append('ddChequeDate', data.ddChequeDate);
+    if (data.ddChequeInFavorType) formData.append('ddChequeInFavorType', data.ddChequeInFavorType);
+    if (data.ddChequeInstitutionId) formData.append('ddChequeInstitutionId', data.ddChequeInstitutionId.toString());
+    if (data.ddChequeOtherInstitution) formData.append('ddChequeOtherInstitution', data.ddChequeOtherInstitution);
+    if (data.ddChequeIssuedBy) formData.append('ddChequeIssuedBy', data.ddChequeIssuedBy.toString());
+    if (data.scholarshipIssuedDate) formData.append('scholarshipIssuedDate', data.scholarshipIssuedDate);
     if (data.bankName) formData.append('bankName', data.bankName);
     if (data.branchDetails) formData.append('branchDetails', data.branchDetails);
     if (data.issuedBy) formData.append('issuedBy', data.issuedBy.toString());
     
     // Append uploaded documents
     if (data.documents && data.documents.length > 0) {
-      data.documents.forEach((file, index) => {
-        formData.append(`documents`, file);
+      data.documents.forEach((file) => {
+        formData.append('documents', file);
       });
     }
 
