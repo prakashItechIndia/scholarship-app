@@ -15,6 +15,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@shared/components";
+import StatusBadge from "../../process/components/StatusBadge";
 
 interface UseReportsTableProps {
   onRowSelect?: (item: ScholarshipReportData | ApprovedFormData, selected: boolean) => void;
@@ -473,7 +474,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Status"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "status")}</span>
+          <StatusBadge status={getFieldValue(item, "status")} />
         ),
       },
       {
@@ -680,9 +681,7 @@ export const useReportsTable = ({
       isSortable: true,
       onRenderHeader: () => createSortableHeader("Status"),
       onRender: (item?: ApprovedFormData | any) => (
-        <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
-          {getFieldValue(item, "status")}
-        </span>
+        <StatusBadge status={getFieldValue(item, "status")} />
       ),
     },
     {
