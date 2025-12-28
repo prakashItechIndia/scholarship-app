@@ -114,31 +114,30 @@ const sidebarStyles: IStackStyles = {
 
 const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: boolean, isCompleted: boolean }) => {
   const isFinalStep = step.id === STEPS.length;
-  
+
   return (
     <Stack horizontal tokens={{ childrenGap: 14 }} verticalAlign="start">
       {/* <div className="rounded-full flex-shrink-0 flex items-center justify-center p-0.5 border-4"> */}
-        <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold border-2 transition-all mt-1 border-none ${
-         isActive 
-            ? 'bg-gray-900 text-white !border-none' 
-            : isCompleted 
-              ? 'bg-green-500 text-white border-green-500' 
-              : isFinalStep
-                ? 'bg-gray-100 border-none'
-                : 'bg-transparent  !bg-[#EBEBEB]'
+      <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold border-2 transition-all mt-1 border-none ${isActive
+          ? 'bg-gray-900 text-white !border-none'
+          : isCompleted
+            ? 'bg-green-500 text-white border-green-500'
+            : isFinalStep
+              ? 'bg-gray-100 border-none'
+              : 'bg-transparent  !bg-[#EBEBEB]'
         }`} style={{ lineHeight: '32px' }} >
-          <div>
-            {isCompleted ? (
-              <Image src={checkmarkIcon} alt="Completed" width={26} height={26} imageFit={ImageFit.contain} />
-            ) : isFinalStep && !isActive ? (
-              <RocketRegular className="font-bold text-gray-400" style={{ width: '18px', height: '18px', color: '#616161' }} />
-            ) : (
-              <div className="flex items-center justify-center">   
-                <span className={`text-[12px] font-bold flex items-center justify-center w-6 h-6 rounded-full 
+        <div>
+          {isCompleted ? (
+            <Image src={checkmarkIcon} alt="Completed" width={26} height={26} imageFit={ImageFit.contain} />
+          ) : isFinalStep && !isActive ? (
+            <RocketRegular className="font-bold text-gray-400" style={{ width: '18px', height: '18px', color: '#616161' }} />
+          ) : (
+            <div className="flex items-center justify-center">
+              <span className={`text-[12px] font-bold flex items-center justify-center w-6 h-6 rounded-full 
                   ${isActive ? 'text-white border-2 ' : 'text-[#616161] border-[#616161] border-2'}`}>{step.id}</span>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
       </div>
       <Stack style={{ paddingTop: '2px', justifyContent: 'center' }}>
         <Text variant="small" className={`uppercase tracking-wider font-semibold mb-1 ${isFinalStep ? 'text-[#707070]' : 'text-[#707070]'}`} style={{ fontSize: '11px', lineHeight: '16px' }}>
@@ -155,10 +154,10 @@ const StepIndicator = ({ step, isActive, isCompleted }: { step: Step, isActive: 
 const RegistrationContent = () => {
   // Direct destructuring - TypeScript should infer types from the hook's return type
   const { currentStep, completedSteps, prevStep, isLoading, formData, previousButtonConfig } = useRegistration();
-  
+
   // BRD Section 6.6.2: Minimum 3 documents required before submission
   // Check if documents step has minimum 3 files (step 6 is DocumentsUpload)
-  const isDocumentsStepValid = currentStep === 6 
+  const isDocumentsStepValid = currentStep === 6
     ? (formData?.documents && Array.isArray(formData.documents) && formData.documents.length >= 3)
     : true;
 
@@ -169,7 +168,7 @@ const RegistrationContent = () => {
   // Build dynamic className for previous button
   const getPreviousButtonClassName = (): string => {
     const baseClasses = 'h-10 text-[12px] font-semibold !rounded-lg';
-    
+
     // If disabled, always use disabled styling (overrides custom colors)
     if (isPreviousDisabled) {
       // If custom className is provided, merge with disabled styles
@@ -177,8 +176,8 @@ const RegistrationContent = () => {
         const customClass = previousButtonConfig.className;
         // Check if disabled styles are already in the custom class
         const hasDisabledStyles = customClass.includes('opacity') || customClass.includes('cursor-not-allowed');
-        return hasDisabledStyles 
-          ? customClass 
+        return hasDisabledStyles
+          ? customClass
           : `${customClass} opacity-50 cursor-not-allowed`;
       }
       // Default disabled styling
@@ -194,15 +193,15 @@ const RegistrationContent = () => {
     // Build className from bgColor and textColor if provided
     const bgColor = previousButtonConfig?.bgColor;
     const textColor = previousButtonConfig?.textColor;
-    
+
     if (bgColor || textColor) {
-      const bgClass = bgColor 
+      const bgClass = bgColor
         ? (bgColor.startsWith('#') ? `!bg-[${bgColor}]` : (bgColor.startsWith('bg-') ? `!${bgColor}` : `!bg-${bgColor}`))
         : '';
       const textClass = textColor
         ? (textColor.startsWith('#') ? `!text-[${textColor}]` : (textColor.startsWith('text-') ? `!${textColor}` : `!text-${textColor}`))
         : '';
-      
+
       return `${baseClasses} ${bgClass} ${textClass}`.trim().replace(/\s+/g, ' ');
     }
 
@@ -229,7 +228,7 @@ const RegistrationContent = () => {
     }
   };
 
-  const progressPercentage = (completedSteps.length / STEPS.length) * 100;
+  const progressPercentage = Math.min((completedSteps.length / TOTAL_STEPS) * 100, 100);
 
   return (
     <>
@@ -255,13 +254,13 @@ const RegistrationContent = () => {
             {/* Title */}
             <Stack.Item grow>
               <Stack horizontalAlign="center" tokens={{ childrenGap: 8 }} style={{ maxHeight: '100%' }}>
-                <Text variant="xxLarge" className="text-[#242424] font-bold text-[28px] font-weight-600" style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap',marginBottom: '10px' }}>
+                <Text variant="xxLarge" className="text-[#242424] font-bold text-[28px] font-weight-600" style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '10px' }}>
                   Leo Muthu Scholarship Application
                 </Text>
                 <Text variant="large" className="!text-[#242424] !text-[16px] font-weight-600" style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   Online Registration for Scholarship Assistance - Academic Year 2025-2026
                 </Text>
-                <Text variant="medium" className="!text-[#242424] !text-[14px] font-weight-400" style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>  
+                <Text variant="medium" className="!text-[#242424] !text-[14px] font-weight-400" style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   Complete the form below to apply for our scholarship program
                 </Text>
               </Stack>
@@ -279,7 +278,7 @@ const RegistrationContent = () => {
 
           {/* Sidebar - Fixed Width, Scrollable inside if needed */}
           <Stack styles={sidebarStyles} className="bg-gray-50 dark:bg-gray-800 hidden md:flex" disableShrink>
-            <Stack tokens={{ childrenGap: 10 }} style={{ marginBottom: 32,marginLeft: '18px' }}>
+            <Stack tokens={{ childrenGap: 10 }} style={{ marginBottom: 32, marginLeft: '18px' }}>
               <Stack horizontal horizontalAlign="space-between" verticalAlign="center" style={{ marginBottom: 32 }}>
                 <Stack style={{ marginBottom: 0 }}>
                   <Text variant="xLarge" className="font-bold text-[20px] mb-0" style={{ lineHeight: '36px' }}>
@@ -311,12 +310,12 @@ const RegistrationContent = () => {
                     />
                   </svg>
                   <div className="absolute text-gray-800 font-semibold text-[13px]" style={{ lineHeight: '20px' }}>
-                    {completedSteps.length}/{TOTAL_STEPS}
+                    {Math.min(completedSteps.length, TOTAL_STEPS)}/{TOTAL_STEPS}
                   </div>
                 </div>
               </Stack>
 
-              <Stack tokens={{ childrenGap: 24 }} style={{fontSize: '10px' }}>
+              <Stack tokens={{ childrenGap: 24 }} style={{ fontSize: '10px' }}>
                 {STEPS.map(step => (
                   <StepIndicator
                     key={step.id}
@@ -336,7 +335,7 @@ const RegistrationContent = () => {
             <Stack grow className="overflow-y-auto py-10 px-10">
               <Stack style={{ marginBottom: 8 }}>
                 <Text className="text-[#2453C3] text-[10px] uppercase tracking-wider mb-0" style={{ lineHeight: '12px', letterSpacing: '0.05em' }}>
-                  STEP {currentStep}/{TOTAL_STEPS}
+                  STEP {currentStep > TOTAL_STEPS ? TOTAL_STEPS : currentStep}/{TOTAL_STEPS}
                 </Text>
               </Stack>
 
@@ -353,7 +352,7 @@ const RegistrationContent = () => {
               <Button
                 // appearance="primary"
                 onClick={handleCancel}
-                style={{border:'1px solid #D1D1D1', height:'40px',borderRadius:'10px' }}
+                style={{ border: '1px solid #D1D1D1', height: '40px', borderRadius: '10px' }}
               >
                 Cancel
               </Button>

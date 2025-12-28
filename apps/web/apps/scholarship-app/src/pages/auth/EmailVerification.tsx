@@ -38,32 +38,33 @@ const EmailVerificationPage = () => {
     //   showError('Error', 'Email address is required');
     //   return;
     // }
-if(email){
-    try {
-      setIsSending(true);
+    if (email) {
+      try {
+        setIsSending(true);
 
-      // Call API to send verification email
-      const result = await scholarshipApplication.sendVerificationEmail(email);
+        // Call API to send verification email
+        const result = await scholarshipApplication.sendVerificationEmail(email);
 
-      if (result.success) {
-        setIsSent(true);
-        success('Success', result.message || 'Verification email sent successfully!');
-      } else {
-        showError('Error', result.message || 'Failed to send verification email. Please try again.');
+        if (result.success) {
+          setIsSent(true);
+          success('Success', result.message || 'Verification email sent successfully!');
+        } else {
+          showError('Error', result.message || 'Failed to send verification email. Please try again.');
+        }
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to send verification email. Please try again.';
+        showError('Error', errorMessage);
+      } finally {
+        setIsSending(false);
       }
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to send verification email. Please try again.';
-      showError('Error', errorMessage);
-    } finally {
-      setIsSending(false);
-    }}
+    }
   }, [email, showError, success]);
 
   useEffect(() => {
     // Get email from localStorage or URL parameter
     const storedEmail = localStorage.getItem('verification_email');
     const emailToUse = emailFromParam || storedEmail || '';
-    
+
     if (emailToUse) {
       setEmail(emailToUse);
     } else if (!token) {
@@ -109,75 +110,61 @@ if(email){
       />
       <AuthLayoutWrapper footerVariant="email">
         <LogoHeader variant="email" />
-        
-        <AuthPageHeader
-          title="Verify Your Email"
-          subtitle="We've sent a verification link to your email address"
-          titleSize="xxLarge"
-          subtitleSize="medium"
-        />
 
-        {isSent && (
-          <MessageBar messageBarType={MessageBarType.success} style={{ marginBottom: '16px' }}>
-            Verification email sent successfully! Please check your inbox.
-          </MessageBar>
-        )}
+        <div style={{ textAlign: 'left', width: '100%', maxWidth: '440px', marginTop: '130px' }}>
+          <Text variant="xxLarge" style={{
+            display: 'block',
 
-        <Stack tokens={{ childrenGap: 24 }} style={{ width: '100%' }}>
-          {email && (
-            <div style={{ textAlign: 'center' }}>
-              <Text variant="medium" style={{ color: '#616161', marginBottom: '8px' }}>
-                Verification link has been sent to:
-              </Text>
-              <Text variant="large" style={{ fontWeight: 600, color: '#242424' }}>
-                {email}
-              </Text>
-            </div>
+            fontWeight: 700,
+            color: '#242424',
+            fontSize: '20px',
+            lineHeight: '28px'
+          }}>
+            Check your email
+          </Text>
+
+          {isSent && (
+            <MessageBar messageBarType={MessageBarType.success} style={{ marginBottom: '16px' }}>
+              Verification email sent successfully! Please check your inbox.
+            </MessageBar>
           )}
 
-          <div style={{ textAlign: 'center', padding: '16px 0' }}>
-            <Text variant="medium" style={{ color: '#616161', lineHeight: '24px' }}>
-              Please check your email and click on the verification link to continue.
-              <br />
-              The link will expire in 30 minutes.
+          <div style={{ marginBottom: '14px' }}>
+            <Text variant="medium" style={{
+              color: '#616161',
+              fontSize: '16px',
+              lineHeight: '22px',
+              fontFamily: 'Inter, sans-serif'
+            }}>
+              We’ve sent you a Verification link to<br />
+              {email}<span style={{ color: '#616161' }}>.</span><br />
+              Please check your inbox and click the link to<br />
+              activate your account.
             </Text>
           </div>
 
-          <Stack horizontal horizontalAlign="center" tokens={{ childrenGap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Text variant="medium" style={{ color: '#616161', fontSize: '15px' }}>
+              Didn’t receive an email?
+            </Text>
             <button
               onClick={handleResendVerification}
               disabled={isSending || !email}
               style={{
-                padding: '8px 16px',
-                backgroundColor: 'transparent',
-                border: '1px solid #2453C3',
+                background: 'none',
+                border: 'none',
+                padding: 0,
                 color: '#2453C3',
-                borderRadius: '8px',
                 cursor: isSending || !email ? 'not-allowed' : 'pointer',
-                fontSize: '14px',
-                fontWeight: 500,
+                fontSize: '15px',
+                fontWeight: 600,
                 opacity: isSending || !email ? 0.5 : 1,
               }}
             >
-              {isSending ? 'Sending...' : 'Resend Verification Email'}
+              {isSending ? 'Sending...' : 'Resend'}
             </button>
-            <button
-              onClick={() => void navigate('/user-login')}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: 'transparent',
-                border: 'none',
-                color: '#2453C3',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: 500,
-                textDecoration: 'underline',
-              }}
-            >
-              Back to Login
-            </button>
-          </Stack>
-        </Stack>
+          </div>
+        </div>
       </AuthLayoutWrapper>
     </>
   );

@@ -30,9 +30,8 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
           fontWeight: 700,
           lineHeight: "28px",
           color: "#242424",
-          marginBottom: "4px",
           fontFamily: "'Inter', sans-serif",
-          paddingLeft: "24px",
+          paddingLeft: "20px",
         }}
       >
         Welcome {userName}!
@@ -40,11 +39,11 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
       <p
         style={{
           fontSize: "13px",
-          lineHeight: "24px",
+          lineHeight: "20px",
           fontWeight: 400,
           color: "#707070",
           fontFamily: "'Inter', sans-serif",
-          paddingLeft: "25px",
+          paddingLeft: "20px",
         }}
       >
         {greeting}
