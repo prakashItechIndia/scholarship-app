@@ -161,12 +161,9 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
             <DropdownMenuItem
               key={option.format}
               onClick={() => handleExport(option.format)}
-            >
-              {option.icon && (
-                <span style={{ marginRight: "8px" }}>{option.icon}</span>
-              )}
-              {option.label}
-            </DropdownMenuItem>
+              icon={option.icon as React.ReactElement}
+              label={option.label}
+            />
           ))}
         </DropdownMenuContent>
       )}

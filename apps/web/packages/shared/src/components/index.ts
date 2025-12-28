@@ -35,4 +35,5 @@ export * from "./vector-icon";
 export * from "./page-action-buttons";
 export * from "./data-table";
 export * from "./calendar-icon";
+export * from "./report-export-pdf-icon";
 
