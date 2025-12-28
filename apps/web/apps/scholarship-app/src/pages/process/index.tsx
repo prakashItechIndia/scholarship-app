@@ -25,6 +25,8 @@ import { ApplicationData } from "./types";
 import { useProcessTable } from "./hooks/useProcessTable";
 import ProcessTabs from "./components/ProcessTabs";
 import DocumentUploadPanel from "./components/DocumentUploadPanel";
+import { usePermissions } from "@/contexts/PermissionContext";
+import { getScreenNameFromTab } from "./utils/tabPermissions";
 import ProcessHistoryModal from "./components/ProcessHistoryModal";
 import ScholarshipHistoryModal from "./components/ScholarshipHistoryModal";
 import PrintDetailsModal from "./components/PrintDetailsModal";
@@ -34,6 +36,7 @@ import SuggestModal from "./components/SuggestModal";
 import VerifyModal from "./components/VerifyModal";
 import { processManagement, reports } from "../../services/scholarship.service";
 import { useToast } from "@/components/ui/toast";
+import { tabLabels } from "./constants";
 
 const tabHeaderInfo: Record<string, { title: string; subtitle: string }> = {
   overview: {
@@ -67,7 +70,92 @@ type SortField = string | null;
 
 const ProcessPage: React.FC = () => {
   const { success, error: showError } = useToast();
+  const { permissions, loading: permissionsLoading } = usePermissions();
   const [activeTab, setActiveTab] = React.useState("overview");
+
+  // Check if user is Administrator - they have full access
+  const isAdministrator = React.useMemo(() => {
+    try {
+      const authData = localStorage.getItem('scholarship_auth');
+      if (authData) {
+        const parsed = JSON.parse(authData);
+        return parsed?.user?.userType === 'Administrator';
+      }
+    } catch {
+      // Ignore errors
+    }
+    return false;
+  }, []);
+
+  // Handle tab change with permission check
+  const handleTabChange = React.useCallback((tab: string) => {
+    // Administrators can access all tabs
+    if (isAdministrator) {
+      setActiveTab(tab);
+      return;
+    }
+
+    // If permissions are loading, allow tab change (will be validated once loaded)
+    if (permissionsLoading || !permissions || !permissions.screens) {
+      setActiveTab(tab);
+      return;
+    }
+
+    // Check if user has permission for this tab
+    const screenName = getScreenNameFromTab(tab);
+    if (!screenName) {
+      // If no mapping exists, allow the tab (for backward compatibility)
+      setActiveTab(tab);
+      return;
+    }
+
+    const hasPermission = permissions.screens.some(
+      (screen) => screen.screenName === screenName && screen.isActive
+    );
+
+    if (hasPermission) {
+      setActiveTab(tab);
+    } else {
+      showError('Access Denied', 'You do not have permission to access this tab.');
+    }
+  }, [permissions, permissionsLoading, isAdministrator, showError]);
+
+  // Validate current active tab when permissions load
+  React.useEffect(() => {
+    if (permissionsLoading || isAdministrator) {
+      return;
+    }
+
+    if (!permissions || !permissions.screens) {
+      return;
+    }
+
+    const screenName = getScreenNameFromTab(activeTab);
+    if (!screenName) {
+      return;
+    }
+
+    const hasPermission = permissions.screens.some(
+      (screen) => screen.screenName === screenName && screen.isActive
+    );
+
+    // If user doesn't have permission for current tab, switch to first allowed tab
+    if (!hasPermission) {
+      const allowedScreenNames = permissions.screens
+        .filter((screen) => screen.isActive)
+        .map((screen) => screen.screenName);
+
+      // Find first allowed tab
+      const firstAllowedTab = tabLabels.find((tab) => {
+        const tabScreenName = getScreenNameFromTab(tab.value);
+        return tabScreenName && allowedScreenNames.includes(tabScreenName);
+      });
+
+      if (firstAllowedTab) {
+        setActiveTab(firstAllowedTab.value);
+      }
+    }
+  }, [permissions, permissionsLoading, activeTab, isAdministrator]);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10); // Default 10 records per page (BRD requirement)
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -140,7 +228,7 @@ const ProcessPage: React.FC = () => {
       mobileNumber: String(apiData.Mobile_Number || ''),
       fatherOccupation: String(apiData.Father_Occupation || ''),
       scholarshipNumber: String(apiData.Scholarship_No || '-'),
-      status: status,
+      status: status, // Keep original status - 'finalCompleted' will show in Issue Amount tab
       scholarship: String(apiData.Scholarship_Id || ''),
       preparedBy: String(apiData.Prepared_By || '-'),
       verifiedBy: String(apiData.Verified_By || '-'),
@@ -176,6 +264,7 @@ const ProcessPage: React.FC = () => {
       if (status === 'Waiting') return 'Approve';
       if (status === 'Approved') return 'Issue Amount';
       if (status === 'Completed') return 'View';
+      if (status === 'finalCompleted') return 'View';
     }
     if (tab === 'documents') return 'Upload';
     if (tab === 'verify') return 'Verify';
@@ -187,7 +276,11 @@ const ProcessPage: React.FC = () => {
       if (status === 'Rejected') return 'Rejected';
       return 'Approve';
     }
-    if (tab === 'issue-amount') return 'Issue Amount';
+    if (tab === 'issue-amount') {
+      // For issue-amount tab, show "View" for finalCompleted status (already issued)
+      if (status === 'finalCompleted') return 'View';
+      return 'Issue Amount';
+    }
     return 'View';
   };
 
@@ -447,10 +540,23 @@ const ProcessPage: React.FC = () => {
   // Handle process action
   const handleProcess = React.useCallback((item: ApplicationData) => {
     const actionLabel = item.processActionLabel;
+    const apiData = item as Record<string, unknown>;
+    const originalStatus = String(apiData.Status || ''); // Get original status from database
 
     if (actionLabel === "Issue Amount") {
       setSelectedIssueAmountApplication(item);
       setIssueAmountModalOpen(true);
+    } else if (actionLabel === "View" && activeTab === 'issue-amount' && originalStatus === 'finalCompleted') {
+      // For "finalCompleted" status in issue-amount tab, open the merged PDF
+      const scholarshipId = item.scholarshipNumber || item.scholarship || apiData.Scholarship_Id;
+      if (scholarshipId && scholarshipId !== '-') {
+        handleViewScholarshipPDF(item);
+      } else {
+        // Fallback to regular PDF
+        setSelectedPdfUrl(`https://scholarship.leomuthu.com/Registered_Pdf_ScholerShip/${item.applicationNo}.pdf`);
+        setSelectedPdfApplicationNo(item.applicationNo);
+        setPdfViewerOpen(true);
+      }
     } else if (actionLabel === "Approved") {
       // For "Approved" status, directly open the PDF
       setSelectedPdfUrl(`https://scholarship.leomuthu.com/Registered_Pdf_ScholerShip/${item.applicationNo}.pdf`);
@@ -469,7 +575,7 @@ const ProcessPage: React.FC = () => {
     } else {
       console.log("Process action for:", item.applicationNo, item.processActionLabel);
     }
-  }, []);
+  }, [activeTab, handleViewScholarshipPDF]);
 
   // Refresh applications after modal actions
   const refreshApplications = React.useCallback(() => {
@@ -816,7 +922,7 @@ const ProcessPage: React.FC = () => {
           height: "100%", // Fill the 44px height
         }}>
           {/* Tabs on the left */}
-          <ProcessTabs activeTab={activeTab} onTabChange={setActiveTab} />
+          <ProcessTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
           {/* Search and Actions on the right */}
           <div style={{
@@ -1122,6 +1228,12 @@ const ProcessPage: React.FC = () => {
               columns={columns}
               data={paginatedData}
               disableScroll={true}
+              onRowClick={(item) => {
+                if (activeTab === 'verify') {
+                  setSelectedVerifyApplication(item);
+                  setVerifyModalOpen(true);
+                }
+              }}
             />
           )}
         </div>
@@ -1413,6 +1525,11 @@ const ProcessPage: React.FC = () => {
         onOpenChange={setIssueAmountModalOpen}
         data={selectedIssueAmountApplication}
         onIssueSuccess={refreshApplications}
+        onViewPDF={(pdfUrl, applicationNo) => {
+          setSelectedPdfUrl(pdfUrl);
+          setSelectedPdfApplicationNo(applicationNo);
+          setPdfViewerOpen(true);
+        }}
       />
       <PrintDetailsModal
         open={printDetailsModalOpen}

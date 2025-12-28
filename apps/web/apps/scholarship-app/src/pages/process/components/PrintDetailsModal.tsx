@@ -12,6 +12,8 @@ import {
     Print24Regular,
     Dismiss24Regular,
     DocumentRegular,
+    DocumentDataRegular,
+    TableRegular,
 } from "@fluentui/react-icons";
 import { ApplicationData } from "../types";
 import { useToast } from "@/components/ui/toast";
@@ -229,11 +231,11 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
         }
     };
 
-    const renderRow = (id: number, label: string, value: string) => (
+    const renderRow = (id: number, label: string, value: string, index: number) => (
         <div key={id} style={{
             display: "flex",
             borderBottom: "1px solid #e0e0e0",
-            backgroundColor: "#ffffff",
+            backgroundColor: index % 2 === 0 ? "#FAFAFA" : "#ffffff",
         }}>
             <div style={{
                 width: "60px",
@@ -241,9 +243,10 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                borderRight: "1px solid #e0e0e0",
                 color: "#616161",
-                fontSize: "14px",
+                fontSize: "13px",
+                lineHeight:"20px",
+                fontWeight:400
             }}>
                 {id}
             </div>
@@ -252,9 +255,9 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
                 padding: "12px 16px",
                 fontWeight: 600,
                 color: "#242424",
-                fontSize: "14px",
-                borderRight: "1px solid #e0e0e0",
                 fontFamily: "'Inter', sans-serif",
+                fontSize:"12px",
+                lineHeight:"16px"
             }}>
                 {label}
             </div>
@@ -262,8 +265,10 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
                 flex: 1,
                 padding: "12px 16px",
                 color: "#242424",
-                fontSize: "14px",
+                fontSize: "13px",
                 fontFamily: "'Inter', sans-serif",
+                lineHeight:"20px",
+                fontWeight:400
             }}>
                 {value}
             </div>
@@ -277,7 +282,7 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
             size="lg"
             headerContent={
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", gap: "20px" }}>
-                    <span style={{ fontSize: "16px", fontWeight: 600, color: "#242424", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap" }}>
+                    <span style={{ fontSize: "16px", fontWeight: 600, color: "#242424", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap",lineHeight:"22px" }}>
                         LEO MUTHU - Scholarship Print Details ( 2025-2026 )
                     </span>
                     <div style={{ display: "flex", gap: "8px" }}>
@@ -296,7 +301,7 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
                                     style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
                                 >
                                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                        <DocumentRegular style={{ width: "16px", height: "16px" }} />
+                                        <TableRegular style={{ width: "16px", height: "16px" }} />
                                         Excel
                                     </div>
                                 </DropdownMenuItem>
@@ -305,7 +310,7 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
                                     style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
                                 >
                                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                        <DocumentRegular style={{ width: "16px", height: "16px" }} />
+                                        <DocumentDataRegular style={{ width: "16px", height: "16px" }} />
                                         Word
                                     </div>
                                 </DropdownMenuItem>
@@ -318,12 +323,19 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
                             style={{ width: "32px", height: "32px", padding: 0 }}
                             aria-label="Print"
                         />
+                        <style>{`
+                            .no-hover-effect:hover {
+                                background-color: transparent !important;
+                                opacity: 1 !important;
+                            }
+                        `}</style>
                         <Button
                             appearance="subtle"
                             icon={<Dismiss24Regular />}
                             onClick={() => onOpenChange(false)}
                             style={{ width: "32px", height: "32px", padding: 0 }}
                             aria-label="Close"
+                            className="no-hover-effect"
                         />
                     </div>
                 </div>
@@ -345,7 +357,7 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
                     borderRadius: "8px",
                     overflow: "hidden"
                 }}>
-                    {details.map((item) => renderRow(item.id, item.label, item.value))}
+                    {details.map((item, index) => renderRow(item.id, item.label, item.value, index))}
                 </div>
 
                 {/* Approval Section */}
@@ -355,7 +367,8 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
                         fontWeight: 600,
                         color: "#242424",
                         marginBottom: "12px",
-                        fontFamily: "'Inter', sans-serif"
+                        fontFamily: "'Inter', sans-serif",
+                        lineHeight:"22px"
                     }}>
                         Approval By
                     </h3>
@@ -364,7 +377,7 @@ const PrintDetailsModal: React.FC<PrintDetailsModalProps> = ({
                         borderRadius: "8px",
                         overflow: "hidden"
                     }}>
-                        {approvalDetails.map((item) => renderRow(item.id, item.label, item.value))}
+                        {approvalDetails.map((item, index) => renderRow(item.id, item.label, item.value, index))}
                     </div>
                 </div>
 

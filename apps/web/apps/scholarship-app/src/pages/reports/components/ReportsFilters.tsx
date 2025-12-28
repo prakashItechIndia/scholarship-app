@@ -1,6 +1,17 @@
 import * as React from "react";
-import { Select, DatePicker, Input, Button } from "@shared/components";
-import { SearchRegular } from "@fluentui/react-icons";
+import { 
+  Input,
+  Button,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@shared/components";
+import { SearchRegular, ChevronDown24Regular, CalendarRegular } from "@fluentui/react-icons";
+import { Calendar, DayOfWeek } from "@fluentui/react";
 import { ReportFilters, ReportTab } from "../types";
 import {
   academicYearOptions,
@@ -70,6 +81,115 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
     onFilterUpdate(key, value);
   };
 
+  const labelStyle: React.CSSProperties = {
+    fontSize: "13px",
+    lineHeight: "20px",
+    fontWeight: 400,
+    color: "#242424",
+    marginBottom: "8px",
+    display: "block",
+    fontFamily: "'Inter', sans-serif",
+  };
+
+  const renderDropdown = (
+    _key: keyof ReportFilters,
+    value: string | undefined,
+    options: { value: string; label: string }[],
+    placeholder: string,
+    onChange: (val: string) => void
+  ) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <button
+          style={{
+            width: "100%",
+            height: "32px",
+            backgroundColor: "#FFFFFF",
+            border: "1px solid #D1D1D1",
+            borderRadius: "4px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "0 12px",
+            cursor: "pointer",
+            fontFamily: "'Inter', sans-serif",
+          }}
+        >
+          <span style={{ 
+            whiteSpace: "nowrap", 
+            overflow: "hidden", 
+            textOverflow: "ellipsis",
+            fontSize: "13px",
+            color: value ? "#242424" : "#707070",
+            fontWeight: 400 
+          }}>
+            {value 
+              ? options.find(opt => opt.value === value)?.label || value
+              : placeholder}
+          </span>
+          <ChevronDown24Regular style={{ width: "16px", height: "16px", color: "#616161", flexShrink: 0 }} />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent style={{ width: "272px" }}>
+        {options.map((option) => (
+          <DropdownMenuItem 
+            key={option.value} 
+            onClick={() => onChange(option.value)}
+          >
+            {option.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
+  const renderDatePicker = (
+    value: Date | undefined,
+    placeholder: string,
+    onChange: (date: Date | null | undefined) => void
+  ) => (
+    <Popover positioning="below">
+      <PopoverTrigger>
+        <button
+          style={{
+            width: "100%",
+            height: "32px",
+            backgroundColor: "#FFFFFF",
+            border: "1px solid #D1D1D1",
+            borderRadius: "4px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "0 12px",
+            cursor: "pointer",
+            fontFamily: "'Inter', sans-serif",
+          }}
+        >
+          <span style={{ 
+            whiteSpace: "nowrap", 
+            overflow: "hidden", 
+            textOverflow: "ellipsis",
+            fontSize: "13px",
+            color: value ? "#242424" : "#707070",
+            fontWeight: 400 
+          }}>
+            {value ? onFormatDate(value) : placeholder}
+          </span>
+          <CalendarRegular style={{ width: "16px", height: "16px", color: "#616161", flexShrink: 0 }} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent style={{ padding: 0, border: "none" }}>
+        <Calendar
+          onSelectDate={onChange}
+          value={value}
+          firstDayOfWeek={DayOfWeek.Sunday}
+          highlightCurrentMonth
+          showGoToToday
+        />
+      </PopoverContent>
+    </Popover>
+  );
+
   const isApplyDisabled = React.useMemo(() => {
     // Apply button is always enabled - filters are optional
     return false;
@@ -101,9 +221,8 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
       {/* Header Section */}
       <div
         style={{
-          backgroundColor: "#FFFFFF",
-          padding: "24px",
-          paddingBottom: "16px",
+          backgroundColor: "#F5F5F5",
+          padding: "24px 24px 16px 24px",
           display: "flex",
           flexDirection: "column",
           gap: "12px",
@@ -111,8 +230,8 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
       >
         <h3
           style={{
-            fontSize: "16px",
-            lineHeight: "24px",
+            fontSize: "13px",
+            lineHeight: "22px",
             fontWeight: 600,
             color: "#242424",
             margin: 0,
@@ -134,113 +253,103 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
       <div
         style={{
           backgroundColor: "#FAFAFA",
-        padding: "24px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "20px",
-        flex: 1,
-        overflowY: "auto", // Allow vertical scrolling for filters
-        overflowX: "hidden", // Prevent horizontal scrolling in drawer
-        minWidth: 0, // Allow flex item to shrink
-      }}
+          padding: "24px",
+          paddingTop: "16px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px",
+          flex: 1,
+          overflowY: "auto", // Allow vertical scrolling for filters
+          overflowX: "hidden", // Prevent horizontal scrolling in drawer
+          minWidth: 0, // Allow flex item to shrink
+        }}
       >
+        <style>
+          {`
+            /* Target all inputs and comboboxes within this container */
+            input::placeholder,
+            .fui-Input__input::placeholder,
+            .fui-Combobox__input::placeholder,
+            .ms-TextField-field::placeholder {
+              color: #707070 !important;
+              font-size: 13px !important;
+              line-height: 20px !important;
+              font-weight: 400 !important;
+              font-family: 'Inter', sans-serif !important;
+            }
+            
+            /* Target the actual text value and background */
+            input,
+            .fui-Input__input,
+            .fui-Combobox__input,
+            .ms-TextField-field {
+              font-size: 13px !important;
+              line-height: 20px !important;
+              font-weight: 400 !important;
+              font-family: 'Inter', sans-serif !important;
+              color: #242424 !important;
+            }
+
+            /* Target Fluent UI specific placeholder elements if any */
+            .fui-Input__placeholder,
+            .fui-Combobox__placeholder {
+              color: #707070 !important;
+              font-size: 13px !important;
+              line-height: 20px !important;
+              font-weight: 400 !important;
+            }
+          `}
+        </style>
+
         {/* Categories Wise Report Filters */}
         {activeTab === "categories-wise" && (
           <>
             {/* Academic Year */}
             <div>
-              <label
-                style={{
-                  fontSize: "14px",
-                  lineHeight: "20px",
-                  fontWeight: 500,
-                  color: "#242424",
-                  marginBottom: "8px",
-                  display: "block",
-                  fontFamily: "'Inter', sans-serif",
-                }}
-              >
-                Academic Year
-              </label>
-              <Select
-                placeholder="Select Academic Year"
-                options={academicYears.length > 0 ? academicYears : academicYearOptions}
-                selectedKey={filters.academicYear?.toString()}
-                onValueChange={(value) =>
-                  handleFilterChange("academicYear", value ? Number(value) : undefined)
-                }
-                style={{ width: "100%", height: "32px" }}
-              />
+              <label style={labelStyle}>Academic Year</label>
+              {renderDropdown(
+                "academicYear",
+                filters.academicYear?.toString(),
+                academicYears.length > 0 ? academicYears : academicYearOptions,
+                "Select Academic Year",
+                (val) => handleFilterChange("academicYear", val ? Number(val) : undefined)
+              )}
             </div>
 
             {/* Applied Date */}
             <div>
-              <label
-                style={{
-                  fontSize: "14px",
-                  lineHeight: "20px",
-                  fontWeight: 500,
-                  color: "#242424",
-                  marginBottom: "8px",
-                  display: "block",
-                }}
-              >
-                Applied Date
-              </label>
-              <DatePicker
-                value={filters.appliedDate || undefined}
-                onSelectDate={(date) => handleFilterChange("appliedDate", date)}
-                formatDate={onFormatDate}
-                textField={{
-                  placeholder: "DD/MM/YYYY",
-                } as any}
-              />
+              <label style={labelStyle}>Applied Date</label>
+              <div style={{ width: "100%"}}>
+                {renderDatePicker(
+                  filters.appliedDate || undefined,
+                  "Select Applied Date",
+                  (date) => handleFilterChange("appliedDate", date)
+                )}
+              </div>
             </div>
 
             {/* Gender */}
             <div>
-              <label
-                style={{
-                  fontSize: "14px",
-                  lineHeight: "20px",
-                  fontWeight: 500,
-                  color: "#242424",
-                  marginBottom: "8px",
-                  display: "block",
-                }}
-              >
-                Gender
-              </label>
-              <Select
-                placeholder="--Select--"
-                options={genderOptions}
-                selectedKey={filters.gender || ""}
-                onValueChange={(value) => handleFilterChange("gender", value)}
-                style={{ width: "100%", height: "32px" }}
-              />
+              <label style={labelStyle}>Gender</label>
+              {renderDropdown(
+                "gender",
+                filters.gender,
+                genderOptions,
+                "Select Gender",
+                (val) => handleFilterChange("gender", val)
+              )}
             </div>
 
             {/* Status */}
             <div>
-              <label
-                style={{
-                  fontSize: "14px",
-                  lineHeight: "20px",
-                  fontWeight: 500,
-                  color: "#242424",
-                  marginBottom: "8px",
-                  display: "block",
-                }}
-              >
-                Status
-              </label>
-              <Select
-                placeholder="--Select--"
-                options={statusOptions}
-                selectedKey={filters.status || ""}
-                onValueChange={(value) => handleFilterChange("status", value)}
-                style={{ width: "100%", height: "32px" }}
-              />
+              <label style={labelStyle}>Status</label>
+              {renderDropdown(
+                "status",
+                filters.status,
+                statusOptions,
+                "Select Status",
+                (val) => handleFilterChange("status", val)
+              )}
             </div>
           </>
         )}
@@ -250,109 +359,61 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
           <>
             {/* Academic Year */}
             <div>
-              <label
-                style={{
-                  fontSize: "14px",
-                  lineHeight: "20px",
-                  fontWeight: 500,
-                  color: "#242424",
-                  marginBottom: "8px",
-                  display: "block",
-                  fontFamily: "'Inter', sans-serif",
-                }}
-              >
-                Academic Year
-              </label>
-              <Select
-                placeholder="Select Academic Year"
-                options={academicYears.length > 0 ? academicYears : academicYearOptions}
-                selectedKey={filters.academicYear?.toString()}
-                onValueChange={(value) =>
-                  handleFilterChange("academicYear", value ? Number(value) : undefined)
-                }
-                style={{ width: "100%", height: "32px" }}
-              />
+              <label style={labelStyle}>Academic Year</label>
+              {renderDropdown(
+                "academicYear",
+                filters.academicYear?.toString(),
+                academicYears.length > 0 ? academicYears : academicYearOptions,
+                "Select Academic Year",
+                (val) => handleFilterChange("academicYear", val ? Number(val) : undefined)
+              )}
             </div>
 
             {/* Issued By */}
             <div>
-              <label
-                style={{
-                  fontSize: "14px",
-                  lineHeight: "20px",
-                  fontWeight: 500,
-                  color: "#242424",
-                  marginBottom: "8px",
-                  display: "block",
-                }}
-              >
-                Issued By
-              </label>
-              <Select
-                placeholder="--Select--"
-                options={chequeIssuedByOptions}
-                selectedKey={filters.strIssuedBy || filters.intIssuedBy?.toString() || ""}
-                onValueChange={(value) => {
-                  if (!value || value === "") {
+              <label style={labelStyle}>Issued By</label>
+              {renderDropdown(
+                "issuedBy",
+                filters.strIssuedBy || filters.intIssuedBy?.toString(),
+                chequeIssuedByOptions,
+                "Select",
+                (val) => {
+                  if (!val) {
                     handleFilterChange("strIssuedBy", undefined);
                     handleFilterChange("intIssuedBy", undefined);
                     handleFilterChange("issuedBy", undefined);
                   } else {
-                    const selectedOption = chequeIssuedByOptions.find(opt => opt.value === value);
+                    const selectedOption = chequeIssuedByOptions.find(opt => opt.value === val);
                     handleFilterChange("strIssuedBy", selectedOption?.label);
-                    handleFilterChange("intIssuedBy", value ? Number(value) : undefined);
+                    handleFilterChange("intIssuedBy", Number(val));
                     handleFilterChange("issuedBy", selectedOption?.label);
                   }
-                }}
-                style={{ width: "100%", height: "32px" }}
-              />
+                }
+              )}
             </div>
 
             {/* Issued Date */}
             <div>
-              <label
-                style={{
-                  fontSize: "14px",
-                  lineHeight: "20px",
-                  fontWeight: 500,
-                  color: "#242424",
-                  marginBottom: "8px",
-                  display: "block",
-                }}
-              >
-                Issued Date
-              </label>
-              <DatePicker
-                value={filters.issuedDate || undefined}
-                onSelectDate={(date) => handleFilterChange("issuedDate", date)}
-                formatDate={onFormatDate}
-                textField={{
-                  placeholder: "DD/MM/YYYY",
-                } as any}
-              />
+              <label style={labelStyle}>Issued Date</label>
+              <div style={{ width: "100%" }}>
+                {renderDatePicker(
+                  filters.issuedDate || undefined,
+                  "Select Date",
+                  (date) => handleFilterChange("issuedDate", date)
+                )}
+              </div>
             </div>
 
             {/* Issued Type */}
             <div>
-              <label
-                style={{
-                  fontSize: "14px",
-                  lineHeight: "20px",
-                  fontWeight: 500,
-                  color: "#242424",
-                  marginBottom: "8px",
-                  display: "block",
-                }}
-              >
-                Issued Type
-              </label>
-              <Select
-                placeholder="--Select--"
-                options={issuedTypeOptions}
-                selectedKey={filters.issuedType || ""}
-                onValueChange={(value) => handleFilterChange("issuedType", value)}
-                style={{ width: "100%", height: "32px" }}
-              />
+              <label style={labelStyle}>Issued Type</label>
+              {renderDropdown(
+                "issuedType",
+                filters.issuedType,
+                issuedTypeOptions,
+                "Select",
+                (val) => handleFilterChange("issuedType", val)
+              )}
             </div>
           </>
         )}
@@ -362,115 +423,58 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
           <>
             {/* Academic Year */}
             <div>
-              <label
-                style={{
-                fontSize: "14px",
-                lineHeight: "20px",
-                fontWeight: 500,
-                color: "#242424",
-                marginBottom: "8px",
-                display: "block",
-                fontFamily: "'Inter', sans-serif",
-                }}
-              >
-                Academic Year
-              </label>
-              <Select
-                placeholder="Select Academic Year"
-                options={academicYears.length > 0 ? academicYears : academicYearOptions}
-                selectedKey={filters.academicYear?.toString()}
-                onValueChange={(value) =>
-                  handleFilterChange("academicYear", value ? Number(value) : undefined)
-                }
-                style={{ width: "100%", height: "32px" }}
-              />
+              <label style={labelStyle}>Academic Year</label>
+              {renderDropdown(
+                "academicYear",
+                filters.academicYear?.toString(),
+                academicYears.length > 0 ? academicYears : academicYearOptions,
+                "Select Academic Year",
+                (val) => handleFilterChange("academicYear", val ? Number(val) : undefined)
+              )}
             </div>
 
             {/* Application No */}
             <div>
-              <label
-                style={{
-                  fontSize: "14px",
-                  lineHeight: "20px",
-                  fontWeight: 500,
-                  color: "#242424",
-                  marginBottom: "8px",
-                  display: "block",
-                }}
-              >
-                Application No.
-              </label>
+              <label style={labelStyle}>Application No.</label>
               <Input
-                placeholder="Enter Application No"
+                placeholder="Enter Application No."
                 value={filters.applicationNo || ""}
-                onChange={(e) => handleFilterChange("applicationNo", e.target.value)}
-                style={{ width: "100%", height: "32px" }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange("applicationNo", e.target.value)}
+                style={{ width: "100%", height: "32px", backgroundColor: "#ffffff", border: "1px solid #d1d5db" }}
               />
             </div>
 
             {/* Student ID */}
             <div>
-              <label
-                style={{
-                fontSize: "14px",
-                lineHeight: "20px",
-                fontWeight: 500,
-                color: "#242424",
-                marginBottom: "8px",
-                display: "block",
-                }}
-              >
-                Student ID
-              </label>
+              <label style={labelStyle}>Student ID</label>
               <Input
                 placeholder="Enter Student ID"
                 value={filters.studentId || ""}
-                onChange={(e) => handleFilterChange("studentId", e.target.value)}
-                style={{ width: "100%", height: "32px" }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange("studentId", e.target.value)}
+                style={{ width: "100%", height: "32px", backgroundColor: "#ffffff", border: "1px solid #d1d5db" }}
               />
             </div>
 
             {/* Status */}
             <div>
-              <label
-                style={{
-                fontSize: "14px",
-                lineHeight: "20px",
-                fontWeight: 500,
-                color: "#242424",
-                marginBottom: "8px",
-                display: "block",
-                }}
-              >
-                Status
-              </label>
-              <Select
-                placeholder="Select"
-                options={statusOptions}
-                selectedKey={filters.status || ""}
-                onValueChange={(value) => handleFilterChange("status", value)}
-              />
+              <label style={labelStyle}>Status</label>
+              {renderDropdown(
+                "status",
+                filters.status,
+                statusOptions,
+                "Select",
+                (val) => handleFilterChange("status", val)
+              )}
             </div>
 
             {/* Mobile Number */}
             <div>
-              <label
-                style={{
-                fontSize: "14px",
-                lineHeight: "20px",
-                fontWeight: 500,
-                color: "#242424",
-                marginBottom: "8px",
-                display: "block",
-                }}
-              >
-                Mobile Number
-              </label>
+              <label style={labelStyle}>Mobile Number</label>
               <Input
-                placeholder="Enter Mobile Number"
+                placeholder="Enter Mobile No."
                 value={filters.mobileNumber || ""}
-                onChange={(e) => handleFilterChange("mobileNumber", e.target.value)}
-                style={{ width: "100%", height: "32px" }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange("mobileNumber", e.target.value)}
+                style={{ width: "100%", height: "32px", backgroundColor: "#ffffff", border: "1px solid #d1d5db" }}
               />
             </div>
           </>
@@ -478,18 +482,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
 
         {/* Keyword Search - Common for all tabs */}
         <div>
-          <label
-            style={{
-              fontSize: "14px",
-              lineHeight: "20px",
-              fontWeight: 500,
-              color: "#242424",
-              marginBottom: "8px",
-              display: "block",
-            }}
-          >
-            Keyword Search
-          </label>
+          <label style={labelStyle}>Keyword Search</label>
           <div
             style={{
               display: "flex",
@@ -497,12 +490,11 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
               width: "100%",
               height: "32px",
               padding: "0 12px",
-              border: "1px solid #d1d1d1",
-              borderRadius: "8px",
+              borderRadius: "4px",
               backgroundColor: "#ffffff",
+              border: "1px solid #D1D1D1",
             }}
           >
-            <SearchRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
             <input
               type="text"
               placeholder="Search"
@@ -517,10 +509,14 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
                 border: "none",
                 outline: "none",
                 color: "#242424",
-                paddingLeft: "8px",
+                paddingRight: "8px",
                 fontFamily: "'Inter', sans-serif",
+                fontSize: "13px",
+                lineHeight: "20px",
+                fontWeight: 400,
               }}
             />
+            <SearchRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
           </div>
         </div>
       </div>
@@ -529,10 +525,10 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
       <div
         style={{
           backgroundColor: "#FFFFFF",
-          padding: "24px",
+          padding: "24px 15px 24px 15px",
           display: "flex",
           flexDirection: "column",
-          gap: "16px",
+          gap: "10px",
           borderTop: "1px solid #E0E0E0",
         }}
       >
@@ -540,7 +536,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
           style={{
             display: "flex",
             justifyContent: "space-between",
-            gap: "12px",
+            gap: "80px",
           }}
         >
           <Button
@@ -551,7 +547,8 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
               border: "1px solid #D1D1D1",
               color: "#242424",
               flex: 1,
-              height: "36px",
+              height: "32px",
+              // width:"36px",
               borderRadius: "4px",
               fontWeight: 600,
               fontSize: "14px",
@@ -568,7 +565,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({
               color: "#ffffff",
               flex: 1,
               height: "36px",
-              borderRadius: "4px",
+              borderRadius: "8px",
               fontWeight: 600,
               fontSize: "14px",
               border: "none",

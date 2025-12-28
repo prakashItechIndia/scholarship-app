@@ -5,10 +5,12 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem
+  DropdownMenuItem,
+  ReportExportPdfIcon
 } from "@shared/components";
 import {
-  MoreVerticalRegular
+  MoreVerticalRegular,
+  TableRegular
 } from "@fluentui/react-icons";
 import { ExportButton, type ExportFormat } from "@/components/common";
 
@@ -63,7 +65,7 @@ const ReportsTabs: React.FC<ReportsTabsProps> = ({ activeTab, onTabChange, onExp
                 }}
                 className="hover:text-[#242424]"
               >
-                {tab.label}
+                {tab.label} 
               </button>
             );
           })}
@@ -82,10 +84,8 @@ const ReportsTabs: React.FC<ReportsTabsProps> = ({ activeTab, onTabChange, onExp
         }}>
           <ExportButton
             options={[
-              { format: "excel", label: "Excel (.xlsx)" },
-              { format: "pdf", label: "PDF" },
-              { format: "csv", label: "CSV" },
-              { format: "word", label: "Word (.docx)" },
+              { format: "excel", label: "Excel", icon: <TableRegular style={{ width: "16px", height: "16px" }} /> },
+              { format: "pdf", label: "PDF", icon: <ReportExportPdfIcon width={16} height={16} /> },
             ]}
             onExport={onExport}
             size="small"

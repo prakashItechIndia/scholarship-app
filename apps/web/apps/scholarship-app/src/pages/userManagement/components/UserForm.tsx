@@ -28,6 +28,7 @@ const ProfileAvatar = ({ width = 80, height = 80, className = '' }: { width?: nu
 import { UserFormData, userRoleOptions } from "../types";
 import { userManagement } from "../../../services/scholarship.service";
 import { useToast } from "@/components/ui/toast";
+import { apiClient } from "../../../shared/api-client";
 
 const UserForm: React.FC = () => {
   const navigate = useNavigate();
@@ -44,11 +45,22 @@ const UserForm: React.FC = () => {
     phoneNumber: "",
     status: "Active",
   });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_profilePhoto, setProfilePhoto] = React.useState<File | null>(null);
+  const [profilePhoto, setProfilePhoto] = React.useState<File | null>(null);
   const [profilePhotoPreview, setProfilePhotoPreview] = React.useState<string | null>(null);
+  const [existingProfileImagePath, setExistingProfileImagePath] = React.useState<string | null>(null);
   const [isHovered, setIsHovered] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const blobUrlRef = React.useRef<string | null>(null);
+
+  // Cleanup blob URLs on unmount
+  React.useEffect(() => {
+    return () => {
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = null;
+      }
+    };
+  }, []);
   const [errors, setErrors] = React.useState<{
     name?: string;
     userRole?: string;
@@ -73,6 +85,29 @@ const UserForm: React.FC = () => {
     void loadUserRoles();
   }, [showError]);
 
+  // Helper function to load profile image as blob and create blob URL
+  const loadProfileImage = async (userId: string): Promise<string | null> => {
+    try {
+      const response = await apiClient.get(
+        `/user-management/user/${encodeURIComponent(userId)}/profile-image`,
+        {
+          responseType: 'blob', // Important: request as blob
+        },
+      );
+
+      // Create blob URL from response data
+      const contentType = (response.headers['content-type'] as string) || 'image/jpeg';
+      const blob = new Blob([response.data as BlobPart], { type: contentType });
+      const blobUrl = URL.createObjectURL(blob);
+
+      return blobUrl;
+    } catch (error) {
+      // If image doesn't exist or fails to load, return null
+      console.warn('Failed to load profile image:', error);
+      return null;
+    }
+  };
+
   // Load user data if editing
   React.useEffect(() => {
     const loadUser = async () => {
@@ -87,6 +122,26 @@ const UserForm: React.FC = () => {
             phoneNumber: userData.Mobile_Number || "",
             status: userData.IsActive === 1 ? "Active" : "Inactive",
           });
+          
+          // Load existing profile image if available
+          const profileImagePath =
+            (userData as { PROFILE_IMAGE_PATH?: string }).PROFILE_IMAGE_PATH ||
+            (userData as { Profile_Image_Path?: string }).Profile_Image_Path ||
+            (userData as { profile_image_path?: string }).profile_image_path;
+          if (profileImagePath && id) {
+            setExistingProfileImagePath(profileImagePath);
+            // Cleanup previous blob URL if exists
+            if (blobUrlRef.current) {
+              URL.revokeObjectURL(blobUrlRef.current);
+              blobUrlRef.current = null;
+            }
+            // Load profile image as blob
+            const blobUrl = await loadProfileImage(id);
+            if (blobUrl) {
+              blobUrlRef.current = blobUrl;
+              setProfilePhotoPreview(blobUrl);
+            }
+          }
         } catch (err) {
           showError('Failed to Load User', err instanceof Error ? err.message : 'Failed to fetch user data');
         } finally {
@@ -217,9 +272,42 @@ const UserForm: React.FC = () => {
 
       if (isEditMode && id) {
         await userManagement.updateUser(userData);
+        
+        // Handle profile image upload/update/remove
+        if (profilePhoto) {
+          // Upload new profile image (will replace existing if any)
+          try {
+            await userManagement.uploadProfileImage(
+              formData.emailId.trim(),
+              profilePhoto,
+              existingProfileImagePath ? 'update' : 'add',
+            );
+          } catch (imageError) {
+            // Log but don't fail user update if image upload fails
+            console.warn('Failed to upload profile image', imageError);
+            showError('Image Upload Failed', 'User updated but profile image upload failed. You can try again later.');
+          }
+        }
+        
         success('Success', 'User updated successfully');
       } else {
         await userManagement.createUser(userData);
+        
+        // Handle profile image upload for new user
+        if (profilePhoto) {
+          try {
+            await userManagement.uploadProfileImage(
+              formData.emailId.trim(),
+              profilePhoto,
+              'add',
+            );
+          } catch (imageError) {
+            // Log but don't fail user creation if image upload fails
+            console.warn('Failed to upload profile image', imageError);
+            showError('Image Upload Failed', 'User created but profile image upload failed. You can update it later.');
+          }
+        }
+        
         success('Success', 'User created successfully. Temporary password sent via email.');
       }
       
@@ -254,18 +342,20 @@ const UserForm: React.FC = () => {
         <div style={{ flex: 1 }}>
           <h1 style={{
             fontSize: "16px",
-            fontWeight: 700,
+            fontWeight: 600,
             color: "#242424",
             fontFamily: "'Inter', sans-serif",
             marginBottom: "4px",
+            lineHeight:"22px"
           }}>
             {isEditMode ? "Edit User" : "Add New User"}
           </h1>
           <p style={{
             fontSize: "12px",
-            lineHeight: "20px",
+            lineHeight: "16px",
             color: "#707070",
             fontFamily: "'Inter', sans-serif",
+            fontWeight:400
           }}>
             {isEditMode ? "Update user details and access levels." : "Enter user details to create a new account."}
           </p>
@@ -284,13 +374,16 @@ const UserForm: React.FC = () => {
               color: "#242424",
               border: "1px solid #d1d1d1",
               minWidth: "100px",
+               borderRadius:"8px"
             }}
           >
             Cancel
           </Button>
           <Button
             appearance="primary"
-            onClick={handleSave}
+            onClick={() => {
+              void handleSave();
+            }}
             disabled={loading}
             style={{
               backgroundColor: "#2453C3",
@@ -299,6 +392,7 @@ const UserForm: React.FC = () => {
               display: "flex",
               alignItems: "center",
               gap: "8px",
+              borderRadius:"8px"
             }}
           >
             {loading ? (
@@ -325,7 +419,7 @@ const UserForm: React.FC = () => {
         <div style={{
           display: "flex",
           alignItems: "center",
-          gap: "24px",
+          gap: "20px",
           // marginBottom: "32px",
           paddingBottom: "32px",
           // borderBottom: "1px solid #e0e0e0",
@@ -335,11 +429,11 @@ const UserForm: React.FC = () => {
             onMouseLeave={() => setIsHovered(false)}
             onClick={handleProfilePhotoClick}
             style={{
-              width: "120px",
-              height: "120px",
+              width: "80px",
+              height: "80px",
               borderRadius: "50%",
-              backgroundColor: profilePhotoPreview ? "transparent" : "rgba(50, 48, 48, 1)",
-              opacity: profilePhotoPreview ? 1 : 0.9,
+              backgroundColor: "rgba(50, 48, 48, 1)",
+              opacity: profilePhotoPreview ? 1 : 0.8,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -358,7 +452,13 @@ const UserForm: React.FC = () => {
                     width: "100%",
                     height: "100%",
                     objectFit: "cover",
-                    backgroundColor: "#54545400",
+                    borderRadius: "50%",
+                  }}
+                  onError={(e) => {
+                    // If image fails to load, show placeholder
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    setProfilePhotoPreview(null);
                   }}
                 />
                 {isHovered && (
@@ -380,7 +480,7 @@ const UserForm: React.FC = () => {
                       textAlign: "center",
                       padding: "0 8px",
                     }}>
-                      Click to Add Photo
+                      {profilePhoto ? "Change Photo" : "Click to Change"}
                     </span>
                   </div>
                 )}
@@ -389,8 +489,8 @@ const UserForm: React.FC = () => {
               <>
                 {!isHovered && (
                   <ProfileAvatar 
-                    width={80} 
-                    height={80} 
+                    width={50} 
+                    height={50} 
                   />
                 )}
                 {isHovered && (
@@ -419,7 +519,7 @@ const UserForm: React.FC = () => {
               </>
             )}
           </div>
-          <div>
+          <div style={{ flex: 1 }}>
             <Label style={{
               fontSize: "12px",
               lineHeight: "20px",
@@ -435,9 +535,52 @@ const UserForm: React.FC = () => {
               lineHeight: "16px",
               color: "#616161",
               fontFamily: "'Inter', sans-serif",
+              marginBottom: "8px",
             }}>
               Supported formats: PNG, JPG and JPEG (up to 5MB)
             </p>
+            {isEditMode && (profilePhotoPreview || existingProfileImagePath) && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (id) {
+                    void (async () => {
+                      try {
+                        setLoading(true);
+                        await userManagement.removeProfileImage(id);
+                        setProfilePhoto(null);
+                        // Cleanup blob URL
+                        if (blobUrlRef.current) {
+                          URL.revokeObjectURL(blobUrlRef.current);
+                          blobUrlRef.current = null;
+                        }
+                        setProfilePhotoPreview(null);
+                        setExistingProfileImagePath(null);
+                        success('Success', 'Profile image removed successfully');
+                      } catch (err) {
+                        showError('Remove Failed', err instanceof Error ? err.message : 'Failed to remove profile image');
+                      } finally {
+                        setLoading(false);
+                      }
+                    })();
+                  }
+                }}
+                style={{
+                  fontSize: "12px",
+                  color: "#dc2626",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "4px 0",
+                  textDecoration: "underline",
+                  fontFamily: "'Inter', sans-serif",
+                }}
+                disabled={loading}
+              >
+                Remove Photo
+              </button>
+            )}
           </div>
           <input
             ref={fileInputRef}

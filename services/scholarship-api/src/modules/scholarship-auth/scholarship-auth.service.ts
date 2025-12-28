@@ -4,6 +4,8 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { EnvVars } from '../../config/env.validation';
+import { EmailService } from '../email/email.service';
+import { randomBytes } from 'crypto';
 
 interface LoginDto {
   username: string;
@@ -66,6 +68,7 @@ export class ScholarshipAuthService {
     private readonly db: DatabaseService,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService<EnvVars, true>,
+    private readonly emailService: EmailService,
   ) {}
 
   /**
@@ -886,5 +889,296 @@ export class ScholarshipAuthService {
       userType: getCaseInsensitiveValue<string>(created, 'User_Type') || '',
       isActive: true,
     };
+  }
+
+  /**
+   * Request password reset - sends email with reset link
+   * Follows the same pattern as T_EmailVerification table
+   */
+  async requestPasswordReset(email: string): Promise<{ message: string }> {
+    try {
+      // Check if user exists by email (User_ID in Tbl_UserMaster is the email)
+      const userQuery = `
+        SELECT ID, User_ID, User_Name, IsActive, IsDeleted
+        FROM Tbl_UserMaster
+        WHERE User_ID = @email
+      `;
+      const userResult = await this.db.query<{
+        ID: number;
+        User_ID: string;
+        User_Name: string;
+        IsActive: number | boolean;
+        IsDeleted: number | boolean;
+      }>(userQuery, { email: email.toLowerCase().trim() });
+
+      // Don't reveal if user exists (security best practice)
+      if (!userResult.recordset || userResult.recordset.length === 0) {
+        return {
+          message: 'If the email exists, a password reset link has been sent.',
+        };
+      }
+
+      const user = userResult.recordset[0];
+      const isActive = toBoolean(getCaseInsensitiveValue(user, 'IsActive'));
+      const isDeleted = toBoolean(getCaseInsensitiveValue(user, 'IsDeleted'));
+
+      // Check if account is active
+      if (!isActive || isDeleted) {
+        // Still return success message for security
+        return {
+          message: 'If the email exists, a password reset link has been sent.',
+        };
+      }
+
+      // Generate reset token (32 bytes = 64 hex characters)
+      const resetToken = randomBytes(32).toString('hex');
+
+      // Calculate expiration time (24 hours)
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 24);
+
+      // Create password reset token table if it doesn't exist (following T_EmailVerification pattern)
+      const createTableQuery = `
+        IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'T_PasswordResetToken')
+        BEGIN
+          CREATE TABLE T_PasswordResetToken (
+            Id INT IDENTITY(1,1) PRIMARY KEY,
+            User_ID NVARCHAR(255) NOT NULL,
+            ResetToken NVARCHAR(255) NOT NULL,
+            ExpiresAt DATETIME NOT NULL,
+            CreatedAt DATETIME DEFAULT GETDATE(),
+            UsedAt DATETIME NULL,
+            CONSTRAINT UQ_PasswordResetToken_Token UNIQUE (ResetToken)
+          )
+          
+          CREATE INDEX IX_T_PasswordResetToken_User_ID ON T_PasswordResetToken (User_ID)
+          CREATE INDEX IX_T_PasswordResetToken_ExpiresAt ON T_PasswordResetToken (ExpiresAt)
+        END
+      `;
+
+      await this.db.query(createTableQuery);
+
+      // Store reset token
+      const insertQuery = `
+        INSERT INTO T_PasswordResetToken (User_ID, ResetToken, ExpiresAt)
+        VALUES (@user_id, @token, @expiresAt)
+      `;
+
+      await this.db.query(insertQuery, {
+        user_id: email.toLowerCase().trim(),
+        token: resetToken,
+        expiresAt: expiresAt.toISOString(),
+      });
+
+      // Get frontend app URL for reset link
+      const appUrl =
+        this.configService.get('SSO_APP_URL', { infer: true }) ||
+        this.configService.get('EXPERIENCE_APP_URL', { infer: true }) ||
+        'http://localhost:5173';
+
+      // Create reset URL - redirects to admin reset password page with token
+      const resetUrl = `${appUrl}/admin-reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+
+      // Get user name for email
+      const userName = getCaseInsensitiveValue<string>(user, 'User_Name') || email.split('@')[0];
+      const firstName = userName.split(' ')[0] || userName;
+
+      // Send password reset email
+      const emailSent = await this.emailService.sendEmail({
+        to: email,
+        subject: 'Reset Your Password - Leo Muthu Scholarship',
+        html: this.getPasswordResetEmailTemplate(firstName, resetUrl),
+        text: this.getPasswordResetEmailText(firstName, resetUrl),
+      });
+
+      if (!emailSent) {
+        this.logger.warn(`Failed to send password reset email to ${email}`);
+      }
+
+      return {
+        message: 'If the email exists, a password reset link has been sent.',
+      };
+    } catch (error) {
+      this.logger.error('Error requesting password reset', error);
+      // Still return success message for security
+      return {
+        message: 'If the email exists, a password reset link has been sent.',
+      };
+    }
+  }
+
+  /**
+   * Reset password using token
+   */
+  async resetPassword(
+    email: string,
+    token: string,
+    newPassword: string,
+  ): Promise<{ message: string }> {
+    try {
+      // Find valid reset token
+      const tokenQuery = `
+        SELECT Id, User_ID, ResetToken, ExpiresAt, UsedAt
+        FROM T_PasswordResetToken
+        WHERE ResetToken = @token
+        AND User_ID = @email
+      `;
+      const tokenResult = await this.db.query<{
+        Id: number;
+        User_ID: string;
+        ResetToken: string;
+        ExpiresAt: Date;
+        UsedAt: Date | null;
+      }>(tokenQuery, {
+        token,
+        email: email.toLowerCase().trim(),
+      });
+
+      if (!tokenResult.recordset || tokenResult.recordset.length === 0) {
+        throw new BadRequestException('Invalid or expired reset token');
+      }
+
+      const tokenRecord = tokenResult.recordset[0];
+      const expiresAt = new Date(tokenRecord.ExpiresAt);
+      const usedAt = tokenRecord.UsedAt ? new Date(tokenRecord.UsedAt) : null;
+
+      // Check if token is expired
+      if (expiresAt < new Date()) {
+        throw new BadRequestException('Reset token has expired');
+      }
+
+      // Check if token has already been used
+      if (usedAt) {
+        throw new BadRequestException('Reset token has already been used');
+      }
+
+      // Encrypt new password
+      const encryptedNewPassword = this.encryptPassword(newPassword);
+
+      // Update password in Tbl_UserMaster
+      const updatePasswordQuery = `
+        UPDATE Tbl_UserMaster
+        SET 
+          Password = @newPassword,
+          Password_change = 'False',
+          Modified_Date = GETDATE(),
+          Modified_By = @email
+        WHERE User_ID = @email
+      `;
+
+      await this.db.query(updatePasswordQuery, {
+        newPassword: encryptedNewPassword,
+        email: email.toLowerCase().trim(),
+      });
+
+      // Mark token as used
+      const markUsedQuery = `
+        UPDATE T_PasswordResetToken
+        SET UsedAt = GETDATE()
+        WHERE Id = @id
+      `;
+
+      await this.db.query(markUsedQuery, {
+        id: getCaseInsensitiveValue<number>(tokenRecord, 'Id'),
+      });
+
+      return {
+        message: 'Password reset successfully. Please log in with your new password.',
+      };
+    } catch (error) {
+      this.logger.error('Error resetting password', error);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException('Failed to reset password. Please try again.');
+    }
+  }
+
+  /**
+   * Get password reset email HTML template
+   */
+  private getPasswordResetEmailTemplate(
+    firstName: string,
+    resetUrl: string,
+  ): string {
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Your Password - Leo Muthu Scholarship</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
+  <div style="background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <div style="background: linear-gradient(135deg, #2453C3 0%, #0078D4 100%); padding: 40px 30px; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">Leo Muthu Scholarship</h1>
+      <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0; font-size: 16px;">Reset your password</p>
+    </div>
+    
+    <div style="padding: 40px 30px;">
+      <p style="font-size: 18px; margin: 0 0 20px 0; color: #1f2937; font-weight: 500;">Hello ${firstName},</p>
+      
+      <p style="font-size: 16px; color: #4b5563; margin: 0 0 20px 0; line-height: 1.7;">
+        We received a request to reset your password for your Leo Muthu Scholarship admin account. Click the button below to set a new password.
+      </p>
+      
+      <div style="text-align: center; margin: 35px 0;">
+        <a href="${resetUrl}" 
+           style="display: inline-block; background: #2453C3; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px rgba(36, 83, 195, 0.3);">
+          Reset Password
+        </a>
+      </div>
+      
+      <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
+        Or copy and paste this link into your browser:
+      </p>
+      <p style="font-size: 12px; color: #9ca3af; word-break: break-all; background: #f9fafb; padding: 12px; border-radius: 6px; margin: 10px 0;">
+        ${resetUrl}
+      </p>
+      
+      <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 30px 0; border-radius: 6px;">
+        <p style="font-size: 14px; color: #92400e; margin: 0; font-weight: 500;">⏰ Important</p>
+        <p style="font-size: 13px; color: #78350f; margin: 8px 0 0 0; line-height: 1.6;">
+          This reset link will expire in 24 hours. If you did not request a password reset, please ignore this email and your password will remain unchanged.
+        </p>
+      </div>
+      
+      <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 40px 0 30px 0;">
+      
+      <p style="font-size: 12px; color: #9ca3af; text-align: center; margin: 0; line-height: 1.6;">
+        © ${new Date().getFullYear()} Leo Muthu Scholarship. All rights reserved.<br>
+        An Initiative of ARAM Foundation<br>
+        Powered by iTech
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+    `.trim();
+  }
+
+  /**
+   * Get password reset email text version
+   */
+  private getPasswordResetEmailText(
+    firstName: string,
+    resetUrl: string,
+  ): string {
+    return `
+Leo Muthu Scholarship - Reset Your Password
+
+Hello ${firstName},
+
+We received a request to reset your password for your Leo Muthu Scholarship admin account. Click the link below to set a new password.
+
+Reset Password: ${resetUrl}
+
+This reset link will expire in 24 hours. If you did not request a password reset, please ignore this email and your password will remain unchanged.
+
+© ${new Date().getFullYear()} Leo Muthu Scholarship. All rights reserved.
+An Initiative of ARAM Foundation
+Powered by iTech
+    `.trim();
   }
 }

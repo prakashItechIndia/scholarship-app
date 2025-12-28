@@ -157,6 +157,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           onOpenChange={setSettingsPopoverOpen}
           onLogout={() => setLogoutModalOpen(true)}
           onChangePassword={() => setChangePasswordModalOpen(true)}
+          positioning={{ position: "after", align: "bottom", offset: { mainAxis: 20 } }}
         >
           <SettingsRegular className="w-5 h-5" />
         </ProfilePopover>
@@ -272,8 +273,8 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
           >
             <span
               style={{
-                fontSize: "18px",
-                lineHeight: "24px",
+                fontSize: "20px",
+                lineHeight: "28px",
                 fontWeight: 600,
                 color: "#242424",
                 fontFamily: "'Inter', sans-serif",
@@ -321,6 +322,8 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
                 color: "#ffffff",
                 border: "none",
                 borderRadius: "8px",
+                height:"32px",
+                width:"96px"
               }}
             >
               Logout
@@ -338,6 +341,8 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
                 color: "#242424",
                 border: "1px solid #d1d1d1",
                 borderRadius: "8px",
+                height:"32px",
+                width:"96px"
               }}
             >
               Cancel
@@ -348,12 +353,12 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
         <div>
           <p
             style={{
-              fontSize: "14px",
+              fontSize: "13px",
               lineHeight: "20px",
               fontWeight: 400,
-              color: "#707070",
+              color: "#242424",
               fontFamily: "'Inter', sans-serif",
-              margin: 0,
+              marginTop: "-3px",
             }}
           >
             Are you sure to logout from current session?

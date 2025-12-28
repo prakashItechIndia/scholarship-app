@@ -8,8 +8,9 @@ import {
     DismissRegular,
     ArrowUploadRegular,
     DeleteRegular,
-    EyeRegular,
     AddRegular,
+    OpenFilled,
+    ArrowSort20Regular,
 } from "@fluentui/react-icons";
 import { ApplicationData } from "../types";
 import { documentUpload } from "../../../services/scholarship.service";
@@ -34,6 +35,25 @@ interface DocumentRow {
     documentPath?: string; // Document path from API
     isNew?: boolean; // Flag to indicate if this is a newly added row (editable)
 }
+
+// Helper function to format date as DD-MM-YYYY
+const formatDateToDDMMYYYY = (dateString: string | null | undefined): string | undefined => {
+    if (!dateString) return undefined;
+    
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return undefined;
+        
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        
+        return `${day}-${month}-${year}`;
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return undefined;
+    }
+};
 
 const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
     isOpen,
@@ -94,13 +114,7 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                 id: doc.Document_Type ?? '',
                 documentId: doc.Document_Id, // May be null for t_esch_ApplicantDocuments
                 name: doc.Document_Type ?? '',
-                uploadedOn: doc.Uploaded_Date 
-                    ? new Date(doc.Uploaded_Date).toLocaleDateString("en-GB", { 
-                        day: "2-digit", 
-                        month: "2-digit", 
-                        year: "numeric" 
-                    }).replace(/\//g, "-")
-                    : undefined, // Table doesn't have Uploaded_Date column
+                uploadedOn: formatDateToDDMMYYYY(doc.Uploaded_Date),
                 status: "Uploaded" as const,
                 url: doc.Document_URL ?? doc.Document_Path ?? undefined, // Use full URL from backend if available
                 documentPath: doc.Document_Path,
@@ -436,10 +450,13 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                 style={{
                     backgroundColor: "white",
                     borderRadius: "8px",
-                    width: "90%",
-                    maxWidth: "1000px",
-                    // Removed fixed height to eliminate space before footer
+                    width: "800px",
+                    maxWidth: "2000px",
+                    // Removed fixed height to eliminate space before footer50
+                    minWidth:"100px",
                     maxHeight: "90%",
+                    minHeight:"100px",
+                    height:"570px",
                     display: "flex",
                     flexDirection: "column",
                     boxShadow: "0px 8px 32px rgba(0, 0, 0, 0.2)",
@@ -466,6 +483,7 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                             color: "#242424",
                             margin: 0,
                             fontFamily: "'Inter', sans-serif",
+                            lineHeight:"22px"
                         }}
                     >
                         LEO MUTHU - Scholarship Upload Document Panel ( 2025-2026 ) | Student Name: {data.studentName} | Application Number: {data.applicationNo}
@@ -475,7 +493,22 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                         icon={<DismissRegular />}
                         onClick={onClose}
                         aria-label="Close"
+                        style={{
+                            backgroundColor: "transparent",
+                            color: "#616161",
+                            border: "none"
+                        }}
+                        className="close-button-no-hover"
                     />
+                    <style>{`
+                        .close-button-no-hover:hover {
+                            background-color: transparent !important;
+                            color: #616161 !important;
+                        }
+                        .close-button-no-hover:active {
+                            background-color: transparent !important;
+                        }
+                    `}</style>
                 </div>
 
                 {/* Content (Scrollable Table) */}
@@ -501,16 +534,32 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                                     <th style={{ padding: "12px 24px", textAlign: "left", width: "40px", borderBottom: "1px solid #e0e0e0" }}>
                                         <input type="checkbox" style={{ width: "16px", height: "16px" }} />
                                     </th>
-                                    <th style={{ padding: "12px", textAlign: "left", fontSize: "14px", fontWeight: 600, color: "#424242", borderBottom: "1px solid #e0e0e0" }}>Document Name ⇅</th>
-                                    <th style={{ padding: "12px", textAlign: "left", fontSize: "14px", fontWeight: 600, color: "#424242", borderBottom: "1px solid #e0e0e0" }}>Uploaded on ⇅</th>
-                                    <th style={{ padding: "12px", textAlign: "center", fontSize: "14px", fontWeight: 600, color: "#424242", borderBottom: "1px solid #e0e0e0" }}>Status ⇅</th>
-                                    <th style={{ padding: "12px", textAlign: "left", fontSize: "14px", fontWeight: 600, color: "#424242", borderBottom: "1px solid #e0e0e0" }}>Action</th>
+                                    <th style={{ padding: "12px", textAlign: "left", fontSize: "13px", fontWeight: 500, color: "#424242", borderBottom: "1px solid #e0e0e0", lineHeight: "19px" }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                            <span>Document Name</span>
+                                            <ArrowSort20Regular style={{ width: "16px", height: "16px", color: "#616161" }} />
+                                        </div>
+                                    </th>
+                                    <th style={{ padding: "12px", textAlign: "left", fontSize: "13px", fontWeight: 500, color: "#424242", borderBottom: "1px solid #e0e0e0", lineHeight: "19px" }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                            <span>Uploaded on</span>
+                                            <ArrowSort20Regular style={{ width: "16px", height: "16px", color: "#616161" }} />
+                                        </div>
+                                    </th>
+                                    <th style={{ padding: "12px", textAlign: "left", fontSize: "13px", fontWeight: 500, color: "#424242", borderBottom: "1px solid #e0e0e0", lineHeight: "19px" }}></th>
+                                    <th style={{ padding: "12px", textAlign: "left", fontSize: "13px", fontWeight: 500, color: "#424242", borderBottom: "1px solid #e0e0e0", lineHeight: "19px" }}>
+                                        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "8px" }}>
+                                            <span>Status</span>
+                                            <ArrowSort20Regular style={{ width: "16px", height: "16px", color: "#616161" }} />
+                                        </div>
+                                    </th>
+                                    <th style={{ padding: "12px", textAlign: "left", fontSize: "13px", fontWeight: 500, color: "#424242", borderBottom: "1px solid #e0e0e0", lineHeight: "19px" }}>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {documents.length === 0 ? (
                                     <tr>
-                                        <td colSpan={5} style={{ padding: "40px", textAlign: "center", color: "#616161" }}>
+                                        <td colSpan={6} style={{ padding: "40px", textAlign: "center", color: "#616161" }}>
                                             No documents found. Please upload documents.
                                         </td>
                                     </tr>
@@ -520,7 +569,7 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                                     <td style={{ padding: "12px 24px" }}>
                                         <input type="checkbox" style={{ width: "16px", height: "16px" }} />
                                     </td>
-                                    <td style={{ padding: "12px", fontSize: "14px", color: "#242424" }}>
+                                    <td style={{ padding: "12px", fontSize: "13px", color: "#242424",lineHeight:"19px",fontWeight:400 }}>
                                         {doc.isNew ? (
                                             <Input
                                                 type="text"
@@ -536,10 +585,15 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                                             doc.name
                                         )}
                                     </td>
-                                    <td style={{ padding: "12px", fontSize: "14px", color: "#242424" }}>
-                                        {doc.uploadedOn ? (
-                                            doc.uploadedOn
+                                    <td style={{ padding: "12px", fontSize: "12px", color: "#242424", lineHeight: "16px", fontWeight: 400 }}>
+                                        {doc.status === "Uploaded" ? (
+                                            doc.uploadedOn || "-"
                                         ) : (
+                                            ""
+                                        )}
+                                    </td>
+                                    <td style={{ padding: "12px", fontSize: "12px", color: "#242424", lineHeight: "16px", fontWeight: 400 }}>
+                                        {doc.status !== "Uploaded" && (
                                             <Button
                                                 appearance="outline"
                                                 icon={<ArrowUploadRegular />}
@@ -550,16 +604,17 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                                             </Button>
                                         )}
                                     </td>
-                                    <td style={{ padding: "12px", textAlign: "center" }}>
+                                    <td style={{ padding: "12px", textAlign: "left" }}>
                                         <span
                                             style={{
                                                 display: "inline-block",
                                                 padding: "4px 12px",
                                                 borderRadius: "100px",
-                                                fontSize: "12px",
-                                                fontWeight: 500,
-                                                backgroundColor: doc.status === "Uploaded" ? "#f1faf1" : "#f5f5f5",
-                                                color: doc.status === "Uploaded" ? "#0e700e" : "#424242",
+                                                fontSize: "10px",
+                                                lineHeight:"14px",
+                                                fontWeight: 600,
+                                                backgroundColor: doc.status === "Uploaded" ? "#f1faf1" : "#F0F0F0",
+                                                color: doc.status === "Uploaded" ? "#0E700E" : "#424242",
                                                 border: `1px solid ${doc.status === "Uploaded" ? "#9fd89f" : "#e0e0e0"}`,
                                             }}
                                         >
@@ -571,16 +626,16 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                                             <div style={{ display: "flex", gap: "8px" }}>
                                                 <Button
                                                     appearance="subtle"
-                                                    icon={<EyeRegular />}
-                                                    style={{ padding: "4px", minWidth: "28px", border: "1px solid #d1d1d1" }}
+                                                    icon={<OpenFilled />}
+                                                    style={{ minWidth: "28px", border: "1px solid #d1d1d1",width:"27px",height:"27px" }}
                                                     onClick={() => {
                                                         void handleView(doc);
                                                     }}
                                                 />
                                                 <Button
                                                     appearance="subtle"
-                                                    icon={<DeleteRegular />}
-                                                    style={{ padding: "4px", minWidth: "28px", border: "1px solid #d1d1d1" }}
+                                                    icon={<DeleteRegular/>}
+                                                    style={{ minWidth: "28px", border: "1px solid #d1d1d1",width:"27px",height:"27px",color:"#242424" }}
                                                     onClick={() => handleDeleteClick(doc)}
                                                 />
                                             </div>
@@ -620,7 +675,7 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                         }}
                     >
                         <div style={{ backgroundColor: "#115ea3", borderRadius: "50%", width: "20px", height: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <AddRegular style={{ color: "white", width: "16px", height: "16px" }} />
+                            <AddRegular style={{ color: "white", width: "13px", height: "13px" }} />
                         </div>
                         <span>Add (Upload if any other certificates available)</span>
                     </div>
@@ -629,7 +684,9 @@ const DocumentUploadPanel: React.FC<DocumentUploadPanelProps> = ({
                         appearance="primary"
                         style={{
                             backgroundColor: "#2453C3", // Fluent Primary
-                            minWidth: "120px",
+                            minWidth: "90px",
+                            borderRadius:"5px",
+                            color:"#FFFFFF"
                         }}
                         onClick={() => {
                             // Mark documents as verified (update IsUpload_Status to '1' if not already)

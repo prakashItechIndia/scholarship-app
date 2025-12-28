@@ -86,6 +86,28 @@ export const scholarshipAuth = {
       });
     return response.data;
   },
+
+  /**
+   * Request password reset (forgot password)
+   */
+  forgotPassword: async (email: string) => {
+    const response = await apiClient.post<{ message: string }>(
+      '/scholarship-auth/forgot-password',
+      { email },
+    );
+    return response.data;
+  },
+
+  /**
+   * Reset password using token
+   */
+  resetPassword: async (email: string, token: string, newPassword: string) => {
+    const response = await apiClient.post<{ message: string }>(
+      '/scholarship-auth/reset-password',
+      { email, token, newPassword },
+    );
+    return response.data;
+  },
 };
 
 /**
@@ -917,6 +939,40 @@ export const userManagement = {
     const response = await apiClient.delete(`/user-management/user/${encodeURIComponent(userId)}`);
     return response.data;
   },
+
+  /**
+   * Upload/Update profile image for a user
+   */
+  uploadProfileImage: async (
+    userId: string,
+    file: File,
+    action: 'add' | 'update' = 'update',
+  ) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('action', action);
+
+    const response = await apiClient.post<{
+      message: string;
+      profileImagePath: string | null;
+    }>(`/user-management/user/${encodeURIComponent(userId)}/profile-image`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  /**
+   * Remove profile image for a user
+   */
+  removeProfileImage: async (userId: string) => {
+    const response = await apiClient.delete<{
+      message: string;
+      profileImagePath: string | null;
+    }>(`/user-management/user/${encodeURIComponent(userId)}/profile-image`);
+    return response.data;
+  },
 };
 
 /**
@@ -1079,11 +1135,17 @@ export const processManagement = {
    */
   issueAmount: async (data: {
     applicationId: string;
+    scholarshipId?: number;
     paymentMode: string;
     comments?: string;
     ddChequeNo?: string;
     ddChequeInFavor?: string;
     ddChequeDate?: string;
+    ddChequeInFavorType?: string;
+    ddChequeInstitutionId?: number;
+    ddChequeOtherInstitution?: string;
+    ddChequeIssuedBy?: number;
+    scholarshipIssuedDate?: string;
     bankName?: string;
     branchDetails?: string;
     documents?: File[];
@@ -1091,19 +1153,25 @@ export const processManagement = {
   }) => {
     const formData = new FormData();
     formData.append('applicationId', data.applicationId);
+    if (data.scholarshipId) formData.append('scholarshipId', data.scholarshipId.toString());
     formData.append('paymentMode', data.paymentMode);
     if (data.comments) formData.append('comments', data.comments);
     if (data.ddChequeNo) formData.append('ddChequeNo', data.ddChequeNo);
     if (data.ddChequeInFavor) formData.append('ddChequeInFavor', data.ddChequeInFavor);
     if (data.ddChequeDate) formData.append('ddChequeDate', data.ddChequeDate);
+    if (data.ddChequeInFavorType) formData.append('ddChequeInFavorType', data.ddChequeInFavorType);
+    if (data.ddChequeInstitutionId) formData.append('ddChequeInstitutionId', data.ddChequeInstitutionId.toString());
+    if (data.ddChequeOtherInstitution) formData.append('ddChequeOtherInstitution', data.ddChequeOtherInstitution);
+    if (data.ddChequeIssuedBy) formData.append('ddChequeIssuedBy', data.ddChequeIssuedBy.toString());
+    if (data.scholarshipIssuedDate) formData.append('scholarshipIssuedDate', data.scholarshipIssuedDate);
     if (data.bankName) formData.append('bankName', data.bankName);
     if (data.branchDetails) formData.append('branchDetails', data.branchDetails);
     if (data.issuedBy) formData.append('issuedBy', data.issuedBy.toString());
     
     // Append uploaded documents
     if (data.documents && data.documents.length > 0) {
-      data.documents.forEach((file, index) => {
-        formData.append(`documents`, file);
+      data.documents.forEach((file) => {
+        formData.append('documents', file);
       });
     }
 

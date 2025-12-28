@@ -118,11 +118,6 @@ async function bootstrap() {
     : (
         allowedOriginsEnv?.split(',') || [
           configService.get('SSO_APP_URL', { infer: true }) ?? '',
-          configService.get('EXPERIENCE_APP_URL', { infer: true }) ?? '',
-          configService.get('CUSTOMER_PORTAL_URL', { infer: true }) ?? '',
-          configService.get('IREPO_URL', { infer: true }) ?? '',
-          configService.get('INVOX_URL', { infer: true }) ?? '',
-          configService.get('ACCOUNTS_URL', { infer: true }) ?? '',
         ]
       ).filter((o) => !!o);
 

@@ -4,7 +4,7 @@ import {
   KeyRegular,
   ArrowExit24Regular,
 } from "@fluentui/react-icons";
-import { Popover, PopoverTrigger, PopoverContent } from "@shared/components";
+import { Popover, PopoverTrigger, PopoverContent, PopoverProps } from "@shared/components";
 
 export interface ProfilePopoverProps {
   userName: string;
@@ -15,6 +15,7 @@ export interface ProfilePopoverProps {
   onChangePassword: () => void;
   children: React.ReactNode;
   sidebarWidth?: number;
+  positioning?: PopoverProps["positioning"];
 }
 
 export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
@@ -26,6 +27,11 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
   onChangePassword,
   children,
   sidebarWidth = 0,
+  positioning = {
+    position: "below",
+    align: "end",
+    offset: { crossAxis: 0, mainAxis: 4 },
+  },
 }) => {
 
   const popoverRef = React.useRef<HTMLDivElement>(null);
@@ -56,11 +62,7 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
         const openState = (data as { open?: boolean })?.open ?? false;
         onOpenChange(openState);
       }}
-      positioning={{
-        position: "below",
-        align: "end",
-        offset: { crossAxis: 0, mainAxis: 4 },
-      }}
+      positioning={positioning}
     >
       <PopoverTrigger disableButtonEnhancement>
         {children as React.ReactElement}

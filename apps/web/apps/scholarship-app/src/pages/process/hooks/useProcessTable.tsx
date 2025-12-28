@@ -161,7 +161,7 @@ export const useProcessTable = ({
       // Define available menu items for reuse
       const menuItemViewHistory = (
         <DropdownMenuItem
-          icon={<HistoryRegular style={{ width: "16px", height: "16px" }} />}
+          icon={<HistoryRegular style={{ width: "20px", height: "20px" }} />}
           label="View History"
           onClick={() => handleViewHistory && handleViewHistory(item)}
           style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
@@ -169,7 +169,7 @@ export const useProcessTable = ({
       );
       const menuItemScholarshipHistory = (
         <DropdownMenuItem
-          icon={<PersonMoneyRegular style={{ width: "16px", height: "16px" }} />}
+          icon={<PersonMoneyRegular style={{ width: "20px", height: "20px" }} />}
           label="Scholarship History"
           onClick={() => handleViewScholarshipHistory && handleViewScholarshipHistory(item)}
           style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
@@ -177,7 +177,7 @@ export const useProcessTable = ({
       );
       const menuItemViewDocuments = (
         <DropdownMenuItem
-          icon={<DocumentBulletListRegular style={{ width: "16px", height: "16px" }} />}
+          icon={<DocumentBulletListRegular style={{ width: "20px", height: "20px" }} />}
           label="View Documents"
           onClick={() => handleViewDocument && handleViewDocument(item)}
           style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
@@ -185,9 +185,17 @@ export const useProcessTable = ({
       );
       const menuItemPrintDetails = (
         <DropdownMenuItem
-          icon={<DocumentPrintRegular style={{ width: "16px", height: "16px" }} />}
+          icon={<DocumentPrintRegular style={{ width: "20px", height: "20px" }} />}
           label="Print Details"
           onClick={() => handlePrintDetails && handlePrintDetails(item)}
+          style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
+        />
+      );
+      const menuItemFinalForm = (
+        <DropdownMenuItem
+          icon={<DocumentBulletListRegular style={{ width: "20px", height: "20px" }} />}
+          label="Final Form"
+          onClick={() => handleViewScholarshipPDF && handleViewScholarshipPDF(item)}
           style={{ fontSize: "13px", fontFamily: "'Inter', sans-serif" }}
         />
       );
@@ -215,8 +223,14 @@ export const useProcessTable = ({
           menuItems = [menuItemViewHistory, menuItemScholarshipHistory];
         }
       } else if (activeTab === "issue-amount") {
-        // "Issue Amount" page: "Approved" status -> Click dot = PDF. So NO menu items.
-        menuItems = [];
+        // "Issue Amount" page: 
+        // - "Approved" status -> Click dot = PDF. So NO menu items.
+        // - "finalCompleted" status -> Show "Final Form" menu item to view merged PDF
+        if (status === "finalCompleted") {
+          menuItems = [menuItemFinalForm];
+        } else {
+          menuItems = [];
+        }
       } else if (activeTab === "overview" || activeTab === "documents") { // Fallback for overview/documents (though documents uses renderDocumentActions)
         if (status === "Registered") {
           menuItems = [menuItemViewHistory, menuItemScholarshipHistory];
@@ -236,38 +250,50 @@ export const useProcessTable = ({
       // If we have menu items, render Dropdown
       if (menuItems.length > 0) {
         return (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button
-                  appearance="subtle"
-                  size="small"
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    padding: 0,
-                  }}
-                  aria-label="More options"
-                >
-                  <MoreHorizontalRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {menuItems.map((item, index) => (
-                  <React.Fragment key={index}>{item}</React.Fragment>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <>
+            <style>{`
+              .more-actions-no-hover:hover {
+                background-color: transparent !important;
+              }
+              .more-actions-no-hover:active {
+                background-color: transparent !important;
+              }
+            `}</style>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", paddingLeft: "12px" }}>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button
+                    appearance="subtle"
+                    size="small"
+                    className="more-actions-no-hover"
+                    style={{
+                      width: "32px",
+                      height: "32px",
+                      padding: 0,
+                    }}
+                    aria-label="More options"
+                  >
+                    <MoreHorizontalRegular style={{ width: "16px", height: "16px", color: "#616161" }} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {menuItems.map((item, index) => (
+                    <React.Fragment key={index}>{item}</React.Fragment>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </>
         );
       }
 
       // Default: Direct PDF Viewer Button
       return (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", paddingLeft: "12px" }}>
           <Button
             appearance="subtle"
             size="small"
+            className="more-actions-no-hover"
             style={{
               width: "32px",
               height: "32px",
@@ -292,7 +318,7 @@ export const useProcessTable = ({
       const isMenuAvailable = isRegistered || isCompleted;
 
       return (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "8px" }}>
           <Button
             appearance="outline"
             onClick={() => handleUpload && handleUpload(item)}
@@ -314,10 +340,12 @@ export const useProcessTable = ({
                 <Button
                   appearance="subtle"
                   size="small"
+                  className="more-actions-no-hover"
                   style={{
                     width: "32px",
                     height: "32px",
                     padding: 0,
+                    marginLeft: "12px",
                   }}
                   aria-label="More options"
                 >
@@ -341,7 +369,6 @@ export const useProcessTable = ({
                     />
                   </>
                 )}
-
                 {isCompleted && (
                   <>
                     <DropdownMenuItem
@@ -376,10 +403,12 @@ export const useProcessTable = ({
             <Button
               appearance="subtle"
               size="small"
+              className="more-actions-no-hover"
               style={{
                 width: "32px",
                 height: "32px",
                 padding: 0,
+                marginLeft: "12px",
               }}
               aria-label="View Application"
               onClick={() => handleViewPDF(item)}
@@ -395,18 +424,22 @@ export const useProcessTable = ({
     const renderApplicationNo = (item: ApplicationData) => (
       <span
         onClick={(e) => {
-          e.stopPropagation(); // Prevent event from bubbling to row
-          handleViewPDF(item);
+          if (activeTab !== "verify") {
+            e.stopPropagation(); // Prevent event from bubbling to row
+            handleViewPDF(item);
+          }
         }}
         onMouseDown={(e) => {
-          e.stopPropagation(); // Also stop on mousedown
+          if (activeTab !== "verify") {
+            e.stopPropagation(); // Also stop on mousedown
+          }
         }}
         style={{
           fontSize: "13px",
           lineHeight: "19px",
           fontWeight: 400,
           color: "#424242",
-          cursor: "pointer",
+          cursor: activeTab !== "verify" ? "pointer" : "default",
           fontFamily: "'Inter', sans-serif",
           display: "inline-block",
         }}
@@ -415,9 +448,11 @@ export const useProcessTable = ({
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            e.stopPropagation();
-            handleViewPDF(item);
+            if (activeTab !== "verify") {
+              e.preventDefault();
+              e.stopPropagation();
+              handleViewPDF(item);
+            }
           }
         }}
       >
@@ -482,6 +517,7 @@ export const useProcessTable = ({
             </span>
           );
         }
+
         
         // If suggestLinkEnable is false, show as plain text (non-clickable)
         if (!item.suggestLinkEnable) {
@@ -500,6 +536,8 @@ export const useProcessTable = ({
           );
         }
         
+ 
+
         // For Completed status, show "Suggest X" as clickable button (no "---" label)
         // For other statuses, show "Suggest X" as clickable button
         return (
@@ -524,23 +562,21 @@ export const useProcessTable = ({
       // For other cases, show as clickable button
       const isCustomStyled = label.includes("Approve") || label.includes("Issue") || label.includes("Suggest");
 
-      return (
-        <Button
-          appearance={isCustomStyled ? "subtle" : "primary"}
-          onClick={() => handleProcess && handleProcess(item)}
-          style={{
-            backgroundColor: isCustomStyled ? "transparent" : "#2453C3",
-            color: isCustomStyled ? "#0F6CBD" : "#ffffff",
-            minWidth: "120px",
-            height: "32px",
-            fontWeight: 600,
-            fontSize: "13px",
-            border: "none",
-          }}
-        >
-          {label}
-        </Button>
-      );
+      return status === "finalCompleted" ? "-" : <Button
+        appearance={isCustomStyled ? "subtle" : "primary"}
+        onClick={() => handleProcess && handleProcess(item)}
+        style={{
+          backgroundColor: isCustomStyled ? "transparent" : "#2453C3",
+          color: isCustomStyled ? "#0F6CBD" : "#ffffff",
+          minWidth: "120px",
+          height: "32px",
+          fontWeight: 600,
+          fontSize: "13px",
+          border: "none",
+        }}
+      >
+        {label}
+      </Button>
     };
 
     // Common text renderer - now clickable to show PDF
@@ -551,10 +587,10 @@ export const useProcessTable = ({
           lineHeight: "19px",
           color: "#424242",
           fontFamily: "'Inter', sans-serif",
-          cursor: item ? "pointer" : "default",
+          cursor: item && activeTab !== "verify" ? "pointer" : "default",
         }}
         onClick={(e) => {
-          if (item && handleViewPDF) {
+          if (item && handleViewPDF && activeTab !== "verify") {
             e.stopPropagation();
             handleViewPDF(item);
           }
@@ -571,6 +607,7 @@ export const useProcessTable = ({
       fieldName: "actions",
       minWidth: 48,
       maxWidth: 48,
+      width: 48,
       isSortable: false,
       onRenderHeader: () => <span />, // Empty header or icon if preferred, but user just said "three horizontal button"
       onRender: renderActions,

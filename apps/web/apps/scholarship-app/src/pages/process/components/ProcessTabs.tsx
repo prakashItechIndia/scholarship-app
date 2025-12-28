@@ -1,6 +1,7 @@
 import * as React from "react";
-
+import { usePermissions } from "@/contexts/PermissionContext";
 import { tabLabels } from "../constants";
+import { getScreenNameFromTab } from "../utils/tabPermissions";
 
 interface ProcessTabsProps {
   activeTab: string;
@@ -8,6 +9,49 @@ interface ProcessTabsProps {
 }
 
 const ProcessTabs: React.FC<ProcessTabsProps> = ({ activeTab, onTabChange }) => {
+  const { permissions, loading } = usePermissions();
+
+  // Check if user is Administrator - they have full access
+  const isAdministrator = React.useMemo(() => {
+    try {
+      const authData = localStorage.getItem('scholarship_auth');
+      if (authData) {
+        const parsed = JSON.parse(authData);
+        return parsed?.user?.userType === 'Administrator';
+      }
+    } catch {
+      // Ignore errors
+    }
+    return false;
+  }, []);
+
+  // Filter tabs based on permissions
+  const allowedTabs = React.useMemo(() => {
+    // Administrators have access to all tabs
+    if (isAdministrator) {
+      return tabLabels;
+    }
+
+    // If permissions are loading or not available, show all tabs (will be filtered once loaded)
+    if (loading || !permissions || !permissions.screens) {
+      return tabLabels;
+    }
+
+    // Filter tabs based on screen permissions
+    return tabLabels.filter((tab) => {
+      const screenName = getScreenNameFromTab(tab.value);
+      if (!screenName) {
+        // If no mapping exists, allow the tab (for backward compatibility)
+        return true;
+      }
+
+      // Check if user has permission for this screen
+      return permissions.screens.some(
+        (screen) => screen.screenName === screenName && screen.isActive
+      );
+    });
+  }, [permissions, loading, isAdministrator]);
+
   return (
     <div style={{ width: "38.71875rem" }}>
       <div style={{
@@ -17,7 +61,7 @@ const ProcessTabs: React.FC<ProcessTabsProps> = ({ activeTab, onTabChange }) => 
         padding: "12px",
         paddingBottom: "10px",
       }}>
-        {tabLabels.map((tab) => {
+        {allowedTabs.map((tab) => {
           const isActive = activeTab === tab.value;
           return (
             <button

@@ -68,13 +68,13 @@ const ViewDocumentsDrawer: React.FC<ViewDocumentsDrawerProps> = ({
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "20px 24px",
-        borderBottom: "1px solid #e0e0e0",
+        padding: "20px 24px 0px 25px",
+        // borderBottom: "1px solid #e0e0e0",
         backgroundColor: "#ffffff",
       }}>
         <h2 style={{
-          fontSize: "20px",
-          lineHeight: "28px",
+          fontSize: "16px",
+          lineHeight: "22px",
           fontWeight: 600,
           color: "#242424",
           fontFamily: "'Inter', sans-serif",
@@ -90,10 +90,11 @@ const ViewDocumentsDrawer: React.FC<ViewDocumentsDrawerProps> = ({
             width: "32px",
             height: "32px",
             padding: 0,
+            border:"none"
           }}
           aria-label="Close"
         >
-          <DismissRegular style={{ width: "20px", height: "20px", color: "#616161" }} />
+          <DismissRegular style={{ width: "20px", height: "20px", color: "#616161",marginLeft:"20px" }} />
         </Button>
       </div>
 

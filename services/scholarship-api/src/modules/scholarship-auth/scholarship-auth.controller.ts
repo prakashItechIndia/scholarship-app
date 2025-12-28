@@ -230,4 +230,49 @@ export class ScholarshipAuthController {
       throw error;
     }
   }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Request password reset for admin user' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string' },
+      },
+      required: ['email'],
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Password reset email sent (if email exists)',
+  })
+  async forgotPassword(@Body() body: { email: string }) {
+    return this.authService.requestPasswordReset(body.email);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset password using token' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string' },
+        token: { type: 'string' },
+        newPassword: { type: 'string' },
+      },
+      required: ['email', 'token', 'newPassword'],
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Password reset successfully',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
+  async resetPassword(
+    @Body() body: { email: string; token: string; newPassword: string },
+  ) {
+    return this.authService.resetPassword(body.email, body.token, body.newPassword);
+  }
 }

@@ -1,5 +1,9 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
+import { FileStorageService } from '../file-storage/file-storage.service';
+import puppeteer from 'puppeteer';
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 
 interface ProcessQueryParams {
   mainCategory?: string;
@@ -39,12 +43,21 @@ interface ApproveApplicationData {
 
 interface IssueAmountData {
   applicationId: string;
+  scholarshipId?: number;
   paymentMode: string; // DD, NEFT/RTGS, Cheque, UPI
   comments?: string;
   ddChequeNo?: string;
   ddChequeInFavor?: string;
   ddChequeDate?: string;
+  ddChequeInFavorType?: string; // Individual, Institution, Concession
+  ddChequeInstitutionId?: number;
+  ddChequeOtherInstitution?: string;
+  ddChequeIssuedBy?: number;
+  scholarshipIssuedDate?: string;
+  bankName?: string;
+  branchDetails?: string;
   issuedBy?: number;
+  documents?: File[];
 }
 
 /**
@@ -124,7 +137,10 @@ function buildOrderByClause(sortField?: string, sortOrder?: 'asc' | 'desc'): str
 export class ProcessManagementService {
   private readonly logger = new Logger(ProcessManagementService.name);
 
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    private readonly db: DatabaseService,
+    private readonly fileStorage: FileStorageService,
+  ) {}
 
   /**
    * Get applications for Overview tab
@@ -241,6 +257,7 @@ export class ProcessManagementService {
         LEFT OUTER JOIN TBL_USERMASTER UV ON P.Verified_By = UV.Id
         LEFT OUTER JOIN TBL_USERMASTER US ON P.Suggested_By = US.Id
         WHERE 1=1
+          AND P.Status != 'finalCompleted'  -- Exclude finalCompleted from Overview tab (only show in Issue Amount tab)
       `;
 
       const queryParams: Record<string, unknown> = {};
@@ -915,7 +932,7 @@ export class ProcessManagementService {
 
   /**
    * Get applications for Issue Amount tab
-   * Shows applications with Approved status
+   * Shows applications with Approved status (ready to issue) and finalCompleted status (already issued)
    */
   async getIssueAmountApplications(params: ProcessQueryParams) {
     try {
@@ -990,7 +1007,7 @@ export class ProcessManagementService {
         FROM t_Registration R
         JOIN t_Registration_Process P ON P.Application_Id = R.Application_Id
         JOIN T_Scholarship_Year SY ON R.Scholarship_Year_Id = SY.ScholarshipYear_Id
-        WHERE P.Status = 'Approved'
+        WHERE P.Status = 'Approved' OR P.Status = 'finalCompleted'
       `;
 
       const queryParams: Record<string, unknown> = {};
@@ -1242,15 +1259,23 @@ export class ProcessManagementService {
    * Issue amount - updates status to Completed with payment details
    * Matches ScholarshipFinal.aspx.cs logic
    */
-  async issueAmount(data: IssueAmountData) {
+  async issueAmount(data: IssueAmountData, files?: Express.Multer.File[]) {
     try {
       const {
         applicationId,
+        scholarshipId,
         paymentMode,
         comments = '',
         ddChequeNo = '',
         ddChequeInFavor = '',
         ddChequeDate = '',
+        ddChequeInFavorType = '',
+        ddChequeInstitutionId,
+        ddChequeOtherInstitution = '',
+        ddChequeIssuedBy,
+        scholarshipIssuedDate = '',
+        bankName = '',
+        branchDetails = '',
         issuedBy,
       } = data;
 
@@ -1258,44 +1283,122 @@ export class ProcessManagementService {
         throw new BadRequestException('Payment mode is required');
       }
 
-      // Get approved amount
+      // Get approved amount and scholarship ID if not provided
       const getAmountQuery = `
-        SELECT Scholarship_Approved_Amount
+        SELECT 
+          Scholarship_Approved_Amount,
+          Scholarship_Id
         FROM t_Registration_Process
         WHERE Application_Id = @applicationId
       `;
-      const amountResult = await this.db.query<{ Scholarship_Approved_Amount: number }>(
+      const amountResult = await this.db.query<{ 
+        Scholarship_Approved_Amount: number | string;
+        Scholarship_Id: number;
+      }>(
         getAmountQuery,
         { applicationId },
       );
       const approvedAmount = amountResult.recordset?.[0]?.Scholarship_Approved_Amount || 0;
+      const finalScholarshipId = scholarshipId || amountResult.recordset?.[0]?.Scholarship_Id;
 
+      // Handle file upload if provided (for DD/Cheque document)
+      let ddChequePath = '';
+      let ddChequePathForCrystal = '';
+      
+      if (files && files.length > 0) {
+        // Use the first file as DD/Cheque document
+        const file = files[0];
+        // Save file following the old app pattern
+        // Pattern: /ScholerShipData/{ApplicationNo}/{ApplicationNo}_DDCheck_{timestamp}.{ext}
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '').replace(/-/g, '').replace('T', '').substring(0, 14);
+        const fileExtension = file.originalname.split('.').pop() || '';
+        const fileName = `${applicationId}_DDCheck_${timestamp}.${fileExtension}`;
+        
+        // Save file using FileStorageService with custom filename
+        // We'll use saveDocument but need to handle the custom filename pattern
+        const fileResult = await this.fileStorage.saveDocument(
+          applicationId,
+          `DDCheck_${timestamp}`,
+          file,
+        );
+        
+        // The fileResult.filePath will be /ScholerShipData/{ApplicationNo}/{ApplicationNo}_DDCheck_{timestamp}.{ext}
+        ddChequePath = fileResult.filePath;
+        ddChequePathForCrystal = fileResult.fullPath;
+      }
+
+      // Build update query with all fields
       const updateQuery = `
         UPDATE t_Registration_Process
         SET
-          Status = 'Completed',
+          Status = 'finalCompleted',
           Scholarship_Issued_Amount = @approvedAmount,
           Payment_Mode = @paymentMode,
           DDCheque_No = @ddChequeNo,
           DDCheque_In_Favor = @ddChequeInFavor,
           DDCheque_Date = @ddChequeDate,
+          DDCheque_In_Favor_Type = @ddChequeInFavorType,
+          DDCheque_Institution_ID = @ddChequeInstitutionId,
+          DDCheque_Other_Institution = @ddChequeOtherInstitution,
+          DDCheque_IssuedBy = @ddChequeIssuedBy,
+          Scholarship_Issued_Date = @scholarshipIssuedDate,
+          Scholarship_Issued_BankName = @bankName,
+          Scholarship_Issued_BankBranch = @branchDetails,
+          DDCheque_Path = @ddChequePath,
+          DDCheque_Path_ForCrystal = @ddChequePathForCrystal,
           Donated_Date = GETDATE(),
-          Update_Date = GETDATE(),
-          Issued_By = @issuedBy
+          Update_Date = GETDATE()
         WHERE Application_Id = @applicationId
+          ${finalScholarshipId ? 'AND Scholarship_Id = @scholarshipId' : ''}
       `;
 
-      await this.db.query(updateQuery, {
+      const updateParams: Record<string, unknown> = {
         applicationId,
-        approvedAmount,
+        approvedAmount: String(approvedAmount),
         paymentMode,
-        ddChequeNo,
-        ddChequeInFavor,
+        ddChequeNo: ddChequeNo || null,
+        ddChequeInFavor: ddChequeInFavor || null,
         ddChequeDate: ddChequeDate || null,
-        issuedBy,
-      });
+        ddChequeInFavorType: ddChequeInFavorType || null,
+        ddChequeInstitutionId: ddChequeInstitutionId || null,
+        ddChequeOtherInstitution: ddChequeOtherInstitution || null,
+        ddChequeIssuedBy: ddChequeIssuedBy || null,
+        scholarshipIssuedDate: scholarshipIssuedDate || null,
+        bankName: bankName || null,
+        branchDetails: branchDetails || null,
+        ddChequePath: ddChequePath || null,
+        ddChequePathForCrystal: ddChequePathForCrystal || null,
+      };
 
-      return { message: 'Amount issued successfully' };
+      if (finalScholarshipId) {
+        updateParams.scholarshipId = finalScholarshipId;
+      }
+
+      await this.db.query(updateQuery, updateParams);
+
+      // Update history if comments provided (matching old app: UpdateHistory)
+      if (comments && issuedBy) {
+        const historyText = `Scholarship amount issued. Payment Mode: ${paymentMode}. ${comments}`;
+        try {
+          await this.db.query(`
+            INSERT INTO TBL_HISTORY (Application_Id, Process, Action, Data_Date, User_ID)
+            VALUES (@applicationId, @process, @action, GETDATE(), @userId)
+          `, {
+            applicationId,
+            process: 'Issue Amount',
+            action: historyText,
+            userId: String(issuedBy),
+          });
+        } catch (historyError) {
+          // Log but don't fail the main operation
+          this.logger.warn('Failed to update history', historyError);
+        }
+      }
+
+      return { 
+        message: 'Amount issued successfully',
+        ddChequePath: ddChequePath || undefined,
+      };
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
@@ -1505,6 +1608,438 @@ export class ProcessManagementService {
         throw new BadRequestException(`Failed to fetch scholarship history: ${error.message}`);
       }
       throw new BadRequestException('Failed to fetch scholarship history');
+    }
+  }
+
+  /**
+   * Generate merged scholarship PDF with cheque image
+   * Top section: Dynamic application data
+   * Center section: Uploaded cheque image (as-is)
+   * Bottom section: Dynamic payment summary
+   */
+  async generateMergedScholarshipPDF(
+    applicationId: string,
+    scholarshipId: string,
+  ): Promise<Buffer> {
+    try {
+      // Fetch application and process data
+      // Handle both Scholarship_Id (numeric) and Scholarship_No (string like "25LMSS2079")
+      const isNumericScholarshipId = !isNaN(Number(scholarshipId)) && scholarshipId.trim() !== '';
+      
+      const query = `
+        SELECT
+          R.Application_Id,
+          R.Applicant_Name,
+          R.Father_Name,
+          R.Mobile_Number,
+          R.Institution_Name,
+          R.Aadhaar_ID,
+          R.Pan_ID,
+          R.Student_ID,
+          P.Scholarship_No,
+          P.Scholarship_Issued_Amount,
+          P.DDCheque_No,
+          P.DDCheque_Date,
+          P.DDCheque_In_Favor,
+          P.DDCheque_In_Favor_Type,
+          P.DDCheque_Path,
+          P.Scholarship_Issued_Date,
+          P.Payment_Mode,
+          P.Scholarship_Approved_Amount,
+          P.Request_Amount,
+          P.Scholarship_Suggest_Amount
+        FROM t_Registration R
+        JOIN t_Registration_Process P ON P.Application_Id = R.Application_Id
+        WHERE R.Application_Id = @applicationId
+          ${isNumericScholarshipId ? 'AND P.Scholarship_Id = @scholarshipId' : 'AND P.Scholarship_No = @scholarshipNo'}
+      `;
+
+      const queryParams: Record<string, unknown> = {
+        applicationId,
+      };
+      
+      if (isNumericScholarshipId) {
+        queryParams.scholarshipId = Number(scholarshipId);
+      } else {
+        queryParams.scholarshipNo = scholarshipId;
+      }
+
+      const result = await this.db.query(query, queryParams);
+
+      const data = result.recordset?.[0] as Record<string, unknown> | undefined;
+
+      if (!data) {
+        throw new BadRequestException(
+          `Application ${applicationId} with scholarship ${scholarshipId} not found`,
+        );
+      }
+
+      // Get cheque image path
+      const chequePath = data.DDCheque_Path as string | undefined;
+      let chequeImageBase64 = '';
+
+      if (chequePath) {
+        try {
+          const uploadBasePath =
+            process.env.UPLOAD_BASE_PATH || join(process.cwd(), 'uploads');
+          let fullChequePath: string;
+
+          if (chequePath.startsWith('/')) {
+            fullChequePath = join(uploadBasePath, chequePath.substring(1));
+          } else {
+            fullChequePath = join(uploadBasePath, chequePath);
+          }
+
+          if (existsSync(fullChequePath)) {
+            const imageBuffer = readFileSync(fullChequePath);
+            const fileExtension = fullChequePath.toLowerCase().split('.').pop() || '';
+            const mimeType =
+              fileExtension === 'jpg' || fileExtension === 'jpeg'
+                ? 'image/jpeg'
+                : fileExtension === 'png'
+                  ? 'image/png'
+                  : 'image/jpeg';
+            chequeImageBase64 = `data:${mimeType};base64,${imageBuffer.toString('base64')}`;
+          } else {
+            this.logger.warn(`Cheque image not found at: ${fullChequePath}`);
+          }
+        } catch (imageError) {
+          this.logger.warn('Error reading cheque image', imageError);
+        }
+      }
+
+      // Format amounts
+      const formatAmount = (amount: unknown): string => {
+        if (!amount) return '0';
+        const num = Number(amount);
+        if (isNaN(num)) return '0';
+        return num.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+      };
+
+      const formatAmountInWords = (amount: unknown): string => {
+        if (!amount) return 'ZERO';
+        const num = Number(amount);
+        if (isNaN(num)) return 'ZERO';
+        
+        // Convert number to words in Indian format
+        const ones = ['', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE'];
+        const teens = ['TEN', 'ELEVEN', 'TWELVE', 'THIRTEEN', 'FOURTEEN', 'FIFTEEN', 'SIXTEEN', 'SEVENTEEN', 'EIGHTEEN', 'NINETEEN'];
+        const tens = ['', '', 'TWENTY', 'THIRTY', 'FORTY', 'FIFTY', 'SIXTY', 'SEVENTY', 'EIGHTY', 'NINETY'];
+        
+        const convertHundreds = (n: number): string => {
+          if (n === 0) return '';
+          if (n < 10) return ones[n];
+          if (n < 20) return teens[n - 10];
+          if (n < 100) {
+            const ten = Math.floor(n / 10);
+            const one = n % 10;
+            return one === 0 ? tens[ten] : `${tens[ten]} ${ones[one]}`;
+          }
+          const hundred = Math.floor(n / 100);
+          const remainder = n % 100;
+          return remainder === 0 
+            ? `${ones[hundred]} HUNDRED` 
+            : `${ones[hundred]} HUNDRED ${convertHundreds(remainder)}`;
+        };
+        
+        if (num === 0) return 'ZERO';
+        
+        const crores = Math.floor(num / 10000000);
+        const lakhs = Math.floor((num % 10000000) / 100000);
+        const thousands = Math.floor((num % 100000) / 1000);
+        const hundreds = num % 1000;
+        
+        let result = '';
+        if (crores > 0) {
+          result += `${convertHundreds(crores)} ${crores === 1 ? 'CRORE' : 'CRORES'} `;
+        }
+        if (lakhs > 0) {
+          result += `${convertHundreds(lakhs)} ${lakhs === 1 ? 'LAKH' : 'LAKHS'} `;
+        }
+        if (thousands > 0) {
+          result += `${convertHundreds(thousands)} ${thousands === 1 ? 'THOUSAND' : 'THOUSANDS'} `;
+        }
+        if (hundreds > 0) {
+          result += convertHundreds(hundreds);
+        }
+        
+        return result.trim() || 'ZERO';
+      };
+
+      const issuedAmount = formatAmount(data.Scholarship_Issued_Amount);
+      const issuedAmountWords = formatAmountInWords(data.Scholarship_Issued_Amount);
+
+      // Format date
+      const formatDate = (date: unknown): string => {
+        if (!date) return '';
+        try {
+          const d = new Date(date as string);
+          return d.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+          });
+        } catch {
+          return String(date);
+        }
+      };
+
+      // Generate HTML for PDF
+      const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 0;
+              padding: 20px;
+              font-size: 12px;
+              color: #000;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 20px;
+            }
+            .header h1 {
+              margin: 0;
+              font-size: 18px;
+              font-weight: bold;
+            }
+            .section {
+              margin-bottom: 20px;
+            }
+            .section-title {
+              font-weight: bold;
+              font-size: 14px;
+              margin-bottom: 10px;
+              text-align: center;
+            }
+            .details-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 15px;
+            }
+            .details-table td {
+              padding: 6px;
+              border: 1px solid #ddd;
+            }
+            .details-table td:first-child {
+              font-weight: bold;
+              width: 40%;
+              background-color: #f5f5f5;
+            }
+            .cheque-image-container {
+              text-align: center;
+              margin: 20px 0;
+              page-break-inside: avoid;
+            }
+            .cheque-image {
+              max-width: 100%;
+              max-height: 500px;
+              height: auto;
+              object-fit: contain;
+              display: block;
+              margin: 0 auto;
+            }
+            .payment-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 15px;
+            }
+            .payment-table th,
+            .payment-table td {
+              padding: 8px;
+              border: 1px solid #ddd;
+              text-align: center;
+            }
+            .payment-table th {
+              background-color: #f5f5f5;
+              font-weight: bold;
+            }
+            .amount-section {
+              margin-top: 15px;
+              text-align: center;
+            }
+            .acknowledgment {
+              margin-top: 30px;
+              position: relative;
+            }
+            .acknowledgment-header {
+              text-align: right;
+              margin-bottom: 20px;
+              font-size: 13px;
+              font-weight: 500;
+            }
+            .acknowledgment-fields {
+              margin-top: 20px;
+            }
+            .acknowledgment-field {
+              display: flex;
+              align-items: center;
+              margin-bottom: 15px;
+              border-bottom: 1px solid #000;
+              padding-bottom: 5px;
+            }
+            .acknowledgment-label {
+              min-width: 100px;
+              font-weight: 500;
+              margin-right: 10px;
+            }
+            .acknowledgment-input {
+              flex: 1;
+              border: none;
+              border-bottom: 1px solid #000;
+              min-height: 20px;
+            }
+          </style>
+        </head>
+        <body>
+          <!-- Top Section: Scholarship Issued Form -->
+          <div class="section">
+            <div class="header">
+              <h1>LEO MUTHU SCHOLARSHIP</h1>
+              <p>Online Registration for Scholarship Assistance 2025-2026</p>
+              <h2 style="margin: 10px 0; font-size: 16px; font-weight: bold;">SCHOLARSHIP ISSUED FORM( 2025-2026 )</h2>
+            </div>
+            
+            <table class="details-table">
+              <tr>
+                <td>Scholarship ID</td>
+                <td>${data.Scholarship_No || '-'}</td>
+              </tr>
+              <tr>
+                <td>Name</td>
+                <td>${String(data.Applicant_Name || '-')}</td>
+              </tr>
+              <tr>
+                <td>Application ID</td>
+                <td>${String(data.Application_Id || '-')}</td>
+              </tr>
+              <tr>
+                <td>Mobile Number</td>
+                <td>${String(data.Mobile_Number || '-')}</td>
+              </tr>
+              <tr>
+                <td>Institution Name</td>
+                <td>${String(data.Institution_Name || '-')}</td>
+              </tr>
+              <tr>
+                <td>Cheque in favour of</td>
+                <td>${String(data.DDCheque_In_Favor_Type || '-')}${data.DDCheque_In_Favor ? ` ${String(data.DDCheque_In_Favor)}` : ''}</td>
+              </tr>
+              <tr>
+                <td>Student ID</td>
+                <td>${String(data.Student_ID || '-')}</td>
+              </tr>
+              <tr>
+                <td>Aadhaar ID</td>
+                <td>${String(data.Aadhaar_ID || '-')}</td>
+              </tr>
+              <tr>
+                <td>PAN ID</td>
+                <td>${String(data.Pan_ID || '-')}</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Center Section: Cheque Image -->
+          ${chequeImageBase64 ? `
+          <div class="cheque-image-container">
+            <img src="${chequeImageBase64}" alt="Cheque" class="cheque-image" />
+          </div>
+          ` : ''}
+
+          <!-- Bottom Section: Payment Summary -->
+          <div class="section">
+            <div class="section-title">Scholarship Approved Cheque Payment Details</div>
+            
+            <table class="payment-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Cheque No</th>
+                  <th>Amount</th>
+                  <th>Passed By</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>${formatDate(data.DDCheque_Date || data.Scholarship_Issued_Date)}</td>
+                  <td>${String(data.DDCheque_No || '-')}</td>
+                  <td>Rs.${issuedAmount}</td>
+                  <td>-</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="amount-section">
+              <p><strong>Amount: Rs.${issuedAmount}</strong></p>
+              <p>Rupees(${issuedAmountWords} ONLY)</p>
+            </div>
+
+            <div class="acknowledgment">
+              <div class="acknowledgment-header">
+                <p>Received with Thanks.</p>
+              </div>
+              <div class="acknowledgment-fields">
+                <div class="acknowledgment-field">
+                  <span class="acknowledgment-label">Name :</span>
+                  <div class="acknowledgment-input"></div>
+                </div>
+                <div class="acknowledgment-field">
+                  <span class="acknowledgment-label">Signature :</span>
+                  <div class="acknowledgment-input"></div>
+                </div>
+                <div class="acknowledgment-field">
+                  <span class="acknowledgment-label">Date :</span>
+                  <div class="acknowledgment-input"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      // Generate PDF using Puppeteer
+      const browser = await puppeteer.launch({
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--disable-gpu',
+        ],
+      });
+
+      try {
+        const page = await browser.newPage();
+        await page.setContent(html, { waitUntil: 'networkidle0' });
+
+        const pdfBuffer = await page.pdf({
+          format: 'A4',
+          margin: {
+            top: '10mm',
+            right: '10mm',
+            bottom: '10mm',
+            left: '10mm',
+          },
+          printBackground: true,
+        });
+
+        return Buffer.from(pdfBuffer);
+      } finally {
+        await browser.close();
+      }
+    } catch (error) {
+      this.logger.error('Error generating merged scholarship PDF', error);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException('Failed to generate merged scholarship PDF');
     }
   }
 }

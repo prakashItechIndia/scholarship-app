@@ -16,6 +16,11 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
       textColor: "#0e700e",
       borderColor: "#9fd89f",
     },
+    finalCompleted: { // Same as Completed - shows only in Issue Amount tab
+      bgColor: "#ebf3fc",
+      textColor: "#0F6CBD",
+      borderColor: "#0F6CBD",
+    },
     Verified: { // Same as Completed
       bgColor: "#f1faf1",
       textColor: "#0e700e",
@@ -37,9 +42,9 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
       borderColor: "#fdcfb4",
     },
     Registered: {
-      bgColor: "#aeb9f600",
-      textColor: "#115ea3",
-      borderColor: "#b4d6fa",
+      bgColor: "#E4EEFF",
+      textColor: "#0E1CDD",
+      borderColor: "#AFCAFF",
     },
     "Documents Submitted": { // Blue text, light blue bg, blue border
       bgColor: "#ebf3fc",
@@ -64,18 +69,20 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
       style={{
         display: "inline-flex",
         alignItems: "center",
-        padding: "4px 10px",
+        justifyContent: "center",
+        padding: "4px 12px",
         borderRadius: "10000px",
-        fontSize: "12px",
-        lineHeight: "16px",
-        fontWeight: 500,
+        fontSize: "10px",
+        lineHeight: "14px",
+        fontWeight: 600,
         border: `1px solid ${config.borderColor}`,
         backgroundColor: config.bgColor,
         color: config.textColor,
         fontFamily: "'Inter', sans-serif",
+        minWidth: "140px",
       }}
     >
-      {status}
+      {status==='finalCompleted' ? 'Completed' : status}
     </span>
   );
 };

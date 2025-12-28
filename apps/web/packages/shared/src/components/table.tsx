@@ -44,10 +44,12 @@ export interface TableProps {
   className?: string;
   /** Disable internal scrolling */
   disableScroll?: boolean;
+  /** Callback for row click */
+  onRowClick?: (item: any, index: number) => void;
 }
 
 export const Table = React.forwardRef<HTMLDivElement, TableProps>(
-  ({ className, columns, data, disableScroll = false }, ref) => {
+  ({ className, columns, data, disableScroll = false, onRowClick }, ref) => {
     return (
       <div ref={ref} className={cn("relative w-full h-full overflow-auto", className)} style={{ padding: 0, margin: 0 }}>
         <FluentTable style={{ minWidth: "100%", width: "max-content", borderCollapse: "collapse", margin: 0, padding: 0, tableLayout: "auto" }}>
@@ -89,11 +91,13 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
                 style={{
                   backgroundColor: "transparent",
                   borderBottom: "1px solid #e0e0e0",
+                  cursor: onRowClick ? "pointer" : "default",
                 }}
                 className="hover:bg-[#f5f5f5]"
                 onClick={(e) => {
-                  // Prevent row click from triggering any actions
-                  // Only specific elements within cells should handle clicks
+                  if (onRowClick) {
+                    onRowClick(item, rowIndex);
+                  }
                   e.stopPropagation();
                 }}
               >
@@ -122,11 +126,6 @@ export const Table = React.forwardRef<HTMLDivElement, TableProps>(
                         whiteSpace: "nowrap",
                         ...col.style,
                         fontWeight: 400,
-                      }}
-                      onClick={(e) => {
-                        // Prevent cell click from triggering actions
-                        // Only specific interactive elements should handle clicks
-                        e.stopPropagation();
                       }}
                     >
                       {cellContent}
