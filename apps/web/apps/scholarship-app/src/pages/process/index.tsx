@@ -1210,6 +1210,12 @@ const ProcessPage: React.FC = () => {
               columns={columns}
               data={paginatedData}
               disableScroll={true}
+              onRowClick={(item) => {
+                if (activeTab === 'verify') {
+                  setSelectedVerifyApplication(item);
+                  setVerifyModalOpen(true);
+                }
+              }}
             />
           )}
         </div>

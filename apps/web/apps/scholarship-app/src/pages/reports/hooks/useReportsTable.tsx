@@ -2,6 +2,9 @@ import * as React from "react";
 import { ScholarshipReportData, ApprovedFormData, ReportTab } from "../types";
 import {
   ArrowSort20Regular,
+  DocumentBulletListRegular,
+  DocumentPrintRegular,
+  MoneyHandRegular,
   MoreHorizontalRegular,
   PrintRegular,
 } from "@fluentui/react-icons";
@@ -19,6 +22,8 @@ interface UseReportsTableProps {
   selectedRows?: Set<string>;
   data?: (ScholarshipReportData | ApprovedFormData)[];
   onViewPdf?: (item: ScholarshipReportData | ApprovedFormData) => void;
+  onViewDocuments?: (item: ScholarshipReportData | ApprovedFormData) => void;
+  onViewScholarshipHistory?: (item: ScholarshipReportData | ApprovedFormData) => void;
   activeTab?: ReportTab;
 }
 
@@ -28,6 +33,8 @@ export const useReportsTable = ({
   selectedRows = new Set(),
   data = [],
   onViewPdf,
+  onViewDocuments,
+  onViewScholarshipHistory,
   activeTab = "categories-wise",
 }: UseReportsTableProps) => {
   // Helper function to create sortable header
@@ -41,9 +48,9 @@ export const useReportsTable = ({
       }}
     >
       <span style={{
-        fontSize: "14px",
-        lineHeight: "20px",
-        fontWeight: 600,
+        fontSize: "13px",
+        lineHeight: "19px",
+        fontWeight: 500,
         color: "#424242",
         fontFamily: "'Inter', sans-serif",
       }}>
@@ -188,7 +195,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Application No."),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#0f6cbd", fontWeight: 500, fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
             {getFieldValue(item, "applicationNo")}
           </span>
         ),
@@ -201,7 +208,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Aadhaar Id"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
             {getFieldValue(item, "aadhaarId")}
           </span>
         ),
@@ -214,7 +221,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Student Name"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
             {getFieldValue(item, "studentName")}
           </span>
         ),
@@ -227,7 +234,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Student Id"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
             {getFieldValue(item, "studentId")}
           </span>
         ),
@@ -240,7 +247,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Class Studying"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
             {getFieldValue(item, "classStudying")}
           </span>
         ),
@@ -253,7 +260,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Institution Name"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
             {getFieldValue(item, "institutionName")}
           </span>
         ),
@@ -266,7 +273,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Father Name"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "fatherName")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "fatherName")}</span>
         ),
       },
       {
@@ -277,7 +284,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Father Office Name"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "fatherOfficeName")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "fatherOfficeName")}</span>
         ),
       },
       {
@@ -288,7 +295,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Mother Name"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "motherName")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "motherName")}</span>
         ),
       },
       {
@@ -299,7 +306,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Mother Office Name"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "motherOfficeName")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "motherOfficeName")}</span>
         ),
       },
       {
@@ -310,7 +317,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Guardian Name"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "guardianName")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "guardianName")}</span>
         ),
       },
       {
@@ -321,7 +328,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Guardian Office Name"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "guardianOfficeName")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "guardianOfficeName")}</span>
         ),
       },
       {
@@ -332,7 +339,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Gender"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "gender")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "gender")}</span>
         ),
       },
       {
@@ -343,7 +350,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Cheque In Favor"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "checkInFavor")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "checkInFavor")}</span>
         ),
       },
       {
@@ -354,7 +361,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Approved Amount"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "approvedAmount")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "approvedAmount")}</span>
         ),
       },
       {
@@ -365,7 +372,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Issued Amount"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "issuedAmount")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "issuedAmount")}</span>
         ),
       },
       {
@@ -376,7 +383,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Scholarship ID"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "scholarshipId")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "scholarshipId")}</span>
         ),
       },
       {
@@ -387,7 +394,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Scholarship"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
             {getFieldValue(item, "scholarship") || getFieldValue(item, "scholarshipId")}
           </span>
         ),
@@ -400,7 +407,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("DDCheckNo"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "ddCheckNo")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "ddCheckNo")}</span>
         ),
       },
       {
@@ -411,7 +418,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Donated Date"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "donateDate")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "donateDate")}</span>
         ),
       },
       {
@@ -422,7 +429,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Bank Name"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "bankName")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "bankName")}</span>
         ),
       },
       {
@@ -433,7 +440,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Applied Date"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "appliedDate")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "appliedDate")}</span>
         ),
       },
       {
@@ -444,7 +451,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Scholarship Year"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "scholarshipYear")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "scholarshipYear")}</span>
         ),
       },
       {
@@ -455,7 +462,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Scholarship For"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "scholarshipFor")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "scholarshipFor")}</span>
         ),
       },
       {
@@ -466,7 +473,7 @@ export const useReportsTable = ({
         isSortable: true,
         onRenderHeader: () => createSortableHeader("Status"),
         onRender: (item?: ScholarshipReportData | any) => (
-          <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "status")}</span>
+          <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{getFieldValue(item, "status")}</span>
         ),
       },
       {
@@ -483,16 +490,26 @@ export const useReportsTable = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem
-                icon={<PrintRegular style={{ width: "20px", height: "20px" }} />}
-                label="Print Details"
-                onClick={() => item && onViewPdf && onViewPdf(item)}
-              />
-            </DropdownMenuContent>
+            <DropdownMenuItem
+              icon={<DocumentBulletListRegular style={{ width: "20px", height: "20px" }} />}
+              label="View Documents"
+              onClick={() => item && onViewDocuments && onViewDocuments(item)}
+            />
+            <DropdownMenuItem
+              icon={<MoneyHandRegular style={{ width: "20px", height: "20px" }} />}
+              label="Scholarship History"
+              onClick={() => item && onViewScholarshipHistory && onViewScholarshipHistory(item)}
+            />
+            <DropdownMenuItem
+              icon={<PrintRegular style={{ width: "20px", height: "20px" }} />}
+              label="Print Details"
+              onClick={() => item && onViewPdf && onViewPdf(item)}
+            />
+          </DropdownMenuContent>
           </DropdownMenu>
         ),
       },
-    ], [selectedRows, onRowSelect, onSelectAll, data, createSortableHeader, onViewPdf, getApplicationNo, getFieldValue]);
+    ], [selectedRows, onRowSelect, onSelectAll, data, createSortableHeader, onViewPdf, onViewDocuments, onViewScholarshipHistory, getApplicationNo, getFieldValue]);
 
   // Columns for Approved Form Report (Tab 3)
   const approvedFormColumns = React.useMemo(() => [
@@ -559,7 +576,7 @@ export const useReportsTable = ({
       isSortable: true,
       onRenderHeader: () => createSortableHeader("Application No"),
       onRender: (item?: ApprovedFormData | any) => (
-        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#0f6cbd", fontWeight: 500, fontFamily: "'Inter', sans-serif" }}>
+        <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
           {getFieldValue(item, "applicationNo")}
         </span>
       ),
@@ -572,7 +589,7 @@ export const useReportsTable = ({
       isSortable: true,
       onRenderHeader: () => createSortableHeader("Student Name"),
       onRender: (item?: ApprovedFormData | any) => (
-        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+        <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
           {getFieldValue(item, "studentName")}
         </span>
       ),
@@ -585,7 +602,7 @@ export const useReportsTable = ({
       isSortable: true,
       onRenderHeader: () => createSortableHeader("Class Studying"),
       onRender: (item?: ApprovedFormData | any) => (
-        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+        <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
           {getFieldValue(item, "classStudying")}
         </span>
       ),
@@ -598,7 +615,7 @@ export const useReportsTable = ({
       isSortable: true,
       onRenderHeader: () => createSortableHeader("Institution Name"),
       onRender: (item?: ApprovedFormData | any) => (
-        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+        <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
           {getFieldValue(item, "institutionName")}
         </span>
       ),
@@ -611,7 +628,7 @@ export const useReportsTable = ({
       isSortable: true,
       onRenderHeader: () => createSortableHeader("Father Annual Income"),
       onRender: (item?: ApprovedFormData | any) => (
-        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+        <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
           {getFieldValue(item, "fatherAnnualIncome")}
         </span>
       ),
@@ -624,7 +641,7 @@ export const useReportsTable = ({
       isSortable: true,
       onRenderHeader: () => createSortableHeader("Mobile Number"),
       onRender: (item?: ApprovedFormData | any) => (
-        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+        <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
           {getFieldValue(item, "mobileNumber")}
         </span>
       ),
@@ -637,7 +654,7 @@ export const useReportsTable = ({
       isSortable: true,
       onRenderHeader: () => createSortableHeader("Father Occupation"),
       onRender: (item?: ApprovedFormData | any) => (
-        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+        <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
           {getFieldValue(item, "fatherOccupation")}
         </span>
       ),
@@ -650,7 +667,7 @@ export const useReportsTable = ({
       isSortable: true,
       onRenderHeader: () => createSortableHeader("Scholarship"),
       onRender: (item?: ApprovedFormData | any) => (
-        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+        <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
           {getFieldValue(item, "scholarship")}
         </span>
       ),
@@ -663,7 +680,7 @@ export const useReportsTable = ({
       isSortable: true,
       onRenderHeader: () => createSortableHeader("Status"),
       onRender: (item?: ApprovedFormData | any) => (
-        <span style={{ fontSize: "14px", lineHeight: "20px", color: "#242424", fontFamily: "'Inter', sans-serif" }}>
+        <span style={{ fontSize: "13px", lineHeight: "19px", color: "#242424", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>
           {getFieldValue(item, "status")}
         </span>
       ),
@@ -683,7 +700,17 @@ export const useReportsTable = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem
-              icon={<PrintRegular style={{ width: "20px", height: "20px" }} />}
+              icon={<DocumentBulletListRegular style={{ width: "20px", height: "20px" }} />}
+              label="View Documents"
+              onClick={() => item && onViewDocuments && onViewDocuments(item)}
+            />
+            <DropdownMenuItem
+              icon={<MoneyHandRegular style={{ width: "20px", height: "20px" }} />}
+              label="Scholarship History"
+              onClick={() => item && onViewScholarshipHistory && onViewScholarshipHistory(item)}
+            />
+            <DropdownMenuItem
+              icon={<DocumentPrintRegular style={{ width: "20px", height: "20px" }} />}
               label="Print Details"
               onClick={() => item && onViewPdf && onViewPdf(item)}
             />
@@ -691,7 +718,7 @@ export const useReportsTable = ({
         </DropdownMenu>
       ),
     },
-  ], [selectedRows, onRowSelect, onSelectAll, data, createSortableHeader, onViewPdf, getApplicationNo, getFieldValue]);
+  ], [selectedRows, onRowSelect, onSelectAll, data, createSortableHeader, onViewPdf, onViewDocuments, onViewScholarshipHistory, getApplicationNo, getFieldValue]);
 
   // Return columns based on active tab
   const columns = React.useMemo(() => {

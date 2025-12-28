@@ -410,18 +410,22 @@ export const useProcessTable = ({
     const renderApplicationNo = (item: ApplicationData) => (
       <span
         onClick={(e) => {
-          e.stopPropagation(); // Prevent event from bubbling to row
-          handleViewPDF(item);
+          if (activeTab !== "verify") {
+            e.stopPropagation(); // Prevent event from bubbling to row
+            handleViewPDF(item);
+          }
         }}
         onMouseDown={(e) => {
-          e.stopPropagation(); // Also stop on mousedown
+          if (activeTab !== "verify") {
+            e.stopPropagation(); // Also stop on mousedown
+          }
         }}
         style={{
           fontSize: "13px",
           lineHeight: "19px",
           fontWeight: 400,
           color: "#424242",
-          cursor: "pointer",
+          cursor: activeTab !== "verify" ? "pointer" : "default",
           fontFamily: "'Inter', sans-serif",
           display: "inline-block",
         }}
@@ -430,9 +434,11 @@ export const useProcessTable = ({
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            e.stopPropagation();
-            handleViewPDF(item);
+            if (activeTab !== "verify") {
+              e.preventDefault();
+              e.stopPropagation();
+              handleViewPDF(item);
+            }
           }
         }}
       >
@@ -566,10 +572,10 @@ export const useProcessTable = ({
           lineHeight: "19px",
           color: "#424242",
           fontFamily: "'Inter', sans-serif",
-          cursor: item ? "pointer" : "default",
+          cursor: item && activeTab !== "verify" ? "pointer" : "default",
         }}
         onClick={(e) => {
-          if (item && handleViewPDF) {
+          if (item && handleViewPDF && activeTab !== "verify") {
             e.stopPropagation();
             handleViewPDF(item);
           }
