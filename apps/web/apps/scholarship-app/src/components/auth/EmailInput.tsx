@@ -32,16 +32,16 @@ export const EmailInput = ({
           {label}
         </Label>
         <Input
-                    id={id}
-                    type="email"
-                    autoComplete={autoComplete}
-                    placeholder={placeholder}
-                    defaultValue={defaultValue}
+          id={id}
+          type="email"
+          autoComplete={autoComplete}
+          placeholder={placeholder}
+          defaultValue={defaultValue}
           errorMessage={error}
           prefixIcon={<PersonRegular style={{ width: '16px', height: '16px', color: '#616161' }} />}
-                    {...register}
-                  />
-                </div>
+          {...register}
+        />
+      </div>
     </div>
   );
 };

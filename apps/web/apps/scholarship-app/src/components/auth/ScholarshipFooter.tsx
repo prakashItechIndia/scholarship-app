@@ -54,7 +54,7 @@ export const ScholarshipFooter = ({ variant = 'email' }: ScholarshipFooterProps)
             },
           })}
         />
-        
+
         {/* Content layer - matches form width */}
         <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
           <div style={{ width: '100%', maxWidth: '448px' }}>
@@ -75,45 +75,45 @@ export const ScholarshipFooter = ({ variant = 'email' }: ScholarshipFooterProps)
               })}
               tokens={{ childrenGap: 16 }}
             >
-          <Text
-            variant="small"
-            styles={{
-              root: {
-                color: '#374151',
-              },
-            }}
-          >
-            Copyright © {currentYear} LEO MUTHU Scholarship
-          </Text>
-          <Stack 
-            horizontal 
-            tokens={{ childrenGap: 4 }} 
-            verticalAlign="center"
-            className={mergeStyles({
-              '@media (max-width: 639px)': {
-                justifyContent: 'center',
-              },
-            })}
-          >
-            <Text
-              variant="small"
-              styles={{
-                root: {
-                  color: '#374151',
-                },
-              }}
-            >
-              Powered by
-            </Text>
-            <img
-              src={iTechLogo}
-              alt="iTech"
-              style={{
-                height: '12px',
-                width: 'auto',
-              }}
-            />
-          </Stack>
+              <Text
+                variant="small"
+                styles={{
+                  root: {
+                    color: '#374151',
+                  },
+                }}
+              >
+                Copyright © {currentYear} LEO MUTHU Scholarship
+              </Text>
+              <Stack
+                horizontal
+                tokens={{ childrenGap: 4 }}
+                verticalAlign="center"
+                className={mergeStyles({
+                  '@media (max-width: 639px)': {
+                    justifyContent: 'center',
+                  },
+                })}
+              >
+                <Text
+                  variant="small"
+                  styles={{
+                    root: {
+                      color: '#374151',
+                    },
+                  }}
+                >
+                  Powered by
+                </Text>
+                <img
+                  src={iTechLogo}
+                  alt="iTech"
+                  style={{
+                    height: '12px',
+                    width: 'auto',
+                  }}
+                />
+              </Stack>
             </Stack>
           </div>
         </div>
@@ -149,7 +149,7 @@ export const ScholarshipFooter = ({ variant = 'email' }: ScholarshipFooterProps)
           textAlign: 'center',
         },
       })}
-      tokens={{ childrenGap: 16 }}
+      tokens={{ childrenGap: 56 }}
     >
       <Text
         variant="small"
@@ -159,14 +159,15 @@ export const ScholarshipFooter = ({ variant = 'email' }: ScholarshipFooterProps)
             fontSize: isPasswordVariant ? '10px' : undefined,
             fontFamily: isPasswordVariant ? 'Segoe UI, sans-serif' : undefined,
             lineHeight: isPasswordVariant ? '14px' : undefined,
+            fontWeight: isPasswordVariant ? '400' : undefined,
           },
         }}
       >
         Copyright © 2025 LEO MUTHU Scholarship
       </Text>
-      <Stack 
-        horizontal 
-        tokens={{ childrenGap: isPasswordVariant ? 3 : 8 }} 
+      <Stack
+        horizontal
+        tokens={{ childrenGap: isPasswordVariant ? 3 : 8 }}
         verticalAlign="center"
         className={mergeStyles({
           '@media (max-width: 639px)': {
@@ -182,6 +183,7 @@ export const ScholarshipFooter = ({ variant = 'email' }: ScholarshipFooterProps)
               fontSize: isPasswordVariant ? '10px' : undefined,
               fontFamily: isPasswordVariant ? 'Segoe UI, sans-serif' : undefined,
               lineHeight: isPasswordVariant ? '14px' : undefined,
+              fontWeight: isPasswordVariant ? '400' : undefined,
             },
           }}
         >

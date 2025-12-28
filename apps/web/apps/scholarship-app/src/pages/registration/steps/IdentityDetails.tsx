@@ -24,13 +24,13 @@ import { useToast } from '@/components/ui/toast';
  */
 function verhoeffCheck(aadhaar: string): boolean {
     if (aadhaar.length !== 12) return false;
-    
+
     // BRD Section 6.2.2: First digit check - Cannot start with 0 or 1
     const firstDigit = parseInt(aadhaar[0], 10);
     if (firstDigit === 0 || firstDigit === 1) {
         return false;
     }
-    
+
     const d = [
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
         [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],
@@ -43,7 +43,7 @@ function verhoeffCheck(aadhaar: string): boolean {
         [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],
         [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
     ];
-    
+
     const p = [
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
         [1, 5, 7, 6, 2, 8, 3, 0, 9, 4],
@@ -54,7 +54,7 @@ function verhoeffCheck(aadhaar: string): boolean {
         [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],
         [7, 0, 4, 6, 9, 1, 3, 2, 5, 8],
     ];
-    
+
     let c = 0;
     const digits = aadhaar.split('').reverse().map(Number);
 
@@ -62,7 +62,7 @@ function verhoeffCheck(aadhaar: string): boolean {
         c = d[c][p[i % 8][digits[i]]];
 
     }
-    
+
     return c === 0;
 }
 
@@ -129,7 +129,7 @@ const IdentityDetails = () => {
         error: string | null;
     }>({ isValidating: false, isUnique: null, error: null });
     const { error: showError } = useToast();
-    
+
     // Fetch applicant categories on mount
     useEffect(() => {
         const loadApplicantCategories = async () => {
@@ -149,7 +149,7 @@ const IdentityDetails = () => {
         };
         void loadApplicantCategories();
     }, []);
-    
+
     // Fetch scholarship year on mount
     useEffect(() => {
         const fetchScholarshipYear = async () => {
@@ -201,7 +201,7 @@ const IdentityDetails = () => {
                     throw new Error(errorMessage);
                 }
             }
-            
+
             // Validate PAN ID with API if provided
             if (data.panId?.trim() && scholarshipYearId) {
                 try {
@@ -290,18 +290,18 @@ const IdentityDetails = () => {
         >
             <form className="w-full h-full flex flex-col" onSubmit={(e) => void handleSubmit(onSubmit)(e)} id="current-step-form">
                 <Stack tokens={STACK_TOKENS}>
-                        {/* Applicant Category Dropdown */}
+                    {/* Applicant Category Dropdown */}
                     <SelectField
-                            name="applicantType"
-                            control={control}
+                        name="applicantType"
+                        control={control}
                         errors={errors}
                         label="What describes you better"
                         required
                         options={applicantOptions}
-                                        placeholder="Select applicant category"
-                        />
+                        placeholder="Select applicant category"
+                    />
 
-                        {/* IDs Row (Side by Side) */}
+                    {/* IDs Row (Side by Side) */}
                     <FormRowContainer>
                         <FormRow>
                             <Controller
@@ -311,7 +311,7 @@ const IdentityDetails = () => {
                                     // Real-time validation feedback
                                     const currentValue = field.value ?? '';
                                     let validationError: string | null = null;
-                                    
+
                                     // BRD Section 6.2.2: Length check - Must be exactly 12 digits
                                     if (currentValue.length > 0 && currentValue.length !== 12) {
                                         validationError = 'AADHAAR ID must be exactly 12 digits';
@@ -331,15 +331,15 @@ const IdentityDetails = () => {
                                             validationError = 'AADHAAR ID failed Verhoeff checksum validation. Please enter a valid AADHAAR number.';
                                         }
                                     }
-                                    
+
                                     // Combine validation errors (schema errors take precedence)
                                     const errorMessage = errors.aadhaarId?.message ?? validationError ?? aadhaarValidationStatus.error ?? null;
                                     const showError = Boolean(errorMessage);
-                                    
+
                                     return (
-                                        <FormField 
-                                            label="AADHAR ID (Candidate)" 
-                                            required 
+                                        <FormField
+                                            label="AADHAR ID (Candidate)"
+                                            required
                                             error={errorMessage as string}
                                         >
                                             <Input
@@ -347,16 +347,15 @@ const IdentityDetails = () => {
                                                 value={field.value ?? ''}
                                                 placeholder="Enter 12 digit AADHAAR number"
                                                 errorMessage={errorMessage as string}
-                                                className="!border-b-0"
                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                     // BRD Section 6.2.2: Character check - Only numeric characters (0-9) allowed
                                                     const value = e.target.value;
                                                     const digitsOnly = value.replace(/\D/g, '');
-                                                    
+
                                                     // BRD Section 6.2.2: Length check - Must be exactly 12 digits
                                                     if (digitsOnly.length <= 12) {
                                                         field.onChange(digitsOnly);
-                                                        
+
                                                         // Trigger validation on change for immediate feedback
                                                         if (digitsOnly.length === 12) {
                                                             // Validate first digit and Verhoeff immediately
@@ -381,7 +380,7 @@ const IdentityDetails = () => {
                                                                 form.clearErrors('aadhaarId');
                                                             }
                                                         }
-                                                        
+
                                                         // Reset uniqueness validation status when user types
                                                         if (digitsOnly.length !== 12 || digitsOnly !== aadhaarValue) {
                                                             setAadhaarValidationStatus({ isValidating: false, isUnique: null, error: null });
@@ -416,7 +415,6 @@ const IdentityDetails = () => {
                                             value={field.value ?? ''}
                                             placeholder="Enter PAN number (Optional)"
                                             errorMessage={errors.panId?.message as string}
-                                            className="!border-b-0"
                                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                 // PAN Number: Must follow the format 5 letters + 4 numbers + 1 letter; input is case-insensitive but will be stored in uppercase
                                                 const value = e.target.value;
@@ -431,8 +429,8 @@ const IdentityDetails = () => {
                             />
                         </FormRow>
                     </FormRowContainer>
-                    </Stack>
-                </form>
+                </Stack>
+            </form>
         </StepLayout>
     );
 };

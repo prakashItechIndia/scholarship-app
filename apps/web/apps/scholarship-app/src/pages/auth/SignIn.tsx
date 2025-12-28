@@ -185,7 +185,7 @@ const SignInPage = () => {
     }
 
     setPasswordValue('email', email);
-    
+
     if (mode === 'login') {
       setStep('password');
     } else {
@@ -198,18 +198,18 @@ const SignInPage = () => {
   const onEmailSubmit = async (values: EmailFormData) => {
     try {
       setIsLoading(true);
-      
+
       // Check user login status (email exists AND password set)
       const { scholarshipApplication } = await import('../../services/scholarship.service');
       const loginStatus = await scholarshipApplication.checkUserLoginStatus(values.email);
-      
+
       if (loginStatus.canLogin) {
         // Email exists AND password is set - enable password field for login
         verifyEmail(values.email, 'login');
       } else if (loginStatus.needsOnboarding) {
         // Email exists but password not set - redirect to onboarding
         localStorage.setItem('verification_email', values.email);
-        
+
         // Send verification email automatically
         try {
           await scholarshipApplication.sendVerificationEmail(values.email);
@@ -217,12 +217,12 @@ const SignInPage = () => {
           // Log error but continue to verification page
           console.error('Failed to send verification email:', err);
         }
-        
+
         void navigate('/email-verification');
       } else {
         // Email does not exist - send verification email and redirect to email verification/onboarding
         localStorage.setItem('verification_email', values.email);
-        
+
         // Send verification email automatically
         try {
           await scholarshipApplication.sendVerificationEmail(values.email);
@@ -230,7 +230,7 @@ const SignInPage = () => {
           // Log error but continue to verification page
           console.error('Failed to send verification email:', err);
         }
-        
+
         void navigate('/email-verification');
       }
     } catch (err: unknown) {
@@ -252,15 +252,15 @@ const SignInPage = () => {
   const onPasswordSubmit = async (values: SignInFormData) => {
     try {
       setIsLoading(true);
-      
+
       // Import scholarship auth service
       const { scholarshipAuth, scholarshipApplication } = await import('../../services/scholarship.service');
-      
+
       // Call user login API - validates credentials (allows Student users)
       const loginResponse = await scholarshipAuth.userLogin(values.email, values.password);
-      
+
       // Create session token (simple implementation - in production use JWT or secure session)
-      const responseData = (loginResponse as unknown) as { userId?: number; userName?: string; [key: string]: unknown };
+      const responseData = (loginResponse as unknown) as { userId?: number; userName?: string;[key: string]: unknown };
       const sessionToken = btoa(JSON.stringify({
         email: values.email,
         userId: responseData.userId ?? null,
@@ -268,14 +268,14 @@ const SignInPage = () => {
         timestamp: Date.now(),
         expiresAt: Date.now() + (20 * 60 * 1000), // 20 minutes session timeout per BRD
       }));
-      
+
       // Store session token and user data
       if (values.rememberMe) {
         localStorage.setItem('scholarship_session_token', sessionToken);
       } else {
         sessionStorage.setItem('scholarship_session_token', sessionToken);
       }
-      
+
       localStorage.setItem('scholarship_auth', JSON.stringify({
         email: values.email,
         cardcode: values.cardcode,
@@ -283,12 +283,12 @@ const SignInPage = () => {
         timestamp: Date.now(),
         user: loginResponse,
       }));
-      
+
       // Check if user has completed registration (has record in t_Registration)
       // New users (who just set password) should be redirected to registration form
       // Existing users (who have completed registration) should be redirected to dashboard
       const hasCompletedRegistration = await scholarshipApplication.checkEmailExists(values.email);
-      
+
       if (hasCompletedRegistration) {
         // Existing user - has completed registration, redirect to dashboard
         success('Sign In Successful', 'Redirecting to dashboard...');
@@ -338,7 +338,7 @@ const SignInPage = () => {
         />
         <AuthLayoutWrapper footerVariant="email">
           <LogoHeader variant="email" />
-          
+
           <WelcomeText variant="email" />
 
           {passwordCreated && (
@@ -406,7 +406,7 @@ const SignInPage = () => {
           <form onSubmit={(e) => void handlePasswordSubmit(onPasswordSubmit as any)(e)} noValidate>
             <Stack tokens={{ childrenGap: 24 }}>
               <EmailField control={passwordForm.control} name="email" variant="email" />
-              
+
               <PasswordField
                 control={passwordForm.control}
                 name="password"

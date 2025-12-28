@@ -132,7 +132,7 @@ export const TopNav = React.forwardRef<HTMLElement, TopNavProps>(
         {...props}
       >
         <div className="flex items-center gap-4 flex-1">
-          <div className="ml-4">{left||''}</div>
+          <div className="ml-4">{left || ''}</div>
           {title && !center && (
             <h1 className="text-base font-semibold">{title}</h1>
           )}

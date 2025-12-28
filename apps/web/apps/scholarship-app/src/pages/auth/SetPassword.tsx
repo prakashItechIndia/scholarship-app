@@ -11,7 +11,7 @@ import { LogoHeaderWithOffset } from '@/components/auth/LogoHeaderWithOffset';
 import { AuthPageHeader } from '@/components/auth/AuthPageHeader';
 import { SubmitButton } from '@/components/auth/SubmitButton';
 import { TermsOfServiceText } from '@/components/auth/TermsOfServiceText';
-import { FormField, FormItem, FormControl, FormMessage, Input, Label } from '@shared/components';
+import { Form, FormField, FormItem, FormControl, FormMessage, Input, Label } from '@shared/components';
 import { EyeIcon, EyeOffIcon } from '@/components/ui/icons';
 import { getBaseUrl } from '@/utils/signInUtils';
 import { useToast } from '@/components/ui/toast';
@@ -56,7 +56,7 @@ const SetPasswordPage = () => {
     const emailFromUrl = searchParams.get('email');
     const storedEmail = localStorage.getItem('verification_email');
     const token = searchParams.get('token') || localStorage.getItem('verification_token');
-    
+
     // Priority: URL param > localStorage
     if (emailFromUrl) {
       setEmail(decodeURIComponent(emailFromUrl));
@@ -109,11 +109,11 @@ const SetPasswordPage = () => {
 
       if (result.success) {
         success('Success', result.message || 'Password set successfully! Please log in with your email and password.');
-        
+
         // Clear verification token
         localStorage.removeItem('verification_token');
         localStorage.removeItem('verification_email');
-        
+
         // Redirect to login page - user needs to enter email and password
         setTimeout(() => {
           void navigate('/user-login');
@@ -138,7 +138,7 @@ const SetPasswordPage = () => {
       />
       <AuthLayoutWrapper footerVariant="email">
         <LogoHeaderWithOffset variant="email" />
-        
+
         <AuthPageHeader
           title="Set Password"
           subtitle="Set your password to enhance account security."
@@ -146,101 +146,102 @@ const SetPasswordPage = () => {
           subtitleSize="medium"
         />
 
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        <form onSubmit={handleSubmit(onSubmit as any)} noValidate>
+        <Form {...form}>
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          <form onSubmit={handleSubmit(onSubmit as any)} noValidate>
             <Stack tokens={{ childrenGap: 24 }}>
               {/* New Password Field */}
               <FormField
                 control={form.control as any}
                 name="password"
                 render={({ field }: { field: any }) => (
-                    <FormItem>
-                      <div className="flex flex-col gap-[4px]">
-                        <div className="required-label-wrapper">
-                          <Label 
-                            required 
-                            // className="text-[12px] text-[#242424] leading-[16px] font-inter [&>*:not([aria-label*='Required'])]:text-[#242424]"
-                          >
-                            New Password
-                          </Label>
-                        </div>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            value={field.value ?? ''}
-                            suffixIcon={
-                              <IconButton
-                                onClick={() => setShowPassword(!showPassword)}
-                                ariaLabel={showPassword ? 'Hide password' : 'Show password'}
-                                onRenderIcon={() => 
-                                  showPassword ? (
-                                    <EyeIcon className="w-4 h-8 !text-[#272727]" />
-                                  ) : (
-                                    <EyeOffIcon className="w-4 h-4 !text-[#272727]" />
-                                  )
-                                }
-                                className="w-auto h-auto min-w-0 p-1 bg-transparent border-none hover:bg-transparent active:bg-transparent"
-                              />
-                            }
-                            type={showPassword ? 'text' : 'password'}
-                            placeholder="Enter your password"
-                            autoComplete="new-password"
-                            aria-invalid={Boolean(form.formState.errors.password)}
-                            required={false}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-Status-Danger-Foreground-1-Rest text-xs" />
+                  <FormItem>
+                    <div className="flex flex-col gap-[4px]">
+                      <div className="required-label-wrapper">
+                        <Label
+                          required
+                        // className="text-[12px] text-[#242424] leading-[16px] font-inter [&>*:not([aria-label*='Required'])]:text-[#242424]"
+                        >
+                          New Password
+                        </Label>
                       </div>
-                    </FormItem>
-                  )}
-                />
+                      <FormControl>
+                        <Input
+                          {...field}
+                          value={field.value ?? ''}
+                          suffixIcon={
+                            <IconButton
+                              onClick={() => setShowPassword(!showPassword)}
+                              ariaLabel={showPassword ? 'Hide password' : 'Show password'}
+                              onRenderIcon={() =>
+                                showPassword ? (
+                                  <EyeIcon className="w-4 h-8 !text-[#272727]" />
+                                ) : (
+                                  <EyeOffIcon className="w-4 h-4 !text-[#272727]" />
+                                )
+                              }
+                              className="w-auto h-auto min-w-0 p-1 bg-transparent border-none hover:bg-transparent active:bg-transparent"
+                            />
+                          }
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder="Enter your password"
+                          autoComplete="new-password"
+                          aria-invalid={Boolean(form.formState.errors.password)}
+                          required={false}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-Status-Danger-Foreground-1-Rest text-xs" />
+                    </div>
+                  </FormItem>
+                )}
+              />
 
-                {/* Confirm Password Field */}
-                <FormField
-                  control={form.control as any}
-                  name="confirmPassword"
-                  render={({ field }: { field: any }) => (
-                    <FormItem>
-                      <div className="flex flex-col gap-[4px]">
-                        <div className="required-label-wrapper">
-                          <Label 
-                            required 
-                            className="text-[12px] text-[#242424] leading-[16px] [&>*:not([aria-label*='Required'])]:text-[#242424]"
-                          >
-                            Confirm Password
-                          </Label>
-                        </div>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            value={field.value ?? ''}
-                            suffixIcon={
-                              <IconButton
-                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                ariaLabel={showConfirmPassword ? 'Hide password' : 'Show password'}
-                                onRenderIcon={() => 
-                                  showConfirmPassword ? (
-                                    <EyeIcon className="w-4 h-4 !text-[#272727]" />
-                                  ) : (
-                                    <EyeOffIcon className="w-4 h-4 !text-[#272727]" />
-                                  )
-                                }
-                                className="w-auto h-auto min-w-0 p-1 bg-transparent border-none hover:bg-transparent active:bg-transparent"
-                              />
-                            }
-                            type={showConfirmPassword ? 'text' : 'password'}
-                            placeholder="Confirm your password"
-                            autoComplete="new-password"
-                            aria-invalid={Boolean(form.formState.errors.confirmPassword)}
-                            required={false}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-Status-Danger-Foreground-1-Rest text-xs" />
+              {/* Confirm Password Field */}
+              <FormField
+                control={form.control as any}
+                name="confirmPassword"
+                render={({ field }: { field: any }) => (
+                  <FormItem>
+                    <div className="flex flex-col gap-[4px]">
+                      <div className="required-label-wrapper">
+                        <Label
+                          required
+                          className="text-[12px] text-[#242424] leading-[16px] [&>*:not([aria-label*='Required'])]:text-[#242424]"
+                        >
+                          Confirm Password
+                        </Label>
                       </div>
-                    </FormItem>
-                  )}
-                />
-                <Stack tokens={{ childrenGap: 8 }}>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          value={field.value ?? ''}
+                          suffixIcon={
+                            <IconButton
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              ariaLabel={showConfirmPassword ? 'Hide password' : 'Show password'}
+                              onRenderIcon={() =>
+                                showConfirmPassword ? (
+                                  <EyeIcon className="w-4 h-4 !text-[#272727]" />
+                                ) : (
+                                  <EyeOffIcon className="w-4 h-4 !text-[#272727]" />
+                                )
+                              }
+                              className="w-auto h-auto min-w-0 p-1 bg-transparent border-none hover:bg-transparent active:bg-transparent"
+                            />
+                          }
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          placeholder="Confirm your password"
+                          autoComplete="new-password"
+                          aria-invalid={Boolean(form.formState.errors.confirmPassword)}
+                          required={false}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-Status-Danger-Foreground-1-Rest text-xs" />
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <Stack tokens={{ childrenGap: 8 }}>
                 <SubmitButton
                   type="submit"
                   disabled={form.formState.isSubmitting}
@@ -250,10 +251,11 @@ const SetPasswordPage = () => {
                   Continue
                 </SubmitButton>
 
-              <TermsOfServiceText />
+                <TermsOfServiceText />
+              </Stack>
             </Stack>
-          </Stack>
-        </form>
+          </form>
+        </Form>
       </AuthLayoutWrapper>
     </>
   );

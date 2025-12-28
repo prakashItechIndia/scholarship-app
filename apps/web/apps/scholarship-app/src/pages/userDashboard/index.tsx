@@ -87,7 +87,7 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
   return <span style={getStatusStyle(status)}>{status}</span>;
 };
 
-const ApplicationCard: React.FC<{ 
+const ApplicationCard: React.FC<{
   data: ApplicationCardData;
   onViewDetails?: (data: ApplicationCardData) => void;
   onContinueDraft?: (data: ApplicationCardData) => void;
@@ -241,10 +241,10 @@ const ApplicationCard: React.FC<{
                 <MoreIcon
                   width={26}
                   height={26}
-                  style={{border: "1px solid #e0e0e0", backgroundColor: '#ffffff',borderRadius: '20%'}}
+                  style={{ border: "1px solid #e0e0e0", backgroundColor: '#ffffff', borderRadius: '20%' }}
                 />
               </button>
-              
+
               {isDropdownOpen && (
                 <div
                   style={{
@@ -262,39 +262,74 @@ const ApplicationCard: React.FC<{
                   }}
                 >
                   {data.status === "Registered" && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleReopen();
-                      }}
-                      style={{
-                        width: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        padding: "8px 12px",
-                        border: "none",
-                        backgroundColor: "transparent",
-                        cursor: "pointer",
-                        borderRadius: "4px",
-                        fontFamily: "'Inter', sans-serif",
-                        fontSize: "14px",
-                        lineHeight: "20px",
-                        color: "#242424",
-                        textAlign: "left",
-                        whiteSpace: "nowrap",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#f5f5f5";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                      }}
-                    >
-                      <ReopenIcon width={16} height={16} />
-                      <span style={{ whiteSpace: "nowrap" }}>Reopen Application</span>
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleReopen();
+                        }}
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          padding: "8px 12px",
+                          border: "none",
+                          backgroundColor: "transparent",
+                          cursor: "pointer",
+                          borderRadius: "4px",
+                          fontFamily: "'Inter', sans-serif",
+                          fontSize: "14px",
+                          lineHeight: "20px",
+                          color: "#242424",
+                          textAlign: "left",
+                          whiteSpace: "nowrap",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#f5f5f5";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                        }}
+                      >
+                        <ReopenIcon width={16} height={16} />
+                        <span style={{ whiteSpace: "nowrap" }}>Reopen Application</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePrint();
+                        }}
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          padding: "8px 12px",
+                          border: "none",
+                          backgroundColor: "transparent",
+                          cursor: "pointer",
+                          borderRadius: "4px",
+                          fontFamily: "'Inter', sans-serif",
+                          fontSize: "14px",
+                          lineHeight: "20px",
+                          color: "#242424",
+                          textAlign: "left",
+                          whiteSpace: "nowrap",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#f5f5f5";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                        }}
+                      >
+                        <PrintIcon width={16} height={16} />
+                        <span style={{ whiteSpace: "nowrap" }}>Print Details</span>
+                      </button>
+                    </>
                   )}
                   {(data.status === "Completed" || data.status === "Approved" || data.status === "In Progress") && (
                     <button
@@ -464,11 +499,11 @@ const UserDashboard: React.FC = () => {
     const fetchApplications = async () => {
       try {
         setIsLoading(true);
-        
+
         // Get email from localStorage or auth context
         const authData = localStorage.getItem('scholarship_auth');
         const email = authData ? JSON.parse(authData).email : null;
-        
+
         if (!email) {
           // Redirect to login if no email found
           navigate('/user-login');
@@ -477,42 +512,42 @@ const UserDashboard: React.FC = () => {
 
         // Fetch applications from API
         const response = await scholarshipApplication.getApplications(email);
-        
+
         // Transform API response to ApplicationCardData format
-        const transformedApplications: ApplicationCardData[] = Array.isArray(response) 
+        const transformedApplications: ApplicationCardData[] = Array.isArray(response)
           ? response.map((app: any) => ({
-              applicationNo: app.Application_Id || app.applicationId || '',
-              status: app.Status || 'Registered',
-              studentName: app.Applicant_Name || app.Student_Name || app.fullName || '',
-              studied: app.Institution_Name || app.institutionName || '',
-              fatherName: app.Father_Name || app.Guardian_Name || '',
-              applied: app.Data_Date 
-                ? (() => {
-                    try {
-                      const date = new Date(app.Data_Date);
-                      if (isNaN(date.getTime())) {
-                        // If date is invalid, try parsing as string
-                        const dateStr = String(app.Data_Date);
-                        const parsed = new Date(dateStr);
-                        return isNaN(parsed.getTime()) 
-                          ? new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
-                          : parsed.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                      }
-                      return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                    } catch {
-                      return new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                    }
-                  })()
-                : new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-              scholarshipNumber: app.Scholarship_No || app.scholarshipNumber || '',
-              mobileNo: app.Mobile_Number || app.mobileNumber || '',
-              preparedBy: app.Prepared_By || app.preparedBy || '',
-            }))
+            applicationNo: app.Application_Id || app.applicationId || '',
+            status: app.Status || 'Registered',
+            studentName: app.Applicant_Name || app.Student_Name || app.fullName || '',
+            studied: app.Institution_Name || app.institutionName || '',
+            fatherName: app.Father_Name || app.Guardian_Name || '',
+            applied: app.Data_Date
+              ? (() => {
+                try {
+                  const date = new Date(app.Data_Date);
+                  if (isNaN(date.getTime())) {
+                    // If date is invalid, try parsing as string
+                    const dateStr = String(app.Data_Date);
+                    const parsed = new Date(dateStr);
+                    return isNaN(parsed.getTime())
+                      ? new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                      : parsed.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                  }
+                  return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                } catch {
+                  return new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                }
+              })()
+              : new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+            scholarshipNumber: app.Scholarship_No || app.scholarshipNumber || '',
+            mobileNo: app.Mobile_Number || app.mobileNumber || '',
+            preparedBy: app.Prepared_By || app.preparedBy || '',
+          }))
           : [];
 
         setApplications(transformedApplications);
         setFilteredApplications(transformedApplications);
-        
+
         // Set user name from first application or use email
         if (transformedApplications.length > 0 && transformedApplications[0].studentName) {
           setUserName(transformedApplications[0].studentName.split(' ')[0]);
@@ -576,11 +611,11 @@ const UserDashboard: React.FC = () => {
 
   const handleContinueDraft = (data: ApplicationCardData) => {
     // Navigate to registration with application data to continue editing
-    navigate("/registration", { 
-      state: { 
+    navigate("/registration", {
+      state: {
         applicationId: data.applicationNo,
-        continueDraft: true 
-      } 
+        continueDraft: true
+      }
     });
   };
 
@@ -603,7 +638,7 @@ const UserDashboard: React.FC = () => {
       <WelcomeBanner userName={userName} />
 
       {/* Application Status Section */}
-      <div style={{  }}>
+      <div style={{}}>
         <div className="flex flex-col md:flex-row md:justify-between md:items-start">
           <div style={{ paddingBottom: "18px" }}>
             <h2
@@ -615,7 +650,7 @@ const UserDashboard: React.FC = () => {
                 marginBottom: "4px",
                 fontFamily: "'Inter', sans-serif",
                 paddingLeft: "24px",
-                
+
               }}
             >
               Your Application Status
@@ -681,7 +716,7 @@ const UserDashboard: React.FC = () => {
                   style={{ marginLeft: "13px" }}
                 />
               </Button>
-              
+
               {/* Filter/Sort Dropdown - BRD Section 7.4 */}
               {isFilterOpen && (
                 <div style={{
@@ -771,14 +806,14 @@ const UserDashboard: React.FC = () => {
             </>
           ) : filteredApplications.length === 0 ? (
             <div style={{ padding: '24px', textAlign: 'center', color: '#616161' }}>
-              {applications.length === 0 
+              {applications.length === 0
                 ? "No applications found. Create a new application to get started."
                 : "No applications match the selected filter."}
             </div>
           ) : (
             filteredApplications.map((app) => (
-              <ApplicationCard 
-                key={app.applicationNo} 
+              <ApplicationCard
+                key={app.applicationNo}
                 data={app}
                 onViewDetails={handleViewDetails}
                 onContinueDraft={handleContinueDraft}

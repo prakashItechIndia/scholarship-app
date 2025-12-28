@@ -15,7 +15,7 @@ export interface SelectProps extends Omit<ComboboxProps, "onChange" | "value"> {
 const Select = React.forwardRef<HTMLInputElement, SelectProps>(
   ({ className, onValueChange, options = [], selectedKey, placeholder, errorMessage, ...props }, ref) => {
     const isDark = useDarkMode();
-    
+
     // Get the selected option's label for display
     const selectedOption = React.useMemo(() => {
       if (!selectedKey || options.length === 0) {
@@ -24,7 +24,7 @@ const Select = React.forwardRef<HTMLInputElement, SelectProps>(
       const keyStr = String(selectedKey);
       return options.find(opt => String(opt.value) === keyStr);
     }, [selectedKey, options]);
-    
+
     const handleChange = React.useCallback(
       (_event: any, data: { optionValue?: string; optionText?: string }) => {
         if (onValueChange && data.optionValue) {
@@ -38,7 +38,7 @@ const Select = React.forwardRef<HTMLInputElement, SelectProps>(
     const tokens = React.useMemo(() => getThemeTokens(isDark ? 'dark' : 'light'), [isDark]);
 
     const borderColor = React.useMemo(() => {
-      return errorMessage 
+      return errorMessage
         ? (tokens as any).colorStatusDangerBorder2 || "#d13438"
         : tokens.colorNeutralStroke1 || "#d1d5db";
     }, [tokens, errorMessage]);
@@ -60,9 +60,9 @@ const Select = React.forwardRef<HTMLInputElement, SelectProps>(
             onOptionSelect={handleChange}
             size="small"
             style={{
-              width: "127px",
+              width: "100%",
               maxWidth: "100%",
-              minWidth:"10%",
+              minWidth: "10%",
               border: `1px solid ${borderColor}`,
               borderRadius: tokens.borderRadiusLarge,
               backgroundColor: tokens.colorNeutralBackground1,
@@ -86,11 +86,11 @@ const Select = React.forwardRef<HTMLInputElement, SelectProps>(
           </Combobox>
         </div>
         {errorMessage && (
-          <div 
-            className="text-xs mt-1" 
-            style={{ 
-              fontSize: tokens.fontSizeBase200, 
-              color: (tokens as any).colorStatusDangerForeground3 || "#d13438" 
+          <div
+            className="text-xs mt-1"
+            style={{
+              fontSize: tokens.fontSizeBase200,
+              color: (tokens as any).colorStatusDangerForeground3 || "#d13438"
             }}
           >
             {errorMessage}

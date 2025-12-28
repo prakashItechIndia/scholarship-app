@@ -18,7 +18,7 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
       className={className}
       style={{
         marginBottom: "18px",
-        backgroundColor: "#2453C3",
+        backgroundColor: "#F5F5F5",
         paddingTop: "12px",
         paddingBottom: "10px",
         ...style,
@@ -28,7 +28,8 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
         style={{
           fontSize: "20px",
           fontWeight: 700,
-          color: "#ffffff",
+          lineHeight: "28px",
+          color: "#242424",
           marginBottom: "4px",
           fontFamily: "'Inter', sans-serif",
           paddingLeft: "24px",
@@ -41,7 +42,7 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
           fontSize: "13px",
           lineHeight: "24px",
           fontWeight: 400,
-          color: "#ffffff",
+          color: "#707070",
           fontFamily: "'Inter', sans-serif",
           paddingLeft: "25px",
         }}

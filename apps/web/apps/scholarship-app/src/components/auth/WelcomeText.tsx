@@ -13,29 +13,85 @@ export const WelcomeText = ({
 }: WelcomeTextProps) => {
   if (variant === 'password') {
     return (
-      <Stack tokens={{ childrenGap: 4 }} className={`w-full max-w-[340px] mt-12 mb-0 ${className}`}>
-        <Text variant="xLarge" className="text-[#242424] font-semibold font-sans leading-8 ">
-          Welcome to<br />Leo Muthu Scholarship
+      <Stack tokens={{ childrenGap: 0 }} className={className}>
+        <Text
+          variant="xxLarge"
+          className="font-semibold font-Base text-[#242424]"
+          style={{
+            fontWeight: 600,
+            fontSize: '1.5rem',
+            lineHeight: '32px',
+          }}
+        >
+          Welcome to
         </Text>
-        <Text variant="small" className="text-[#707070] font-sans leading-4">
-          {subtitle || 'Log In to Administer and Monitor Scholarship Applications'}
+
+        <Text
+          variant="xxLarge"
+          className="font-semibold font-Base text-[#242424]"
+          style={{
+            fontWeight: 600,
+            fontSize: '1.5rem',
+            lineHeight: '32px',
+          }}
+        >
+          Leo Muthu Scholarship
+        </Text>
+
+        <Text
+          variant="small"
+          className="mt-2 text-[#707070]"
+          style={{
+            fontWeight: 400,
+            fontSize: '12px',
+            lineHeight: '16px',
+          }}
+        >
+          {subtitle}
         </Text>
       </Stack>
     );
   }
 
   return (
-    <Stack tokens={{ childrenGap: 8 }} className={className}>
-      <Text variant="xxLarge" className="font-bold text-[#242424] leading-[1.25] font-inter text-[1.5rem]">
+    <Stack tokens={{ childrenGap: 0 }} className={className}>
+      <Text
+        variant="xxLarge"
+        className="font-semibold font-Base text-[#242424]"
+        style={{
+          fontWeight: 600,
+          fontSize: '1.5rem',
+          lineHeight: '32px',
+        }}
+      >
         Welcome to
       </Text>
-      <Text variant="xxLarge" className="font-bold text-[#242424] leading-[1.25] font-inter text-[1.5rem]">
+
+      <Text
+        variant="xxLarge"
+        className="font-semibold font-Base text-[#242424]"
+        style={{
+          fontWeight: 600,
+          fontSize: '1.5rem',
+          lineHeight: '32px',
+        }}
+      >
         Leo Muthu Scholarship
       </Text>
-      <Text variant="small" className="text-[#707070] mt-2">
+
+      <Text
+        variant="small"
+        className="mt-2 text-[#707070]"
+        style={{
+          fontWeight: 400,
+          fontSize: '12px',
+          lineHeight: '16px',
+        }}
+      >
         {subtitle}
       </Text>
     </Stack>
+
   );
 };
 

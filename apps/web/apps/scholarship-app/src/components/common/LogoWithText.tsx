@@ -10,15 +10,17 @@ export interface LogoWithTextProps {
   className?: string;
   containerClassName?: string;
   gap?: string;
+  textColor?: string;
+  subtitleColor?: string;
 }
 
 // Simple JS function to return SVG logo
 const LogoSVG = ({ width = "45", height = "45" }: { width?: string; height?: string }) => {
   return (
-    <img 
-      src={logoImage} 
-      alt="Leo Muthu Scholarship Logo" 
-      style={{ width, height, display: "block" }} 
+    <img
+      src={logoImage}
+      alt="Leo Muthu Scholarship Logo"
+      style={{ width, height, display: "block" }}
     />
   );
 };
@@ -32,6 +34,8 @@ export const LogoWithText: React.FC<LogoWithTextProps> = ({
   className,
   containerClassName,
   gap = "12px",
+  textColor = "#242424",
+  subtitleColor = "#707070",
 }) => {
   const titleStyles: Record<"sm" | "md" | "lg", React.CSSProperties> = {
     sm: { fontSize: "14px", lineHeight: "22px" },
@@ -56,7 +60,7 @@ export const LogoWithText: React.FC<LogoWithTextProps> = ({
   };
 
   return (
-    <div 
+    <div
       className={`flex items-center ${containerClassName || ""}`}
       style={{ gap }}
     >
@@ -74,25 +78,24 @@ export const LogoWithText: React.FC<LogoWithTextProps> = ({
       )}
       <div className={`flex flex-col ${className || ""}`}>
         <span
-          className="font-semibold text-gray-900"
+          className="font-semibold"
           style={{
             ...titleStyles[titleSize],
-            color: "#242424",
+            color: textColor,
             fontSize: "16px",
-            fontWeight: 'semibold',
+            fontWeight: 600,
             lineHeight: "22px",
           }}
         >
           Shri. Leo Muthu Scholarship (LMS)
         </span>
         <span
-          className="text-gray-600"
           style={{
             ...subtitleStyles[subtitleSize],
-            color: "#707070",
+            color: subtitleColor,
             fontSize: "12px",
             fontWeight: 400,
-            lineHeight: "16px", 
+            lineHeight: "16px",
           }}
         >
           An Initiative of ARAM Foundation
