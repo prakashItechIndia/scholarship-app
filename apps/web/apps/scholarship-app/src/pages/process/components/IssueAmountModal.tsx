@@ -1,14 +1,19 @@
+
 import * as React from "react";
 import {
     Modal,
     Button,
     Input,
-    Select,
-    Label
+    Label,
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem
 } from "@shared/components";
 import {
     Dismiss24Regular,
-    CheckmarkCircle24Regular
+    CheckmarkCircle24Regular,
+    ChevronDown24Regular
 } from "@fluentui/react-icons";
 import { Spinner, SpinnerSize } from "@fluentui/react";
 import { ApplicationData } from "../types";
@@ -287,10 +292,11 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
                     padding: "12px 16px",
                     fontWeight: 600,
                     color: "#242424",
-                    fontSize: "14px",
+                    fontSize: "12px",
                     borderRight: "1px solid #e0e0e0",
                     fontFamily: "'Inter', sans-serif",
-                    backgroundColor: "#fafafa", // Slightly gray for header column effect
+                    backgroundColor: "#fafafa", // Slightly gray for header column effect,
+                    lineHeight: "16px",
                 }}
             >
                 {label}
@@ -300,8 +306,9 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
                     width: "60%",
                     padding: "12px 16px",
                     color: "#242424",
-                    fontSize: "14px",
+                    fontSize: "13px",
                     fontFamily: "'Inter', sans-serif",
+                    lineHeight: "20px",
                 }}
             >
                 {value}
@@ -399,28 +406,55 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
                         <Label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
                             Select mode of payment
                         </Label>
-                        <Select
-                            placeholder="Select mode of payment"
-                            selectedKey={paymentMode}
-                            onValueChange={(value) => setPaymentMode(value)}
-                            options={[
-                                { value: "Demand Draft (DD)", label: "Demand Draft (DD)" },
-                                { value: "NEFT/RTGS Transfer", label: "NEFT/RTGS Transfer" },
-                                { value: "Cheque", label: "Cheque" },
-                                { value: "UPI Transfer", label: "UPI Transfer" }
-                            ]}
-                        />
+                        <DropdownMenu>
+                            <DropdownMenuTrigger>
+                                <button
+                                    style={{
+                                        width: "100%",
+                                        height: "32px",
+                                        backgroundColor: "#ffffff",
+                                        border: "1px solid #d1d1d1",
+                                        borderRadius: "4px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                        padding: "0 12px",
+                                        cursor: "pointer",
+                                        fontSize: "14px",
+                                        color: paymentMode ? "#242424" : "#616161",
+                                        fontFamily: "'Inter', sans-serif",
+                                    }}
+                                >
+                                    <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                        {paymentMode || "Select mode of payment"}
+                                    </span>
+                                    <ChevronDown24Regular style={{ width: "16px", height: "16px", color: "#616161", flexShrink: 0 }} />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent style={{ width: "var(--radix-dropdown-menu-trigger-width)" }}>
+                                {[
+                                    { value: "Demand Draft (DD)", label: "Demand Draft" },
+                                    { value: "Cheque", label: "Cheque" },
+                                    { value: "UPI Transfer", label: "Net Banking" }
+                                ].map((option) => (
+                                    <DropdownMenuItem
+                                        key={option.value}
+                                        onClick={() => setPaymentMode(option.value)}
+                                    >
+                                        {option.label}
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
 
+                    {/* Cheque/DD Details - Show when Cheque or DD is selected */}
                     {/* Cheque/DD Details - Show when Cheque or DD is selected */}
                     {(paymentMode === "Cheque" || paymentMode === "Demand Draft (DD)") && (
                         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                                 {/* Cheque Number */}
                                 <div>
-                                    <Label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
-                                        Cheque Number
-                                    </Label>
                                     <Input
                                         type="text"
                                         value={ddChequeNo}
@@ -431,9 +465,6 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
 
                                 {/* Cheque Date */}
                                 <div>
-                                    <Label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
-                                        Cheque Date
-                                    </Label>
                                     <Input
                                         type="date"
                                         value={ddChequeDate}
@@ -445,31 +476,55 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                                 {/* Bank Name */}
                                 <div>
-                                    <Label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
-                                        Bank Name
-                                    </Label>
-                                    <Select
-                                        placeholder="Select Bank"
-                                        selectedKey={bankName}
-                                        onValueChange={(value) => setBankName(value)}
-                                        options={[
-                                            { value: "HDFC Bank", label: "HDFC Bank" },
-                                            { value: "State Bank of India", label: "State Bank of India" },
-                                            { value: "ICICI Bank", label: "ICICI Bank" },
-                                            { value: "Axis Bank", label: "Axis Bank" },
-                                            { value: "Punjab National Bank", label: "Punjab National Bank" },
-                                            { value: "Bank of Baroda", label: "Bank of Baroda" },
-                                            { value: "Canara Bank", label: "Canara Bank" },
-                                            { value: "Union Bank of India", label: "Union Bank of India" }
-                                        ]}
-                                    />
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger>
+                                            <button
+                                                style={{
+                                                    width: "100%",
+                                                    height: "32px",
+                                                    backgroundColor: "#ffffff",
+                                                    border: "1px solid #d1d1d1",
+                                                    borderRadius: "4px",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "space-between",
+                                                    padding: "0 12px",
+                                                    cursor: "pointer",
+                                                    fontSize: "14px",
+                                                    color: bankName ? "#242424" : "#616161",
+                                                    fontFamily: "'Inter', sans-serif",
+                                                }}
+                                            >
+                                                <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                                    {bankName || "Select Bank"}
+                                                </span>
+                                                <ChevronDown24Regular style={{ width: "16px", height: "16px", color: "#616161", flexShrink: 0 }} />
+                                            </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent style={{ width: "var(--radix-dropdown-menu-trigger-width)" }}>
+                                            {[
+                                                { value: "HDFC Bank", label: "HDFC Bank" },
+                                                { value: "State Bank of India", label: "State Bank of India" },
+                                                { value: "ICICI Bank", label: "ICICI Bank" },
+                                                { value: "Axis Bank", label: "Axis Bank" },
+                                                { value: "Punjab National Bank", label: "Punjab National Bank" },
+                                                { value: "Bank of Baroda", label: "Bank of Baroda" },
+                                                { value: "Canara Bank", label: "Canara Bank" },
+                                                { value: "Union Bank of India", label: "Union Bank of India" }
+                                            ].map((option) => (
+                                                <DropdownMenuItem
+                                                    key={option.value}
+                                                    onClick={() => setBankName(option.value)}
+                                                >
+                                                    {option.label}
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
 
                                 {/* Branch Details */}
                                 <div>
-                                    <Label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
-                                        Branch Details
-                                    </Label>
                                     <Input
                                         type="text"
                                         value={branchDetails}
@@ -478,101 +533,104 @@ const IssueAmountModal: React.FC<IssueAmountModalProps> = ({
                                     />
                                 </div>
                             </div>
+
+                            {/* Document Upload Area */}
+                            <div>
+                                <div
+                                    style={{
+                                        border: "2px dashed #d1d1d1",
+                                        borderRadius: "4px",
+                                        padding: "16px",
+                                        textAlign: "center",
+                                        backgroundColor: "#fafafa",
+                                        cursor: "pointer",
+                                        transition: "all 0.2s",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        gap: "8px"
+                                    }}
+                                    onDragOver={(e) => {
+                                        e.preventDefault();
+                                        e.currentTarget.style.borderColor = "#2453C3";
+                                        e.currentTarget.style.backgroundColor = "#f0f7ff";
+                                    }}
+                                    onDragLeave={(e) => {
+                                        e.currentTarget.style.borderColor = "#d1d1d1";
+                                        e.currentTarget.style.backgroundColor = "#fafafa";
+                                    }}
+                                    onDrop={(e) => {
+                                        e.preventDefault();
+                                        e.currentTarget.style.borderColor = "#d1d1d1";
+                                        e.currentTarget.style.backgroundColor = "#fafafa";
+                                        const files = Array.from(e.dataTransfer.files);
+                                        const validFiles = files.filter(file => {
+                                            const ext = file.name.split('.').pop()?.toLowerCase();
+                                            return ['jpg', 'jpeg', 'docx', 'pdf'].includes(ext || '');
+                                        });
+                                        setUploadedFiles([...uploadedFiles, ...validFiles]);
+                                    }}
+                                    onClick={() => {
+                                        const input = document.createElement('input');
+                                        input.type = 'file';
+                                        input.accept = '.jpg,.jpeg,.docx,.pdf';
+                                        input.multiple = true;
+                                        input.onchange = (e) => {
+                                            const files = Array.from((e.target as HTMLInputElement).files || []);
+                                            setUploadedFiles([...uploadedFiles, ...files]);
+                                        };
+                                        input.click();
+                                    }}
+                                >
+                                    <div style={{ fontSize: "14px", color: "#2453C3", fontFamily: "'Inter', sans-serif" }}>
+                                        Drop files here or Choose File
+                                    </div>
+                                    <div style={{ fontSize: "12px", color: "#9ca3af", fontFamily: "'Inter', sans-serif" }}>
+                                        JPG, DOCX and PDF (up to 20MB)
+                                    </div>
+                                </div>
+                                {uploadedFiles.length > 0 && (
+                                    <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                                        {uploadedFiles.map((file, index) => (
+                                            <div
+                                                key={index}
+                                                style={{
+                                                    display: "flex",
+                                                    justifyContent: "space-between",
+                                                    alignItems: "center",
+                                                    padding: "8px 12px",
+                                                    backgroundColor: "#f5f5f5",
+                                                    borderRadius: "4px",
+                                                    fontSize: "14px",
+                                                    fontFamily: "'Inter', sans-serif"
+                                                }}
+                                            >
+                                                <span style={{ color: "#242424" }}>{file.name}</span>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
+                                                    }}
+                                                    style={{
+                                                        background: "none",
+                                                        border: "none",
+                                                        color: "#dc2626",
+                                                        cursor: "pointer",
+                                                        fontSize: "14px",
+                                                        padding: "4px 8px"
+                                                    }}
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
 
-                    {/* Document Upload Area */}
-                    <div>
-                        <Label style={{ display: "block", marginBottom: "8px", fontSize: "14px", fontWeight: 500, color: "#242424", fontFamily: "'Inter', sans-serif" }}>
-                            Upload Documents
-                        </Label>
-                        <div
-                            style={{
-                                border: "2px dashed #d1d1d1",
-                                borderRadius: "4px",
-                                padding: "24px",
-                                textAlign: "center",
-                                backgroundColor: "#fafafa",
-                                cursor: "pointer",
-                                transition: "all 0.2s"
-                            }}
-                            onDragOver={(e) => {
-                                e.preventDefault();
-                                e.currentTarget.style.borderColor = "#2453C3";
-                                e.currentTarget.style.backgroundColor = "#f0f7ff";
-                            }}
-                            onDragLeave={(e) => {
-                                e.currentTarget.style.borderColor = "#d1d1d1";
-                                e.currentTarget.style.backgroundColor = "#fafafa";
-                            }}
-                            onDrop={(e) => {
-                                e.preventDefault();
-                                e.currentTarget.style.borderColor = "#d1d1d1";
-                                e.currentTarget.style.backgroundColor = "#fafafa";
-                                const files = Array.from(e.dataTransfer.files);
-                                const validFiles = files.filter(file => {
-                                    const ext = file.name.split('.').pop()?.toLowerCase();
-                                    return ['jpg', 'jpeg', 'docx', 'pdf'].includes(ext || '');
-                                });
-                                setUploadedFiles([...uploadedFiles, ...validFiles]);
-                            }}
-                            onClick={() => {
-                                const input = document.createElement('input');
-                                input.type = 'file';
-                                input.accept = '.jpg,.jpeg,.docx,.pdf';
-                                input.multiple = true;
-                                input.onchange = (e) => {
-                                    const files = Array.from((e.target as HTMLInputElement).files || []);
-                                    setUploadedFiles([...uploadedFiles, ...files]);
-                                };
-                                input.click();
-                            }}
-                        >
-                            <div style={{ fontSize: "14px", color: "#616161", fontFamily: "'Inter', sans-serif" }}>
-                                Drop files here or Choose File
-                            </div>
-                            <div style={{ fontSize: "12px", color: "#9ca3af", marginTop: "4px", fontFamily: "'Inter', sans-serif" }}>
-                                JPG, DOCX and PDF (up to 20MB)
-                            </div>
-                        </div>
-                        {uploadedFiles.length > 0 && (
-                            <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
-                                {uploadedFiles.map((file, index) => (
-                                    <div
-                                        key={index}
-                                        style={{
-                                            display: "flex",
-                                            justifyContent: "space-between",
-                                            alignItems: "center",
-                                            padding: "8px 12px",
-                                            backgroundColor: "#f5f5f5",
-                                            borderRadius: "4px",
-                                            fontSize: "14px",
-                                            fontFamily: "'Inter', sans-serif"
-                                        }}
-                                    >
-                                        <span style={{ color: "#242424" }}>{file.name}</span>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
-                                            }}
-                                            style={{
-                                                background: "none",
-                                                border: "none",
-                                                color: "#dc2626",
-                                                cursor: "pointer",
-                                                fontSize: "14px",
-                                                padding: "4px 8px"
-                                            }}
-                                        >
-                                            Remove
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+
 
                     {/* Comments Section */}
                     <div>

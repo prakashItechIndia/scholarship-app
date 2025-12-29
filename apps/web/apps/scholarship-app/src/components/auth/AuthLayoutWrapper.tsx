@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Stack, Text, mergeStyles } from '@fluentui/react';
 import { ScholarshipFooter } from './ScholarshipFooter';
-import defaultLoginBanner from '@shared/assets/icons/LoginPageLeftSideBanner.png';
+import defaultLoginBanner from '@shared/assets/icons/LoginPageLeftSideBanner.jpg';
 
 interface AuthLayoutWrapperProps {
   children: ReactNode;

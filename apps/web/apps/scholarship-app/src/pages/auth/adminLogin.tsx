@@ -20,7 +20,7 @@ import { SEO } from '../../components/seo/SEO';
 import { useAuth } from '../../contexts/AuthContext';
 import { handleAuthRedirect } from '../../utils/redirect';
 import { generateOrganizationSchema } from '../../utils/schema';
-import adminLoginBanner from '@shared/assets/icons/adminLogin.png';
+import adminLoginBanner from '@shared/assets/icons/adminLogin.jpg';
 import { isScholarshipLoggedIn, getScholarshipUserType, getLandingPage } from '../../utils/routeProtection';
 
 const loginSchema = z.object({
