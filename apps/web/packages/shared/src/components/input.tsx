@@ -31,14 +31,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
-    const hasPrefix = !!prefixIcon;
-    const hasSuffix = !!suffixIcon;
     const isDark = useDarkMode();
 
     // Get theme tokens for styling
     const tokens = React.useMemo(() => getThemeTokens(isDark ? 'dark' : 'light'), [isDark]);
-
-
 
     const contentAfter = suffixIcon ? (
       <span className={cn("flex items-center", iconClassName)}>{suffixIcon}</span>
@@ -48,9 +44,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <span className={cn("flex items-center", iconClassName)}>{prefixIcon}</span>
     ) : undefined;
 
-    // Calculate padding - if no prefix/suffix, use 12px, otherwise use 32px for icon space
-    const paddingLeft = hasPrefix ? "32px" : "0px";
-    const paddingRight = hasSuffix ? "32px" : "0px";
+    // Calculate padding - use 4px for icons to move them to the corners, 12px for regular text
+    const paddingLeft = prefixIcon ? "4px" : "12px";
+    const paddingRight = suffixIcon ? "4px" : "12px";
 
     return (
       <div className="relative w-full" style={{ marginTop: 0, paddingTop: 0 }}>
@@ -87,11 +83,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           />
         </div>
         {errorMessage && (
-          <div 
-            className="text-xs mt-1" 
-            style={{ 
-              fontSize: tokens.fontSizeBase200, 
-              color: (tokens as any).colorStatusDangerForeground3 || "#d13438" 
+          <div
+            className="text-xs mt-1"
+            style={{
+              fontSize: tokens.fontSizeBase200,
+              color: (tokens as any).colorStatusDangerForeground3 || "#d13438"
             }}
           >
             {errorMessage}

@@ -144,7 +144,7 @@ const EmailVerificationPage = () => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Text variant="medium" style={{ color: '#616161', fontSize: '15px' }}>
+            <Text variant="medium" style={{ color: '#616161', fontSize: '16px', lineHeight: '22px' }}>
               Didn’t receive an email?
             </Text>
             <button

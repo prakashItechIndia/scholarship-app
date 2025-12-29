@@ -1,7 +1,7 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
 import puppeteer from 'puppeteer';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 // Dynamic imports for Excel and Word generation libraries
 /* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires */
@@ -51,7 +51,7 @@ interface ApprovedFormReportFilter {
 export class ReportsService {
   private readonly logger = new Logger(ReportsService.name);
 
-  constructor(private readonly db: DatabaseService) {}
+  constructor(private readonly db: DatabaseService) { }
 
   /**
    * Get categories wise report
@@ -68,7 +68,7 @@ export class ReportsService {
       // Normalize status to handle case-insensitive comparison
       const normalizedStatus = filter.status
         ? filter.status.charAt(0).toUpperCase() +
-          filter.status.slice(1).toLowerCase()
+        filter.status.slice(1).toLowerCase()
         : null;
 
       // Base query - select all relevant fields from registration and process tables
@@ -316,7 +316,7 @@ export class ReportsService {
       // Normalize status to handle case-insensitive comparison
       const normalizedStatus = filter.status
         ? filter.status.charAt(0).toUpperCase() +
-          filter.status.slice(1).toLowerCase()
+        filter.status.slice(1).toLowerCase()
         : null;
 
       // Base query - select all relevant fields for approved forms
@@ -691,12 +691,12 @@ export class ReportsService {
           ) {
             cellValue = row['Scholarship_Approved_Amount']
               ? Number(row['Scholarship_Approved_Amount']).toLocaleString(
-                  'en-IN',
-                  {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  },
-                )
+                'en-IN',
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                },
+              )
               : '';
           } else if (col.key.includes('Amount') || col.key.includes('amount')) {
             const amount = row[col.key];
@@ -767,7 +767,7 @@ export class ReportsService {
           format: 'A4',
           landscape: true,
           margin: {
-            top: '25mm', // Increased top margin for header
+            top: '80mm', // Drastically increased to prevent ANY overlap of header (approx 300px)
             right: '10mm',
             bottom: '20mm',
             left: '10mm',
@@ -831,7 +831,7 @@ export class ReportsService {
   <style>
     @page {
       size: A4 landscape;
-      margin: 25mm 10mm 20mm 10mm;
+      margin: 50mm 10mm 20mm 10mm;
     }
     
     * {
@@ -855,7 +855,7 @@ export class ReportsService {
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 5px;
+      margin-top: 0;
       font-size: 7pt;
       table-layout: fixed;
       page-break-inside: auto;
@@ -911,22 +911,21 @@ export class ReportsService {
     
     /* Column width classes */
     ${columns
-      .map(
-        (_, index) => `
+        .map(
+          (_, index) => `
     th:nth-child(${index + 1}),
     td:nth-child(${index + 1}) {
       width: ${colWidth};
     }
     `,
-      )
-      .join('')}
+        )
+        .join('')}
   </style>
 </head>
 <body>
-  ${
-    rows.length === 0
-      ? '<div class="no-data">No data available</div>'
-      : `
+  ${rows.length === 0
+        ? '<div class="no-data">No data available</div>'
+        : `
   <table>
     <thead>
       <tr>${headerHTML}</tr>
@@ -936,7 +935,7 @@ export class ReportsService {
     </tbody>
   </table>
   `
-  }
+      }
 </body>
 </html>
     `.trim();
@@ -947,19 +946,33 @@ export class ReportsService {
    */
   private getLogoBase64(): string {
     try {
-      // Try to read logo from old app directory first
-      const oldAppLogoPath = join(
-        process.cwd(),
-        '..',
-        'SaiAramFoundation Without SVN',
-        'images',
-        'chairman logo.png',
-      );
-      const logoBuffer = readFileSync(oldAppLogoPath);
-      const base64 = logoBuffer.toString('base64');
-      return `data:image/png;base64,${base64}`;
+      // Extensive list of possible paths to ensure we find the logo
+      const possiblePaths = [
+        // 1. Absolute path (Most reliable for this environment)
+        '/home/mahalakshmi/ITECHPROJECTS/scholarship-app/apps/web/packages/shared/src/assets/icons/LMS Logo.png',
+        // 2. Relative from project root (if cwd is project root)
+        join(process.cwd(), 'apps/web/packages/shared/src/assets/icons/LMS Logo.png'),
+        // 3. Fallback to other logos if LMS Logo is strictly missing
+        join(process.cwd(), 'apps/web/packages/shared/src/assets/icons/brandLogo.png'),
+        join(process.cwd(), 'apps/web/apps/scholarship-app/src/assets/images/logo-aram.png'),
+      ];
+
+      this.logger.log(`Searching for logo in ${possiblePaths.length} locations...`);
+      this.logger.log(`Current CWD: ${process.cwd()}`);
+
+      for (const logoPath of possiblePaths) {
+        if (existsSync(logoPath)) {
+          this.logger.log(`Found logo at: ${logoPath}`);
+          const logoBuffer = readFileSync(logoPath);
+          const base64 = logoBuffer.toString('base64');
+          return `data:image/png;base64,${base64}`;
+        }
+      }
+
+      this.logger.error('CRITICAL: No logo found in any of the expected locations.');
+      return '';
     } catch (error) {
-      this.logger.warn('Logo file not found, using text-only header', error);
+      this.logger.error('Error reading logo file', error);
       return '';
     }
   }
@@ -973,24 +986,40 @@ export class ReportsService {
     reportTitle: string,
   ): string {
     const logoHtml = logoBase64
-      ? `<img src="${logoBase64}" style="width: 60px; height: 60px; object-fit: contain; margin-right: 10px;" alt="Logo" />`
-      : '';
+      ? `<img src="${logoBase64}" style="width: 75px; height: 75px; object-fit: contain;" alt="Logo" />`
+      : '<div style="width: 75px; height: 75px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 8pt;">Logo</div>';
 
     return `
-      <div style="width: 100%; padding: 5mm 10mm; border-bottom: 1px solid #000; display: flex; align-items: center; justify-content: space-between; font-family: Arial, Helvetica, sans-serif;">
-        <div style="display: flex; align-items: center; flex: 1;">
-          ${logoHtml}
-          <div>
-            <div style="font-size: 20pt; font-weight: bold; color: #8B0000; line-height: 1.2; margin-bottom: 2px;">LEO MUTHU</div>
-            <div style="font-size: 14pt; font-weight: bold; color: #FF8C00; line-height: 1.2;">SCHOLARSHIP</div>
+      <!-- Container with strict box-sizing and explicit styles to prevent zooming issues -->
+      <div style="width: 100%; font-family: 'Segoe UI', Arial, Helvetica, sans-serif; padding: 0 10mm; box-sizing: border-box; overflow: hidden; font-size: 16px;">
+        
+        <!-- Header Top: 3 Columns with Vertical Dividers -->
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: none; height: 90px; padding-bottom: 5px;">
+          <!-- Left: Logo Area -->
+          <div style="width: 25%; display: flex; justify-content: center; align-items: center; border-right: 1px solid #e0e0e0; height: 80px;">
+            ${logoHtml}
+          </div>
+          
+          <!-- Middle: Name Area -->
+          <div style="width: 50%; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 80px;">
+            <div style="font-size: 34pt; font-weight: bold; color: #8B0000; line-height: 1; margin: 0; padding: 0;">LEO MUTHU</div>
+            <div style="font-size: 20pt; font-weight: bold; color: #EE7621; line-height: 1; margin-top: 5px; padding: 0;">SCHOLARSHIP</div>
+          </div>
+          
+          <!-- Right: Info Area -->
+          <div style="width: 25%; border-left: 1px solid #e0e0e0; height: 80px; display: flex; flex-direction: column; justify-content: center; padding-left: 20px; font-size: 10pt; color: #000; text-align: left;">
+            <div style="line-height: 1.4;">Online Reports of</div>
+            <div style="line-height: 1.4;">Leo Muthu Scholarship (LMS)</div>
           </div>
         </div>
-        <div style="font-size: 10pt; color: #000; text-align: right; flex: 1;">
-          Online Reports of Leo Muthu Scholarship (LMS)
+        
+        <!-- Thick Black Horizontal Line -->
+        <div style="width: 100%; border-bottom: 2px solid #000; margin-top: 0;"></div>
+        
+        <!-- Report Title Area -->
+        <div style="width: 100%; text-align: center; padding: 10px 0;">
+          <div style="font-size: 12pt; font-weight: bold; color: #000;">${this.escapeHtml(reportTitle)}</div>
         </div>
-      </div>
-      <div style="width: 100%; padding: 3mm 10mm; text-align: center; border-bottom: 1px solid #ccc;">
-        <div style="font-size: 12pt; font-weight: bold; color: #000;">${this.escapeHtml(reportTitle)}</div>
       </div>
     `;
   }

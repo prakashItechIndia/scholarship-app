@@ -204,7 +204,7 @@ export const ProcessLayout: React.FC<ProcessLayoutProps> = ({ children, hideSide
     window.location.href = '/admin-login';
   };
 
-  const isUserDashboard = location.pathname === "/User-dashboard";
+  const isUserDashboard = location.pathname === "/user-dashboard";
 
   const topNavConfig: TopNavProps = {
     className: isUserDashboard ? "bg-[#2453C3] border-b border-[#1e45a3]" : "bg-white border-b border-gray-200",
