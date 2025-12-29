@@ -124,7 +124,7 @@ function buildOrderByClause(sortField?: string, sortOrder?: 'asc' | 'desc'): str
 
   // Get the database column name, default to Application_Id if not found
   const dbColumn = fieldMapping[sortField] || 'R.Application_Id';
-  
+
   // Validate sort order - default to DESC if not provided (matches default behavior)
   // This ensures first click applies sorting correctly
   const order = sortOrder === 'asc' ? 'ASC' : 'DESC';
@@ -140,7 +140,7 @@ export class ProcessManagementService {
   constructor(
     private readonly db: DatabaseService,
     private readonly fileStorage: FileStorageService,
-  ) {}
+  ) { }
 
   /**
    * Get applications for Overview tab
@@ -322,12 +322,12 @@ export class ProcessManagementService {
 
       // Apply dynamic ORDER BY based on sortField and sortOrder
       query += ' ' + buildOrderByClause(sortField, sortOrder);
-      
+
       // Validate and sanitize pagination parameters
       const page = Math.max(1, Math.floor(Number(params.page) || 1));
       const pageSize = Math.max(1, Math.min(100, Math.floor(Number(params.pageSize) || 10))); // Max 100 items per page
       const offset = (page - 1) * pageSize;
-      
+
       // Use validated integers for pagination (safe from SQL injection since they're validated numbers)
       query += ` OFFSET ${offset} ROWS FETCH NEXT ${pageSize} ROWS ONLY`;
 
@@ -421,12 +421,12 @@ export class ProcessManagementService {
 
       // Apply dynamic ORDER BY based on sortField and sortOrder
       query += ' ' + buildOrderByClause(sortField, sortOrder);
-      
+
       // Validate and sanitize pagination parameters
       const page = Math.max(1, Math.floor(Number(params.page) || 1));
       const pageSize = Math.max(1, Math.min(100, Math.floor(Number(params.pageSize) || 10))); // Max 100 items per page
       const offset = (page - 1) * pageSize;
-      
+
       // Use validated integers for pagination (safe from SQL injection since they're validated numbers)
       query += ` OFFSET ${offset} ROWS FETCH NEXT ${pageSize} ROWS ONLY`;
 
@@ -586,12 +586,12 @@ export class ProcessManagementService {
 
       // Apply dynamic ORDER BY based on sortField and sortOrder
       query += ' ' + buildOrderByClause(sortField, sortOrder);
-      
+
       // Validate and sanitize pagination parameters
       const page = Math.max(1, Math.floor(Number(params.page) || 1));
       const pageSize = Math.max(1, Math.min(100, Math.floor(Number(params.pageSize) || 10))); // Max 100 items per page
       const offset = (page - 1) * pageSize;
-      
+
       // Use validated integers for pagination (safe from SQL injection since they're validated numbers)
       query += ` OFFSET ${offset} ROWS FETCH NEXT ${pageSize} ROWS ONLY`;
 
@@ -788,7 +788,7 @@ export class ProcessManagementService {
       query += ` OFFSET ${offset} ROWS FETCH NEXT ${pageSize} ROWS ONLY`;
 
       const result = await this.db.query(query, queryParams);
-      
+
       // Map boolean fields from 1/0 to true/false
       const mappedData = (result.recordset || []).map((row: Record<string, unknown>) => {
         const mappedRow = { ...row };
@@ -807,7 +807,7 @@ export class ProcessManagementService {
         }
         return mappedRow;
       });
-      
+
       return {
         data: mappedData,
         total: Number(total),
@@ -907,12 +907,12 @@ export class ProcessManagementService {
 
       // Apply dynamic ORDER BY based on sortField and sortOrder
       query += ' ' + buildOrderByClause(sortField, sortOrder);
-      
+
       // Validate and sanitize pagination parameters
       const page = Math.max(1, Math.floor(Number(params.page) || 1));
       const pageSize = Math.max(1, Math.min(100, Math.floor(Number(params.pageSize) || 10))); // Max 100 items per page
       const offset = (page - 1) * pageSize;
-      
+
       // Use validated integers for pagination (safe from SQL injection since they're validated numbers)
       query += ` OFFSET ${offset} ROWS FETCH NEXT ${pageSize} ROWS ONLY`;
 
@@ -1057,12 +1057,12 @@ export class ProcessManagementService {
 
       // Apply dynamic ORDER BY based on sortField and sortOrder
       query += ' ' + buildOrderByClause(sortField, sortOrder);
-      
+
       // Validate and sanitize pagination parameters
       const page = Math.max(1, Math.floor(Number(params.page) || 1));
       const pageSize = Math.max(1, Math.min(100, Math.floor(Number(params.pageSize) || 10))); // Max 100 items per page
       const offset = (page - 1) * pageSize;
-      
+
       // Use validated integers for pagination (safe from SQL injection since they're validated numbers)
       query += ` OFFSET ${offset} ROWS FETCH NEXT ${pageSize} ROWS ONLY`;
 
@@ -1291,7 +1291,7 @@ export class ProcessManagementService {
         FROM t_Registration_Process
         WHERE Application_Id = @applicationId
       `;
-      const amountResult = await this.db.query<{ 
+      const amountResult = await this.db.query<{
         Scholarship_Approved_Amount: number | string;
         Scholarship_Id: number;
       }>(
@@ -1304,7 +1304,7 @@ export class ProcessManagementService {
       // Handle file upload if provided (for DD/Cheque document)
       let ddChequePath = '';
       let ddChequePathForCrystal = '';
-      
+
       if (files && files.length > 0) {
         // Use the first file as DD/Cheque document
         const file = files[0];
@@ -1313,7 +1313,7 @@ export class ProcessManagementService {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '').replace(/-/g, '').replace('T', '').substring(0, 14);
         const fileExtension = file.originalname.split('.').pop() || '';
         const fileName = `${applicationId}_DDCheck_${timestamp}.${fileExtension}`;
-        
+
         // Save file using FileStorageService with custom filename
         // We'll use saveDocument but need to handle the custom filename pattern
         const fileResult = await this.fileStorage.saveDocument(
@@ -1321,7 +1321,7 @@ export class ProcessManagementService {
           `DDCheck_${timestamp}`,
           file,
         );
-        
+
         // The fileResult.filePath will be /ScholerShipData/{ApplicationNo}/{ApplicationNo}_DDCheck_{timestamp}.{ext}
         ddChequePath = fileResult.filePath;
         ddChequePathForCrystal = fileResult.fullPath;
@@ -1395,7 +1395,7 @@ export class ProcessManagementService {
         }
       }
 
-      return { 
+      return {
         message: 'Amount issued successfully',
         ddChequePath: ddChequePath || undefined,
       };
@@ -1480,8 +1480,8 @@ export class ProcessManagementService {
       // Map results to match frontend expectations
       const mappedData = (historyResult.recordset || []).map(
         (row: Record<string, unknown>, index: number) => {
-        const rowRecord = row as Record<string, unknown>;
-        return {
+          const rowRecord = row as Record<string, unknown>;
+          return {
             id: Number(rowRecord.ID) || (getAllRecords ? index + 1 : offset + index + 1),
             action: String(rowRecord.Action ?? ''),
             processUndergone: String(rowRecord.ProcessUndergone ?? ''),
@@ -1489,7 +1489,7 @@ export class ProcessManagementService {
               rowRecord.HandledBy ?? rowRecord.User_ID ?? 'Admin',
             ),
             date: String(rowRecord.Date ?? ''),
-        };
+          };
         },
       );
 
@@ -1587,7 +1587,7 @@ export class ProcessManagementService {
           const year = row.ScholarshipYear_Code || '';
           const scholarshipNo = row.Scholarship_No?.trim() || '';
           // Only add parentheses if scholarship number exists
-          const yearFormatted = scholarshipNo 
+          const yearFormatted = scholarshipNo
             ? `${year} ( ${scholarshipNo} )`
             : year;
           return {
@@ -1625,7 +1625,7 @@ export class ProcessManagementService {
       // Fetch application and process data
       // Handle both Scholarship_Id (numeric) and Scholarship_No (string like "25LMSS2079")
       const isNumericScholarshipId = !isNaN(Number(scholarshipId)) && scholarshipId.trim() !== '';
-      
+
       const query = `
         SELECT
           R.Application_Id,
@@ -1657,7 +1657,7 @@ export class ProcessManagementService {
       const queryParams: Record<string, unknown> = {
         applicationId,
       };
-      
+
       if (isNumericScholarshipId) {
         queryParams.scholarshipId = Number(scholarshipId);
       } else {
@@ -1672,6 +1672,35 @@ export class ProcessManagementService {
         throw new BadRequestException(
           `Application ${applicationId} with scholarship ${scholarshipId} not found`,
         );
+      }
+
+      // Get logo image
+      let logoBase64 = '';
+      try {
+        // Try multiple possible paths to find the logo
+        const logoPaths = [
+          join(process.cwd(), '../../apps/web/packages/shared/src/assets/icons/LMS Logo.png'),
+          join(process.cwd(), '../apps/web/packages/shared/src/assets/icons/LMS Logo.png'),
+          join(process.cwd(), 'apps/web/packages/shared/src/assets/icons/LMS Logo.png'),
+          '/home/mahalakshmi/ITECHPROJECTS/scholarship-app/apps/web/packages/shared/src/assets/icons/LMS Logo.png'
+        ];
+
+        let foundPath = '';
+        for (const p of logoPaths) {
+          if (existsSync(p)) {
+            foundPath = p;
+            break;
+          }
+        }
+
+        if (foundPath) {
+          const logoBuffer = readFileSync(foundPath);
+          logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+        } else {
+          this.logger.warn('Could not find scholarship logo in any of the expected locations');
+        }
+      } catch (e) {
+        this.logger.warn('Failed to load scholarship logo', e);
       }
 
       // Get cheque image path
@@ -1720,12 +1749,12 @@ export class ProcessManagementService {
         if (!amount) return 'ZERO';
         const num = Number(amount);
         if (isNaN(num)) return 'ZERO';
-        
+
         // Convert number to words in Indian format
         const ones = ['', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE'];
         const teens = ['TEN', 'ELEVEN', 'TWELVE', 'THIRTEEN', 'FOURTEEN', 'FIFTEEN', 'SIXTEEN', 'SEVENTEEN', 'EIGHTEEN', 'NINETEEN'];
         const tens = ['', '', 'TWENTY', 'THIRTY', 'FORTY', 'FIFTY', 'SIXTY', 'SEVENTY', 'EIGHTY', 'NINETY'];
-        
+
         const convertHundreds = (n: number): string => {
           if (n === 0) return '';
           if (n < 10) return ones[n];
@@ -1737,18 +1766,18 @@ export class ProcessManagementService {
           }
           const hundred = Math.floor(n / 100);
           const remainder = n % 100;
-          return remainder === 0 
-            ? `${ones[hundred]} HUNDRED` 
+          return remainder === 0
+            ? `${ones[hundred]} HUNDRED`
             : `${ones[hundred]} HUNDRED ${convertHundreds(remainder)}`;
         };
-        
+
         if (num === 0) return 'ZERO';
-        
+
         const crores = Math.floor(num / 10000000);
         const lakhs = Math.floor((num % 10000000) / 100000);
         const thousands = Math.floor((num % 100000) / 1000);
         const hundreds = num % 1000;
-        
+
         let result = '';
         if (crores > 0) {
           result += `${convertHundreds(crores)} ${crores === 1 ? 'CRORE' : 'CRORES'} `;
@@ -1762,7 +1791,7 @@ export class ProcessManagementService {
         if (hundreds > 0) {
           result += convertHundreds(hundreds);
         }
-        
+
         return result.trim() || 'ZERO';
       };
 
@@ -1795,166 +1824,219 @@ export class ProcessManagementService {
               font-family: Arial, sans-serif;
               margin: 0;
               padding: 20px;
-              font-size: 12px;
               color: #000;
+              line-height: 1.3;
             }
-            .header {
+            .main-container {
+              width: 100%;
+              border: 1px solid #000;
+            }
+            .header-table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+            .header-table td {
+              border: 0.5px solid #000;
+              padding: 5px;
+              vertical-align: middle;
+            }
+            .logo-cell {
+              width: 25%;
               text-align: center;
-              margin-bottom: 20px;
             }
-            .header h1 {
+            .title-cell {
+              width: 50%;
+              text-align: left;
+              padding: 5px 15px !important;
+              vertical-align: middle;
+            }
+            .title-cell h1 {
               margin: 0;
-              font-size: 18px;
+              font-size: 36px;
+              color: #a12c2c; /* Deep red */
               font-weight: bold;
+              line-height: 0.9;
+              letter-spacing: 1px;
             }
-            .section {
-              margin-bottom: 20px;
-            }
-            .section-title {
+            .title-cell .sub-title {
+              font-size: 20px;
+              letter-spacing: 2px;
               font-weight: bold;
-              font-size: 14px;
-              margin-bottom: 10px;
+              color: #ec662b; /* Orange */
+              padding-left: 90px;
+              display: block;
+              margin-top: -2px;
+            }
+            .info-cell {
+              width: 25%;
               text-align: center;
+              font-size: 11px;
+              line-height: 1.4;
+            }
+            .scholarship-row td {
+              border: 0.5px solid #000;
+              padding: 8px;
+              font-weight: bold;
+              text-align: center;
+            }
+            .form-type-text {
+              width: 50%;
+              font-size: 14px;
+            }
+            .scholarship-no-text {
+              width: 50%;
+              font-size: 18px;
             }
             .details-table {
               width: 100%;
               border-collapse: collapse;
-              margin-bottom: 15px;
             }
             .details-table td {
-              padding: 6px;
-              border: 1px solid #ddd;
+              border: 0.5px solid #000;
+              padding: 6px 10px;
+              font-size: 11px;
+              height: 20px;
             }
-            .details-table td:first-child {
+            .label-cell {
+              width: 25%;
+              background-color: #fff;
+            }
+            .value-cell {
+              width: 25%;
               font-weight: bold;
-              width: 40%;
-              background-color: #f5f5f5;
+            }
+            .full-row-value {
+              font-weight: bold;
             }
             .cheque-image-container {
+              width: 100%;
+              padding: 10px 0;
+              border: 0.5px solid #000;
               text-align: center;
-              margin: 20px 0;
-              page-break-inside: avoid;
+              background-color: #fff;
+              min-height: 250px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
             }
             .cheque-image {
-              max-width: 100%;
-              max-height: 500px;
-              height: auto;
+              max-width: 98%;
+              max-height: 350px;
               object-fit: contain;
-              display: block;
-              margin: 0 auto;
+            }
+            .payment-header-container {
+              padding: 10px;
+              text-align: center;
+              border: 0.5px solid #000;
+            }
+            .payment-header-box {
+              border: 0.5px solid #000;
+              padding: 5px 20px;
+              display: inline-block;
+              font-weight: bold;
+              font-size: 13px;
             }
             .payment-table {
               width: 100%;
               border-collapse: collapse;
-              margin-top: 15px;
             }
-            .payment-table th,
-            .payment-table td {
+            .payment-table th, .payment-table td {
+              border: 0.5px solid #000;
               padding: 8px;
-              border: 1px solid #ddd;
               text-align: center;
+              font-size: 12px;
             }
             .payment-table th {
-              background-color: #f5f5f5;
-              font-weight: bold;
+              font-weight: 500;
             }
-            .amount-section {
-              margin-top: 15px;
-              text-align: center;
-            }
-            .acknowledgment {
-              margin-top: 30px;
+            .summary-section {
+              padding: 15px;
+              border: 0.5px solid #000;
               position: relative;
             }
-            .acknowledgment-header {
-              text-align: right;
-              margin-bottom: 20px;
+            .amount-text {
               font-size: 13px;
-              font-weight: 500;
+              margin-bottom: 5px;
             }
-            .acknowledgment-fields {
-              margin-top: 20px;
+            .thanks-text {
+              position: absolute;
+              bottom: 15px;
+              right: 20px;
+              font-weight: bold;
+              font-size: 12px;
             }
-            .acknowledgment-field {
-              display: flex;
-              align-items: center;
-              margin-bottom: 15px;
-              border-bottom: 1px solid #000;
-              padding-bottom: 5px;
-            }
-            .acknowledgment-label {
-              min-width: 100px;
-              font-weight: 500;
-              margin-right: 10px;
-            }
-            .acknowledgment-input {
-              flex: 1;
-              border: none;
-              border-bottom: 1px solid #000;
-              min-height: 20px;
-            }
+            .bold { font-weight: bold; }
           </style>
         </head>
         <body>
-          <!-- Top Section: Scholarship Issued Form -->
-          <div class="section">
-            <div class="header">
-              <h1>LEO MUTHU SCHOLARSHIP</h1>
-              <p>Online Registration for Scholarship Assistance 2025-2026</p>
-              <h2 style="margin: 10px 0; font-size: 16px; font-weight: bold;">SCHOLARSHIP ISSUED FORM( 2025-2026 )</h2>
-            </div>
-            
-            <table class="details-table">
+          <div class="main-container">
+            <!-- Header Section -->
+            <table class="header-table">
               <tr>
-                <td>Scholarship ID</td>
-                <td>${data.Scholarship_No || '-'}</td>
+                <td class="logo-cell" rowspan="2">
+                  ${logoBase64 ? `<img src="${logoBase64}" style="height: 65px;" />` : 'LOGO'}
+                </td>
+                <td class="title-cell">
+                  <h1>LEO MUTHU</h1>
+                  <div class="sub-title">SCHOLARSHIP</div>
+                </td>
+                <td class="info-cell">
+                  Online Registration for<br>
+                  Scholarship Assistance<br><br>
+                  2025-2026
+                </td>
               </tr>
-              <tr>
-                <td>Name</td>
-                <td>${String(data.Applicant_Name || '-')}</td>
-              </tr>
-              <tr>
-                <td>Application ID</td>
-                <td>${String(data.Application_Id || '-')}</td>
-              </tr>
-              <tr>
-                <td>Mobile Number</td>
-                <td>${String(data.Mobile_Number || '-')}</td>
-              </tr>
-              <tr>
-                <td>Institution Name</td>
-                <td>${String(data.Institution_Name || '-')}</td>
-              </tr>
-              <tr>
-                <td>Cheque in favour of</td>
-                <td>${String(data.DDCheque_In_Favor_Type || '-')}${data.DDCheque_In_Favor ? ` ${String(data.DDCheque_In_Favor)}` : ''}</td>
-              </tr>
-              <tr>
-                <td>Student ID</td>
-                <td>${String(data.Student_ID || '-')}</td>
-              </tr>
-              <tr>
-                <td>Aadhaar ID</td>
-                <td>${String(data.Aadhaar_ID || '-')}</td>
-              </tr>
-              <tr>
-                <td>PAN ID</td>
-                <td>${String(data.Pan_ID || '-')}</td>
+              <tr class="scholarship-row">
+                <td class="form-type-text">SCHOLARSHIP ISSUED FORM( 2025-2026 )</td>
+                <td class="scholarship-no-text">${data.Scholarship_No || '-'}</td>
               </tr>
             </table>
-          </div>
 
-          <!-- Center Section: Cheque Image -->
-          ${chequeImageBase64 ? `
-          <div class="cheque-image-container">
-            <img src="${chequeImageBase64}" alt="Cheque" class="cheque-image" />
-          </div>
-          ` : ''}
+            <!-- Details Table -->
+            <table class="details-table">
+              <tr>
+                <td class="label-cell">Name</td>
+                <td class="value-cell bold">${String(data.Applicant_Name || '-')}</td>
+                <td class="label-cell">Student ID</td>
+                <td class="value-cell">${String(data.Student_ID || '-')}</td>
+              </tr>
+              <tr>
+                <td class="label-cell">Application ID</td>
+                <td class="value-cell bold">${String(data.Application_Id || '-')}</td>
+                <td class="label-cell">Aadhaar ID</td>
+                <td class="value-cell bold">${String(data.Aadhaar_ID || '-')}</td>
+              </tr>
+              <tr>
+                <td class="label-cell">Mobile Number</td>
+                <td class="value-cell bold">${String(data.Mobile_Number || '-')}</td>
+                <td class="label-cell">PAN ID</td>
+                <td class="value-cell">${String(data.Pan_ID || '-')}</td>
+              </tr>
+              <tr>
+                <td class="label-cell">Institution Name</td>
+                <td class="full-row-value bold" colspan="2">${String(data.Institution_Name || '-')}</td>
+                <td style="border-left: none;"></td>
+              </tr>
+              <tr>
+                <td class="label-cell">Cheque in favour of</td>
+                <td class="value-cell bold">${String(data.DDCheque_In_Favor_Type || '-')}</td>
+                <td class="full-row-value bold" colspan="2" style="text-align: center;">${String(data.DDCheque_In_Favor || '')}</td>
+              </tr>
+            </table>
 
-          <!-- Bottom Section: Payment Summary -->
-          <div class="section">
-            <div class="section-title">Scholarship Approved Cheque Payment Details</div>
-            
+            <!-- Cheque Image Section -->
+            <div class="cheque-image-container">
+              ${chequeImageBase64 ? `<img src="${chequeImageBase64}" alt="Cheque" class="cheque-image" />` : 'CHEQUE IMAGE NOT AVAILABLE'}
+            </div>
+
+            <!-- Payment Details Header -->
+            <div class="payment-header-container">
+              <div class="payment-header-box">
+                Scholarship Approved Cheque Payment Details
+              </div>
+            </div>
+
+            <!-- Payment Table -->
             <table class="payment-table">
               <thead>
                 <tr>
@@ -1966,37 +2048,38 @@ export class ProcessManagementService {
               </thead>
               <tbody>
                 <tr>
-                  <td>${formatDate(data.DDCheque_Date || data.Scholarship_Issued_Date)}</td>
-                  <td>${String(data.DDCheque_No || '-')}</td>
-                  <td>Rs.${issuedAmount}</td>
-                  <td>-</td>
+                  <td class="bold">${formatDate(data.DDCheque_Date || data.Scholarship_Issued_Date)}</td>
+                  <td class="bold">${String(data.DDCheque_No || '-')}</td>
+                  <td class="bold">Rs.${issuedAmount}</td>
+                  <td></td>
                 </tr>
               </tbody>
             </table>
 
-            <div class="amount-section">
-              <p><strong>Amount: Rs.${issuedAmount}</strong></p>
-              <p>Rupees(${issuedAmountWords} ONLY)</p>
-            </div>
+            <!-- Summary & Acknowledgment Section -->
+            <div style="border: 0.5px solid #000; border-top: none;">
+              <div style="padding: 12px 15px; display: flex; gap: 100px;">
+                <div style="font-size: 12px;">Amount : Rs.${issuedAmount}</div>
+                <div style="font-size: 12px;">Rupees( ${issuedAmountWords} ONLY)</div>
+              </div>
+              
+              <div style="text-align: right; padding-right: 20px; padding-bottom: 5px; font-size: 11px;">
+                Received with Thanks.
+              </div>
 
-            <div class="acknowledgment">
-              <div class="acknowledgment-header">
-                <p>Received with Thanks.</p>
-              </div>
-              <div class="acknowledgment-fields">
-                <div class="acknowledgment-field">
-                  <span class="acknowledgment-label">Name :</span>
-                  <div class="acknowledgment-input"></div>
-                </div>
-                <div class="acknowledgment-field">
-                  <span class="acknowledgment-label">Signature :</span>
-                  <div class="acknowledgment-input"></div>
-                </div>
-                <div class="acknowledgment-field">
-                  <span class="acknowledgment-label">Date :</span>
-                  <div class="acknowledgment-input"></div>
-                </div>
-              </div>
+              <table style="width: 100%; border-collapse: collapse; border-top: 0.5px solid #000;">
+                <tr>
+                  <td style="width: 40%; border-right: 0.5px solid #000; height: 70px;"></td>
+                  <td style="width: 60%; vertical-align: top; padding: 0;">
+                    <div style="border-bottom: 0.5px solid #000; padding: 8px 12px; font-size: 12px;">
+                      Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:
+                    </div>
+                    <div style="padding: 12px; font-size: 12px;">
+                      Signature &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:
+                    </div>
+                  </td>
+                </tr>
+              </table>
             </div>
           </div>
         </body>

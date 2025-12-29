@@ -29,7 +29,7 @@ const EducationMedicalDetails = () => {
     const isMedical = applicantType?.toLowerCase() === 'medical';
     const isSchool = applicantType?.toLowerCase() === 'school';
     const isCollege = applicantType?.toLowerCase() === 'college';
-    
+
     // Use union schema that accepts both education and medical fields
     // Validation will be done dynamically based on applicantType
     const combinedSchema = z.object({
@@ -39,6 +39,7 @@ const EducationMedicalDetails = () => {
         university: z.string().optional(),
         classStudying: z.string().optional(),
         boardOfStudying: z.string().optional(),
+        otherBoard: z.string().optional(),
         courceOfStudying: z.string().optional(),
         degreeType: z.string().optional(),
         degree: z.string().optional(),
@@ -55,7 +56,7 @@ const EducationMedicalDetails = () => {
         // Get applicantType from formData to determine validation
         const currentApplicantType = getStringValue(formData, 'applicantType', '').toLowerCase();
         const isMedicalType = currentApplicantType === 'medical';
-        
+
         if (isMedicalType) {
             // Medical validation
             if (!data.medicalReason || data.medicalReason.trim() === '') {
@@ -83,7 +84,7 @@ const EducationMedicalDetails = () => {
             const currentApplicantType = getStringValue(formData, 'applicantType', '').toLowerCase();
             const isSchoolType = currentApplicantType === 'school';
             const isCollegeType = currentApplicantType === 'college';
-            
+
             if (isSchoolType) {
                 // School validation - only 4 required fields
                 if (!data.typeOfInstitution || data.typeOfInstitution.trim() === '') {
@@ -112,6 +113,13 @@ const EducationMedicalDetails = () => {
                         code: z.ZodIssueCode.custom,
                         message: 'Board of Studying is required',
                         path: ['boardOfStudying'],
+                    });
+                }
+                if (data.boardOfStudying === 'Others' && (!data.otherBoard || data.otherBoard.trim() === '')) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: 'Other Board is required',
+                        path: ['otherBoard'],
                     });
                 }
             } else if (isCollegeType) {
@@ -291,6 +299,7 @@ const EducationMedicalDetails = () => {
                 university: getStringValue(formData, 'university'),
                 classStudying: getStringValue(formData, 'classStudying'),
                 boardOfStudying: getStringValue(formData, 'boardOfStudying'),
+                otherBoard: getStringValue(formData, 'otherBoard'),
                 courceOfStudying: getStringValue(formData, 'courceOfStudying'),
                 degreeType: getStringValue(formData, 'degreeType'),
                 degree: getStringValue(formData, 'degree'),
@@ -312,7 +321,8 @@ const EducationMedicalDetails = () => {
     // Watch for course changes to show/hide fields
     const courceOfStudying = watch('courceOfStudying');
     const degreeType = watch('degreeType');
-    
+    const boardOfStudying = watch('boardOfStudying');
+
     // Dynamic field visibility based on Course of Studying (for College)
     const showOtherDegreeForCollege = courceOfStudying === 'Medical' || courceOfStudying === 'Legal' || courceOfStudying === 'Others';
     const showDegreeForCollege = !showOtherDegreeForCollege && !!courceOfStudying && courceOfStudying !== 'PreUniversity' && courceOfStudying !== 'Diploma';
@@ -494,9 +504,8 @@ const EducationMedicalDetails = () => {
                                         <input
                                             {...field}
                                             type="date"
-                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                                errors.lastDateForAmount ? 'border-red-500' : 'border-gray-300'
-                                            }`}
+                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.lastDateForAmount ? 'border-red-500' : 'border-gray-300'
+                                                }`}
                                         />
                                     )}
                                 />
@@ -554,6 +563,21 @@ const EducationMedicalDetails = () => {
                                     />
                                 </FormRow>
                             </FormRowContainer>
+
+                            {boardOfStudying === 'Others' && (
+                                <FormRowContainer>
+                                    <FormRow>
+                                        <InputField
+                                            name="otherBoard"
+                                            control={control}
+                                            errors={errors}
+                                            label="Specify Board"
+                                            required
+                                            placeholder="Enter board name"
+                                        />
+                                    </FormRow>
+                                </FormRowContainer>
+                            )}
                         </>
                     ) : isCollege ? (
                         // College Education Details Section - Specific fields only
@@ -820,7 +844,7 @@ const EducationMedicalDetails = () => {
                                 required={false}
                                 placeholder="Enter specialization"
                             />
-                            
+
                             {/* Spacing after Specialization field */}
                             <div style={{ marginBottom: '24px' }}></div>
                         </>
