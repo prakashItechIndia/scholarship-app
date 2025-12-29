@@ -333,7 +333,7 @@ const ReviewSubmit = () => {
             if (Array.isArray(medicalDocuments) && medicalDocuments.length > 0) {
                 try {
                     const medicalDocumentTypes = medicalDocuments.map((_, index) => `MedicalDocument_${index + 1}`);
-                    await documentUpload.uploadMultipleDocuments(
+                    await documentUpload.uploadMultipleMedicalDocuments(
                         appNumber,
                         medicalDocuments,
                         medicalDocumentTypes,

@@ -2185,6 +2185,68 @@ export const DocumentUploadApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * 
+         * @summary Upload multiple medical documents (saves to MedicalDocuments folder)
+         * @param {Array<any>} files 
+         * @param {string} applicationId 
+         * @param {string} documentTypes Comma-separated list of document types
+         * @param {number} [uploadedBy] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerUploadMultipleMedicalDocuments: async (files: Array<any>, applicationId: string, documentTypes: string, uploadedBy?: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'files' is not null or undefined
+            assertParamExists('documentUploadControllerUploadMultipleMedicalDocuments', 'files', files)
+            // verify required parameter 'applicationId' is not null or undefined
+            assertParamExists('documentUploadControllerUploadMultipleMedicalDocuments', 'applicationId', applicationId)
+            // verify required parameter 'documentTypes' is not null or undefined
+            assertParamExists('documentUploadControllerUploadMultipleMedicalDocuments', 'documentTypes', documentTypes)
+            const localVarPath = `/document-upload/upload-medical-multiple`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+            if (files) {
+                files.forEach((element) => {
+                    localVarFormParams.append('files', element as any);
+                })
+            }
+
+    
+            if (applicationId !== undefined) { 
+                localVarFormParams.append('applicationId', applicationId as any);
+            }
+    
+            if (documentTypes !== undefined) { 
+                localVarFormParams.append('documentTypes', documentTypes as any);
+            }
+    
+            if (uploadedBy !== undefined) { 
+                localVarFormParams.append('uploadedBy', uploadedBy as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Upload student photo
          * @param {any} [photo] 
          * @param {string} [applicationId] 
@@ -2362,6 +2424,20 @@ export const DocumentUploadApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Upload multiple medical documents (saves to MedicalDocuments folder)
+         * @param {Array<any>} files 
+         * @param {string} applicationId 
+         * @param {string} documentTypes Comma-separated list of document types
+         * @param {number} [uploadedBy] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async documentUploadControllerUploadMultipleMedicalDocuments(files: Array<any>, applicationId: string, documentTypes: string, uploadedBy?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.documentUploadControllerUploadMultipleMedicalDocuments(files, applicationId, documentTypes, uploadedBy, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Upload student photo
          * @param {any} [photo] 
          * @param {string} [applicationId] 
@@ -2471,6 +2547,19 @@ export const DocumentUploadApiFactory = function (configuration?: Configuration,
          */
         documentUploadControllerUploadMultipleDocuments(files: Array<any>, applicationId: string, documentTypes: string, uploadedBy?: number, options?: any): AxiosPromise<void> {
             return localVarFp.documentUploadControllerUploadMultipleDocuments(files, applicationId, documentTypes, uploadedBy, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Upload multiple medical documents (saves to MedicalDocuments folder)
+         * @param {Array<any>} files 
+         * @param {string} applicationId 
+         * @param {string} documentTypes Comma-separated list of document types
+         * @param {number} [uploadedBy] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        documentUploadControllerUploadMultipleMedicalDocuments(files: Array<any>, applicationId: string, documentTypes: string, uploadedBy?: number, options?: any): AxiosPromise<void> {
+            return localVarFp.documentUploadControllerUploadMultipleMedicalDocuments(files, applicationId, documentTypes, uploadedBy, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2594,6 +2683,21 @@ export class DocumentUploadApi extends BaseAPI {
      */
     public documentUploadControllerUploadMultipleDocuments(files: Array<any>, applicationId: string, documentTypes: string, uploadedBy?: number, options?: any) {
         return DocumentUploadApiFp(this.configuration).documentUploadControllerUploadMultipleDocuments(files, applicationId, documentTypes, uploadedBy, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Upload multiple medical documents (saves to MedicalDocuments folder)
+     * @param {Array<any>} files 
+     * @param {string} applicationId 
+     * @param {string} documentTypes Comma-separated list of document types
+     * @param {number} [uploadedBy] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentUploadApi
+     */
+    public documentUploadControllerUploadMultipleMedicalDocuments(files: Array<any>, applicationId: string, documentTypes: string, uploadedBy?: number, options?: any) {
+        return DocumentUploadApiFp(this.configuration).documentUploadControllerUploadMultipleMedicalDocuments(files, applicationId, documentTypes, uploadedBy, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

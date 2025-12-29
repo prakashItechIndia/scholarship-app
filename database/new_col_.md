@@ -30,3 +30,16 @@ IF COL_LENGTH('T_ROLES', 'User_Type') IS NULL
     ALTER TABLE T_ROLES ADD User_Type NVARCHAR(50) NULL;
 
         User_Type IN ('Administrator', 'Manager', 'Standard User')
+
+
+ALTER TABLE t_Registration
+ADD ABHA_ID NVARCHAR(255) NULL;
+
+ALTER TABLE t_Registration
+ADD Medical_Reason NVARCHAR(MAX) NULL;
+
+ALTER TABLE t_Registration
+ADD Last_Date_For_Amount DATE NULL;
+
+ALTER TABLE t_Registration
+ADD Medical_Documents NVARCHAR(MAX) NULL;

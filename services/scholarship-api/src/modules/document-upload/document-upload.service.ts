@@ -287,6 +287,114 @@ export class DocumentUploadService {
   }
 
   /**
+   * Upload medical document with file (saves to MedicalDocuments folder)
+   */
+  async uploadMedicalDocumentFile(
+    applicationId: string,
+    documentType: string,
+    file: Express.Multer.File,
+    uploadedBy?: number,
+  ) {
+    try {
+      // Save file using file storage service (medical documents folder)
+      const fileResult = await this.fileStorage.saveMedicalDocument(
+        applicationId,
+        documentType,
+        file,
+      );
+
+      // Get Registration ID
+      const registrationId = await this.getRegistrationId(applicationId);
+
+      // Save document using stored procedure
+      await this.db.execute('USP_SAVE_UploadDocument', {
+        Registration_ID: registrationId,
+        Application_Id: applicationId,
+        DocumentType: documentType,
+        DocumentPath: fileResult.filePath,
+        UserId: uploadedBy || null,
+      });
+
+      // Update IsUpload_Status
+      const updateQuery = `
+        UPDATE t_Registration_Process
+        SET IsUpload_Status = '1', Update_Date = GETDATE()
+        WHERE Application_Id = @applicationId
+      `;
+
+      await this.db.query(updateQuery, {
+        applicationId,
+      });
+
+      // Try to update Uploaded_Date in t_esch_ApplicantDocuments if column exists
+      try {
+        const updateUploadedDateQuery = `
+          UPDATE t_esch_ApplicantDocuments
+          SET Uploaded_Date = GETDATE()
+          WHERE Application_Id = @applicationId AND DocumentType = @documentType
+        `;
+        const updateResult = await this.db.query(updateUploadedDateQuery, {
+          applicationId,
+          documentType,
+        });
+        this.logger.debug(`Updated Uploaded_Date for ${applicationId} - ${documentType}. Rows affected: ${updateResult.rowsAffected?.[0] || 0}`);
+      } catch (error: any) {
+        // If Uploaded_Date column doesn't exist, log and continue
+        if (error.message && error.message.includes('Uploaded_Date')) {
+          this.logger.warn(`Uploaded_Date column does not exist in t_esch_ApplicantDocuments. Please run the SQL script to add it.`);
+        } else {
+          this.logger.warn('Could not update Uploaded_Date in t_esch_ApplicantDocuments:', error.message);
+        }
+      }
+
+      // Update Medical_Documents column in t_Registration with comma-separated paths
+      try {
+        // Get all medical document paths for this application
+        const getMedicalDocsQuery = `
+          SELECT DocumentPath
+          FROM t_esch_ApplicantDocuments
+          WHERE Application_Id = @applicationId 
+            AND DocumentType LIKE 'MedicalDocument_%'
+          ORDER BY DocumentType
+        `;
+        const medicalDocsResult = await this.db.query<{ DocumentPath: string }>(getMedicalDocsQuery, {
+          applicationId,
+        });
+        
+        if (medicalDocsResult.recordset && medicalDocsResult.recordset.length > 0) {
+          const medicalDocPaths = medicalDocsResult.recordset.map(row => row.DocumentPath).join(',');
+          
+          const updateMedicalDocsQuery = `
+            UPDATE t_Registration
+            SET Medical_Documents = @medicalDocPaths
+            WHERE Application_Id = @applicationId
+          `;
+          await this.db.query(updateMedicalDocsQuery, {
+            applicationId,
+            medicalDocPaths: medicalDocPaths,
+          });
+          this.logger.debug(`Updated Medical_Documents in t_Registration for ${applicationId}`);
+        }
+      } catch (error: any) {
+        // If Medical_Documents column doesn't exist, log and continue
+        if (error.message && error.message.includes('Medical_Documents')) {
+          this.logger.warn(`Medical_Documents column does not exist in t_Registration. Please run the SQL script to add it.`);
+        } else {
+          this.logger.warn('Could not update Medical_Documents in t_Registration:', error.message);
+        }
+      }
+
+      return {
+        message: 'Medical document uploaded successfully',
+        documentPath: fileResult.filePath,
+      };
+    } catch (error) {
+      this.logger.error('Error uploading medical document', error);
+      throw new BadRequestException('Failed to upload medical document');
+    }
+  }
+
+  /**
    * Upload multiple documents
    */
   async uploadMultipleDocuments(
@@ -329,6 +437,85 @@ export class DocumentUploadService {
   }
 
   /**
+   * Upload multiple medical documents (saves to MedicalDocuments folder)
+   */
+  async uploadMultipleMedicalDocuments(
+    applicationId: string,
+    files: Express.Multer.File[],
+    documentTypes: string[],
+    uploadedBy?: number,
+  ) {
+    try {
+      // Ensure arrays match
+      if (files.length !== documentTypes.length) {
+        throw new BadRequestException(
+          'Number of files must match number of document types',
+        );
+      }
+
+      // Upload each file
+      const uploadResults: Array<{
+        message: string;
+        documentPath: string;
+      }> = [];
+      for (let i = 0; i < files.length; i++) {
+        const result = await this.uploadMedicalDocumentFile(
+          applicationId,
+          documentTypes[i],
+          files[i],
+          uploadedBy,
+        );
+        uploadResults.push(result);
+      }
+
+      // Update Medical_Documents column in t_Registration with all medical document paths
+      // This is done after all files are uploaded to ensure all paths are included
+      try {
+        const getMedicalDocsQuery = `
+          SELECT DocumentPath
+          FROM t_esch_ApplicantDocuments
+          WHERE Application_Id = @applicationId 
+            AND DocumentType LIKE 'MedicalDocument_%'
+          ORDER BY DocumentType
+        `;
+        const medicalDocsResult = await this.db.query<{ DocumentPath: string }>(getMedicalDocsQuery, {
+          applicationId,
+        });
+        
+        if (medicalDocsResult.recordset && medicalDocsResult.recordset.length > 0) {
+          const medicalDocPaths = medicalDocsResult.recordset.map(row => row.DocumentPath).join(',');
+          
+          const updateMedicalDocsQuery = `
+            UPDATE t_Registration
+            SET Medical_Documents = @medicalDocPaths
+            WHERE Application_Id = @applicationId
+          `;
+          await this.db.query(updateMedicalDocsQuery, {
+            applicationId,
+            medicalDocPaths: medicalDocPaths,
+          });
+          this.logger.debug(`Updated Medical_Documents in t_Registration for ${applicationId} with ${medicalDocsResult.recordset.length} documents`);
+        }
+      } catch (error: any) {
+        // If Medical_Documents column doesn't exist, log and continue
+        if (error.message && error.message.includes('Medical_Documents')) {
+          this.logger.warn(`Medical_Documents column does not exist in t_Registration. Please run the SQL script to add it.`);
+        } else {
+          this.logger.warn('Could not update Medical_Documents in t_Registration:', error.message);
+        }
+      }
+
+      return {
+        message: 'Medical documents uploaded successfully',
+        results: uploadResults,
+      };
+    } catch (error) {
+      this.logger.error('Error uploading multiple medical documents', error);
+      throw new BadRequestException('Failed to upload medical documents');
+    }
+  }
+
+  /**
    * Upload student photo
    */
   async uploadPhoto(
@@ -350,6 +537,98 @@ export class DocumentUploadService {
         applicationId,
         photoPath: fileResult.filePath,
       });
+
+      // Update Profile_Image_Path in Tbl_UserMaster
+      // For first-time registration: Set Profile_Image_Path if it's NULL or empty
+      // For subsequent registrations: Update Profile_Image_Path and delete old image if exists
+      try {
+        // Get the email associated with this application
+        const getEmailQuery = `
+          SELECT TOP 1 Email
+          FROM t_Registration
+          WHERE Application_Id = @applicationId
+        `;
+        const emailResult = await this.db.query<{ Email: string }>(
+          getEmailQuery,
+          { applicationId },
+        );
+
+        const email =
+          emailResult.recordset && emailResult.recordset.length > 0
+            ? emailResult.recordset[0].Email
+            : null;
+
+        if (email) {
+          // Check if user already has a profile image
+          const getProfileImageQuery = `
+            SELECT Profile_Image_Path
+            FROM Tbl_UserMaster
+            WHERE User_ID = @userId
+          `;
+          const profileImageResult = await this.db.query<{ Profile_Image_Path: string | null }>(
+            getProfileImageQuery,
+            { userId: email },
+          );
+
+          const existingProfileImagePath =
+            profileImageResult.recordset && profileImageResult.recordset.length > 0
+              ? profileImageResult.recordset[0].Profile_Image_Path
+              : null;
+
+          // If user has an existing profile image, delete the old file
+          if (existingProfileImagePath && existingProfileImagePath.trim() !== '') {
+            try {
+              await this.fileStorage.deleteFile(existingProfileImagePath);
+              this.logger.log(
+                `Deleted old profile image: ${existingProfileImagePath} for user: ${email}`,
+              );
+            } catch (deleteError) {
+              // Log but continue even if old file deletion fails
+              this.logger.warn(
+                `Failed to delete old profile image: ${existingProfileImagePath}`,
+                deleteError,
+              );
+            }
+          }
+
+          // Update Profile_Image_Path in Tbl_UserMaster
+          // For first-time registration: Set if NULL/empty
+          // For subsequent registrations: Always update with new path
+          const updateProfileImageQuery = `
+            UPDATE Tbl_UserMaster
+            SET Profile_Image_Path = @photoPath,
+                Modified_Date = GETDATE(),
+                Modified_By = @modifiedBy
+            WHERE User_ID = @userId
+          `;
+
+          await this.db.query(updateProfileImageQuery, {
+            userId: email,
+            photoPath: fileResult.filePath,
+            modifiedBy: email,
+          });
+
+          if (existingProfileImagePath) {
+            this.logger.log(
+              `Profile_Image_Path updated for user: ${email} (replaced existing image)`,
+            );
+          } else {
+            this.logger.log(
+              `Profile_Image_Path set for first-time registration user: ${email}`,
+            );
+          }
+        } else {
+          this.logger.warn(
+            `Could not find email for Application_Id: ${applicationId} while updating Profile_Image_Path`,
+          );
+        }
+      } catch (profileImageError) {
+        // Log but do not fail photo upload if profile image update fails
+        this.logger.warn(
+          'Failed to update Profile_Image_Path in Tbl_UserMaster',
+          profileImageError,
+        );
+      }
 
       return {
         message: 'Photo uploaded successfully',
