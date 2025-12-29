@@ -1,6 +1,9 @@
 import * as React from "react";
 import { SideNav, SideNavItem, TopNav, TopNavProps } from "@shared/components";
 import { cn } from "@shared/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { userManagement } from "@/services/scholarship.service";
+import { apiClient } from "../../shared/api-client";
 
 /**
  * PageLayout - A reusable layout component that supports dynamic navigation
@@ -74,12 +77,120 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
   contentClassName,
   containerClassName,
 }) => {
+  const { user, isAuthenticated } = useAuth();
+  const [userProfile, setUserProfile] = React.useState<{
+    name?: string;
+    role?: string;
+    imageUrl?: string;
+  } | null>(null);
+
   const hasSideNav = sideNav !== null && sideNav !== undefined;
   const hasTopNav = topNav !== null && topNav !== undefined;
 
   const sidebarWidth = hasSideNav 
     ? (sideNav?.expanded ? 256 : 56)
     : 0;
+
+  // Fetch user profile when authenticated
+  React.useEffect(() => {
+    let blobUrl: string | null = null;
+
+    const fetchUserProfile = async () => {
+      if (!isAuthenticated || !user?.email) {
+        setUserProfile(null);
+        return;
+      }
+
+      try {
+        // Fetch user details including Profile_Image_Path
+        const userData = await userManagement.getUserById(user.email);
+        
+        const profileImagePath =
+          (userData as { PROFILE_IMAGE_PATH?: string }).PROFILE_IMAGE_PATH ||
+          (userData as { Profile_Image_Path?: string }).Profile_Image_Path ||
+          (userData as { profile_image_path?: string }).profile_image_path;
+
+        const userName =
+          (userData as { USER_NAME?: string }).USER_NAME ||
+          (userData as { User_Name?: string }).User_Name ||
+          (userData as { user_name?: string }).user_name ||
+          (user.firstName && user.lastName
+            ? `${user.firstName} ${user.lastName}`
+            : user.email);
+
+        const userRole =
+          (userData as { ROLE_NAME?: string }).ROLE_NAME ||
+          (userData as { Role_Name?: string }).Role_Name ||
+          (userData as { role_name?: string }).role_name ||
+          user.role ||
+          'User';
+
+        // Construct profile image URL if profile image exists
+        let profileImageUrl: string | undefined;
+        if (profileImagePath) {
+          try {
+            // Try to load profile image as blob URL
+            const response = await apiClient.get(
+              `/user-management/user/${encodeURIComponent(user.email)}/profile-image`,
+              {
+                responseType: 'blob',
+              },
+            );
+            const contentType = (response.headers['content-type'] as string) || 'image/jpeg';
+            const blob = new Blob([response.data as BlobPart], { type: contentType });
+            blobUrl = URL.createObjectURL(blob);
+            profileImageUrl = blobUrl;
+          } catch (imageError) {
+            // If image loading fails, just don't set imageUrl
+            console.warn('Failed to load profile image:', imageError);
+          }
+        }
+
+        setUserProfile({
+          name: userName,
+          role: userRole,
+          imageUrl: profileImageUrl,
+        });
+      } catch (error) {
+        console.warn('Failed to fetch user profile:', error);
+        // Fallback to basic user info from auth context
+        setUserProfile({
+          name: (user.firstName && user.lastName
+            ? `${user.firstName} ${user.lastName}`
+            : user.email) || 'User',
+          role: user.role || 'User',
+        });
+      }
+    };
+
+    void fetchUserProfile();
+
+    // Cleanup: revoke blob URL when component unmounts or user changes
+    return () => {
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+      }
+    };
+  }, [isAuthenticated, user]);
+
+  // Merge user profile into topNav props
+  const topNavWithProfile = React.useMemo(() => {
+    if (!hasTopNav || !topNav) return topNav;
+
+    // If topNav already has userAvatar, use it; otherwise add from fetched profile
+    if (topNav.userAvatar || !userProfile) {
+      return topNav;
+    }
+
+    return {
+      ...topNav,
+      userAvatar: {
+        name: userProfile.name,
+        role: userProfile.role,
+        imageUrl: userProfile.imageUrl,
+      },
+    };
+  }, [topNav, userProfile, hasTopNav]);
 
   return (
     <div
@@ -96,7 +207,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
       }}
     >
       {/* Top Navigation - Renders if topNav is provided */}
-      {hasTopNav && <TopNav {...topNav} />}
+      {hasTopNav && topNavWithProfile && <TopNav {...topNavWithProfile} />}
 
       {/* Side Navigation - Renders if sideNav is provided */}
       {hasSideNav && sideNav && (

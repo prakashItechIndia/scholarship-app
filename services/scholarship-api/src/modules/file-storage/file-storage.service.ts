@@ -50,6 +50,7 @@ export class FileStorageService {
       'TempImage',
       'DD_Check_DT',
       'user_profile_images',
+      'MedicalDocuments',
     ];
 
     directories.forEach((dir) => {
@@ -343,6 +344,56 @@ export class FileStorageService {
       };
     } catch (error) {
       this.logger.error(`Error saving profile image: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Save medical document file
+   * Pattern: /MedicalDocuments/{ApplicationNo}/{ApplicationNo}_{DocumentType}.{ext}
+   */
+  async saveMedicalDocument(
+    applicationId: string,
+    documentType: string,
+    file: Express.Multer.File,
+  ): Promise<FileUploadResult> {
+    try {
+      // Ensure MedicalDocuments folder exists
+      const medicalDocsFolder = join(this.uploadBasePath, 'MedicalDocuments');
+      if (!existsSync(medicalDocsFolder)) {
+        mkdirSync(medicalDocsFolder, { recursive: true });
+        this.logger.log(`Created MedicalDocuments directory: ${medicalDocsFolder}`);
+      }
+
+      // Create application-specific folder in MedicalDocuments
+      const appFolder = join(medicalDocsFolder, applicationId);
+      if (!existsSync(appFolder)) {
+        mkdirSync(appFolder, { recursive: true });
+        this.logger.log(`Created medical documents folder: ${appFolder}`);
+      }
+
+      // Get file extension
+      const fileExtension = this.getFileExtension(file.originalname);
+
+      // Create filename following pattern: {ApplicationNo}_{DocumentType}.{ext}
+      const fileName = `${applicationId}_${documentType}${fileExtension}`;
+      const filePath = join(appFolder, fileName);
+
+      // Save file
+      writeFileSync(filePath, file.buffer);
+
+      // Return relative path
+      const relativePath = `/MedicalDocuments/${applicationId}/${fileName}`;
+
+      this.logger.log(`Saved medical document: ${relativePath}`);
+
+      return {
+        filePath: relativePath,
+        fileName,
+        fullPath: filePath,
+      };
+    } catch (error) {
+      this.logger.error(`Error saving medical document: ${error}`);
       throw error;
     }
   }

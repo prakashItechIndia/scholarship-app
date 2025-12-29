@@ -23,6 +23,7 @@ const EducationMedicalDetails = () => {
     useEffect(() => {
         const type = getStringValue(formData, 'applicantType', '');
         setApplicantType(type);
+        // setApplicantType('medical');
     }, [formData]);
 
     // Determine which schema to use based on applicant type

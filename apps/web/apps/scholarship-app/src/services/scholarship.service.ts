@@ -429,6 +429,36 @@ export const documentUpload = {
   },
 
   /**
+   * Upload multiple medical documents (saves to MedicalDocuments folder)
+   */
+  uploadMultipleMedicalDocuments: async (
+    applicationId: string,
+    files: File[],
+    documentTypes: string[],
+    uploadedBy?: number,
+  ) => {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+    formData.append('applicationId', applicationId);
+    formData.append('documentTypes', documentTypes.join(','));
+    if (uploadedBy !== undefined) {
+      formData.append('uploadedBy', uploadedBy.toString());
+    }
+
+    const response = await apiClient.post<{
+      message: string;
+      results: { message: string; documentPath: string }[];
+    }>('/document-upload/upload-medical-multiple', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  /**
    * Upload student photo
    */
   uploadPhoto: async (applicationId: string, file: File) => {

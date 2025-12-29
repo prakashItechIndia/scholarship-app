@@ -355,7 +355,9 @@ export class ScholarshipApplicationService {
         applicationId = await this.generateApplicationId(normalizedData.schYear);
       }
 
-      // Call stored procedure
+      // Call stored procedure - keep parameters in sync with existing USP_SAVESCHOLERSHIP signature
+      // NOTE: New medical fields (ABHA_ID, Medical_Reason, Last_Date_For_Amount) are updated via a separate raw SQL UPDATE
+      // to avoid changing the stored procedure definition and causing parameter mismatches.
       await this.db.execute('USP_SAVESCHOLERSHIP', {
         Sch_YearId: normalizedData.schYearId,
         Sch_Year: normalizedData.schYear,
@@ -426,6 +428,32 @@ export class ScholarshipApplicationService {
         DDCheque_Date: '',
         User_ID: '',
       });
+
+      // After the stored procedure call succeeds, update new medical fields directly in t_Registration.
+      // This avoids modifying USP_SAVESCHOLERSHIP while still persisting the new columns.
+      try {
+        const updateMedicalFieldsQuery = `
+          UPDATE t_Registration
+          SET
+            ABHA_ID = @abhaId,
+            Medical_Reason = @medicalReason,
+            Last_Date_For_Amount = @lastDateForAmount
+          WHERE Application_Id = @applicationId
+        `;
+
+        await this.db.query(updateMedicalFieldsQuery, {
+          applicationId,
+          abhaId: normalizedData.abhaId || '',
+          medicalReason: normalizedData.medicalReason || '',
+          lastDateForAmount: normalizedData.lastDateForAmount || '',
+        });
+      } catch (updateMedicalError) {
+        // Log but don't fail the whole registration if medical field update fails
+        this.logger.warn(
+          'Failed to update medical fields (ABHA_ID, Medical_Reason, Last_Date_For_Amount) in t_Registration',
+          updateMedicalError,
+        );
+      }
 
       // Update Tbl_UserMaster with personal details for Student users (first-time registration completion)
       // This updates User_Name from Applicant_Name for Student role users

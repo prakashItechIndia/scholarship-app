@@ -261,6 +261,83 @@ export class DocumentUploadController {
     return this.documentService.deleteDocument(Number(documentId), applicationId, documentType);
   }
 
+  @Post('upload-medical-multiple')
+  @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(FilesInterceptor('files', 10))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Upload multiple medical documents (saves to MedicalDocuments folder)' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+        applicationId: {
+          type: 'string',
+        },
+        documentTypes: {
+          type: 'string',
+          description: 'Comma-separated list of document types',
+        },
+        uploadedBy: {
+          type: 'number',
+        },
+      },
+      required: ['files', 'applicationId', 'documentTypes'],
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Medical documents uploaded successfully',
+  })
+  async uploadMultipleMedicalDocuments(
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 20 * 1024 * 1024 }), // 20MB per file
+          new FileTypeValidator({
+            fileType: /(jpg|jpeg|png|pdf|doc|docx)$/,
+          }),
+        ],
+        fileIsRequired: true,
+      }),
+    )
+    files: Express.Multer.File[],
+    @Body('applicationId') applicationId: string,
+    @Body('documentTypes') documentTypes: string,
+    @Body('uploadedBy') uploadedBy?: number,
+  ) {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('At least one file is required');
+    }
+    if (!applicationId) {
+      throw new BadRequestException('Application ID is required');
+    }
+    if (!documentTypes) {
+      throw new BadRequestException('Document types are required');
+    }
+    
+    const types = documentTypes.split(',').map((t) => t.trim());
+    
+    if (files.length !== types.length) {
+      throw new BadRequestException(
+        `Number of files (${files.length}) must match number of document types (${types.length})`,
+      );
+    }
+    
+    return this.documentService.uploadMultipleMedicalDocuments(
+      applicationId,
+      files,
+      types,
+      uploadedBy ? Number(uploadedBy) : undefined,
+    );
+  }
+
   @Get('document-types')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get standard document types list' })
